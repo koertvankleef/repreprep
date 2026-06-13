@@ -1,0 +1,24 @@
+:root {
+  --rrr-color-primary: #2563eb;
+  --rrr-color-primary-contrast: #ffffff;
+  --rrr-color-secondary: #64748b;
+  --rrr-color-background: #f8fafc;
+  --rrr-color-surface: #ffffff;
+  --rrr-color-text: #0f172a;
+  --rrr-color-text-muted: #64748b;
+  --rrr-color-border: #e2e8f0;
+  --rrr-color-danger: #dc2626;
+  --rrr-color-success: #16a34a;
+  --rrr-space-xs: 0.25rem;
+  --rrr-space-sm: 0.5rem;
+  --rrr-space-md: 1rem;
+  --rrr-space-lg: 1.5rem;
+  --rrr-space-xl: 2rem;
+  --rrr-radius-sm: 0.25rem;
+  --rrr-radius-md: 0.5rem;
+  --rrr-radius-lg: 0.75rem;
+  --rrr-font-family: system-ui, -apple-system, sans-serif;
+  --rrr-font-size-sm: 0.875rem;
+  --rrr-font-size-md: 1rem;
+  --rrr-font-size-lg: 1.25rem;
+}
