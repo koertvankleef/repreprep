@@ -1,0 +1,87 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol {
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--rrr-font-family);
+  font-size: var(--rrr-font-size-md);
+  line-height: 1.5;
+  color: var(--rrr-color-text);
+  background: var(--rrr-color-background);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: 1px solid transparent;
+  border-radius: var(--rrr-radius-md);
+  padding: var(--rrr-space-sm) var(--rrr-space-md);
+  cursor: pointer;
+  background: var(--rrr-color-primary);
+  color: var(--rrr-color-primary-contrast);
+}
+
+button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: var(--rrr-space-sm) var(--rrr-space-md);
+  border: 1px solid var(--rrr-color-border);
+  border-radius: var(--rrr-radius-md);
+  background: var(--rrr-color-surface);
+  color: var(--rrr-color-text);
+}
+
+label {
+  display: grid;
+  gap: var(--rrr-space-xs);
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.125rem;
+}
+
+a {
+  color: var(--rrr-color-primary);
+}
+
+:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+}
