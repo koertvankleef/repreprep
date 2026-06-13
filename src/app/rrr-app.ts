@@ -62,6 +62,11 @@ export class RrrApp extends HTMLElement {
       return
     }
 
+    if (hash === '#/workouts/new') {
+      window.location.hash = '#/workouts'
+      return
+    }
+
     this.render()
   }
 

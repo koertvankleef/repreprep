@@ -1,16 +1,31 @@
 import { storageService } from '../app/storage-instance.ts'
 import { getExercise } from '../domain/exercise-service.ts'
+import { getActiveRoutines } from '../domain/routine-service.ts'
+import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
 import { confirmDialog } from '../utils/dialog-service.ts'
-import { formatDate } from '../utils/date.ts'
+import { formatDate, todayIso } from '../utils/date.ts'
 
 const styles = `
   .list {
     display: grid;
     gap: var(--rrr-space-md);
   }
+
+  .start-panel {
+    display: flex;
+    gap: var(--rrr-space-sm);
+    align-items: end;
+    flex-wrap: wrap;
+  }
+
+  .start-panel label {
+    min-width: 14rem;
+  }
 `
 
 export class RrrWorkoutList extends HTMLElement {
+  private selectedRoutineId: string | null = null
+
   private readonly handleDataChanged = (): void => {
     this.render()
   }
@@ -40,9 +55,27 @@ export class RrrWorkoutList extends HTMLElement {
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
   }
 
+  private startWorkout(routineId: string): void {
+    const data = storageService.getData()
+    const workout = createWorkoutFromRoutine(data, routineId, todayIso())
+
+    if (!workout) {
+      return
+    }
+
+    storageService.saveWorkout(workout)
+    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+    window.location.hash = `#/workouts/${workout.id}`
+  }
+
   private render(): void {
     const data = storageService.getData()
+    const routines = getActiveRoutines(data)
     const workouts = [...data.workouts].sort((left, right) => right.date.localeCompare(left.date))
+
+    if (!this.selectedRoutineId || !routines.some((routine) => routine.id === this.selectedRoutineId)) {
+      this.selectedRoutineId = routines[0]?.id ?? null
+    }
 
     this.innerHTML = `
       <style>${styles}</style>
@@ -52,12 +85,33 @@ export class RrrWorkoutList extends HTMLElement {
             <h2>Workouts</h2>
             <p>Your logged training sessions</p>
           </div>
-          <button type="button" data-action="new">New Workout</button>
+          ${
+            routines.length === 0
+              ? '<button type="button" data-action="create-routine">Create Routine</button>'
+              : `
+                <div class="start-panel">
+                  <label>
+                    Routine
+                    <select name="routine">
+                      ${routines
+                        .map(
+                          (routine) =>
+                            `<option value="${routine.id}" ${routine.id === this.selectedRoutineId ? 'selected' : ''}>${routine.name}</option>`,
+                        )
+                        .join('')}
+                    </select>
+                  </label>
+                  <button type="button" data-action="start">Start Workout</button>
+                </div>
+              `
+          }
         </div>
         <div class="list">
           ${
             workouts.length === 0
-              ? '<p>No workouts logged yet. Start your first session.</p>'
+              ? routines.length === 0
+                ? '<p>No workouts logged yet. Create a routine first, then start your session from it.</p>'
+                : '<p>No workouts logged yet. Start your first session from a routine.</p>'
               : workouts
                   .map((workout) => {
                     const summary = workout.exercises
@@ -82,8 +136,19 @@ export class RrrWorkoutList extends HTMLElement {
       </section>
     `
 
-    this.querySelector<HTMLButtonElement>('button[data-action="new"]')?.addEventListener('click', () => {
-      window.location.hash = '#/workouts/new'
+    this.querySelector<HTMLButtonElement>('button[data-action="create-routine"]')?.addEventListener('click', () => {
+      window.location.hash = '#/routines/new'
+    })
+
+    this.querySelector<HTMLSelectElement>('select[name="routine"]')?.addEventListener('change', (event) => {
+      const target = event.currentTarget as HTMLSelectElement
+      this.selectedRoutineId = target.value
+    })
+
+    this.querySelector<HTMLButtonElement>('button[data-action="start"]')?.addEventListener('click', () => {
+      if (this.selectedRoutineId) {
+        this.startWorkout(this.selectedRoutineId)
+      }
     })
 
     this.querySelectorAll<HTMLButtonElement>('button[data-action="edit"]').forEach((button) => {
