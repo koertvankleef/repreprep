@@ -423,12 +423,12 @@ export class RrrRoutineEditor extends HTMLElement {
                       return `
                         <div class="planned-set">
                           <span>Set ${setIndex + 1}:</span>
-                          <label>Reps <input type="number" min="0" placeholder="Reps"
+                          <label>Target reps <input type="number" min="0" placeholder="e.g. 10"
                             data-exercise-id="${routineExercise.id}"
                             data-set-index="${setIndex}"
                             data-field="reps"
                             value="${set.targetReps ?? ''}" /></label>
-                          <label>Weight (kg) <input type="number" min="0" step="0.5" placeholder="kg"
+                          <label>Target weight (kg) <input type="number" min="0" step="0.5" placeholder="optional"
                             data-exercise-id="${routineExercise.id}"
                             data-set-index="${setIndex}"
                             data-field="weight"
@@ -443,7 +443,7 @@ export class RrrRoutineEditor extends HTMLElement {
                     return `
                       <div class="planned-set">
                         <span>Set ${setIndex + 1}:</span>
-                        <label>Seconds <input type="number" min="0" placeholder="Seconds"
+                        <label>Target seconds <input type="number" min="0" placeholder="e.g. 30"
                           data-exercise-id="${routineExercise.id}"
                           data-set-index="${setIndex}"
                           data-field="seconds"
