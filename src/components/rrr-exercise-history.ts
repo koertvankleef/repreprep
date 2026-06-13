@@ -115,8 +115,8 @@ export class RrrExerciseHistory extends HTMLElement {
                       .join('')}
                   </select>
                 </label>
-                ${this.renderPersonalRecord()}
-                <div class="history-list">${this.renderSets()}</div>
+                <div role="status" aria-live="polite" aria-atomic="true">${this.renderPersonalRecord()}</div>
+                <div class="history-list" aria-live="polite">${this.renderSets()}</div>
               `
           }
         </rrr-card>

@@ -76,8 +76,8 @@ export class RrrRoutineList extends HTMLElement {
                         <div class="card-title">${escapeHtml(routine.name)}</div>
                         <div class="card-meta">${exerciseCount} exercise${exerciseCount === 1 ? '' : 's'}</div>
                         <div class="actions">
-                          <button type="button" data-action="start" data-id="${routine.id}">Start Workout</button>
-                          <button type="button" data-action="edit" data-id="${routine.id}">Edit Routine</button>
+                          <button type="button" data-action="start" data-id="${routine.id}" aria-label="Start workout from ${escapeHtml(routine.name)}">Start Workout</button>
+                          <button type="button" data-action="edit" data-id="${routine.id}" aria-label="Edit ${escapeHtml(routine.name)} routine">Edit Routine</button>
                         </div>
                       </rrr-card>
                     `

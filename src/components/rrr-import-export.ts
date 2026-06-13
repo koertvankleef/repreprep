@@ -3,12 +3,9 @@ import { exportToJson } from '../import-export/json-export-service.ts'
 import { importFromJson } from '../import-export/json-import-service.ts'
 
 const styles = `
-  .status-success {
-    color: var(--rrr-color-success);
-  }
-
-  .status-error {
-    color: var(--rrr-color-danger);
+  .helper-text {
+    color: var(--rrr-color-text-muted);
+    font-size: var(--rrr-font-size-sm);
   }
 `
 
@@ -59,21 +56,22 @@ export class RrrImportExport extends HTMLElement {
       <section class="page">
         <rrr-card size="lg">
           <h2>Import & Export</h2>
-          <p>Your data is stored locally in this browser under <code>repreprep:data</code>.</p>
+          <p id="storage-description">Your data is stored locally in this browser under <code>repreprep:data</code>.</p>
           <div>
             <button type="button" data-action="export">Export Data</button>
           </div>
           <label>
             Import Data
-            <input type="file" accept="application/json,.json" />
+            <input type="file" accept="application/json,.json" aria-describedby="import-helper storage-description" />
           </label>
+          <p id="import-helper" class="helper-text">Choose a JSON export file. Import replaces the current local data.</p>
           <div>
             <button type="button" data-action="import">Import Data</button>
           </div>
           ${
             this.statusType
-              ? `<p class="status-${this.statusType}">${this.statusMessage}</p>`
-              : '<p>Select a file to replace your current local data.</p>'
+              ? `<p class="status-message status-${this.statusType}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage}</p>`
+              : '<p class="status-message" role="status" aria-live="polite" aria-atomic="true">Select a file to replace your current local data.</p>'
           }
         </rrr-card>
       </section>

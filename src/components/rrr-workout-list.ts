@@ -62,8 +62,8 @@ export class RrrWorkoutList extends HTMLElement {
                         <p>${summary || 'No exercises added yet'}</p>
                         <p>${workout.notes || 'No notes'}</p>
                         <div class="actions">
-                          <button type="button" data-action="edit" data-id="${workout.id}">Edit</button>
-                          <button type="button" data-action="delete" data-id="${workout.id}">Delete</button>
+                          <button type="button" data-action="edit" data-id="${workout.id}" aria-label="Edit workout on ${formatDate(workout.date)}">Edit</button>
+                          <button type="button" data-action="delete" data-id="${workout.id}" aria-label="Delete workout on ${formatDate(workout.date)}">Delete</button>
                         </div>
                       </rrr-card>
                     `

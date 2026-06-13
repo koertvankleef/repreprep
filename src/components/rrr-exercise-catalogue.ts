@@ -40,6 +40,8 @@ export class RrrExerciseCatalogue extends HTMLElement {
   private readonly handleDataChanged = (): void => {
     this.render()
   }
+  private statusMessage = ''
+  private statusType: 'error' | 'success' | null = null
 
   connectedCallback(): void {
     window.addEventListener('rrr-data-changed', this.handleDataChanged)
@@ -50,6 +52,11 @@ export class RrrExerciseCatalogue extends HTMLElement {
     window.removeEventListener('rrr-data-changed', this.handleDataChanged)
   }
 
+  private setStatus(message: string, type: 'error' | 'success'): void {
+    this.statusMessage = message
+    this.statusType = type
+  }
+
   private addExercise(): void {
     const nameInput = this.querySelector<HTMLInputElement>('input[name="name"]')
     const kindInput = this.querySelector<HTMLSelectElement>('select[name="kind"]')
@@ -57,12 +64,15 @@ export class RrrExerciseCatalogue extends HTMLElement {
     const kind = kindInput?.value === 'duration' ? 'duration' : 'reps-weight'
 
     if (!name) {
-      window.alert('Please enter an exercise name')
+      this.setStatus('Please enter an exercise name.', 'error')
+      this.render()
+      this.querySelector<HTMLInputElement>('input[name="name"]')?.focus()
       return
     }
 
     storageService.saveExercise(createNewExercise(name, kind))
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+    this.setStatus(`Created exercise ${name}.`, 'success')
 
     if (nameInput) {
       nameInput.value = ''
@@ -89,6 +99,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
       updatedAt: new Date().toISOString(),
     })
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+    this.setStatus(`Renamed exercise to ${nextName}.`, 'success')
   }
 
   private archiveExercise(id: string): void {
@@ -98,6 +109,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
     storageService.archiveExercise(id)
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+    this.setStatus('Exercise archived.', 'success')
   }
 
   private renderList(showArchived: boolean): string {
@@ -124,8 +136,8 @@ export class RrrExerciseCatalogue extends HTMLElement {
               </div>
             </div>
             <div class="actions">
-              ${showArchived ? '' : `<button type="button" data-action="edit" data-id="${exercise.id}">Edit</button>`}
-              ${showArchived ? '' : `<button type="button" data-action="archive" data-id="${exercise.id}">Archive</button>`}
+              ${showArchived ? '' : `<button type="button" data-action="edit" data-id="${exercise.id}" aria-label="Edit ${exercise.name}">Edit</button>`}
+              ${showArchived ? '' : `<button type="button" data-action="archive" data-id="${exercise.id}" aria-label="Archive ${exercise.name}">Archive</button>`}
             </div>
           </article>
         `
@@ -142,10 +154,11 @@ export class RrrExerciseCatalogue extends HTMLElement {
             <h2>Exercises</h2>
             <p>Manage your exercise catalogue.</p>
           </div>
+          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || 'Create, rename, or archive exercises used across workouts and routines.'}</p>
           <div class="form">
             <label>
               Name
-              <input type="text" name="name" placeholder="Exercise name" />
+              <input type="text" name="name" placeholder="Exercise name" required aria-required="true" />
             </label>
             <label>
               Kind

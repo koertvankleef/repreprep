@@ -153,24 +153,25 @@ export class RrrExerciseEntry extends HTMLElement {
 
     const exerciseName = this.exerciseValue?.name ?? 'Unknown exercise'
     const exerciseKind = this.exerciseValue?.kind ?? 'reps-weight'
+    const headingId = `exercise-entry-${this.entryValue.id}`
 
     this.shadowRoot.innerHTML = `
       <style>${styles}</style>
-      <section class="entry">
+      <section class="entry" aria-labelledby="${headingId}">
         <div class="header">
           <div>
-            <h3>${exerciseName}</h3>
+            <h3 id="${headingId}">${exerciseName}</h3>
             <p>${exerciseKind === 'duration' ? 'Duration exercise' : 'Reps and weight exercise'}</p>
           </div>
-          <button type="button" data-action="remove-exercise">Remove Exercise</button>
+          <button type="button" data-action="remove-exercise" aria-label="Remove ${exerciseName} from workout">Remove Exercise</button>
         </div>
         <label>
           Notes
           <textarea rows="2" name="notes" placeholder="Exercise notes">${this.entryValue.notes}</textarea>
         </label>
-        <div class="sets"></div>
+        <div class="sets" aria-live="polite"></div>
         <div class="footer">
-          <button type="button" data-action="add-set">Add Set</button>
+          <button type="button" data-action="add-set" aria-label="Add set to ${exerciseName}">Add Set</button>
         </div>
       </section>
     `

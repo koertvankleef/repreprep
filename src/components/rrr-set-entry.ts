@@ -78,10 +78,12 @@ export class RrrSetEntry extends HTMLElement {
     }
 
     const set = this.setValue
+    const labelId = `set-label-${set.id}`
 
     this.shadowRoot.innerHTML = `
       <style>${styles}</style>
-      <div class="set">
+      <div class="set" role="group" aria-labelledby="${labelId}">
+        <span class="sr-only" id="${labelId}">Workout set details</span>
         <div class="fields">
           ${
             this.exerciseKindValue === 'duration'
@@ -108,7 +110,7 @@ export class RrrSetEntry extends HTMLElement {
           <input type="text" name="notes" value="${set.notes}" placeholder="Optional notes" />
         </label>
         <div class="actions">
-          <button type="button" data-action="remove">Remove Set</button>
+          <button type="button" data-action="remove" aria-label="Remove this set">Remove Set</button>
         </div>
       </div>
     `

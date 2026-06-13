@@ -16,6 +16,8 @@ export class RrrWorkoutEditor extends HTMLElement {
   private workoutIdValue: string | null = null
   private workout: Workout | null = null
   private listenersBound = false
+  private statusMessage = ''
+  private statusType: 'error' | 'success' | null = null
 
   set workoutId(value: string | null) {
     this.workoutIdValue = value
@@ -79,6 +81,11 @@ export class RrrWorkoutEditor extends HTMLElement {
     this.render()
   }
 
+  private setStatus(message: string, type: 'error' | 'success'): void {
+    this.statusMessage = message
+    this.statusType = type
+  }
+
   private updateWorkoutFields(): void {
     if (!this.workout) {
       return
@@ -120,7 +127,9 @@ export class RrrWorkoutEditor extends HTMLElement {
     this.updateWorkoutFields()
 
     if (!this.workout || !this.workout.date.trim()) {
-      window.alert('Please provide a workout date')
+      this.setStatus('Please provide a workout date.', 'error')
+      this.render()
+      this.querySelector<HTMLInputElement>('input[name="date"]')?.focus()
       return
     }
 
@@ -188,10 +197,11 @@ export class RrrWorkoutEditor extends HTMLElement {
             <h2>${title}</h2>
             <p>Capture your training details for the day.</p>
           </div>
+          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || 'Fill in workout details and save when finished.'}</p>
           <div class="row">
             <label>
               Date
-              <input type="date" name="date" value="${this.workout.date}" required />
+              <input type="date" name="date" value="${this.workout.date}" required aria-required="true" />
             </label>
             <label>
               Notes
@@ -200,7 +210,7 @@ export class RrrWorkoutEditor extends HTMLElement {
           </div>
           <div>
             <h3>Exercises</h3>
-            <div class="entries"></div>
+            <div class="entries" aria-live="polite"></div>
           </div>
           <div class="row">
             <label>

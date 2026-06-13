@@ -70,6 +70,8 @@ export class RrrRoutineEditor extends HTMLElement {
   private name = ''
   private exercises: RoutineExercise[] = []
   private listenersBound = false
+  private statusMessage = ''
+  private statusType: 'error' | 'success' | null = null
 
   set routineId(value: string | null) {
     this.routineIdValue = value
@@ -108,6 +110,11 @@ export class RrrRoutineEditor extends HTMLElement {
     }
 
     this.render()
+  }
+
+  private setStatus(message: string, type: 'error' | 'success'): void {
+    this.statusMessage = message
+    this.statusType = type
   }
 
   private bindListeners(): void {
@@ -310,7 +317,9 @@ export class RrrRoutineEditor extends HTMLElement {
     this.readFields()
 
     if (!this.name.trim()) {
-      window.alert('Please provide a routine name.')
+      this.setStatus('Please provide a routine name.', 'error')
+      this.render()
+      this.querySelector<HTMLInputElement>('input[name="routine-name"]')?.focus()
       return
     }
 
@@ -323,7 +332,8 @@ export class RrrRoutineEditor extends HTMLElement {
 
   private startWorkout(): void {
     if (!this.routineIdValue) {
-      window.alert('Save the routine first before starting a workout.')
+      this.setStatus('Save the routine first before starting a workout.', 'error')
+      this.render()
       return
     }
 
@@ -331,7 +341,8 @@ export class RrrRoutineEditor extends HTMLElement {
     const workout = createWorkoutFromRoutine(data, this.routineIdValue, todayIso())
 
     if (!workout) {
-      window.alert('Could not start workout from this routine.')
+      this.setStatus('Could not start workout from this routine.', 'error')
+      this.render()
       return
     }
 
@@ -365,6 +376,7 @@ export class RrrRoutineEditor extends HTMLElement {
           .map((routineExercise, index) => {
             const def = data.exercises.find((e) => e.id === routineExercise.exerciseId)
             const exerciseName = def?.name ?? 'Unknown exercise'
+            const exerciseHeadingId = `routine-exercise-${routineExercise.id}`
             const isFirst = index === 0
             const isLast = index === this.exercises.length - 1
 
@@ -388,7 +400,7 @@ export class RrrRoutineEditor extends HTMLElement {
                             value="${set.targetWeightKg ?? ''}" /></label>
                           <button type="button" data-action="remove-set"
                             data-exercise-id="${routineExercise.id}"
-                            data-set-index="${setIndex}">Remove</button>
+                            data-set-index="${setIndex}" aria-label="Remove set ${setIndex + 1} from ${escapeHtml(exerciseName)}">Remove</button>
                         </div>
                       `
                     }
@@ -403,29 +415,29 @@ export class RrrRoutineEditor extends HTMLElement {
                           value="${set.targetSeconds ?? ''}" /></label>
                         <button type="button" data-action="remove-set"
                           data-exercise-id="${routineExercise.id}"
-                          data-set-index="${setIndex}">Remove</button>
+                          data-set-index="${setIndex}" aria-label="Remove set ${setIndex + 1} from ${escapeHtml(exerciseName)}">Remove</button>
                       </div>
                     `
                   })
                   .join('')
 
             return `
-              <div class="exercise-item">
+              <section class="exercise-item" aria-labelledby="${exerciseHeadingId}">
                 <div class="exercise-header">
-                  <span class="exercise-name">${escapeHtml(exerciseName)}</span>
+                  <span class="exercise-name" id="${exerciseHeadingId}">${escapeHtml(exerciseName)}</span>
                   <div class="exercise-order">
                     <button type="button" data-action="move-up" data-id="${routineExercise.id}"
-                      ${isFirst ? 'disabled' : ''}>↑</button>
+                      ${isFirst ? 'disabled' : ''} aria-label="Move ${escapeHtml(exerciseName)} up">↑</button>
                     <button type="button" data-action="move-down" data-id="${routineExercise.id}"
-                      ${isLast ? 'disabled' : ''}>↓</button>
-                    <button type="button" data-action="remove-exercise" data-id="${routineExercise.id}">Remove</button>
+                      ${isLast ? 'disabled' : ''} aria-label="Move ${escapeHtml(exerciseName)} down">↓</button>
+                    <button type="button" data-action="remove-exercise" data-id="${routineExercise.id}" aria-label="Remove ${escapeHtml(exerciseName)} from routine">Remove</button>
                   </div>
                 </div>
                 <div class="planned-sets">${setsHtml}</div>
                 <div>
-                  <button type="button" data-action="add-set" data-id="${routineExercise.id}">Add Set</button>
+                  <button type="button" data-action="add-set" data-id="${routineExercise.id}" aria-label="Add set to ${escapeHtml(exerciseName)}">Add Set</button>
                 </div>
-              </div>
+              </section>
             `
           })
           .join('')
@@ -437,15 +449,16 @@ export class RrrRoutineEditor extends HTMLElement {
           <div>
             <h2>${title}</h2>
           </div>
+          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || 'Define a routine structure, then save it as a reusable template.'}</p>
           <div class="row">
             <label>
               Name
-              <input type="text" name="routine-name" value="${escapeHtml(this.name)}" placeholder="Routine name" />
+              <input type="text" name="routine-name" value="${escapeHtml(this.name)}" placeholder="Routine name" required aria-required="true" />
             </label>
           </div>
           <div>
             <h3>Exercises</h3>
-            <div class="exercise-list">${exerciseListHtml}</div>
+            <div class="exercise-list" aria-live="polite">${exerciseListHtml}</div>
           </div>
           <div class="add-exercise-row">
             <label>
