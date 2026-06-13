@@ -1,5 +1,6 @@
 import { storageService } from '../app/storage-instance.ts'
 import { getExercise } from '../domain/exercise-service.ts'
+import { confirmDialog } from '../utils/dialog-service.ts'
 import { formatDate } from '../utils/date.ts'
 
 const styles = `
@@ -23,8 +24,15 @@ export class RrrWorkoutList extends HTMLElement {
     window.removeEventListener('rrr-data-changed', this.handleDataChanged)
   }
 
-  private deleteWorkout(id: string): void {
-    if (!window.confirm('Delete this workout?')) {
+  private async deleteWorkout(id: string): Promise<void> {
+    const confirmed = await confirmDialog({
+      title: 'Delete Workout',
+      message: 'Delete this workout? This cannot be undone.',
+      confirmLabel: 'Delete',
+      cancelLabel: 'Cancel',
+    })
+
+    if (!confirmed) {
       return
     }
 
@@ -93,7 +101,7 @@ export class RrrWorkoutList extends HTMLElement {
         const id = button.dataset.id
 
         if (id) {
-          this.deleteWorkout(id)
+          void this.deleteWorkout(id)
         }
       })
     })

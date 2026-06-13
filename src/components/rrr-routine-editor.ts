@@ -1,4 +1,5 @@
 import { storageService } from '../app/storage-instance.ts'
+import { Required, type Validator } from '@lion/ui/form-core.js'
 import { getActiveExercises } from '../domain/exercise-service.ts'
 import { createRoutineExercise, getActiveRoutineVersion, getRoutine } from '../domain/routine-service.ts'
 import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
@@ -63,7 +64,18 @@ const styles = `
     flex: 1;
     min-width: 12rem;
   }
+
+  lion-input,
+  lion-select {
+    display: block;
+  }
 `
+
+interface LionFieldLike extends HTMLElement {
+  modelValue: unknown
+  submitted: boolean
+  validators: Validator[]
+}
 
 export class RrrRoutineEditor extends HTMLElement {
   private routineIdValue: string | null = null
@@ -201,10 +213,10 @@ export class RrrRoutineEditor extends HTMLElement {
   }
 
   private readFields(): void {
-    const nameInput = this.querySelector<HTMLInputElement>('input[name="routine-name"]')
+    const nameInput = this.querySelector<LionFieldLike>('lion-input[name="routine-name"]')
 
     if (nameInput) {
-      this.name = nameInput.value
+      this.name = String(nameInput.modelValue ?? '')
     }
 
     this.exercises = this.exercises.map((exercise) => {
@@ -241,8 +253,8 @@ export class RrrRoutineEditor extends HTMLElement {
   private addExercise(): void {
     this.readFields()
 
-    const select = this.querySelector<HTMLSelectElement>('select[name="add-exercise"]')
-    const exerciseId = select?.value ?? ''
+    const select = this.querySelector<LionFieldLike>('lion-select[name="add-exercise"]')
+    const exerciseId = String(select?.modelValue ?? '')
 
     if (!exerciseId) {
       return
@@ -319,7 +331,7 @@ export class RrrRoutineEditor extends HTMLElement {
     if (!this.name.trim()) {
       this.setStatus('Please provide a routine name.', 'error')
       this.render()
-      this.querySelector<HTMLInputElement>('input[name="routine-name"]')?.focus()
+      this.querySelector<LionFieldLike>('lion-input[name="routine-name"]')?.focus()
       return
     }
 
@@ -451,22 +463,18 @@ export class RrrRoutineEditor extends HTMLElement {
           </div>
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || 'Define a routine structure, then save it as a reusable template.'}</p>
           <div class="row">
-            <label>
-              Name
-              <input type="text" name="routine-name" value="${escapeHtml(this.name)}" placeholder="Routine name" required aria-required="true" />
-            </label>
+            <lion-input name="routine-name" label="Name"></lion-input>
           </div>
           <div>
             <h3>Exercises</h3>
             <div class="exercise-list" aria-live="polite">${exerciseListHtml}</div>
           </div>
           <div class="add-exercise-row">
-            <label>
-              Add Exercise
-              <select name="add-exercise">
+            <lion-select name="add-exercise" label="Add Exercise">
+              <select slot="input">
                 ${activeExercises.map((e) => `<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('')}
               </select>
-            </label>
+            </lion-select>
             <button type="button" data-action="add-exercise">Add</button>
           </div>
           <div class="actions">
@@ -477,6 +485,22 @@ export class RrrRoutineEditor extends HTMLElement {
         </rrr-card>
       </section>
     `
+
+    const nameField = this.querySelector<LionFieldLike>('lion-input[name="routine-name"]')
+    const exerciseField = this.querySelector<LionFieldLike>('lion-select[name="add-exercise"]')
+
+    if (nameField) {
+      nameField.modelValue = this.name
+      nameField.validators = [new Required()]
+      nameField.setAttribute('placeholder', 'Routine name')
+      nameField.setAttribute('field-name', 'routine name')
+    }
+
+    if (exerciseField) {
+      exerciseField.modelValue = activeExercises[0]?.id ?? ''
+      exerciseField.validators = []
+      exerciseField.setAttribute('field-name', 'exercise')
+    }
   }
 }
 

@@ -15,5 +15,8 @@
     "typescript": "^5.4.0",
     "vite": "^8.0.16",
     "vitest": "^4.1.0"
+  },
+  "dependencies": {
+    "@lion/ui": "^0.17.1"
   }
 }

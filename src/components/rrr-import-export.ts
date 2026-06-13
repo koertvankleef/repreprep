@@ -1,6 +1,7 @@
 import { storageService } from '../app/storage-instance.ts'
 import { exportToJson } from '../import-export/json-export-service.ts'
 import { importFromJson } from '../import-export/json-import-service.ts'
+import { confirmDialog } from '../utils/dialog-service.ts'
 
 const styles = `
   .helper-text {
@@ -32,7 +33,14 @@ export class RrrImportExport extends HTMLElement {
       return
     }
 
-    if (!window.confirm('Importing will replace your current local data. Continue?')) {
+    const confirmed = await confirmDialog({
+      title: 'Import Data',
+      message: 'Importing will replace your current local data. Continue?',
+      confirmLabel: 'Import',
+      cancelLabel: 'Cancel',
+    })
+
+    if (!confirmed) {
       return
     }
 

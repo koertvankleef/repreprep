@@ -1,5 +1,7 @@
 import { storageService } from '../app/storage-instance.ts'
+import { Required, type Validator } from '@lion/ui/form-core.js'
 import { createNewExercise, isExerciseUsedInWorkouts } from '../domain/exercise-service.ts'
+import { confirmDialog, promptDialog } from '../utils/dialog-service.ts'
 
 const styles = `
   .list {
@@ -34,7 +36,18 @@ const styles = `
     color: var(--rrr-color-text-muted);
     font-size: var(--rrr-font-size-sm);
   }
+
+  lion-input,
+  lion-select {
+    display: block;
+  }
 `
+
+interface LionFieldLike extends HTMLElement {
+  modelValue: unknown
+  submitted: boolean
+  validators: Validator[]
+}
 
 export class RrrExerciseCatalogue extends HTMLElement {
   private readonly handleDataChanged = (): void => {
@@ -58,15 +71,21 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private addExercise(): void {
-    const nameInput = this.querySelector<HTMLInputElement>('input[name="name"]')
-    const kindInput = this.querySelector<HTMLSelectElement>('select[name="kind"]')
-    const name = nameInput?.value.trim() ?? ''
-    const kind = kindInput?.value === 'duration' ? 'duration' : 'reps-weight'
+    const nameField = this.querySelector<LionFieldLike>('lion-input[name="name"]')
+    const kindField = this.querySelector<LionFieldLike>('lion-select[name="kind"]')
+
+    if (!nameField || !kindField) {
+      return
+    }
+
+    nameField.submitted = true
+
+    const name = String(nameField.modelValue ?? '').trim()
+    const kind = kindField.modelValue === 'duration' ? 'duration' : 'reps-weight'
 
     if (!name) {
       this.setStatus('Please enter an exercise name.', 'error')
-      this.render()
-      this.querySelector<HTMLInputElement>('input[name="name"]')?.focus()
+      nameField.focus()
       return
     }
 
@@ -74,12 +93,10 @@ export class RrrExerciseCatalogue extends HTMLElement {
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
     this.setStatus(`Created exercise ${name}.`, 'success')
 
-    if (nameInput) {
-      nameInput.value = ''
-    }
+    this.render()
   }
 
-  private editExercise(id: string): void {
+  private async editExercise(id: string): Promise<void> {
     const data = storageService.getData()
     const exercise = data.exercises.find((item) => item.id === id)
 
@@ -87,7 +104,15 @@ export class RrrExerciseCatalogue extends HTMLElement {
       return
     }
 
-    const nextName = window.prompt('Rename exercise', exercise.name)?.trim()
+    const nextName = await promptDialog({
+      title: 'Rename Exercise',
+      message: `Choose a new name for ${exercise.name}.`,
+      label: 'Exercise name',
+      initialValue: exercise.name,
+      confirmLabel: 'Save',
+      cancelLabel: 'Cancel',
+      required: true,
+    })
 
     if (!nextName) {
       return
@@ -102,8 +127,15 @@ export class RrrExerciseCatalogue extends HTMLElement {
     this.setStatus(`Renamed exercise to ${nextName}.`, 'success')
   }
 
-  private archiveExercise(id: string): void {
-    if (!window.confirm('Archive this exercise?')) {
+  private async archiveExercise(id: string): Promise<void> {
+    const confirmed = await confirmDialog({
+      title: 'Archive Exercise',
+      message: 'Archive this exercise? Existing workout history will be preserved.',
+      confirmLabel: 'Archive',
+      cancelLabel: 'Cancel',
+    })
+
+    if (!confirmed) {
       return
     }
 
@@ -157,15 +189,15 @@ export class RrrExerciseCatalogue extends HTMLElement {
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || 'Create, rename, or archive exercises used across workouts and routines.'}</p>
           <div class="form">
             <label>
-              Name
-              <input type="text" name="name" placeholder="Exercise name" required aria-required="true" />
+              <lion-input name="name" label="Name"></lion-input>
             </label>
             <label>
-              Kind
-              <select name="kind">
-                <option value="reps-weight">Reps + weight</option>
-                <option value="duration">Duration</option>
-              </select>
+              <lion-select name="kind" label="Kind">
+                <select slot="input">
+                  <option value="reps-weight">Reps + weight</option>
+                  <option value="duration">Duration</option>
+                </select>
+              </lion-select>
             </label>
             <button type="button" data-action="add">Add Exercise</button>
           </div>
@@ -183,6 +215,22 @@ export class RrrExerciseCatalogue extends HTMLElement {
       </section>
     `
 
+    const nameField = this.querySelector<LionFieldLike>('lion-input[name="name"]')
+    const kindField = this.querySelector<LionFieldLike>('lion-select[name="kind"]')
+
+    if (nameField) {
+      nameField.modelValue = ''
+      nameField.validators = [new Required()]
+      nameField.setAttribute('placeholder', 'Exercise name')
+      nameField.setAttribute('field-name', 'exercise name')
+    }
+
+    if (kindField) {
+      kindField.modelValue = 'reps-weight'
+      kindField.validators = []
+      kindField.setAttribute('field-name', 'exercise kind')
+    }
+
     this.querySelector<HTMLButtonElement>('button[data-action="add"]')?.addEventListener('click', () => {
       this.addExercise()
     })
@@ -192,7 +240,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
         const id = button.dataset.id
 
         if (id) {
-          this.editExercise(id)
+          void this.editExercise(id)
         }
       })
     })
@@ -202,7 +250,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
         const id = button.dataset.id
 
         if (id) {
-          this.archiveExercise(id)
+          void this.archiveExercise(id)
         }
       })
     })
