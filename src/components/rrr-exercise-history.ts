@@ -3,24 +3,6 @@ import { getExerciseHistory, getPersonalRecord } from '../domain/history-service
 import { formatDate } from '../utils/date.ts'
 
 const styles = `
-  :host {
-    display: block;
-  }
-
-  .page {
-    display: grid;
-    gap: var(--rrr-space-lg);
-  }
-
-  .card {
-    background: var(--rrr-color-surface);
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-lg);
-    padding: var(--rrr-space-lg);
-    display: grid;
-    gap: var(--rrr-space-md);
-  }
-
   .history-list {
     display: grid;
     gap: var(--rrr-space-sm);
@@ -38,11 +20,6 @@ export class RrrExerciseHistory extends HTMLElement {
   private readonly handleDataChanged = (): void => {
     this.ensureSelectedExercise()
     this.render()
-  }
-
-  constructor() {
-    super()
-    this.attachShadow({ mode: 'open' })
   }
 
   connectedCallback(): void {
@@ -116,16 +93,12 @@ export class RrrExerciseHistory extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
     const exercises = storageService.getData().exercises.filter((exercise) => !exercise.archived)
 
-    this.shadowRoot.innerHTML = `
+    this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <div class="card">
+        <rrr-card size="lg">
           <h2>Exercise History</h2>
           ${
             exercises.length === 0
@@ -146,11 +119,11 @@ export class RrrExerciseHistory extends HTMLElement {
                 <div class="history-list">${this.renderSets()}</div>
               `
           }
-        </div>
+        </rrr-card>
       </section>
     `
 
-    this.shadowRoot.querySelector<HTMLSelectElement>('select[name="exercise"]')?.addEventListener('change', (event) => {
+    this.querySelector<HTMLSelectElement>('select[name="exercise"]')?.addEventListener('change', (event) => {
       const target = event.currentTarget as HTMLSelectElement
       this.selectedExerciseId = target.value
       this.render()

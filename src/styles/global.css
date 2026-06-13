@@ -19,6 +19,15 @@ ol {
   margin: 0;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--rrr-font-family-heading);
+}
+
 body {
   min-height: 100vh;
   font-family: var(--rrr-font-family);
@@ -84,4 +93,36 @@ a {
 :focus-visible {
   outline: 3px solid rgba(37, 99, 235, 0.35);
   outline-offset: 2px;
+}
+
+.page {
+  display: grid;
+  gap: var(--rrr-space-lg);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--rrr-space-md);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.actions {
+  display: flex;
+  gap: var(--rrr-space-sm);
+  flex-wrap: wrap;
+}
+
+.row {
+  display: grid;
+  gap: var(--rrr-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.form {
+  display: grid;
+  gap: var(--rrr-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  align-items: end;
 }

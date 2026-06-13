@@ -6,39 +6,9 @@ import { todayIso } from '../utils/date.ts'
 import './rrr-exercise-entry.ts'
 
 const styles = `
-  :host {
-    display: block;
-  }
-
-  .page {
-    display: grid;
-    gap: var(--rrr-space-lg);
-  }
-
-  .card {
-    background: var(--rrr-color-surface);
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-lg);
-    padding: var(--rrr-space-lg);
-    display: grid;
-    gap: var(--rrr-space-md);
-  }
-
-  .row {
-    display: grid;
-    gap: var(--rrr-space-md);
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  }
-
   .entries {
     display: grid;
     gap: var(--rrr-space-md);
-  }
-
-  .actions {
-    display: flex;
-    gap: var(--rrr-space-sm);
-    flex-wrap: wrap;
   }
 `
 
@@ -46,11 +16,6 @@ export class RrrWorkoutEditor extends HTMLElement {
   private workoutIdValue: string | null = null
   private workout: Workout | null = null
   private listenersBound = false
-
-  constructor() {
-    super()
-    this.attachShadow({ mode: 'open' })
-  }
 
   set workoutId(value: string | null) {
     this.workoutIdValue = value
@@ -67,13 +32,13 @@ export class RrrWorkoutEditor extends HTMLElement {
   }
 
   private bindListeners(): void {
-    if (!this.shadowRoot || this.listenersBound) {
+    if (this.listenersBound) {
       return
     }
 
     this.listenersBound = true
 
-    this.shadowRoot.addEventListener('rrr-exercise-changed', (event) => {
+    this.addEventListener('rrr-exercise-changed', (event) => {
       const customEvent = event as CustomEvent<WorkoutExerciseEntry>
 
       if (!this.workout) {
@@ -86,7 +51,7 @@ export class RrrWorkoutEditor extends HTMLElement {
       }
     })
 
-    this.shadowRoot.addEventListener('rrr-exercise-removed', (event) => {
+    this.addEventListener('rrr-exercise-removed', (event) => {
       const customEvent = event as CustomEvent<string>
 
       if (!this.workout) {
@@ -115,12 +80,12 @@ export class RrrWorkoutEditor extends HTMLElement {
   }
 
   private updateWorkoutFields(): void {
-    if (!this.workout || !this.shadowRoot) {
+    if (!this.workout) {
       return
     }
 
-    const dateInput = this.shadowRoot.querySelector<HTMLInputElement>('input[name="date"]')
-    const notesInput = this.shadowRoot.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')
+    const dateInput = this.querySelector<HTMLInputElement>('input[name="date"]')
+    const notesInput = this.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')
 
     this.workout = {
       ...this.workout,
@@ -131,11 +96,11 @@ export class RrrWorkoutEditor extends HTMLElement {
   }
 
   private addExercise(): void {
-    if (!this.workout || !this.shadowRoot) {
+    if (!this.workout) {
       return
     }
 
-    const select = this.shadowRoot.querySelector<HTMLSelectElement>('select[name="exercise"]')
+    const select = this.querySelector<HTMLSelectElement>('select[name="exercise"]')
     const exerciseId = select?.value ?? ''
 
     if (!exerciseId) {
@@ -165,11 +130,11 @@ export class RrrWorkoutEditor extends HTMLElement {
   }
 
   private renderExerciseEntries(activeExercises: ExerciseDefinition[]): void {
-    if (!this.shadowRoot || !this.workout) {
+    if (!this.workout) {
       return
     }
 
-    const container = this.shadowRoot.querySelector<HTMLDivElement>('.entries')
+    const container = this.querySelector<HTMLDivElement>('.entries')
 
     if (!container) {
       return
@@ -194,24 +159,20 @@ export class RrrWorkoutEditor extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
     const activeExercises = getActiveExercises(storageService.getData())
 
     if (!this.workout) {
-      this.shadowRoot.innerHTML = `
+      this.innerHTML = `
         <style>${styles}</style>
         <section class="page">
-          <div class="card">
+          <rrr-card size="lg">
             <h2>Workout not found</h2>
             <button type="button" data-action="back">Back to Workouts</button>
-          </div>
+          </rrr-card>
         </section>
       `
 
-      this.shadowRoot.querySelector<HTMLButtonElement>('button[data-action="back"]')?.addEventListener('click', () => {
+      this.querySelector<HTMLButtonElement>('button[data-action="back"]')?.addEventListener('click', () => {
         window.location.hash = '#/workouts'
       })
       return
@@ -219,10 +180,10 @@ export class RrrWorkoutEditor extends HTMLElement {
 
     const title = this.workoutIdValue ? 'Edit Workout' : 'New Workout'
 
-    this.shadowRoot.innerHTML = `
+    this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <div class="card">
+        <rrr-card size="lg">
           <div>
             <h2>${title}</h2>
             <p>Capture your training details for the day.</p>
@@ -254,29 +215,29 @@ export class RrrWorkoutEditor extends HTMLElement {
             <button type="button" data-action="save">Save Workout</button>
             <button type="button" data-action="cancel">Cancel</button>
           </div>
-        </div>
+        </rrr-card>
       </section>
     `
 
     this.renderExerciseEntries(activeExercises)
 
-    this.shadowRoot.querySelector<HTMLInputElement>('input[name="date"]')?.addEventListener('input', () => {
+    this.querySelector<HTMLInputElement>('input[name="date"]')?.addEventListener('input', () => {
       this.updateWorkoutFields()
     })
 
-    this.shadowRoot.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')?.addEventListener('input', () => {
+    this.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')?.addEventListener('input', () => {
       this.updateWorkoutFields()
     })
 
-    this.shadowRoot.querySelector<HTMLButtonElement>('button[data-action="add-exercise"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLButtonElement>('button[data-action="add-exercise"]')?.addEventListener('click', () => {
       this.addExercise()
     })
 
-    this.shadowRoot.querySelector<HTMLButtonElement>('button[data-action="save"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLButtonElement>('button[data-action="save"]')?.addEventListener('click', () => {
       this.saveWorkout()
     })
 
-    this.shadowRoot.querySelector<HTMLButtonElement>('button[data-action="cancel"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLButtonElement>('button[data-action="cancel"]')?.addEventListener('click', () => {
       window.location.hash = '#/workouts'
     })
   }

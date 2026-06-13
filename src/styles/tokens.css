@@ -17,7 +17,8 @@
   --rrr-radius-sm: 0.25rem;
   --rrr-radius-md: 0.5rem;
   --rrr-radius-lg: 0.75rem;
-  --rrr-font-family: system-ui, -apple-system, sans-serif;
+  --rrr-font-family: 'Exo 2', system-ui, -apple-system, sans-serif;
+  --rrr-font-family-heading: 'Oxanium', system-ui, -apple-system, sans-serif;
   --rrr-font-size-sm: 0.875rem;
   --rrr-font-size-md: 1rem;
   --rrr-font-size-lg: 1.25rem;

@@ -1,8 +1,10 @@
 import { storageService } from './storage-instance.ts'
+import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
 
 const styles = `
+  ${shadowTypographyStyles}
+
   :host {
-    display: block;
     min-height: 100vh;
   }
 

@@ -1,11 +1,10 @@
 import { createDurationSet, createRepsWeightSet } from '../domain/workout-service.ts'
+import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
 import type { ExerciseDefinition, SetEntry, WorkoutExerciseEntry } from '../domain/types.ts'
 import './rrr-set-entry.ts'
 
 const styles = `
-  :host {
-    display: block;
-  }
+  ${shadowTypographyStyles}
 
   .entry {
     border: 1px solid var(--rrr-color-border);

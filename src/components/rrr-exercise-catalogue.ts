@@ -2,24 +2,6 @@ import { storageService } from '../app/storage-instance.ts'
 import { createNewExercise, isExerciseUsedInWorkouts } from '../domain/exercise-service.ts'
 
 const styles = `
-  :host {
-    display: block;
-  }
-
-  .page {
-    display: grid;
-    gap: var(--rrr-space-lg);
-  }
-
-  .card {
-    background: var(--rrr-color-surface);
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-lg);
-    padding: var(--rrr-space-lg);
-    display: grid;
-    gap: var(--rrr-space-md);
-  }
-
   .list {
     display: grid;
     gap: var(--rrr-space-sm);
@@ -52,29 +34,11 @@ const styles = `
     color: var(--rrr-color-text-muted);
     font-size: var(--rrr-font-size-sm);
   }
-
-  .actions {
-    display: flex;
-    gap: var(--rrr-space-sm);
-    flex-wrap: wrap;
-  }
-
-  .form {
-    display: grid;
-    gap: var(--rrr-space-md);
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-    align-items: end;
-  }
 `
 
 export class RrrExerciseCatalogue extends HTMLElement {
   private readonly handleDataChanged = (): void => {
     this.render()
-  }
-
-  constructor() {
-    super()
-    this.attachShadow({ mode: 'open' })
   }
 
   connectedCallback(): void {
@@ -87,12 +51,8 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private addExercise(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
-    const nameInput = this.shadowRoot.querySelector<HTMLInputElement>('input[name="name"]')
-    const kindInput = this.shadowRoot.querySelector<HTMLSelectElement>('select[name="kind"]')
+    const nameInput = this.querySelector<HTMLInputElement>('input[name="name"]')
+    const kindInput = this.querySelector<HTMLSelectElement>('select[name="kind"]')
     const name = nameInput?.value.trim() ?? ''
     const kind = kindInput?.value === 'duration' ? 'duration' : 'reps-weight'
 
@@ -174,14 +134,10 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
-    this.shadowRoot.innerHTML = `
+    this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <div class="card">
+        <rrr-card size="lg">
           <div>
             <h2>Exercises</h2>
             <p>Manage your exercise catalogue.</p>
@@ -200,23 +156,25 @@ export class RrrExerciseCatalogue extends HTMLElement {
             </label>
             <button type="button" data-action="add">Add Exercise</button>
           </div>
-        </div>
-        <div class="card">
+        </rrr-card>
+        <rrr-card size="lg">
           <h3>Active Exercises</h3>
           <div class="list">${this.renderList(false)}</div>
-        </div>
-        <details class="card">
-          <summary>Archived Exercises</summary>
-          <div class="list">${this.renderList(true)}</div>
-        </details>
+        </rrr-card>
+        <rrr-card size="lg">
+          <details>
+            <summary>Archived Exercises</summary>
+            <div class="list">${this.renderList(true)}</div>
+          </details>
+        </rrr-card>
       </section>
     `
 
-    this.shadowRoot.querySelector<HTMLButtonElement>('button[data-action="add"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLButtonElement>('button[data-action="add"]')?.addEventListener('click', () => {
       this.addExercise()
     })
 
-    this.shadowRoot.querySelectorAll<HTMLButtonElement>('button[data-action="edit"]').forEach((button) => {
+    this.querySelectorAll<HTMLButtonElement>('button[data-action="edit"]').forEach((button) => {
       button.addEventListener('click', () => {
         const id = button.dataset.id
 
@@ -226,7 +184,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
       })
     })
 
-    this.shadowRoot.querySelectorAll<HTMLButtonElement>('button[data-action="archive"]').forEach((button) => {
+    this.querySelectorAll<HTMLButtonElement>('button[data-action="archive"]').forEach((button) => {
       button.addEventListener('click', () => {
         const id = button.dataset.id
 

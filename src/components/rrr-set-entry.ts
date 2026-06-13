@@ -1,9 +1,8 @@
 import type { ExerciseKind, SetEntry } from '../domain/types.ts'
+import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
 
 const styles = `
-  :host {
-    display: block;
-  }
+  ${shadowTypographyStyles}
 
   .set {
     border: 1px solid var(--rrr-color-border);

@@ -6,30 +6,6 @@ import type { PlannedSet, RoutineExercise } from '../domain/types.ts'
 import { todayIso } from '../utils/date.ts'
 
 const styles = `
-  :host {
-    display: block;
-  }
-
-  .page {
-    display: grid;
-    gap: var(--rrr-space-lg);
-  }
-
-  .card {
-    background: var(--rrr-color-surface);
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-lg);
-    padding: var(--rrr-space-lg);
-    display: grid;
-    gap: var(--rrr-space-md);
-  }
-
-  .row {
-    display: grid;
-    gap: var(--rrr-space-md);
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  }
-
   .exercise-list {
     display: grid;
     gap: var(--rrr-space-md);
@@ -76,12 +52,6 @@ const styles = `
     width: 6rem;
   }
 
-  .actions {
-    display: flex;
-    gap: var(--rrr-space-sm);
-    flex-wrap: wrap;
-  }
-
   .add-exercise-row {
     display: flex;
     gap: var(--rrr-space-sm);
@@ -100,11 +70,6 @@ export class RrrRoutineEditor extends HTMLElement {
   private name = ''
   private exercises: RoutineExercise[] = []
   private listenersBound = false
-
-  constructor() {
-    super()
-    this.attachShadow({ mode: 'open' })
-  }
 
   set routineId(value: string | null) {
     this.routineIdValue = value
@@ -146,13 +111,13 @@ export class RrrRoutineEditor extends HTMLElement {
   }
 
   private bindListeners(): void {
-    if (!this.shadowRoot || this.listenersBound) {
+    if (this.listenersBound) {
       return
     }
 
     this.listenersBound = true
 
-    this.shadowRoot.addEventListener('click', (event) => {
+    this.addEventListener('click', (event) => {
       const target = event.target as HTMLElement
       const action = target.dataset.action
 
@@ -229,11 +194,7 @@ export class RrrRoutineEditor extends HTMLElement {
   }
 
   private readFields(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
-    const nameInput = this.shadowRoot.querySelector<HTMLInputElement>('input[name="routine-name"]')
+    const nameInput = this.querySelector<HTMLInputElement>('input[name="routine-name"]')
 
     if (nameInput) {
       this.name = nameInput.value
@@ -242,10 +203,10 @@ export class RrrRoutineEditor extends HTMLElement {
     this.exercises = this.exercises.map((exercise) => {
       const sets = exercise.plannedSets.map((set, index) => {
         if (set.kind === 'reps-weight') {
-          const repsInput = this.shadowRoot?.querySelector<HTMLInputElement>(
+          const repsInput = this.querySelector<HTMLInputElement>(
             `input[data-exercise-id="${exercise.id}"][data-set-index="${index}"][data-field="reps"]`,
           )
-          const weightInput = this.shadowRoot?.querySelector<HTMLInputElement>(
+          const weightInput = this.querySelector<HTMLInputElement>(
             `input[data-exercise-id="${exercise.id}"][data-set-index="${index}"][data-field="weight"]`,
           )
 
@@ -256,7 +217,7 @@ export class RrrRoutineEditor extends HTMLElement {
           }
         }
 
-        const secondsInput = this.shadowRoot?.querySelector<HTMLInputElement>(
+        const secondsInput = this.querySelector<HTMLInputElement>(
           `input[data-exercise-id="${exercise.id}"][data-set-index="${index}"][data-field="seconds"]`,
         )
 
@@ -271,13 +232,9 @@ export class RrrRoutineEditor extends HTMLElement {
   }
 
   private addExercise(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
     this.readFields()
 
-    const select = this.shadowRoot.querySelector<HTMLSelectElement>('select[name="add-exercise"]')
+    const select = this.querySelector<HTMLSelectElement>('select[name="add-exercise"]')
     const exerciseId = select?.value ?? ''
 
     if (!exerciseId) {
@@ -384,23 +341,19 @@ export class RrrRoutineEditor extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
     const data = storageService.getData()
     const activeExercises = getActiveExercises(data)
     const isEditing = this.routineIdValue !== null
     const title = isEditing ? 'Edit Routine' : 'New Routine'
 
     if (isEditing && this.routineIdValue !== null && !getRoutine(data, this.routineIdValue)) {
-      this.shadowRoot.innerHTML = `
+      this.innerHTML = `
         <style>${styles}</style>
         <section class="page">
-          <div class="card">
+          <rrr-card size="lg">
             <h2>Routine not found</h2>
             <button type="button" data-action="back">Back to Routines</button>
-          </div>
+          </rrr-card>
         </section>
       `
       return
@@ -477,10 +430,10 @@ export class RrrRoutineEditor extends HTMLElement {
           })
           .join('')
 
-    this.shadowRoot.innerHTML = `
+    this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <div class="card">
+        <rrr-card size="lg">
           <div>
             <h2>${title}</h2>
           </div>
@@ -508,7 +461,7 @@ export class RrrRoutineEditor extends HTMLElement {
             ${isEditing ? '<button type="button" data-action="start-workout">Start Workout</button>' : ''}
             <button type="button" data-action="back">Cancel</button>
           </div>
-        </div>
+        </rrr-card>
       </section>
     `
   }

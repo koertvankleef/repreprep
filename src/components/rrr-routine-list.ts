@@ -4,35 +4,9 @@ import { todayIso } from '../utils/date.ts'
 import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
 
 const styles = `
-  :host {
-    display: block;
-  }
-
-  .page {
-    display: grid;
-    gap: var(--rrr-space-lg);
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--rrr-space-md);
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
   .list {
     display: grid;
     gap: var(--rrr-space-md);
-  }
-
-  .card {
-    background: var(--rrr-color-surface);
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-lg);
-    padding: var(--rrr-space-md);
-    display: grid;
-    gap: var(--rrr-space-sm);
   }
 
   .card-title {
@@ -44,22 +18,11 @@ const styles = `
     color: var(--rrr-color-text-secondary, #666);
     font-size: 0.9rem;
   }
-
-  .actions {
-    display: flex;
-    gap: var(--rrr-space-sm);
-    flex-wrap: wrap;
-  }
 `
 
 export class RrrRoutineList extends HTMLElement {
   private readonly handleDataChanged = (): void => {
     this.render()
-  }
-
-  constructor() {
-    super()
-    this.attachShadow({ mode: 'open' })
   }
 
   connectedCallback(): void {
@@ -86,14 +49,10 @@ export class RrrRoutineList extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
     const data = storageService.getData()
     const routines = getActiveRoutines(data)
 
-    this.shadowRoot.innerHTML = `
+    this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
         <div class="header">
@@ -113,14 +72,14 @@ export class RrrRoutineList extends HTMLElement {
                     const exerciseCount = version?.exercises.length ?? 0
 
                     return `
-                      <div class="card">
+                      <rrr-card size="md">
                         <div class="card-title">${escapeHtml(routine.name)}</div>
                         <div class="card-meta">${exerciseCount} exercise${exerciseCount === 1 ? '' : 's'}</div>
                         <div class="actions">
                           <button type="button" data-action="start" data-id="${routine.id}">Start Workout</button>
                           <button type="button" data-action="edit" data-id="${routine.id}">Edit Routine</button>
                         </div>
-                      </div>
+                      </rrr-card>
                     `
                   })
                   .join('')
@@ -129,11 +88,11 @@ export class RrrRoutineList extends HTMLElement {
       </section>
     `
 
-    this.shadowRoot.querySelector<HTMLButtonElement>('button[data-action="new"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLButtonElement>('button[data-action="new"]')?.addEventListener('click', () => {
       window.location.hash = '#/routines/new'
     })
 
-    this.shadowRoot.querySelectorAll<HTMLButtonElement>('button[data-action="start"]').forEach((btn) => {
+    this.querySelectorAll<HTMLButtonElement>('button[data-action="start"]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id
 
@@ -143,7 +102,7 @@ export class RrrRoutineList extends HTMLElement {
       })
     })
 
-    this.shadowRoot.querySelectorAll<HTMLButtonElement>('button[data-action="edit"]').forEach((btn) => {
+    this.querySelectorAll<HTMLButtonElement>('button[data-action="edit"]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id
 

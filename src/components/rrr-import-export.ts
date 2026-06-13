@@ -3,24 +3,6 @@ import { exportToJson } from '../import-export/json-export-service.ts'
 import { importFromJson } from '../import-export/json-import-service.ts'
 
 const styles = `
-  :host {
-    display: block;
-  }
-
-  .page {
-    display: grid;
-    gap: var(--rrr-space-lg);
-  }
-
-  .card {
-    background: var(--rrr-color-surface);
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-lg);
-    padding: var(--rrr-space-lg);
-    display: grid;
-    gap: var(--rrr-space-md);
-  }
-
   .status-success {
     color: var(--rrr-color-success);
   }
@@ -34,11 +16,6 @@ export class RrrImportExport extends HTMLElement {
   private statusMessage = ''
   private statusType: 'success' | 'error' | null = null
 
-  constructor() {
-    super()
-    this.attachShadow({ mode: 'open' })
-  }
-
   connectedCallback(): void {
     this.render()
   }
@@ -50,7 +27,7 @@ export class RrrImportExport extends HTMLElement {
   }
 
   private async handleImport(): Promise<void> {
-    const input = this.shadowRoot?.querySelector<HTMLInputElement>('input[type="file"]')
+    const input = this.querySelector<HTMLInputElement>('input[type="file"]')
     const file = input?.files?.[0]
 
     if (!file) {
@@ -77,14 +54,10 @@ export class RrrImportExport extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
-    this.shadowRoot.innerHTML = `
+    this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <div class="card">
+        <rrr-card size="lg">
           <h2>Import & Export</h2>
           <p>Your data is stored locally in this browser under <code>repreprep:data</code>.</p>
           <div>
@@ -102,16 +75,16 @@ export class RrrImportExport extends HTMLElement {
               ? `<p class="status-${this.statusType}">${this.statusMessage}</p>`
               : '<p>Select a file to replace your current local data.</p>'
           }
-        </div>
+        </rrr-card>
       </section>
     `
 
-    this.shadowRoot.querySelector<HTMLButtonElement>('button[data-action="export"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLButtonElement>('button[data-action="export"]')?.addEventListener('click', () => {
       exportToJson(storageService.getData())
       this.setStatus('Export started', 'success')
     })
 
-    this.shadowRoot.querySelector<HTMLButtonElement>('button[data-action="import"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLButtonElement>('button[data-action="import"]')?.addEventListener('click', () => {
       void this.handleImport()
     })
   }
