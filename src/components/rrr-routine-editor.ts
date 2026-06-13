@@ -1,0 +1,521 @@
+import { storageService } from '../app/storage-instance.ts'
+import { getActiveExercises } from '../domain/exercise-service.ts'
+import { createRoutineExercise, getActiveRoutineVersion, getRoutine } from '../domain/routine-service.ts'
+import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
+import type { PlannedSet, RoutineExercise } from '../domain/types.ts'
+import { todayIso } from '../utils/date.ts'
+
+const styles = `
+  :host {
+    display: block;
+  }
+
+  .page {
+    display: grid;
+    gap: var(--rrr-space-lg);
+  }
+
+  .card {
+    background: var(--rrr-color-surface);
+    border: 1px solid var(--rrr-color-border);
+    border-radius: var(--rrr-radius-lg);
+    padding: var(--rrr-space-lg);
+    display: grid;
+    gap: var(--rrr-space-md);
+  }
+
+  .row {
+    display: grid;
+    gap: var(--rrr-space-md);
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  }
+
+  .exercise-list {
+    display: grid;
+    gap: var(--rrr-space-md);
+  }
+
+  .exercise-item {
+    border: 1px solid var(--rrr-color-border);
+    border-radius: var(--rrr-radius-md);
+    padding: var(--rrr-space-md);
+    display: grid;
+    gap: var(--rrr-space-sm);
+  }
+
+  .exercise-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--rrr-space-sm);
+    flex-wrap: wrap;
+  }
+
+  .exercise-name {
+    font-weight: bold;
+  }
+
+  .exercise-order {
+    display: flex;
+    gap: var(--rrr-space-xs, 0.25rem);
+  }
+
+  .planned-sets {
+    display: grid;
+    gap: var(--rrr-space-sm);
+  }
+
+  .planned-set {
+    display: flex;
+    gap: var(--rrr-space-sm);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .planned-set input {
+    width: 6rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: var(--rrr-space-sm);
+    flex-wrap: wrap;
+  }
+
+  .add-exercise-row {
+    display: flex;
+    gap: var(--rrr-space-sm);
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .add-exercise-row label {
+    flex: 1;
+    min-width: 12rem;
+  }
+`
+
+export class RrrRoutineEditor extends HTMLElement {
+  private routineIdValue: string | null = null
+  private name = ''
+  private exercises: RoutineExercise[] = []
+  private listenersBound = false
+
+  constructor() {
+    super()
+    this.attachShadow({ mode: 'open' })
+  }
+
+  set routineId(value: string | null) {
+    this.routineIdValue = value
+    this.initialize()
+  }
+
+  get routineId(): string | null {
+    return this.routineIdValue
+  }
+
+  connectedCallback(): void {
+    this.bindListeners()
+    this.initialize()
+  }
+
+  private initialize(): void {
+    const data = storageService.getData()
+
+    if (this.routineIdValue) {
+      const routine = getRoutine(data, this.routineIdValue)
+
+      if (!routine) {
+        this.name = ''
+        this.exercises = []
+        this.render()
+        return
+      }
+
+      const version = getActiveRoutineVersion(data, this.routineIdValue)
+
+      this.name = routine.name
+      this.exercises = version ? [...version.exercises] : []
+    } else {
+      this.name = ''
+      this.exercises = []
+    }
+
+    this.render()
+  }
+
+  private bindListeners(): void {
+    if (!this.shadowRoot || this.listenersBound) {
+      return
+    }
+
+    this.listenersBound = true
+
+    this.shadowRoot.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement
+      const action = target.dataset.action
+
+      if (action === 'add-exercise') {
+        this.addExercise()
+        return
+      }
+
+      if (action === 'remove-exercise') {
+        const id = target.dataset.id
+
+        if (id) {
+          this.removeExercise(id)
+        }
+
+        return
+      }
+
+      if (action === 'move-up') {
+        const id = target.dataset.id
+
+        if (id) {
+          this.moveExercise(id, -1)
+        }
+
+        return
+      }
+
+      if (action === 'move-down') {
+        const id = target.dataset.id
+
+        if (id) {
+          this.moveExercise(id, 1)
+        }
+
+        return
+      }
+
+      if (action === 'add-set') {
+        const id = target.dataset.id
+
+        if (id) {
+          this.addPlannedSet(id)
+        }
+
+        return
+      }
+
+      if (action === 'remove-set') {
+        const exerciseId = target.dataset.exerciseId
+        const setIndex = target.dataset.setIndex
+
+        if (exerciseId && setIndex !== undefined) {
+          this.removePlannedSet(exerciseId, Number(setIndex))
+        }
+
+        return
+      }
+
+      if (action === 'save') {
+        this.save()
+        return
+      }
+
+      if (action === 'start-workout') {
+        this.startWorkout()
+        return
+      }
+
+      if (action === 'back') {
+        window.location.hash = '#/routines'
+      }
+    })
+  }
+
+  private readFields(): void {
+    if (!this.shadowRoot) {
+      return
+    }
+
+    const nameInput = this.shadowRoot.querySelector<HTMLInputElement>('input[name="routine-name"]')
+
+    if (nameInput) {
+      this.name = nameInput.value
+    }
+
+    this.exercises = this.exercises.map((exercise) => {
+      const sets = exercise.plannedSets.map((set, index) => {
+        if (set.kind === 'reps-weight') {
+          const repsInput = this.shadowRoot?.querySelector<HTMLInputElement>(
+            `input[data-exercise-id="${exercise.id}"][data-set-index="${index}"][data-field="reps"]`,
+          )
+          const weightInput = this.shadowRoot?.querySelector<HTMLInputElement>(
+            `input[data-exercise-id="${exercise.id}"][data-set-index="${index}"][data-field="weight"]`,
+          )
+
+          return {
+            kind: 'reps-weight' as const,
+            targetReps: repsInput?.value ? Number(repsInput.value) : null,
+            targetWeightKg: weightInput?.value ? Number(weightInput.value) : null,
+          }
+        }
+
+        const secondsInput = this.shadowRoot?.querySelector<HTMLInputElement>(
+          `input[data-exercise-id="${exercise.id}"][data-set-index="${index}"][data-field="seconds"]`,
+        )
+
+        return {
+          kind: 'duration' as const,
+          targetSeconds: secondsInput?.value ? Number(secondsInput.value) : null,
+        }
+      })
+
+      return { ...exercise, plannedSets: sets }
+    })
+  }
+
+  private addExercise(): void {
+    if (!this.shadowRoot) {
+      return
+    }
+
+    this.readFields()
+
+    const select = this.shadowRoot.querySelector<HTMLSelectElement>('select[name="add-exercise"]')
+    const exerciseId = select?.value ?? ''
+
+    if (!exerciseId) {
+      return
+    }
+
+    this.exercises = [...this.exercises, createRoutineExercise(exerciseId)]
+    this.render()
+  }
+
+  private removeExercise(id: string): void {
+    this.readFields()
+    this.exercises = this.exercises.filter((e) => e.id !== id)
+    this.render()
+  }
+
+  private moveExercise(id: string, direction: -1 | 1): void {
+    this.readFields()
+    const index = this.exercises.findIndex((e) => e.id === id)
+
+    if (index === -1) {
+      return
+    }
+
+    const next = index + direction
+
+    if (next < 0 || next >= this.exercises.length) {
+      return
+    }
+
+    const updated = [...this.exercises]
+    const temp = updated[index]
+    const swapTarget = updated[next]
+
+    if (!temp || !swapTarget) {
+      return
+    }
+
+    updated[index] = swapTarget
+    updated[next] = temp
+
+    this.exercises = updated
+    this.render()
+  }
+
+  private addPlannedSet(exerciseId: string): void {
+    this.readFields()
+    const data = storageService.getData()
+    const exerciseDef = data.exercises.find((e) => e.id === exerciseId)
+    const kind = exerciseDef?.kind ?? 'reps-weight'
+    const newSet: PlannedSet =
+      kind === 'duration'
+        ? { kind: 'duration', targetSeconds: null }
+        : { kind: 'reps-weight', targetReps: null, targetWeightKg: null }
+
+    this.exercises = this.exercises.map((e) =>
+      e.id === exerciseId ? { ...e, plannedSets: [...e.plannedSets, newSet] } : e,
+    )
+    this.render()
+  }
+
+  private removePlannedSet(exerciseId: string, setIndex: number): void {
+    this.readFields()
+    this.exercises = this.exercises.map((e) =>
+      e.id === exerciseId
+        ? { ...e, plannedSets: e.plannedSets.filter((_, i) => i !== setIndex) }
+        : e,
+    )
+    this.render()
+  }
+
+  private save(): void {
+    this.readFields()
+
+    if (!this.name.trim()) {
+      window.alert('Please provide a routine name.')
+      return
+    }
+
+    const saved = storageService.saveRoutine(this.routineIdValue, this.name.trim(), this.exercises)
+
+    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+    this.routineIdValue = saved.id
+    window.location.hash = '#/routines'
+  }
+
+  private startWorkout(): void {
+    if (!this.routineIdValue) {
+      window.alert('Save the routine first before starting a workout.')
+      return
+    }
+
+    const data = storageService.getData()
+    const workout = createWorkoutFromRoutine(data, this.routineIdValue, todayIso())
+
+    if (!workout) {
+      window.alert('Could not start workout from this routine.')
+      return
+    }
+
+    storageService.saveWorkout(workout)
+    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+    window.location.hash = `#/workouts/${workout.id}`
+  }
+
+  private render(): void {
+    if (!this.shadowRoot) {
+      return
+    }
+
+    const data = storageService.getData()
+    const activeExercises = getActiveExercises(data)
+    const isEditing = this.routineIdValue !== null
+    const title = isEditing ? 'Edit Routine' : 'New Routine'
+
+    if (isEditing && this.routineIdValue !== null && !getRoutine(data, this.routineIdValue)) {
+      this.shadowRoot.innerHTML = `
+        <style>${styles}</style>
+        <section class="page">
+          <div class="card">
+            <h2>Routine not found</h2>
+            <button type="button" data-action="back">Back to Routines</button>
+          </div>
+        </section>
+      `
+      return
+    }
+
+    const exerciseListHtml = this.exercises.length === 0
+      ? '<p>No exercises added yet.</p>'
+      : this.exercises
+          .map((routineExercise, index) => {
+            const def = data.exercises.find((e) => e.id === routineExercise.exerciseId)
+            const exerciseName = def?.name ?? 'Unknown exercise'
+            const isFirst = index === 0
+            const isLast = index === this.exercises.length - 1
+
+            const setsHtml = routineExercise.plannedSets.length === 0
+              ? '<p>No planned sets.</p>'
+              : routineExercise.plannedSets
+                  .map((set, setIndex) => {
+                    if (set.kind === 'reps-weight') {
+                      return `
+                        <div class="planned-set">
+                          <span>Set ${setIndex + 1}:</span>
+                          <label>Reps <input type="number" min="0" placeholder="Reps"
+                            data-exercise-id="${routineExercise.id}"
+                            data-set-index="${setIndex}"
+                            data-field="reps"
+                            value="${set.targetReps ?? ''}" /></label>
+                          <label>Weight (kg) <input type="number" min="0" step="0.5" placeholder="kg"
+                            data-exercise-id="${routineExercise.id}"
+                            data-set-index="${setIndex}"
+                            data-field="weight"
+                            value="${set.targetWeightKg ?? ''}" /></label>
+                          <button type="button" data-action="remove-set"
+                            data-exercise-id="${routineExercise.id}"
+                            data-set-index="${setIndex}">Remove</button>
+                        </div>
+                      `
+                    }
+
+                    return `
+                      <div class="planned-set">
+                        <span>Set ${setIndex + 1}:</span>
+                        <label>Seconds <input type="number" min="0" placeholder="Seconds"
+                          data-exercise-id="${routineExercise.id}"
+                          data-set-index="${setIndex}"
+                          data-field="seconds"
+                          value="${set.targetSeconds ?? ''}" /></label>
+                        <button type="button" data-action="remove-set"
+                          data-exercise-id="${routineExercise.id}"
+                          data-set-index="${setIndex}">Remove</button>
+                      </div>
+                    `
+                  })
+                  .join('')
+
+            return `
+              <div class="exercise-item">
+                <div class="exercise-header">
+                  <span class="exercise-name">${escapeHtml(exerciseName)}</span>
+                  <div class="exercise-order">
+                    <button type="button" data-action="move-up" data-id="${routineExercise.id}"
+                      ${isFirst ? 'disabled' : ''}>↑</button>
+                    <button type="button" data-action="move-down" data-id="${routineExercise.id}"
+                      ${isLast ? 'disabled' : ''}>↓</button>
+                    <button type="button" data-action="remove-exercise" data-id="${routineExercise.id}">Remove</button>
+                  </div>
+                </div>
+                <div class="planned-sets">${setsHtml}</div>
+                <div>
+                  <button type="button" data-action="add-set" data-id="${routineExercise.id}">Add Set</button>
+                </div>
+              </div>
+            `
+          })
+          .join('')
+
+    this.shadowRoot.innerHTML = `
+      <style>${styles}</style>
+      <section class="page">
+        <div class="card">
+          <div>
+            <h2>${title}</h2>
+          </div>
+          <div class="row">
+            <label>
+              Name
+              <input type="text" name="routine-name" value="${escapeHtml(this.name)}" placeholder="Routine name" />
+            </label>
+          </div>
+          <div>
+            <h3>Exercises</h3>
+            <div class="exercise-list">${exerciseListHtml}</div>
+          </div>
+          <div class="add-exercise-row">
+            <label>
+              Add Exercise
+              <select name="add-exercise">
+                ${activeExercises.map((e) => `<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('')}
+              </select>
+            </label>
+            <button type="button" data-action="add-exercise">Add</button>
+          </div>
+          <div class="actions">
+            <button type="button" data-action="save">Save Routine</button>
+            ${isEditing ? '<button type="button" data-action="start-workout">Start Workout</button>' : ''}
+            <button type="button" data-action="back">Cancel</button>
+          </div>
+        </div>
+      </section>
+    `
+  }
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
+customElements.define('rrr-routine-editor', RrrRoutineEditor)

@@ -4,13 +4,31 @@ import { isValidAppData } from '../import-export/json-import-service.ts'
 
 const storageKey = 'repreprep:data'
 
-function migrateData(data: AppData): AppData | null {
-  switch (data.schemaVersion) {
-    case 1:
-      return data
-    default:
-      return null
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+export function migrateRawToAppData(parsed: unknown): AppData | null {
+  if (!isRecord(parsed) || typeof parsed.schemaVersion !== 'number') {
+    return null
   }
+
+  let candidate: Record<string, unknown> = parsed
+
+  if (parsed.schemaVersion === 1) {
+    candidate = {
+      ...parsed,
+      schemaVersion: 2,
+      routines: Array.isArray(parsed.routines) ? parsed.routines : [],
+      routineVersions: Array.isArray(parsed.routineVersions) ? parsed.routineVersions : [],
+    }
+  }
+
+  if (!isValidAppData(candidate)) {
+    return null
+  }
+
+  return candidate
 }
 
 export class LocalStorageAdapter implements StorageAdapter {
@@ -28,11 +46,7 @@ export class LocalStorageAdapter implements StorageAdapter {
     try {
       const parsed: unknown = JSON.parse(raw)
 
-      if (!isValidAppData(parsed)) {
-        return null
-      }
-
-      return migrateData(parsed)
+      return migrateRawToAppData(parsed)
     } catch {
       return null
     }

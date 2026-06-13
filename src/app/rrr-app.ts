@@ -47,6 +47,9 @@ type Route =
   | { name: 'exercises' }
   | { name: 'history' }
   | { name: 'import-export' }
+  | { name: 'routines' }
+  | { name: 'routine-new' }
+  | { name: 'routine-edit'; routineId: string }
 
 export class RrrApp extends HTMLElement {
   private readonly handleRouteChange = (): void => {
@@ -104,11 +107,25 @@ export class RrrApp extends HTMLElement {
       return { name: 'import-export' }
     }
 
+    if (hash === '#/routines') {
+      return { name: 'routines' }
+    }
+
+    if (hash === '#/routines/new') {
+      return { name: 'routine-new' }
+    }
+
+    if (hash.startsWith('#/routines/')) {
+      return { name: 'routine-edit', routineId: hash.replace('#/routines/', '') }
+    }
+
     return { name: 'workouts' }
   }
 
   private linkClass(routeName: Route['name'], current: Route['name']): string {
-    return routeName === current ? 'active' : ''
+    if (routeName === current) return 'active'
+    if (routeName === 'routines' && (current === 'routine-new' || current === 'routine-edit')) return 'active'
+    return ''
   }
 
   private render(): void {
@@ -123,6 +140,7 @@ export class RrrApp extends HTMLElement {
       <div class="shell">
         <nav>
           <a class="${this.linkClass('workouts', route.name)}" href="#/workouts">Workouts</a>
+          <a class="${this.linkClass('routines', route.name)}" href="#/routines">Routines</a>
           <a class="${this.linkClass('exercises', route.name)}" href="#/exercises">Exercises</a>
           <a class="${this.linkClass('history', route.name)}" href="#/history">History</a>
           <a class="${this.linkClass('import-export', route.name)}" href="#/import-export">Import/Export</a>
@@ -163,6 +181,23 @@ export class RrrApp extends HTMLElement {
 
     if (route.name === 'history') {
       view.append(document.createElement('rrr-exercise-history'))
+      return
+    }
+
+    if (route.name === 'routines') {
+      view.append(document.createElement('rrr-routine-list'))
+      return
+    }
+
+    if (route.name === 'routine-new') {
+      view.append(document.createElement('rrr-routine-editor'))
+      return
+    }
+
+    if (route.name === 'routine-edit') {
+      const editor = document.createElement('rrr-routine-editor') as HTMLElement & { routineId: string | null }
+      editor.routineId = route.routineId
+      view.append(editor)
       return
     }
 

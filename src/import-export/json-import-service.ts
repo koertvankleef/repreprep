@@ -2,7 +2,11 @@ import type {
   AppData,
   DurationSetEntry,
   ExerciseDefinition,
+  PlannedSet,
   RepsWeightSetEntry,
+  Routine,
+  RoutineExercise,
+  RoutineVersion,
   SetEntry,
   Workout,
   WorkoutExerciseEntry,
@@ -85,7 +89,73 @@ export function isValidWorkout(obj: unknown): obj is Workout {
     Array.isArray(obj.exercises) &&
     obj.exercises.every((entry) => isValidWorkoutExerciseEntry(entry)) &&
     typeof obj.createdAt === 'string' &&
-    typeof obj.updatedAt === 'string'
+    typeof obj.updatedAt === 'string' &&
+    (obj.routineId === undefined || typeof obj.routineId === 'string') &&
+    (obj.routineVersionId === undefined || typeof obj.routineVersionId === 'string')
+  )
+}
+
+function isValidPlannedSet(obj: unknown): obj is PlannedSet {
+  if (!isRecord(obj)) {
+    return false
+  }
+
+  if (obj.kind === 'reps-weight') {
+    return (
+      (typeof obj.targetReps === 'number' || obj.targetReps === null) &&
+      (typeof obj.targetWeightKg === 'number' || obj.targetWeightKg === null)
+    )
+  }
+
+  if (obj.kind === 'duration') {
+    return typeof obj.targetSeconds === 'number' || obj.targetSeconds === null
+  }
+
+  return false
+}
+
+function isValidRoutineExercise(obj: unknown): obj is RoutineExercise {
+  if (!isRecord(obj)) {
+    return false
+  }
+
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.exerciseId === 'string' &&
+    Array.isArray(obj.plannedSets) &&
+    obj.plannedSets.every((ps) => isValidPlannedSet(ps)) &&
+    (obj.notes === undefined || typeof obj.notes === 'string')
+  )
+}
+
+function isValidRoutineVersion(obj: unknown): obj is RoutineVersion {
+  if (!isRecord(obj)) {
+    return false
+  }
+
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.routineId === 'string' &&
+    (typeof obj.previousVersionId === 'string' || obj.previousVersionId === null) &&
+    typeof obj.createdAt === 'string' &&
+    Array.isArray(obj.exercises) &&
+    obj.exercises.every((re) => isValidRoutineExercise(re))
+  )
+}
+
+function isValidRoutine(obj: unknown): obj is Routine {
+  if (!isRecord(obj)) {
+    return false
+  }
+
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.name === 'string' &&
+    typeof obj.activeVersionId === 'string' &&
+    typeof obj.archived === 'boolean' &&
+    typeof obj.createdAt === 'string' &&
+    typeof obj.updatedAt === 'string' &&
+    (obj.description === undefined || typeof obj.description === 'string')
   )
 }
 
@@ -99,7 +169,11 @@ export function isValidAppData(data: unknown): data is AppData {
     Array.isArray(data.exercises) &&
     data.exercises.every((exercise) => isValidExercise(exercise)) &&
     Array.isArray(data.workouts) &&
-    data.workouts.every((workout) => isValidWorkout(workout))
+    data.workouts.every((workout) => isValidWorkout(workout)) &&
+    Array.isArray(data.routines) &&
+    data.routines.every((routine) => isValidRoutine(routine)) &&
+    Array.isArray(data.routineVersions) &&
+    data.routineVersions.every((version) => isValidRoutineVersion(version))
   )
 }
 
@@ -133,9 +207,20 @@ export async function importFromJson(file: File): Promise<AppData> {
     throw new Error('Imported data contains an invalid workout record')
   }
 
-  if (!isValidAppData(parsed)) {
+  // Migrate v1 exports by injecting empty routine collections
+  const candidate: Record<string, unknown> =
+    parsed.schemaVersion === 1
+      ? {
+          ...parsed,
+          schemaVersion: 2,
+          routines: Array.isArray(parsed.routines) ? parsed.routines : [],
+          routineVersions: Array.isArray(parsed.routineVersions) ? parsed.routineVersions : [],
+        }
+      : parsed
+
+  if (!isValidAppData(candidate)) {
     throw new Error('Imported data is not in the expected AppData format')
   }
 
-  return parsed
+  return candidate
 }

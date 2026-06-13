@@ -2,6 +2,8 @@ export interface AppData {
   schemaVersion: number
   exercises: ExerciseDefinition[]
   workouts: Workout[]
+  routines: Routine[]
+  routineVersions: RoutineVersion[]
 }
 
 export type ExerciseKind = 'reps-weight' | 'duration'
@@ -23,6 +25,46 @@ export interface Workout {
   exercises: WorkoutExerciseEntry[]
   createdAt: string
   updatedAt: string
+  routineId?: string
+  routineVersionId?: string
+}
+
+export interface Routine {
+  id: string
+  name: string
+  description?: string
+  activeVersionId: string
+  archived: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface RoutineVersion {
+  id: string
+  routineId: string
+  previousVersionId: string | null
+  createdAt: string
+  exercises: RoutineExercise[]
+}
+
+export interface RoutineExercise {
+  id: string
+  exerciseId: string
+  plannedSets: PlannedSet[]
+  notes?: string
+}
+
+export type PlannedSet = RepsWeightPlannedSet | DurationPlannedSet
+
+export interface RepsWeightPlannedSet {
+  kind: 'reps-weight'
+  targetReps: number | null
+  targetWeightKg: number | null
+}
+
+export interface DurationPlannedSet {
+  kind: 'duration'
+  targetSeconds: number | null
 }
 
 export interface WorkoutExerciseEntry {

@@ -1,4 +1,4 @@
-import type { AppData, ExerciseDefinition, ExerciseKind } from './types.ts'
+import type { AppData, ExerciseDefinition, ExerciseKind, PlannedSet, Routine, RoutineExercise, RoutineVersion } from './types.ts'
 import { generateId as generateUniqueId } from '../utils/id.ts'
 
 interface SeedExercise {
@@ -36,9 +36,50 @@ function createSeedExercise(seed: SeedExercise): ExerciseDefinition {
 }
 
 export function createDefaultData(): AppData {
+  const timestamp = new Date().toISOString()
+  const exercises = seedExercises.map(createSeedExercise)
+
+  const routineId = generateId()
+  const versionId = generateId()
+
+  const routineExercises: RoutineExercise[] = exercises.map((exercise) => {
+    const isPlank = exercise.name === 'Plank'
+    const plannedSets: PlannedSet[] = isPlank
+      ? [{ kind: 'duration', targetSeconds: 30 }]
+      : [
+          { kind: 'reps-weight', targetReps: 10, targetWeightKg: null },
+          { kind: 'reps-weight', targetReps: 10, targetWeightKg: null },
+        ]
+
+    return {
+      id: generateId(),
+      exerciseId: exercise.id,
+      plannedSets,
+    }
+  })
+
+  const routineVersion: RoutineVersion = {
+    id: versionId,
+    routineId,
+    previousVersionId: null,
+    createdAt: timestamp,
+    exercises: routineExercises,
+  }
+
+  const routine: Routine = {
+    id: routineId,
+    name: 'Full Body',
+    activeVersionId: versionId,
+    archived: false,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  }
+
   return {
-    schemaVersion: 1,
-    exercises: seedExercises.map(createSeedExercise),
+    schemaVersion: 2,
+    exercises,
     workouts: [],
+    routines: [routine],
+    routineVersions: [routineVersion],
   }
 }
