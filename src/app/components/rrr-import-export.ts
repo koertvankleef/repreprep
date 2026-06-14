@@ -62,7 +62,7 @@ export class RrrImportExport extends HTMLElement {
           <h2>${t('importExport.title')}</h2>
           <p id="storage-description">${t('importExport.storageDescription')} <code>${this.storageKey}</code>.</p>
           <div>
-            <button type="button" data-action="export">${t('importExport.action.export')}</button>
+            <rrr-button type="button" data-action="export">${t('importExport.action.export')}</rrr-button>
           </div>
           <label>
             ${t('action.import')}
@@ -70,7 +70,7 @@ export class RrrImportExport extends HTMLElement {
           </label>
           <p id="import-helper" class="helper-text">${t('importExport.helper')}</p>
           <div>
-            <button type="button" data-action="import">${t('action.import')}</button>
+            <rrr-button type="button" data-action="import">${t('action.import')}</rrr-button>
           </div>
           ${
             this.statusType
@@ -81,12 +81,12 @@ export class RrrImportExport extends HTMLElement {
       </section>
     `
 
-    this.querySelector<HTMLButtonElement>('button[data-action="export"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="export"]')?.addEventListener('click', () => {
       exportToJson(storageService.getData())
       this.setStatus(t('importExport.status.exportStarted'), 'success')
     })
 
-    this.querySelector<HTMLButtonElement>('button[data-action="import"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="import"]')?.addEventListener('click', () => {
       void this.handleImport()
     })
   }

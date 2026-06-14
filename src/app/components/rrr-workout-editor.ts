@@ -177,12 +177,12 @@ export class RrrWorkoutEditor extends HTMLElement {
         <section class="page">
           <rrr-card size="lg">
             <h2>${t('workout.notFound.title')}</h2>
-            <button type="button" data-action="back">${t('workout.notFound.back')}</button>
+            <rrr-button type="button" variant="secondary" data-action="back">${t('workout.notFound.back')}</rrr-button>
           </rrr-card>
         </section>
       `
 
-      this.querySelector<HTMLButtonElement>('button[data-action="back"]')?.addEventListener('click', () => {
+      this.querySelector<HTMLElement>('rrr-button[data-action="back"]')?.addEventListener('click', () => {
         window.location.hash = '#/workouts'
       })
       return
@@ -222,9 +222,9 @@ export class RrrWorkoutEditor extends HTMLElement {
             </label>
           </div>
           <div class="actions">
-            <button type="button" data-action="add-exercise" ${activeExercises.length === 0 ? 'disabled' : ''}>${t('action.add')}</button>
-            <button type="button" data-action="save">${t('workout.action.save')}</button>
-            <button type="button" data-action="cancel">${t('action.cancel')}</button>
+            <rrr-button type="button" data-action="add-exercise" ${activeExercises.length === 0 ? 'disabled' : ''}>${t('action.add')}</rrr-button>
+            <rrr-button type="button" data-action="save">${t('workout.action.save')}</rrr-button>
+            <rrr-button type="button" variant="secondary" data-action="cancel">${t('action.cancel')}</rrr-button>
           </div>
         </rrr-card>
       </section>
@@ -257,15 +257,15 @@ export class RrrWorkoutEditor extends HTMLElement {
       this.updateWorkoutFields()
     })
 
-    this.querySelector<HTMLButtonElement>('button[data-action="add-exercise"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="add-exercise"]')?.addEventListener('click', () => {
       this.addExercise()
     })
 
-    this.querySelector<HTMLButtonElement>('button[data-action="save"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="save"]')?.addEventListener('click', () => {
       this.saveWorkout()
     })
 
-    this.querySelector<HTMLButtonElement>('button[data-action="cancel"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="cancel"]')?.addEventListener('click', () => {
       window.location.hash = '#/workouts'
     })
   }

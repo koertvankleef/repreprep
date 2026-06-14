@@ -12,7 +12,7 @@ template.innerHTML = `
 `
 
 export class RrrButton extends HTMLElement {
-  static observedAttributes = ['disabled']
+  static observedAttributes = ['aria-label', 'disabled']
 
   private readonly button: HTMLButtonElement
 
@@ -33,7 +33,7 @@ export class RrrButton extends HTMLElement {
   }
 
   connectedCallback(): void {
-    this.syncDisabled()
+    this.syncAll()
 
     this.button.addEventListener('click', () => {
       if (this.button.disabled) {
@@ -52,8 +52,8 @@ export class RrrButton extends HTMLElement {
   }
 
   attributeChangedCallback(name: string): void {
-    if (name === 'disabled') {
-      this.syncDisabled()
+    if (name === 'aria-label' || name === 'disabled') {
+      this.syncAll()
     }
   }
 
@@ -65,7 +65,19 @@ export class RrrButton extends HTMLElement {
     this.toggleAttribute('disabled', value)
   }
 
-  private syncDisabled(): void {
+  override focus(options?: FocusOptions): void {
+    this.button.focus(options)
+  }
+
+  private syncAll(): void {
+    const ariaLabel = this.getAttribute('aria-label')
+
+    if (ariaLabel) {
+      this.button.setAttribute('aria-label', ariaLabel)
+    } else {
+      this.button.removeAttribute('aria-label')
+    }
+
     reflectDisabled(this, this.button)
   }
 }

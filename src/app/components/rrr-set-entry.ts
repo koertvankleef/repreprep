@@ -90,7 +90,7 @@ export class RrrSetEntry extends HTMLElement {
           <input type="text" name="notes" value="${set.notes}" placeholder="${t('setEntry.field.notes.placeholder')}" />
         </label>
         <div class="actions">
-          <button type="button" data-action="remove" aria-label="${t('setEntry.action.removeAria')}">${t('action.remove')}</button>
+          <rrr-button type="button" variant="danger" data-action="remove" aria-label="${t('setEntry.action.removeAria')}">${t('action.remove')}</rrr-button>
         </div>
       </div>
     `
@@ -130,7 +130,7 @@ export class RrrSetEntry extends HTMLElement {
       })
     })
 
-    this.shadowRoot.querySelector<HTMLButtonElement>('button[data-action="remove"]')?.addEventListener('click', () => {
+    this.shadowRoot.querySelector<HTMLElement>('rrr-button[data-action="remove"]')?.addEventListener('click', () => {
       if (this.setValue) {
         this.emitRemoved(this.setValue.id)
       }

@@ -85,7 +85,7 @@ export class RrrDialogHost extends HTMLElement {
     if (this.mode === 'prompt') {
       this.getPromptField()?.focus()
     } else {
-      this.querySelector<HTMLButtonElement>('button[data-action="confirm"]')?.focus()
+      this.querySelector<HTMLElement>('rrr-button[data-action="confirm"]')?.focus()
     }
   }
 
@@ -167,8 +167,8 @@ export class RrrDialogHost extends HTMLElement {
           <p class="dialog-message" id="${messageId}">${escapeHtml(this.message)}</p>
           ${promptContent}
           <div class="dialog-actions">
-            <button type="button" data-action="cancel">${escapeHtml(this.cancelLabel)}</button>
-            <button type="button" data-action="confirm">${escapeHtml(this.confirmLabel)}</button>
+            <rrr-button type="button" variant="secondary" data-action="cancel">${escapeHtml(this.cancelLabel)}</rrr-button>
+            <rrr-button type="button" data-action="confirm">${escapeHtml(this.confirmLabel)}</rrr-button>
           </div>
         </div>
       </dialog>
@@ -181,11 +181,11 @@ export class RrrDialogHost extends HTMLElement {
       this.closeWith(this.mode === 'confirm' ? false : null)
     })
 
-    this.querySelector<HTMLButtonElement>('button[data-action="cancel"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="cancel"]')?.addEventListener('click', () => {
       this.closeWith(this.mode === 'confirm' ? false : null)
     })
 
-    this.querySelector<HTMLButtonElement>('button[data-action="confirm"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="confirm"]')?.addEventListener('click', () => {
       this.handleConfirm()
     })
 

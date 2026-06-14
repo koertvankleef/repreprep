@@ -45,7 +45,7 @@ export class RrrRoutineList extends HTMLElement {
             <h2>${t('routineList.title')}</h2>
             <p>${t('routineList.subtitle')}</p>
           </div>
-          <button type="button" data-action="new">${t('routineList.new')}</button>
+          <rrr-button type="button" data-action="new">${t('routineList.new')}</rrr-button>
         </div>
         <div class="list">
           ${
@@ -62,8 +62,8 @@ export class RrrRoutineList extends HTMLElement {
                         <div class="card-title">${escapeHtml(routine.name)}</div>
                         <div class="card-meta">${exerciseSummary}</div>
                         <div class="actions">
-                          <button type="button" data-action="start" data-id="${routine.id}" aria-label="${escapeHtml(t('routineList.action.startAria', { name: routine.name }))}">${t('routineList.action.start')}</button>
-                          <button type="button" data-action="edit" data-id="${routine.id}" aria-label="${escapeHtml(t('routineList.action.editAria', { name: routine.name }))}">${t('action.edit')}</button>
+                          <rrr-button type="button" data-action="start" data-id="${routine.id}" aria-label="${escapeHtml(t('routineList.action.startAria', { name: routine.name }))}">${t('routineList.action.start')}</rrr-button>
+                          <rrr-button type="button" variant="secondary" data-action="edit" data-id="${routine.id}" aria-label="${escapeHtml(t('routineList.action.editAria', { name: routine.name }))}">${t('action.edit')}</rrr-button>
                         </div>
                       </rrr-card>
                     `
@@ -74,11 +74,11 @@ export class RrrRoutineList extends HTMLElement {
       </section>
     `
 
-    this.querySelector<HTMLButtonElement>('button[data-action="new"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="new"]')?.addEventListener('click', () => {
       window.location.hash = '#/routines/new'
     })
 
-    this.querySelectorAll<HTMLButtonElement>('button[data-action="start"]').forEach((btn) => {
+    this.querySelectorAll<HTMLElement>('rrr-button[data-action="start"]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id
 
@@ -88,7 +88,7 @@ export class RrrRoutineList extends HTMLElement {
       })
     })
 
-    this.querySelectorAll<HTMLButtonElement>('button[data-action="edit"]').forEach((btn) => {
+    this.querySelectorAll<HTMLElement>('rrr-button[data-action="edit"]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id
 

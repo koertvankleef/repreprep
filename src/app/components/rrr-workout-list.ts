@@ -87,7 +87,7 @@ export class RrrWorkoutList extends HTMLElement {
           </div>
           ${
             routines.length === 0
-              ? `<button type="button" data-action="create-routine">${t('workoutList.createRoutine')}</button>`
+              ? `<rrr-button type="button" data-action="create-routine">${t('workoutList.createRoutine')}</rrr-button>`
               : `
                 <div class="start-panel">
                   <label>
@@ -101,7 +101,7 @@ export class RrrWorkoutList extends HTMLElement {
                         .join('')}
                     </select>
                   </label>
-                  <button type="button" data-action="start">${t('workoutList.startWorkout')}</button>
+                  <rrr-button type="button" data-action="start">${t('workoutList.startWorkout')}</rrr-button>
                 </div>
               `
           }
@@ -125,8 +125,8 @@ export class RrrWorkoutList extends HTMLElement {
                         <p>${summary || t('workoutList.exercise.none')}</p>
                         <p>${workout.notes || t('workoutList.notes.none')}</p>
                         <div class="actions">
-                          <button type="button" data-action="edit" data-id="${workout.id}" aria-label="${t('workoutList.action.editAria', { date: workoutDate })}">${t('action.edit')}</button>
-                          <button type="button" data-action="delete" data-id="${workout.id}" aria-label="${t('workoutList.action.deleteAria', { date: workoutDate })}">${t('action.delete')}</button>
+                          <rrr-button type="button" variant="secondary" data-action="edit" data-id="${workout.id}" aria-label="${t('workoutList.action.editAria', { date: workoutDate })}">${t('action.edit')}</rrr-button>
+                          <rrr-button type="button" variant="danger" data-action="delete" data-id="${workout.id}" aria-label="${t('workoutList.action.deleteAria', { date: workoutDate })}">${t('action.delete')}</rrr-button>
                         </div>
                       </rrr-card>
                     `
@@ -137,7 +137,7 @@ export class RrrWorkoutList extends HTMLElement {
       </section>
     `
 
-    this.querySelector<HTMLButtonElement>('button[data-action="create-routine"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="create-routine"]')?.addEventListener('click', () => {
       window.location.hash = '#/routines/new'
     })
 
@@ -146,13 +146,13 @@ export class RrrWorkoutList extends HTMLElement {
       this.selectedRoutineId = target.value
     })
 
-    this.querySelector<HTMLButtonElement>('button[data-action="start"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="start"]')?.addEventListener('click', () => {
       if (this.selectedRoutineId) {
         this.startWorkout(this.selectedRoutineId)
       }
     })
 
-    this.querySelectorAll<HTMLButtonElement>('button[data-action="edit"]').forEach((button) => {
+    this.querySelectorAll<HTMLElement>('rrr-button[data-action="edit"]').forEach((button) => {
       button.addEventListener('click', () => {
         const id = button.dataset.id
 
@@ -162,7 +162,7 @@ export class RrrWorkoutList extends HTMLElement {
       })
     })
 
-    this.querySelectorAll<HTMLButtonElement>('button[data-action="delete"]').forEach((button) => {
+    this.querySelectorAll<HTMLElement>('rrr-button[data-action="delete"]').forEach((button) => {
       button.addEventListener('click', () => {
         const id = button.dataset.id
 

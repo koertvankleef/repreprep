@@ -305,7 +305,7 @@ export class RrrRoutineEditor extends HTMLElement {
         <section class="page">
           <rrr-card size="lg">
             <h2>${t('routineEditor.notFound.title')}</h2>
-            <button type="button" data-action="back">${t('routineEditor.notFound.back')}</button>
+            <rrr-button type="button" variant="secondary" data-action="back">${t('routineEditor.notFound.back')}</rrr-button>
           </rrr-card>
         </section>
       `
@@ -340,9 +340,9 @@ export class RrrRoutineEditor extends HTMLElement {
                             data-set-index="${setIndex}"
                             data-field="weight"
                             value="${set.targetWeightKg ?? ''}" /></label>
-                          <button type="button" data-action="remove-set"
+                          <rrr-button type="button" variant="danger" data-action="remove-set"
                             data-exercise-id="${routineExercise.id}"
-                            data-set-index="${setIndex}" aria-label="${escapeHtml(t('routineEditor.action.removeSetAria', { index: setIndex + 1, name: exerciseName }))}">${t('action.remove')}</button>
+                            data-set-index="${setIndex}" aria-label="${escapeHtml(t('routineEditor.action.removeSetAria', { index: setIndex + 1, name: exerciseName }))}">${t('action.remove')}</rrr-button>
                         </div>
                       `
                     }
@@ -355,9 +355,9 @@ export class RrrRoutineEditor extends HTMLElement {
                           data-set-index="${setIndex}"
                           data-field="seconds"
                           value="${set.targetSeconds ?? ''}" /></label>
-                        <button type="button" data-action="remove-set"
+                        <rrr-button type="button" variant="danger" data-action="remove-set"
                           data-exercise-id="${routineExercise.id}"
-                          data-set-index="${setIndex}" aria-label="${escapeHtml(t('routineEditor.action.removeSetAria', { index: setIndex + 1, name: exerciseName }))}">${t('action.remove')}</button>
+                          data-set-index="${setIndex}" aria-label="${escapeHtml(t('routineEditor.action.removeSetAria', { index: setIndex + 1, name: exerciseName }))}">${t('action.remove')}</rrr-button>
                       </div>
                     `
                   })
@@ -368,16 +368,16 @@ export class RrrRoutineEditor extends HTMLElement {
                 <div class="exercise-header">
                   <span class="exercise-name" id="${exerciseHeadingId}">${escapeHtml(exerciseName)}</span>
                   <div class="exercise-order">
-                    <button type="button" data-action="move-up" data-id="${routineExercise.id}"
-                      ${isFirst ? 'disabled' : ''} aria-label="${escapeHtml(t('routineEditor.action.moveUpAria', { name: exerciseName }))}">↑</button>
-                    <button type="button" data-action="move-down" data-id="${routineExercise.id}"
-                      ${isLast ? 'disabled' : ''} aria-label="${escapeHtml(t('routineEditor.action.moveDownAria', { name: exerciseName }))}">↓</button>
-                    <button type="button" data-action="remove-exercise" data-id="${routineExercise.id}" aria-label="${escapeHtml(t('routineEditor.action.removeExerciseAria', { name: exerciseName }))}">${t('action.remove')}</button>
+                    <rrr-button type="button" variant="secondary" data-action="move-up" data-id="${routineExercise.id}"
+                      ${isFirst ? 'disabled' : ''} aria-label="${escapeHtml(t('routineEditor.action.moveUpAria', { name: exerciseName }))}">↑</rrr-button>
+                    <rrr-button type="button" variant="secondary" data-action="move-down" data-id="${routineExercise.id}"
+                      ${isLast ? 'disabled' : ''} aria-label="${escapeHtml(t('routineEditor.action.moveDownAria', { name: exerciseName }))}">↓</rrr-button>
+                    <rrr-button type="button" variant="danger" data-action="remove-exercise" data-id="${routineExercise.id}" aria-label="${escapeHtml(t('routineEditor.action.removeExerciseAria', { name: exerciseName }))}">${t('action.remove')}</rrr-button>
                   </div>
                 </div>
                 <div class="planned-sets">${setsHtml}</div>
                 <div>
-                  <button type="button" data-action="add-set" data-id="${routineExercise.id}" aria-label="${escapeHtml(t('routineEditor.action.addSetAria', { name: exerciseName }))}">${t('routineEditor.action.addSet')}</button>
+                  <rrr-button type="button" data-action="add-set" data-id="${routineExercise.id}" aria-label="${escapeHtml(t('routineEditor.action.addSetAria', { name: exerciseName }))}">${t('routineEditor.action.addSet')}</rrr-button>
                 </div>
               </section>
             `
@@ -409,12 +409,12 @@ export class RrrRoutineEditor extends HTMLElement {
                 ${activeExercises.map((e) => `<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('')}
               </select>
             </label>
-            <button type="button" data-action="add-exercise">${t('action.add')}</button>
+            <rrr-button type="button" data-action="add-exercise">${t('action.add')}</rrr-button>
           </div>
           <div class="actions">
-            <button type="button" data-action="save">${t('routineEditor.action.save')}</button>
-            ${isEditing ? `<button type="button" data-action="start-workout">${t('routineEditor.action.startWorkout')}</button>` : ''}
-            <button type="button" data-action="back">${t('action.cancel')}</button>
+            <rrr-button type="button" data-action="save">${t('routineEditor.action.save')}</rrr-button>
+            ${isEditing ? `<rrr-button type="button" data-action="start-workout">${t('routineEditor.action.startWorkout')}</rrr-button>` : ''}
+            <rrr-button type="button" variant="secondary" data-action="back">${t('action.cancel')}</rrr-button>
           </div>
         </rrr-card>
       </section>

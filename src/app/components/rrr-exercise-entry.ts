@@ -136,7 +136,7 @@ export class RrrExerciseEntry extends HTMLElement {
             <h3 id="${headingId}">${exerciseName}</h3>
             <p>${exerciseKind === 'duration' ? t('exerciseEntry.kind.duration') : t('exerciseEntry.kind.repsWeight')}</p>
           </div>
-          <button type="button" data-action="remove-exercise" aria-label="${escapeHtml(t('exerciseEntry.action.removeExerciseAria', { name: exerciseName }))}">${t('action.remove')}</button>
+          <rrr-button type="button" variant="danger" data-action="remove-exercise" aria-label="${escapeHtml(t('exerciseEntry.action.removeExerciseAria', { name: exerciseName }))}">${t('action.remove')}</rrr-button>
         </div>
         <label>
           ${t('exerciseEntry.field.notes')}
@@ -144,7 +144,7 @@ export class RrrExerciseEntry extends HTMLElement {
         </label>
         <div class="sets" aria-live="polite"></div>
         <div class="footer">
-          <button type="button" data-action="add-set" aria-label="${escapeHtml(t('exerciseEntry.action.addSetAria', { name: exerciseName }))}">${t('exerciseEntry.action.addSet')}</button>
+          <rrr-button type="button" data-action="add-set" aria-label="${escapeHtml(t('exerciseEntry.action.addSetAria', { name: exerciseName }))}">${t('exerciseEntry.action.addSet')}</rrr-button>
         </div>
       </section>
     `
@@ -164,11 +164,11 @@ export class RrrExerciseEntry extends HTMLElement {
       this.emitChanged()
     })
 
-    this.shadowRoot.querySelector<HTMLButtonElement>('button[data-action="add-set"]')?.addEventListener('click', () => {
+    this.shadowRoot.querySelector<HTMLElement>('rrr-button[data-action="add-set"]')?.addEventListener('click', () => {
       this.addSet()
     })
 
-    this.shadowRoot.querySelector<HTMLButtonElement>('button[data-action="remove-exercise"]')?.addEventListener('click', () => {
+    this.shadowRoot.querySelector<HTMLElement>('rrr-button[data-action="remove-exercise"]')?.addEventListener('click', () => {
       this.emitRemoved()
     })
 

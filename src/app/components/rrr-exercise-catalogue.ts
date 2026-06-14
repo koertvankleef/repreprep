@@ -125,8 +125,8 @@ export class RrrExerciseCatalogue extends HTMLElement {
               </div>
             </div>
             <div class="actions">
-              ${showArchived ? '' : `<button type="button" data-action="edit" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.editAria', { name: exercise.name }))}">${t('action.edit')}</button>`}
-              ${showArchived ? '' : `<button type="button" data-action="archive" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.archiveAria', { name: exercise.name }))}">${t('action.archive')}</button>`}
+              ${showArchived ? '' : `<rrr-button type="button" variant="secondary" data-action="edit" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.editAria', { name: exercise.name }))}">${t('action.edit')}</rrr-button>`}
+              ${showArchived ? '' : `<rrr-button type="button" variant="secondary" data-action="archive" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.archiveAria', { name: exercise.name }))}">${t('action.archive')}</rrr-button>`}
             </div>
           </article>
         `
@@ -156,7 +156,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
                 <option value="duration">${t('exercise.form.kind.duration')}</option>
               </select>
             </label>
-            <button type="button" data-action="add">${t('exercise.form.add')}</button>
+            <rrr-button type="button" data-action="add">${t('exercise.form.add')}</rrr-button>
           </div>
         </rrr-card>
         <rrr-card size="lg">
@@ -184,11 +184,11 @@ export class RrrExerciseCatalogue extends HTMLElement {
       kindField.value = 'reps-weight'
     }
 
-    this.querySelector<HTMLButtonElement>('button[data-action="add"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="add"]')?.addEventListener('click', () => {
       this.addExercise()
     })
 
-    this.querySelectorAll<HTMLButtonElement>('button[data-action="edit"]').forEach((button) => {
+    this.querySelectorAll<HTMLElement>('rrr-button[data-action="edit"]').forEach((button) => {
       button.addEventListener('click', () => {
         const id = button.dataset.id
 
@@ -198,7 +198,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
       })
     })
 
-    this.querySelectorAll<HTMLButtonElement>('button[data-action="archive"]').forEach((button) => {
+    this.querySelectorAll<HTMLElement>('rrr-button[data-action="archive"]').forEach((button) => {
       button.addEventListener('click', () => {
         const id = button.dataset.id
 
