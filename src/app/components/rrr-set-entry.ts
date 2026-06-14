@@ -1,6 +1,6 @@
-import { t } from '../i18n/index.ts'
-import type { ExerciseKind, SetEntry } from '../domain/types.ts'
-import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
+import { t } from '../../i18n/index.ts'
+import type { ExerciseKind, SetEntry } from '../../domain/types.ts'
+import { shadowTypographyStyles } from '../../design-system/shadow-styles.ts'
 import componentStyles from './rrr-set-entry.css?inline'
 
 const styles = `${shadowTypographyStyles}\n${componentStyles}`

@@ -1,7 +1,7 @@
-import { storageService } from '../app/storage-instance.ts'
-import { createNewExercise, isExerciseUsedInWorkouts } from '../domain/exercise-service.ts'
-import { confirmDialog, promptDialog } from '../utils/dialog-service.ts'
-import { t } from '../i18n/index.ts'
+import { storageService } from '../storage-instance.ts'
+import { createNewExercise, isExerciseUsedInWorkouts } from '../../domain/exercise-service.ts'
+import { confirmDialog, promptDialog } from '../../utils/dialog-service.ts'
+import { t } from '../../i18n/index.ts'
 import styles from './rrr-exercise-catalogue.css?inline'
 
 export class RrrExerciseCatalogue extends HTMLElement {

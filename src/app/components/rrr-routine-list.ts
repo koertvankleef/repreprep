@@ -1,8 +1,8 @@
-import { storageService } from '../app/storage-instance.ts'
-import { getActiveRoutines } from '../domain/routine-service.ts'
-import { t, tPlural } from '../i18n/index.ts'
-import { todayIso } from '../utils/date.ts'
-import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
+import { storageService } from '../storage-instance.ts'
+import { getActiveRoutines } from '../../domain/routine-service.ts'
+import { t, tPlural } from '../../i18n/index.ts'
+import { todayIso } from '../../utils/date.ts'
+import { createWorkoutFromRoutine } from '../../domain/workout-service.ts'
 import styles from './rrr-routine-list.css?inline'
 
 export class RrrRoutineList extends HTMLElement {

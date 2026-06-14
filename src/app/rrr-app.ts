@@ -1,6 +1,6 @@
 import { storageService } from './storage-instance.ts'
 import { t } from '../i18n/index.ts'
-import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
+import { shadowTypographyStyles } from '../design-system/shadow-styles.ts'
 import { appRoutes, type AppRouteMeta } from '../domain/routes.ts'
 import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
 import appStyles from './rrr-app.css?inline'

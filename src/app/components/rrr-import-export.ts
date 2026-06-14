@@ -1,8 +1,8 @@
-import { storageService } from '../app/storage-instance.ts'
-import { t } from '../i18n/index.ts'
-import { exportToJson } from '../import-export/json-export-service.ts'
-import { importFromJson } from '../import-export/json-import-service.ts'
-import { confirmDialog } from '../utils/dialog-service.ts'
+import { storageService } from '../storage-instance.ts'
+import { t } from '../../i18n/index.ts'
+import { exportToJson } from '../../import-export/json-export-service.ts'
+import { importFromJson } from '../../import-export/json-import-service.ts'
+import { confirmDialog } from '../../utils/dialog-service.ts'
 import styles from './rrr-import-export.css?inline'
 
 export class RrrImportExport extends HTMLElement {

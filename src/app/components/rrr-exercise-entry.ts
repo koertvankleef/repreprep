@@ -1,7 +1,7 @@
-import { createDurationSet, createRepsWeightSet } from '../domain/workout-service.ts'
-import { t } from '../i18n/index.ts'
-import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
-import type { ExerciseDefinition, SetEntry, WorkoutExerciseEntry } from '../domain/types.ts'
+import { createDurationSet, createRepsWeightSet } from '../../domain/workout-service.ts'
+import { t } from '../../i18n/index.ts'
+import { shadowTypographyStyles } from '../../design-system/shadow-styles.ts'
+import type { ExerciseDefinition, SetEntry, WorkoutExerciseEntry } from '../../domain/types.ts'
 import './rrr-set-entry.ts'
 import componentStyles from './rrr-exercise-entry.css?inline'
 

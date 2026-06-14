@@ -1,10 +1,10 @@
-import { storageService } from '../app/storage-instance.ts'
-import { getExercise } from '../domain/exercise-service.ts'
-import { getActiveRoutines } from '../domain/routine-service.ts'
-import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
-import { formatDate as formatLocalizedDate, t } from '../i18n/index.ts'
-import { confirmDialog } from '../utils/dialog-service.ts'
-import { todayIso } from '../utils/date.ts'
+import { storageService } from '../storage-instance.ts'
+import { getExercise } from '../../domain/exercise-service.ts'
+import { getActiveRoutines } from '../../domain/routine-service.ts'
+import { createWorkoutFromRoutine } from '../../domain/workout-service.ts'
+import { formatDate as formatLocalizedDate, t } from '../../i18n/index.ts'
+import { confirmDialog } from '../../utils/dialog-service.ts'
+import { todayIso } from '../../utils/date.ts'
 import styles from './rrr-workout-list.css?inline'
 
 export class RrrWorkoutList extends HTMLElement {

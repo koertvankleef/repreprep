@@ -4,15 +4,15 @@ import { resolve } from 'node:path'
 const filesToCheck = [
   'src/app/rrr-app.ts',
   'src/design-system/components/rrr-dialog-host.ts',
-  'src/components/rrr-exercise-catalogue.ts',
-  'src/components/rrr-exercise-entry.ts',
-  'src/components/rrr-exercise-history.ts',
-  'src/components/rrr-import-export.ts',
-  'src/components/rrr-routine-editor.ts',
-  'src/components/rrr-routine-list.ts',
-  'src/components/rrr-set-entry.ts',
-  'src/components/rrr-workout-editor.ts',
-  'src/components/rrr-workout-list.ts',
+  'src/app/components/rrr-exercise-catalogue.ts',
+  'src/app/components/rrr-exercise-entry.ts',
+  'src/app/components/rrr-exercise-history.ts',
+  'src/app/components/rrr-import-export.ts',
+  'src/app/components/rrr-routine-editor.ts',
+  'src/app/components/rrr-routine-list.ts',
+  'src/app/components/rrr-set-entry.ts',
+  'src/app/components/rrr-workout-editor.ts',
+  'src/app/components/rrr-workout-list.ts',
 ]
 
 const violations = []
