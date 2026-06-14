@@ -52,8 +52,28 @@ All workout data is stored in your browser's localStorage under the key `reprepr
 
 ## Deploying to GitHub Pages
 
-1. Update `vite.config.ts` to set the correct base path: `base: '/repreprep/'`
-2. Run `npm run build`
-3. Deploy the `dist/` folder to GitHub Pages
+This project already builds with a relative Vite base, so it can be hosted from a GitHub Pages project site without changing `vite.config.ts`.
 
-Or use the GitHub Actions workflow for automated deployment.
+### One-time GitHub setup
+
+1. Push this repository to GitHub.
+2. In the repository settings, open `Settings > Pages`.
+3. Under `Build and deployment`, choose `GitHub Actions` as the source.
+
+### Automatic deployment
+
+A workflow is included at [.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml).
+
+- Every push to `main` will:
+	- install dependencies
+	- run the test suite
+	- build the app
+	- deploy `dist/` to GitHub Pages
+
+### Preview URL
+
+For this repository, the deployed preview will be published at:
+
+`https://koertvankleef.github.io/repreprep/`
+
+You can also trigger the deploy manually from the `Actions` tab with `workflow_dispatch`.
