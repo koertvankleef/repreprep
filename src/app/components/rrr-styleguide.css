@@ -1,0 +1,58 @@
+.intro {
+  display: grid;
+  gap: var(--rrr-space-sm);
+}
+
+.stack {
+  display: grid;
+  gap: var(--rrr-space-lg);
+}
+
+.showcase-grid {
+  display: grid;
+  gap: var(--rrr-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.showcase-block {
+  display: grid;
+  gap: var(--rrr-space-sm);
+}
+
+.button-row {
+  display: flex;
+  gap: var(--rrr-space-sm);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.swatch-grid {
+  display: grid;
+  gap: var(--rrr-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+.swatch {
+  display: grid;
+  gap: var(--rrr-space-sm);
+}
+
+.swatch-chip {
+  min-height: 4rem;
+  border-radius: var(--rrr-radius-md);
+  border: 1px solid var(--rrr-color-border);
+}
+
+.token-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--rrr-font-size-sm);
+}
+
+.sample-text {
+  color: var(--rrr-color-text-muted);
+}
+
+.component-column {
+  display: grid;
+  gap: var(--rrr-space-sm);
+}

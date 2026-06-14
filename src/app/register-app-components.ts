@@ -8,6 +8,7 @@ import './components/rrr-import-export.ts'
 import './components/rrr-exercise-history.ts'
 import './components/rrr-routine-list.ts'
 import './components/rrr-routine-editor.ts'
+import './components/rrr-styleguide.ts'
 
 export function registerAppComponents(): void {
   // Side-effect imports above register custom elements once.

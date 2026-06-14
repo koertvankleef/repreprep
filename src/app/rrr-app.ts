@@ -16,9 +16,13 @@ type Route =
   | { name: 'routines' }
   | { name: 'routine-new' }
   | { name: 'routine-edit'; routineId: string }
+  | { name: 'styleguide' }
+
+const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
 
 export class RrrApp extends HTMLElement {
   private route: Route = { name: 'workouts' }
+  private readonly styleguideEnabled = import.meta.env.DEV || localHosts.has(window.location.hostname)
   private readonly router = createHashRouter({
     routes: appRoutes,
     notFoundRouteId: 'workouts',
@@ -71,6 +75,10 @@ export class RrrApp extends HTMLElement {
       return { name: 'import-export' }
     }
 
+    if (match.route.id === 'styleguide' && this.styleguideEnabled) {
+      return { name: 'styleguide' }
+    }
+
     return { name: 'workouts' }
   }
 
@@ -96,6 +104,7 @@ export class RrrApp extends HTMLElement {
           <a class="${this.linkClass('exercises', route.name)}" href="#/exercises">${t('app.nav.exercises')}</a>
           <a class="${this.linkClass('history', route.name)}" href="#/history">${t('app.nav.history')}</a>
           <a class="${this.linkClass('import-export', route.name)}" href="#/import-export">${t('app.nav.importExport')}</a>
+          ${this.styleguideEnabled ? `<a class="${this.linkClass('styleguide', route.name)}" href="#/styleguide">${t('app.nav.styleguide')}</a>` : ''}
         </nav>
         <main>
           <div id="view"></div>
@@ -145,6 +154,11 @@ export class RrrApp extends HTMLElement {
       const editor = document.createElement('rrr-routine-editor') as HTMLElement & { routineId: string | null }
       editor.routineId = route.routineId
       view.append(editor)
+      return
+    }
+
+    if (route.name === 'styleguide') {
+      view.append(document.createElement('rrr-styleguide'))
       return
     }
 

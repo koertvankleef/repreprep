@@ -1,25 +1,197 @@
 :root {
-  --rrr-color-primary: #2563eb;
-  --rrr-color-primary-contrast: #ffffff;
-  --rrr-color-secondary: #64748b;
-  --rrr-color-background: #f8fafc;
-  --rrr-color-surface: #ffffff;
-  --rrr-color-text: #0f172a;
-  --rrr-color-text-muted: #64748b;
-  --rrr-color-border: #e2e8f0;
-  --rrr-color-danger: #dc2626;
-  --rrr-color-success: #16a34a;
-  --rrr-space-xs: 0.25rem;
-  --rrr-space-sm: 0.5rem;
-  --rrr-space-md: 1rem;
-  --rrr-space-lg: 1.5rem;
-  --rrr-space-xl: 2rem;
-  --rrr-radius-sm: 0.25rem;
-  --rrr-radius-md: 0.5rem;
-  --rrr-radius-lg: 0.75rem;
+  color-scheme: light dark;
+
+  --rrr-colors-grayscale-100: oklch(0.18% 0.0004 0.37);
+  --rrr-colors-grayscale-90: oklch(26.32% 0.0104 248.56);
+  --rrr-colors-grayscale-80: oklch(40.03% 0.0165 255.97);
+  --rrr-colors-grayscale-70: oklch(55.72% 0.0172 255.04);
+  --rrr-colors-grayscale-60: oklch(64.23% 0.0193 259.79);
+  --rrr-colors-grayscale-50: oklch(77.73% 0.0177 254.30);
+  --rrr-colors-grayscale-40: oklch(86.89% 0.0179 259.79);
+  --rrr-colors-grayscale-30: oklch(92.67% 0.0164 257.57);
+  --rrr-colors-grayscale-20: oklch(95.85% 0.0125 264.88);
+  --rrr-colors-grayscale-10: oklch(97.69% 0.0066 264.90);
+  --rrr-colors-grayscale-00: oklch(99.88% 0.0004 90.25);
+
+  /* Brand mapping: brand-inspired tone derived from --rrr-colors-magenta-60 (#E30075). */
+  /* Magenta remains the accent family in the imported palette. */
+  --rrr-colors-magenta-10: oklch(97.69% 0.0595 346.56);
+  --rrr-colors-magenta-20: oklch(90.02% 0.0957 349.55);
+  --rrr-colors-magenta-30: oklch(82.35% 0.1319 352.54);
+  --rrr-colors-magenta-40: oklch(74.67% 0.1680 355.54);
+  --rrr-colors-magenta-50: oklch(67.00% 0.2042 358.53);
+  --rrr-colors-magenta-60: oklch(59.33% 0.2404 1.52);
+  --rrr-colors-magenta-70: oklch(48.33% 0.2034 359.37);
+  --rrr-colors-magenta-80: oklch(37.32% 0.1664 357.22);
+  --rrr-colors-magenta-90: oklch(26.32% 0.1294 355.07);
+
+  /* Brand mapping: brand-inspired tone derived from --rrr-colors-balpen-blauw-60 (#0074A7). */
+  /* Balpen Blauw remains the primary family in the imported palette. */
+  --rrr-colors-balpen-blauw-10: oklch(97.69% 0.0289 226.09);
+  --rrr-colors-balpen-blauw-20: oklch(88.78% 0.0467 228.49);
+  --rrr-colors-balpen-blauw-30: oklch(79.87% 0.0645 230.90);
+  --rrr-colors-balpen-blauw-40: oklch(70.97% 0.0824 233.30);
+  --rrr-colors-balpen-blauw-50: oklch(62.06% 0.1002 235.71);
+  --rrr-colors-balpen-blauw-60: oklch(53.15% 0.1180 238.11);
+  --rrr-colors-balpen-blauw-70: oklch(44.21% 0.1039 236.66);
+  --rrr-colors-balpen-blauw-80: oklch(35.26% 0.0898 235.20);
+  --rrr-colors-balpen-blauw-90: oklch(26.32% 0.0757 233.75);
+
+  /* Brand mapping: no direct brand-color equivalent in this set.*/
+  --rrr-colors-context-danger-10: oklch(97.69% 0.0261 17.97);
+  --rrr-colors-context-danger-20: oklch(85.92% 0.0692 20.58);
+  --rrr-colors-context-danger-30: oklch(74.16% 0.1123 23.18);
+  --rrr-colors-context-danger-40: oklch(67.11% 0.1512 25.64);
+  --rrr-colors-context-danger-50: oklch(58.61% 0.1901 28.10);
+  --rrr-colors-context-danger-60: oklch(50.61% 0.1819 28.57);
+  --rrr-colors-context-danger-70: oklch(42.61% 0.1729 29.27);
+  --rrr-colors-context-danger-80: oklch(34.61% 0.1579 29.07);
+  --rrr-colors-context-danger-90: oklch(26.32% 0.1429 28.87);
+
+  /* Brand mapping: no direct brand-color equivalent in this set.*/
+  --rrr-colors-context-success-10: oklch(97.69% 0.0224 154.49);
+  --rrr-colors-context-success-20: oklch(90.84% 0.0612 152.83);
+  --rrr-colors-context-success-30: oklch(84.00% 0.1001 151.17);
+  --rrr-colors-context-success-40: oklch(69.31% 0.1263 148.85);
+  --rrr-colors-context-success-50: oklch(60.21% 0.1525 146.52);
+  --rrr-colors-context-success-60: oklch(52.11% 0.1459 146.53);
+  --rrr-colors-context-success-70: oklch(44.11% 0.1389 146.53);
+  --rrr-colors-context-success-80: oklch(35.21% 0.1269 146.54);
+  --rrr-colors-context-success-90: oklch(26.32% 0.1149 146.55);
+
+  /* Brand mapping: no direct brand-color equivalent in this set.*/
+  --rrr-colors-context-info-10: oklch(97.69% 0.0225 266.13);
+  --rrr-colors-context-info-20: oklch(88.14% 0.0579 266.18);
+  --rrr-colors-context-info-30: oklch(78.60% 0.0933 266.23);
+  --rrr-colors-context-info-40: oklch(68.91% 0.1249 264.34);
+  --rrr-colors-context-info-50: oklch(59.91% 0.1565 262.44);
+  --rrr-colors-context-info-60: oklch(51.81% 0.1499 262.43);
+  --rrr-colors-context-info-70: oklch(43.71% 0.1429 262.43);
+  --rrr-colors-context-info-80: oklch(35.11% 0.1269 262.41);
+  --rrr-colors-context-info-90: oklch(26.32% 0.1109 262.38);
+
+  /* Brand mapping: no direct brand-color equivalent in this set.*/
+  --rrr-colors-context-warning-10: oklch(97.69% 0.0249 58.87);
+  --rrr-colors-context-warning-20: oklch(90.84% 0.0649 57.17);
+  --rrr-colors-context-warning-30: oklch(84.00% 0.1129 55.17);
+  --rrr-colors-context-warning-40: oklch(71.11% 0.1509 52.37);
+  --rrr-colors-context-warning-50: oklch(59.91% 0.1985 60.33);
+  --rrr-colors-context-warning-60: oklch(50.41% 0.1739 56.87);
+  --rrr-colors-context-warning-70: oklch(42.11% 0.1509 54.37);
+  --rrr-colors-context-warning-80: oklch(34.31% 0.1339 52.57);
+  --rrr-colors-context-warning-90: oklch(26.32% 0.1169 51.37);
+
+  --rrr-radius-xs: .125rem;
+  --rrr-radius-s: .25rem;
+  --rrr-radius-m: .5rem;
+  --rrr-radius-l: .75rem;
+  --rrr-radius-xl: 1rem;
+  --rrr-radius-2xl: 1.25rem;
+
+  --rrr-spacing-2xs: .125rem;
+  --rrr-spacing-xs: .25rem;
+  --rrr-spacing-s: .5rem;
+  --rrr-spacing-m: .75rem;
+  --rrr-spacing-l: 1rem;
+  --rrr-spacing-xl: 1.25rem;
+  --rrr-spacing-2xl: 2rem;
+  --rrr-spacing-3xl: 3rem;
+  --rrr-spacing-4xl: 4rem;
+
+  /* Macro spacing for page-level layout only (not for component internals) */
+  --rrr-layout-spacing-5xl: 6rem;
+  --rrr-layout-spacing-6xl: 9rem;
+
+  --rrr-font-size-xs: .625rem;
+  --rrr-font-size-s: .75rem;
+  /* size-m: User agent default */
+  --rrr-font-size-m: 1rem;
+  --rrr-font-size-l: 1.125rem;
+  --rrr-font-size-xl: 1.5rem;
+  --rrr-font-size-2xl: 2rem;
+  --rrr-font-default-size: var(--rrr-font-size-m);
+
+  --rrr-font-weight-light: 300;
+  --rrr-font-weight-normal: 400;
+  --rrr-font-weight-semibold: 600;
+  --rrr-font-weight-bold: 700;
+
+  --rrr-sizes-grid-space: .25rem;
+  --rrr-sizes-grid-1: .5rem;
+  --rrr-sizes-grid-2: 1rem;
+  --rrr-sizes-grid-3: 1.5rem;
+  --rrr-sizes-grid-4: 2rem;
+  --rrr-sizes-grid-5: 2.5rem;
+  --rrr-sizes-grid-6: 3rem;
+  --rrr-sizes-grid-7: 3.5rem;
+  --rrr-sizes-grid-8: 4rem;
+
+  --rrr-hairline: 1px;
+
+  /* Shadows are kept px because rem-based shadows can cause inconsistent rendering and unnatural scaling */
+  /* Depth 1: subtle lift for quiet interactive controls (for example: resting buttons, chips, tiny badges). */
+  --rrr-depth-1-shadow: 0 1px 2px #00000012, 0 1px 1px #0000000f;
+  /* Depth 2: default component elevation (for example: cards, tiles, input groups). */
+  --rrr-depth-2-shadow: 0 2px 4px #00000014, 0 1px 2px #0000000a;
+  /* Depth 3: attention surfaces above regular content (for example: dialogs, popovers, sticky panels). */
+  --rrr-depth-3-shadow: 0 3px 8px #00000018, 0 2px 4px #0000000d;
+  /* Depth 4: strong elevation for high-priority overlays (for example: dropdown menus, command palettes). */
+  --rrr-depth-4-shadow: 0 6px 16px #0000001f, 0 3px 7px #00000007;
+  /* Depth 5: maximum emphasis, use sparingly (for example: blocking modals, urgent callouts, tour coachmarks). */
+  --rrr-depth-5-shadow: 0 10px 28px #00000024, 0 5px 12px #0000000c;
+
+  /* Semantic mappings for common use-cases */
+  --rrr-shadow-button: var(--rrr-depth-1-shadow);
+  --rrr-shadow-card: var(--rrr-depth-2-shadow);
+  --rrr-shadow-dialog: var(--rrr-depth-3-shadow);
+
+  /* Backward compatibility: legacy token points to max-1 depth */
+  --rrr-borders-shadow: var(--rrr-depth-4-shadow);
+
+  --rrr-border-width: 1px;
+  --rrr-border-default-color: var(--rrr-colors-grayscale-30);
+
+  --rrr-default-background-color: var(--rrr-colors-grayscale-10);
+
+  --global-focus-ring-color: var(--rrr-colors-grayscale-100);
+  --global-focus-ring-offset: 2px;
+  --global-focus-ring-width: 2px;
+
+  /* Anything smaller than 576px is default */
+  --grid-breakpoint-s: 36rem;
+  --grid-breakpoint-m: 48rem;
+  --grid-breakpoint-l: 62rem;
+  --grid-breakpoint-xl: 80rem;
+
+  --rrr-default-transition: 128ms cubic-bezier(.4, 0, .2, 1);
+
+  --rrr-anim-fromto-timingfunction: cubic-bezier(0.205, 0.000, 0.000, 1.000);
+  /* Semantic aliases kept for the current app surface during token migration. */
+  --rrr-color-primary: var(--rrr-colors-balpen-blauw-60);
+  --rrr-color-primary-contrast: var(--rrr-colors-grayscale-00);
+  --rrr-color-secondary: var(--rrr-colors-grayscale-70);
+  --rrr-color-background: var(--rrr-colors-grayscale-10);
+  --rrr-color-surface: var(--rrr-colors-grayscale-00);
+  --rrr-color-text: var(--rrr-colors-grayscale-100);
+  --rrr-color-text-muted: var(--rrr-colors-grayscale-70);
+  --rrr-color-text-secondary: var(--rrr-color-text-muted);
+  --rrr-color-border: var(--rrr-colors-grayscale-30);
+  --rrr-color-danger: var(--rrr-colors-context-danger-60);
+  --rrr-color-success: var(--rrr-colors-context-success-60);
+
+  --rrr-space-xs: var(--rrr-spacing-xs);
+  --rrr-space-sm: var(--rrr-spacing-s);
+  --rrr-space-md: var(--rrr-spacing-l);
+  --rrr-space-lg: var(--rrr-spacing-xl);
+  --rrr-space-xl: var(--rrr-spacing-2xl);
+
+  --rrr-radius-sm: var(--rrr-radius-s);
+  --rrr-radius-md: var(--rrr-radius-m);
+  --rrr-radius-lg: var(--rrr-radius-l);
+
   --rrr-font-family: 'Exo 2', system-ui, -apple-system, sans-serif;
   --rrr-font-family-heading: 'Oxanium', system-ui, -apple-system, sans-serif;
-  --rrr-font-size-sm: 0.875rem;
-  --rrr-font-size-md: 1rem;
-  --rrr-font-size-lg: 1.25rem;
+  --rrr-font-size-sm: var(--rrr-font-size-s);
+  --rrr-font-size-md: var(--rrr-font-size-m);
+  --rrr-font-size-lg: var(--rrr-font-size-l);
 }
