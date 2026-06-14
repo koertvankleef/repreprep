@@ -168,6 +168,13 @@ const TOKEN_SCALES: TokenScale[] = [
   },
 ]
 
+const CONTEXT_PALETTE_KEYS = new Set([
+  'styleguide.palette.info.title',
+  'styleguide.palette.success.title',
+  'styleguide.palette.warning.title',
+  'styleguide.palette.danger.title',
+])
+
 export class RrrStyleguide extends HTMLElement {
   private readonly handleClick = (event: Event): void => {
     const trigger = event
@@ -202,6 +209,7 @@ export class RrrStyleguide extends HTMLElement {
 
   connectedCallback(): void {
     this.render()
+    this.initializeSwatches()
     this.addEventListener('click', this.handleClick)
   }
 
@@ -256,7 +264,7 @@ export class RrrStyleguide extends HTMLElement {
   }
 
   private renderColorPaletteShowcase(): string {
-    return COLOR_PALETTES.map((palette) => {
+    const renderGroup = (palette: PaletteGroup): string => {
       const swatches = palette.entries
         .map((entry) => {
           const marker = palette.isBrandPalette && entry.isBrandAnchor
@@ -264,13 +272,12 @@ export class RrrStyleguide extends HTMLElement {
             : ''
 
           return `
-            <li class="swatch" style="--swatch-color: var(${entry.token});">
-              <div class="swatch-chip"></div>
+            <li class="swatch" data-swatch-token="${entry.token}" style="--swatch-color: var(${entry.token});">
               <div class="swatch-meta">
                 <span class="swatch-step">${entry.step}</span>
                 ${marker}
               </div>
-              <code class="token-name">${entry.token}</code>
+              <code class="token-name" data-swatch-value>${entry.token}</code>
             </li>
           `
         })
@@ -283,7 +290,15 @@ export class RrrStyleguide extends HTMLElement {
           <ul class="swatch-grid">${swatches}</ul>
         </section>
       `
-    }).join('')
+    }
+
+    const contextGroups = COLOR_PALETTES.filter((palette) => CONTEXT_PALETTE_KEYS.has(palette.titleKey)).map(renderGroup).join('')
+    const otherGroups = COLOR_PALETTES.filter((palette) => !CONTEXT_PALETTE_KEYS.has(palette.titleKey)).map(renderGroup).join('')
+
+    return `
+      <div class="swatch-row swatch-row--primary">${otherGroups}</div>
+      <div class="swatch-row swatch-row--context">${contextGroups}</div>
+    `
   }
 
   private renderTokenScales(): string {
@@ -423,7 +438,187 @@ export class RrrStyleguide extends HTMLElement {
         </div>
       </section>
     `
+
+    this.initializeSwatches()
   }
+
+  private initializeSwatches(): void {
+    const swatches = this.querySelectorAll<HTMLElement>('.swatch[data-swatch-token]')
+    if (swatches.length === 0) {
+      return
+    }
+
+    const rootStyles = getComputedStyle(document.documentElement)
+
+    swatches.forEach((swatch) => {
+      const tokenName = swatch.dataset.swatchToken
+      const tokenValue = tokenName ? rootStyles.getPropertyValue(tokenName).trim() : ''
+      const backgroundColor = tokenValue || getComputedStyle(swatch).backgroundColor
+      const rgb = parseColorToRgb(backgroundColor)
+      if (!rgb) {
+        return
+      }
+
+      const valueElement = swatch.querySelector<HTMLElement>('[data-swatch-value]')
+      if (valueElement) {
+        valueElement.textContent = rgbToHslLabel(rgb.r, rgb.g, rgb.b)
+      }
+
+      const luminance = toRelativeLuminance(rgb.r, rgb.g, rgb.b)
+      swatch.dataset.swatchDark = luminance < 0.45 ? 'true' : 'false'
+    })
+  }
+}
+
+function parseColorToRgb(color: string): { r: number; g: number; b: number } | null {
+  const rgb = parseRgbColor(color)
+  if (rgb) {
+    return rgb
+  }
+
+  const oklch = parseOklchColor(color)
+  if (oklch) {
+    return oklchToRgb(oklch.l, oklch.c, oklch.h)
+  }
+
+  return null
+}
+
+function parseRgbColor(color: string): { r: number; g: number; b: number } | null {
+  const match = color.match(/rgba?\(([^)]+)\)/i)
+  const channelSource = match?.[1]
+  if (!channelSource) {
+    return null
+  }
+
+  const channels = channelSource
+    .replace(/\//g, ' ')
+    .split(/[\s,]+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .map((part) => Number.parseFloat(part.trim()))
+
+  if (channels.length < 3 || channels.some((channel) => Number.isNaN(channel))) {
+    return null
+  }
+
+  const [r, g, b] = channels
+  if (r === undefined || g === undefined || b === undefined) {
+    return null
+  }
+
+  return {
+    r,
+    g,
+    b,
+  }
+}
+
+function parseOklchColor(color: string): { l: number; c: number; h: number } | null {
+  const match = color.match(/oklch\(\s*([-\d.]+)%\s+([-\d.]+)\s+([-\d.]+)(?:deg)?(?:\s*\/\s*[-\d.%]+)?\s*\)/i)
+  const lightnessText = match?.[1]
+  const chromaText = match?.[2]
+  const hueText = match?.[3]
+
+  if (!lightnessText || !chromaText || !hueText) {
+    return null
+  }
+
+  const lightness = Number.parseFloat(lightnessText) / 100
+  const chroma = Number.parseFloat(chromaText)
+  const hue = Number.parseFloat(hueText)
+
+  if (Number.isNaN(lightness) || Number.isNaN(chroma) || Number.isNaN(hue)) {
+    return null
+  }
+
+  return {
+    l: lightness,
+    c: chroma,
+    h: hue,
+  }
+}
+
+function oklchToRgb(lightness: number, chroma: number, hue: number): { r: number; g: number; b: number } {
+  const hueRadians = hue * Math.PI / 180
+  const a = chroma * Math.cos(hueRadians)
+  const b = chroma * Math.sin(hueRadians)
+
+  const lPrime = lightness + 0.3963377774 * a + 0.2158037573 * b
+  const mPrime = lightness - 0.1055613458 * a - 0.0638541728 * b
+  const sPrime = lightness - 0.0894841775 * a - 1.291485548 * b
+
+  const l = lPrime ** 3
+  const m = mPrime ** 3
+  const s = sPrime ** 3
+
+  const linearR = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s
+  const linearG = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s
+  const linearB = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s
+
+  const toSrgb = (channel: number): number => {
+    const clampedLinear = Math.max(0, Math.min(1, channel))
+    const srgb = clampedLinear <= 0.0031308
+      ? 12.92 * clampedLinear
+      : 1.055 * (clampedLinear ** (1 / 2.4)) - 0.055
+
+    return Math.max(0, Math.min(255, srgb * 255))
+  }
+
+  return {
+    r: toSrgb(linearR),
+    g: toSrgb(linearG),
+    b: toSrgb(linearB),
+  }
+}
+
+function rgbToHslLabel(r: number, g: number, b: number): string {
+  const red = r / 255
+  const green = g / 255
+  const blue = b / 255
+
+  const max = Math.max(red, green, blue)
+  const min = Math.min(red, green, blue)
+  const delta = max - min
+
+  let hue = 0
+  const lightness = (max + min) / 2
+  let saturation = 0
+
+  if (delta !== 0) {
+    saturation = delta / (1 - Math.abs(2 * lightness - 1))
+
+    switch (max) {
+      case red:
+        hue = 60 * (((green - blue) / delta) % 6)
+        break
+      case green:
+        hue = 60 * ((blue - red) / delta + 2)
+        break
+      default:
+        hue = 60 * ((red - green) / delta + 4)
+        break
+    }
+  }
+
+  if (hue < 0) {
+    hue += 360
+  }
+
+  return `hsl(${Math.round(hue)}, ${Math.round(saturation * 100)}, ${Math.round(lightness * 100)})`
+}
+
+function toRelativeLuminance(r: number, g: number, b: number): number {
+  const normalize = (channel: number): number => {
+    const value = channel / 255
+    return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
+  }
+
+  const red = normalize(r)
+  const green = normalize(g)
+  const blue = normalize(b)
+
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue
 }
 
 customElements.define('rrr-styleguide', RrrStyleguide)
