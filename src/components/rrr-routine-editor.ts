@@ -1,5 +1,4 @@
 import { storageService } from '../app/storage-instance.ts'
-import { Required, type Validator } from '@lion/ui/form-core.js'
 import { getActiveExercises } from '../domain/exercise-service.ts'
 import { createRoutineExercise, getActiveRoutineVersion, getRoutine } from '../domain/routine-service.ts'
 import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
@@ -65,17 +64,12 @@ const styles = `
     min-width: 12rem;
   }
 
-  lion-input,
-  lion-select {
+  .field-input,
+  .field-select {
     display: block;
+    width: 100%;
   }
 `
-
-interface LionFieldLike extends HTMLElement {
-  modelValue: unknown
-  submitted: boolean
-  validators: Validator[]
-}
 
 export class RrrRoutineEditor extends HTMLElement {
   private routineIdValue: string | null = null
@@ -213,10 +207,10 @@ export class RrrRoutineEditor extends HTMLElement {
   }
 
   private readFields(): void {
-    const nameInput = this.querySelector<LionFieldLike>('lion-input[name="routine-name"]')
+    const nameInput = this.querySelector<HTMLInputElement>('input[name="routine-name"]')
 
     if (nameInput) {
-      this.name = String(nameInput.modelValue ?? '')
+      this.name = nameInput.value
     }
 
     this.exercises = this.exercises.map((exercise) => {
@@ -253,8 +247,8 @@ export class RrrRoutineEditor extends HTMLElement {
   private addExercise(): void {
     this.readFields()
 
-    const select = this.querySelector<LionFieldLike>('lion-select[name="add-exercise"]')
-    const exerciseId = String(select?.modelValue ?? '')
+    const select = this.querySelector<HTMLSelectElement>('select[name="add-exercise"]')
+    const exerciseId = String(select?.value ?? '')
 
     if (!exerciseId) {
       return
@@ -331,7 +325,7 @@ export class RrrRoutineEditor extends HTMLElement {
     if (!this.name.trim()) {
       this.setStatus('Please provide a routine name.', 'error')
       this.render()
-      this.querySelector<LionFieldLike>('lion-input[name="routine-name"]')?.focus()
+      this.querySelector<HTMLInputElement>('input[name="routine-name"]')?.focus()
       return
     }
 
@@ -463,18 +457,22 @@ export class RrrRoutineEditor extends HTMLElement {
           </div>
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || 'Define a routine structure, then save it as a reusable template.'}</p>
           <div class="row">
-            <lion-input name="routine-name" label="Name"></lion-input>
+            <label>
+              Name
+              <input class="field-input" name="routine-name" type="text" placeholder="Routine name" autocomplete="off" />
+            </label>
           </div>
           <div>
             <h3>Exercises</h3>
             <div class="exercise-list" aria-live="polite">${exerciseListHtml}</div>
           </div>
           <div class="add-exercise-row">
-            <lion-select name="add-exercise" label="Add Exercise">
-              <select slot="input">
+            <label>
+              Add Exercise
+              <select class="field-select" name="add-exercise">
                 ${activeExercises.map((e) => `<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('')}
               </select>
-            </lion-select>
+            </label>
             <button type="button" data-action="add-exercise">Add</button>
           </div>
           <div class="actions">
@@ -486,20 +484,15 @@ export class RrrRoutineEditor extends HTMLElement {
       </section>
     `
 
-    const nameField = this.querySelector<LionFieldLike>('lion-input[name="routine-name"]')
-    const exerciseField = this.querySelector<LionFieldLike>('lion-select[name="add-exercise"]')
+    const nameField = this.querySelector<HTMLInputElement>('input[name="routine-name"]')
+    const exerciseField = this.querySelector<HTMLSelectElement>('select[name="add-exercise"]')
 
     if (nameField) {
-      nameField.modelValue = this.name
-      nameField.validators = [new Required()]
-      nameField.setAttribute('placeholder', 'Routine name')
-      nameField.setAttribute('field-name', 'routine name')
+      nameField.value = this.name
     }
 
     if (exerciseField) {
-      exerciseField.modelValue = activeExercises[0]?.id ?? ''
-      exerciseField.validators = []
-      exerciseField.setAttribute('field-name', 'exercise')
+      exerciseField.value = activeExercises[0]?.id ?? ''
     }
   }
 }

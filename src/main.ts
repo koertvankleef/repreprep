@@ -1,10 +1,4 @@
 import './app/rrr-app.ts'
-import '@lion/ui/define/lion-dialog.js'
-import '@lion/ui/define/lion-input.js'
-import '@lion/ui/define/lion-input-datepicker.js'
-import '@lion/ui/define/lion-select.js'
-import '@lion/ui/define/lion-textarea.js'
-import { loadDefaultFeedbackMessages } from '@lion/ui/validate-messages.js'
 import './components/rrr-workout-list.ts'
 import './components/rrr-workout-editor.ts'
 import './components/rrr-exercise-entry.ts'
@@ -16,5 +10,3 @@ import './components/rrr-import-export.ts'
 import './components/rrr-exercise-history.ts'
 import './components/rrr-routine-list.ts'
 import './components/rrr-routine-editor.ts'
-
-loadDefaultFeedbackMessages()

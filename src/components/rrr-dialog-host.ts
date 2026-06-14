@@ -1,20 +1,26 @@
-import { Required, type Validator } from '@lion/ui/form-core.js'
-
 const styles = `
   :host {
     display: contents;
   }
 
-  .dialog-panel {
+  dialog {
     width: min(32rem, calc(100vw - 2rem));
-    background: var(--rrr-color-surface);
-    color: var(--rrr-color-text);
     border: 1px solid var(--rrr-color-border);
     border-radius: var(--rrr-radius-lg);
+    padding: 0;
+    background: var(--rrr-color-surface);
+    color: var(--rrr-color-text);
+    box-shadow: 0 1rem 2rem rgba(15, 23, 42, 0.18);
+  }
+
+  dialog::backdrop {
+    background: rgba(15, 23, 42, 0.4);
+  }
+
+  .dialog-panel {
     padding: var(--rrr-space-lg);
     display: grid;
     gap: var(--rrr-space-md);
-    box-shadow: 0 1rem 2rem rgba(15, 23, 42, 0.18);
   }
 
   .dialog-actions {
@@ -27,18 +33,22 @@ const styles = `
   .dialog-message {
     margin: 0;
   }
+
+  .dialog-field {
+    display: grid;
+    gap: var(--rrr-space-xs);
+  }
+
+  .dialog-field input {
+    width: 100%;
+  }
+
+  .dialog-error {
+    color: var(--rrr-color-danger);
+    margin: 0;
+    min-height: 1.25rem;
+  }
 `
-
-interface LionDialogLike extends HTMLElement {
-  opened: boolean
-}
-
-interface LionFieldLike extends HTMLElement {
-  modelValue: unknown
-  submitted: boolean
-  validators: Validator[]
-  hasFeedbackFor: string[]
-}
 
 type DialogMode = 'confirm' | 'prompt' | null
 
@@ -51,6 +61,7 @@ export class RrrDialogHost extends HTMLElement {
   private confirmLabel = 'Confirm'
   private cancelLabel = 'Cancel'
   private required = false
+  private inputError = ''
   private resolver: ((value: boolean | string | null) => void) | null = null
 
   connectedCallback(): void {
@@ -68,12 +79,9 @@ export class RrrDialogHost extends HTMLElement {
     this.message = options.message
     this.confirmLabel = options.confirmLabel ?? 'Confirm'
     this.cancelLabel = options.cancelLabel ?? 'Cancel'
+    this.inputError = ''
     this.render()
-    const dialog = this.getDialog()
-
-    if (dialog) {
-      dialog.opened = true
-    }
+    this.openDialog()
 
     return new Promise<boolean>((resolve) => {
       this.resolver = resolve as (value: boolean | string | null) => void
@@ -97,18 +105,13 @@ export class RrrDialogHost extends HTMLElement {
     this.confirmLabel = options.confirmLabel ?? 'Save'
     this.cancelLabel = options.cancelLabel ?? 'Cancel'
     this.required = options.required ?? false
+    this.inputError = ''
     this.render()
+    this.openDialog()
 
     const field = this.getPromptField()
     if (field) {
-      field.modelValue = this.value
-      field.validators = this.required ? [new Required()] : []
-    }
-
-    const dialog = this.getDialog()
-
-    if (dialog) {
-      dialog.opened = true
+      field.value = this.value
     }
 
     return new Promise<string | null>((resolve) => {
@@ -116,19 +119,38 @@ export class RrrDialogHost extends HTMLElement {
     })
   }
 
-  private getDialog(): LionDialogLike | null {
-    return this.querySelector<LionDialogLike>('lion-dialog')
+  private openDialog(): void {
+    const dialog = this.getDialog()
+
+    if (!dialog) {
+      return
+    }
+
+    if (!dialog.open) {
+      dialog.showModal()
+    }
+
+    if (this.mode === 'prompt') {
+      this.getPromptField()?.focus()
+    } else {
+      this.querySelector<HTMLButtonElement>('button[data-action="confirm"]')?.focus()
+    }
   }
 
-  private getPromptField(): LionFieldLike | null {
-    return this.querySelector<LionFieldLike>('lion-input[name="dialog-prompt"]')
+  private getDialog(): HTMLDialogElement | null {
+    return this.querySelector<HTMLDialogElement>('dialog')
+  }
+
+  private getPromptField(): HTMLInputElement | null {
+    return this.querySelector<HTMLInputElement>('input[name="dialog-prompt"]')
   }
 
   private closeWith(result: boolean | string | null): void {
-    this.getDialog()?.removeAttribute('opened')
+    this.getDialog()?.close()
     const resolver = this.resolver
     this.resolver = null
     this.mode = null
+    this.inputError = ''
     this.render()
     resolver?.(result)
   }
@@ -146,38 +168,66 @@ export class RrrDialogHost extends HTMLElement {
       return
     }
 
-    field.submitted = true
+    const value = field.value.trim()
 
-    if (field.hasFeedbackFor.includes('error')) {
+    if (this.required && !value) {
+      this.inputError = 'This field is required.'
+      field.setAttribute('aria-invalid', 'true')
+      this.renderValidationState()
+      field.focus()
       return
     }
 
-    const value = String(field.modelValue ?? '').trim()
+    field.removeAttribute('aria-invalid')
     this.closeWith(value)
   }
 
+  private renderValidationState(): void {
+    const error = this.querySelector<HTMLElement>('[data-role="dialog-error"]')
+
+    if (error) {
+      error.textContent = this.inputError
+    }
+  }
+
   private render(): void {
+    const titleId = 'rrr-dialog-title'
+    const messageId = 'rrr-dialog-message'
+    const promptId = 'rrr-dialog-prompt'
+    const errorId = 'rrr-dialog-error'
+
     const promptContent =
       this.mode === 'prompt'
         ? `
-          <lion-input name="dialog-prompt" label="${escapeHtml(this.label)}"></lion-input>
+          <div class="dialog-field">
+            <label for="${promptId}">${escapeHtml(this.label)}</label>
+            <input id="${promptId}" name="dialog-prompt" type="text" value="${escapeHtml(this.value)}" aria-describedby="${errorId}" />
+            <p class="dialog-error" id="${errorId}" data-role="dialog-error" role="alert">${escapeHtml(this.inputError)}</p>
+          </div>
         `
         : ''
 
     this.innerHTML = `
       <style>${styles}</style>
-      <lion-dialog>
-        <div slot="content" class="dialog-panel" role="document">
-          <h2>${escapeHtml(this.dialogTitle)}</h2>
-          <p class="dialog-message">${escapeHtml(this.message)}</p>
+      <dialog aria-labelledby="${titleId}" aria-describedby="${messageId}">
+        <div class="dialog-panel" role="document">
+          <h2 id="${titleId}">${escapeHtml(this.dialogTitle)}</h2>
+          <p class="dialog-message" id="${messageId}">${escapeHtml(this.message)}</p>
           ${promptContent}
           <div class="dialog-actions">
             <button type="button" data-action="cancel">${escapeHtml(this.cancelLabel)}</button>
             <button type="button" data-action="confirm">${escapeHtml(this.confirmLabel)}</button>
           </div>
         </div>
-      </lion-dialog>
+      </dialog>
     `
+
+    const dialog = this.getDialog()
+
+    dialog?.addEventListener('cancel', (event) => {
+      event.preventDefault()
+      this.closeWith(this.mode === 'confirm' ? false : null)
+    })
 
     this.querySelector<HTMLButtonElement>('button[data-action="cancel"]')?.addEventListener('click', () => {
       this.closeWith(this.mode === 'confirm' ? false : null)
@@ -185,6 +235,16 @@ export class RrrDialogHost extends HTMLElement {
 
     this.querySelector<HTMLButtonElement>('button[data-action="confirm"]')?.addEventListener('click', () => {
       this.handleConfirm()
+    })
+
+    this.getPromptField()?.addEventListener('input', () => {
+      if (!this.inputError) {
+        return
+      }
+
+      this.inputError = ''
+      this.renderValidationState()
+      this.getPromptField()?.removeAttribute('aria-invalid')
     })
   }
 }

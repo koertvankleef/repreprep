@@ -1,5 +1,4 @@
 import { storageService } from '../app/storage-instance.ts'
-import { Required, type Validator } from '@lion/ui/form-core.js'
 import { createNewExercise, isExerciseUsedInWorkouts } from '../domain/exercise-service.ts'
 import { confirmDialog, promptDialog } from '../utils/dialog-service.ts'
 
@@ -37,17 +36,12 @@ const styles = `
     font-size: var(--rrr-font-size-sm);
   }
 
-  lion-input,
-  lion-select {
+  .form input,
+  .form select {
     display: block;
+    width: 100%;
   }
 `
-
-interface LionFieldLike extends HTMLElement {
-  modelValue: unknown
-  submitted: boolean
-  validators: Validator[]
-}
 
 export class RrrExerciseCatalogue extends HTMLElement {
   private readonly handleDataChanged = (): void => {
@@ -71,23 +65,24 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private addExercise(): void {
-    const nameField = this.querySelector<LionFieldLike>('lion-input[name="name"]')
-    const kindField = this.querySelector<LionFieldLike>('lion-select[name="kind"]')
+    const nameField = this.querySelector<HTMLInputElement>('input[name="name"]')
+    const kindField = this.querySelector<HTMLSelectElement>('select[name="kind"]')
 
     if (!nameField || !kindField) {
       return
     }
 
-    nameField.submitted = true
-
-    const name = String(nameField.modelValue ?? '').trim()
-    const kind = kindField.modelValue === 'duration' ? 'duration' : 'reps-weight'
+    const name = nameField.value.trim()
+    const kind = kindField.value === 'duration' ? 'duration' : 'reps-weight'
 
     if (!name) {
       this.setStatus('Please enter an exercise name.', 'error')
+      nameField.setAttribute('aria-invalid', 'true')
       nameField.focus()
       return
     }
+
+    nameField.removeAttribute('aria-invalid')
 
     storageService.saveExercise(createNewExercise(name, kind))
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
@@ -189,15 +184,15 @@ export class RrrExerciseCatalogue extends HTMLElement {
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || 'Create, rename, or archive exercises used across workouts and routines.'}</p>
           <div class="form">
             <label>
-              <lion-input name="name" label="Name"></lion-input>
+              Name
+              <input name="name" type="text" placeholder="Exercise name" autocomplete="off" />
             </label>
             <label>
-              <lion-select name="kind" label="Kind">
-                <select slot="input">
-                  <option value="reps-weight">Reps + weight</option>
-                  <option value="duration">Duration</option>
-                </select>
-              </lion-select>
+              Kind
+              <select name="kind">
+                <option value="reps-weight">Reps + weight</option>
+                <option value="duration">Duration</option>
+              </select>
             </label>
             <button type="button" data-action="add">Add Exercise</button>
           </div>
@@ -215,20 +210,16 @@ export class RrrExerciseCatalogue extends HTMLElement {
       </section>
     `
 
-    const nameField = this.querySelector<LionFieldLike>('lion-input[name="name"]')
-    const kindField = this.querySelector<LionFieldLike>('lion-select[name="kind"]')
+    const nameField = this.querySelector<HTMLInputElement>('input[name="name"]')
+    const kindField = this.querySelector<HTMLSelectElement>('select[name="kind"]')
 
     if (nameField) {
-      nameField.modelValue = ''
-      nameField.validators = [new Required()]
-      nameField.setAttribute('placeholder', 'Exercise name')
-      nameField.setAttribute('field-name', 'exercise name')
+      nameField.value = ''
+      nameField.removeAttribute('aria-invalid')
     }
 
     if (kindField) {
-      kindField.modelValue = 'reps-weight'
-      kindField.validators = []
-      kindField.setAttribute('field-name', 'exercise kind')
+      kindField.value = 'reps-weight'
     }
 
     this.querySelector<HTMLButtonElement>('button[data-action="add"]')?.addEventListener('click', () => {

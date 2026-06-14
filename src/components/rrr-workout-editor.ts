@@ -1,5 +1,4 @@
 import { storageService } from '../app/storage-instance.ts'
-import { Required, type Validator } from '@lion/ui/form-core.js'
 import { getActiveExercises, getExercise } from '../domain/exercise-service.ts'
 import { createExerciseEntry, createNewWorkout } from '../domain/workout-service.ts'
 import type { ExerciseDefinition, Workout, WorkoutExerciseEntry } from '../domain/types.ts'
@@ -12,40 +11,13 @@ const styles = `
     gap: var(--rrr-space-md);
   }
 
-  lion-input-datepicker,
-  lion-textarea,
-  lion-select {
+  .field-input,
+  .field-textarea,
+  .field-select {
     display: block;
+    width: 100%;
   }
 `
-
-interface LionFieldLike extends HTMLElement {
-  modelValue: unknown
-  submitted: boolean
-  validators: Validator[]
-}
-
-function isoDateToDate(value: string): Date | undefined {
-  if (!value) {
-    return undefined
-  }
-
-  const parsed = new Date(`${value}T00:00:00`)
-
-  return Number.isNaN(parsed.getTime()) ? undefined : parsed
-}
-
-function dateToIsoDate(value: unknown): string {
-  if (!(value instanceof Date) || Number.isNaN(value.getTime())) {
-    return ''
-  }
-
-  const year = value.getFullYear()
-  const month = String(value.getMonth() + 1).padStart(2, '0')
-  const day = String(value.getDate()).padStart(2, '0')
-
-  return `${year}-${month}-${day}`
-}
 
 export class RrrWorkoutEditor extends HTMLElement {
   private workoutIdValue: string | null = null
@@ -126,13 +98,13 @@ export class RrrWorkoutEditor extends HTMLElement {
       return
     }
 
-    const dateField = this.querySelector<LionFieldLike>('lion-input-datepicker[name="date"]')
-    const notesField = this.querySelector<LionFieldLike>('lion-textarea[name="notes"]')
+    const dateField = this.querySelector<HTMLInputElement>('input[name="date"]')
+    const notesField = this.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')
 
     this.workout = {
       ...this.workout,
-      date: dateToIsoDate(dateField?.modelValue),
-      notes: String(notesField?.modelValue ?? ''),
+      date: dateField?.value ?? '',
+      notes: notesField?.value ?? '',
       updatedAt: new Date().toISOString(),
     }
   }
@@ -142,8 +114,8 @@ export class RrrWorkoutEditor extends HTMLElement {
       return
     }
 
-    const select = this.querySelector<LionFieldLike>('lion-select[name="exercise"]')
-    const exerciseId = String(select?.modelValue ?? '')
+    const select = this.querySelector<HTMLSelectElement>('select[name="exercise"]')
+    const exerciseId = String(select?.value ?? '')
 
     if (!exerciseId) {
       return
@@ -162,15 +134,15 @@ export class RrrWorkoutEditor extends HTMLElement {
     this.updateWorkoutFields()
 
     if (!this.workout || !this.workout.date.trim()) {
-      const dateField = this.querySelector<LionFieldLike>('lion-input-datepicker[name="date"]')
+      const dateField = this.querySelector<HTMLInputElement>('input[name="date"]')
 
       if (dateField) {
-        dateField.submitted = true
+        dateField.setAttribute('aria-invalid', 'true')
       }
 
       this.setStatus('Please provide a workout date.', 'error')
       this.render()
-      this.querySelector<LionFieldLike>('lion-input-datepicker[name="date"]')?.focus()
+      this.querySelector<HTMLInputElement>('input[name="date"]')?.focus()
       return
     }
 
@@ -240,19 +212,26 @@ export class RrrWorkoutEditor extends HTMLElement {
           </div>
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || 'Fill in workout details and save when finished.'}</p>
           <div class="row">
-            <lion-input-datepicker name="date" label="Date"></lion-input-datepicker>
-            <lion-textarea name="notes" label="Notes"></lion-textarea>
+            <label>
+              Date
+              <input class="field-input" name="date" type="date" />
+            </label>
+            <label>
+              Notes
+              <textarea class="field-textarea" name="notes" rows="3" placeholder="Workout notes"></textarea>
+            </label>
           </div>
           <div>
             <h3>Exercises</h3>
             <div class="entries" aria-live="polite"></div>
           </div>
           <div class="row">
-            <lion-select name="exercise" label="Add Exercise">
-              <select slot="input">
+            <label>
+              Add Exercise
+              <select class="field-select" name="exercise">
                 ${activeExercises.map((exercise) => `<option value="${exercise.id}">${exercise.name}</option>`).join('')}
               </select>
-            </lion-select>
+            </label>
           </div>
           <div class="actions">
             <button type="button" data-action="add-exercise" ${activeExercises.length === 0 ? 'disabled' : ''}>Add</button>
@@ -263,36 +242,30 @@ export class RrrWorkoutEditor extends HTMLElement {
       </section>
     `
 
-    const dateField = this.querySelector<LionFieldLike>('lion-input-datepicker[name="date"]')
-    const notesField = this.querySelector<LionFieldLike>('lion-textarea[name="notes"]')
-    const exerciseField = this.querySelector<LionFieldLike>('lion-select[name="exercise"]')
+    const dateField = this.querySelector<HTMLInputElement>('input[name="date"]')
+    const notesField = this.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')
+    const exerciseField = this.querySelector<HTMLSelectElement>('select[name="exercise"]')
 
     if (dateField) {
-      dateField.modelValue = isoDateToDate(this.workout.date)
-      dateField.validators = [new Required()]
-      dateField.setAttribute('field-name', 'workout date')
+      dateField.value = this.workout.date
+      dateField.removeAttribute('aria-invalid')
     }
 
     if (notesField) {
-      notesField.modelValue = this.workout.notes
-      notesField.validators = []
-      notesField.setAttribute('placeholder', 'Workout notes')
-      notesField.setAttribute('rows', '3')
+      notesField.value = this.workout.notes
     }
 
     if (exerciseField) {
-      exerciseField.modelValue = activeExercises[0]?.id ?? ''
-      exerciseField.validators = []
-      exerciseField.setAttribute('field-name', 'exercise')
+      exerciseField.value = activeExercises[0]?.id ?? ''
     }
 
     this.renderExerciseEntries(activeExercises)
 
-    this.querySelector<LionFieldLike>('lion-input-datepicker[name="date"]')?.addEventListener('model-value-changed', () => {
+    this.querySelector<HTMLInputElement>('input[name="date"]')?.addEventListener('input', () => {
       this.updateWorkoutFields()
     })
 
-    this.querySelector<LionFieldLike>('lion-textarea[name="notes"]')?.addEventListener('model-value-changed', () => {
+    this.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')?.addEventListener('input', () => {
       this.updateWorkoutFields()
     })
 
