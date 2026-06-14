@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.ts'
 import type { ExerciseKind, SetEntry } from '../domain/types.ts'
 import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
 
@@ -83,34 +84,34 @@ export class RrrSetEntry extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>${styles}</style>
       <div class="set" role="group" aria-labelledby="${labelId}">
-        <span class="sr-only" id="${labelId}">Workout set details</span>
+        <span class="sr-only" id="${labelId}">${t('setEntry.groupLabel')}</span>
         <div class="fields">
           ${
             this.exerciseKindValue === 'duration'
               ? `
                 <label>
-                  Seconds
+                  ${t('field.seconds')}
                   <input type="number" min="0" step="1" name="seconds" value="${set.kind === 'duration' ? set.seconds : 0}" />
                 </label>
               `
               : `
                 <label>
-                  Reps
+                  ${t('setEntry.field.reps')}
                   <input type="number" min="0" step="1" name="reps" value="${set.kind === 'reps-weight' ? set.reps : 0}" />
                 </label>
                 <label>
-                  Weight (kg)
+                  ${t('setEntry.field.weightKg')}
                   <input type="number" min="0" step="0.5" name="weightKg" value="${set.kind === 'reps-weight' && set.weightKg !== null ? set.weightKg : ''}" />
                 </label>
               `
           }
         </div>
         <label>
-          Notes
-          <input type="text" name="notes" value="${set.notes}" placeholder="Optional notes" />
+          ${t('setEntry.field.notes')}
+          <input type="text" name="notes" value="${set.notes}" placeholder="${t('setEntry.field.notes.placeholder')}" />
         </label>
         <div class="actions">
-          <button type="button" data-action="remove" aria-label="Remove this set">Remove Set</button>
+          <button type="button" data-action="remove" aria-label="${t('setEntry.action.removeAria')}">${t('action.remove')}</button>
         </div>
       </div>
     `

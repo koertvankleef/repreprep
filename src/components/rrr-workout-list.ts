@@ -2,8 +2,9 @@ import { storageService } from '../app/storage-instance.ts'
 import { getExercise } from '../domain/exercise-service.ts'
 import { getActiveRoutines } from '../domain/routine-service.ts'
 import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
+import { formatDate as formatLocalizedDate, t } from '../i18n/index.ts'
 import { confirmDialog } from '../utils/dialog-service.ts'
-import { formatDate, todayIso } from '../utils/date.ts'
+import { todayIso } from '../utils/date.ts'
 
 const styles = `
   .list {
@@ -41,10 +42,10 @@ export class RrrWorkoutList extends HTMLElement {
 
   private async deleteWorkout(id: string): Promise<void> {
     const confirmed = await confirmDialog({
-      title: 'Delete Workout',
-      message: 'Delete this workout? This cannot be undone.',
-      confirmLabel: 'Delete',
-      cancelLabel: 'Cancel',
+      title: t('workoutList.dialog.delete.title'),
+      message: t('workoutList.dialog.delete.message'),
+      confirmLabel: t('action.delete'),
+      cancelLabel: t('action.cancel'),
     })
 
     if (!confirmed) {
@@ -68,6 +69,22 @@ export class RrrWorkoutList extends HTMLElement {
     window.location.hash = `#/workouts/${workout.id}`
   }
 
+  private formatWorkoutDate(value: string): string {
+    const date = new Date(`${value}T00:00:00Z`)
+
+    if (Number.isNaN(date.getTime())) {
+      return value
+    }
+
+    return formatLocalizedDate(date, {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    })
+  }
+
   private render(): void {
     const data = storageService.getData()
     const routines = getActiveRoutines(data)
@@ -82,16 +99,16 @@ export class RrrWorkoutList extends HTMLElement {
       <section class="page">
         <div class="header">
           <div>
-            <h2>Workouts</h2>
-            <p>Your logged training sessions</p>
+            <h2>${t('workoutList.title')}</h2>
+            <p>${t('workoutList.subtitle')}</p>
           </div>
           ${
             routines.length === 0
-              ? '<button type="button" data-action="create-routine">Create Routine</button>'
+              ? `<button type="button" data-action="create-routine">${t('workoutList.createRoutine')}</button>`
               : `
                 <div class="start-panel">
                   <label>
-                    Routine
+                    ${t('workoutList.routineLabel')}
                     <select name="routine">
                       ${routines
                         .map(
@@ -101,7 +118,7 @@ export class RrrWorkoutList extends HTMLElement {
                         .join('')}
                     </select>
                   </label>
-                  <button type="button" data-action="start">Start Workout</button>
+                  <button type="button" data-action="start">${t('workoutList.startWorkout')}</button>
                 </div>
               `
           }
@@ -110,22 +127,23 @@ export class RrrWorkoutList extends HTMLElement {
           ${
             workouts.length === 0
               ? routines.length === 0
-                ? '<p>No workouts logged yet. Create a routine first, then start your session from it.</p>'
-                : '<p>No workouts logged yet. Start your first session from a routine.</p>'
+                ? `<p>${t('workoutList.empty.noRoutine')}</p>`
+                : `<p>${t('workoutList.empty.withRoutine')}</p>`
               : workouts
                   .map((workout) => {
+                    const workoutDate = this.formatWorkoutDate(workout.date)
                     const summary = workout.exercises
-                      .map((entry) => getExercise(data, entry.exerciseId)?.name ?? 'Unknown exercise')
+                      .map((entry) => getExercise(data, entry.exerciseId)?.name ?? t('workoutList.exercise.unknown'))
                       .join(', ')
 
                     return `
                       <rrr-card size="md">
-                        <h3>${formatDate(workout.date)}</h3>
-                        <p>${summary || 'No exercises added yet'}</p>
-                        <p>${workout.notes || 'No notes'}</p>
+                        <h3>${workoutDate}</h3>
+                        <p>${summary || t('workoutList.exercise.none')}</p>
+                        <p>${workout.notes || t('workoutList.notes.none')}</p>
                         <div class="actions">
-                          <button type="button" data-action="edit" data-id="${workout.id}" aria-label="Edit workout on ${formatDate(workout.date)}">Edit</button>
-                          <button type="button" data-action="delete" data-id="${workout.id}" aria-label="Delete workout on ${formatDate(workout.date)}">Delete</button>
+                          <button type="button" data-action="edit" data-id="${workout.id}" aria-label="${t('workoutList.action.editAria', { date: workoutDate })}">${t('action.edit')}</button>
+                          <button type="button" data-action="delete" data-id="${workout.id}" aria-label="${t('workoutList.action.deleteAria', { date: workoutDate })}">${t('action.delete')}</button>
                         </div>
                       </rrr-card>
                     `

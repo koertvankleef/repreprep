@@ -1,4 +1,5 @@
 import { createDurationSet, createRepsWeightSet } from '../domain/workout-service.ts'
+import { t } from '../i18n/index.ts'
 import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
 import type { ExerciseDefinition, SetEntry, WorkoutExerciseEntry } from '../domain/types.ts'
 import './rrr-set-entry.ts'
@@ -151,7 +152,7 @@ export class RrrExerciseEntry extends HTMLElement {
       return
     }
 
-    const exerciseName = this.exerciseValue?.name ?? 'Unknown exercise'
+    const exerciseName = this.exerciseValue?.name ?? t('exerciseEntry.unknownExercise')
     const exerciseKind = this.exerciseValue?.kind ?? 'reps-weight'
     const headingId = `exercise-entry-${this.entryValue.id}`
 
@@ -161,17 +162,17 @@ export class RrrExerciseEntry extends HTMLElement {
         <div class="header">
           <div>
             <h3 id="${headingId}">${exerciseName}</h3>
-            <p>${exerciseKind === 'duration' ? 'Duration exercise' : 'Reps and weight exercise'}</p>
+            <p>${exerciseKind === 'duration' ? t('exerciseEntry.kind.duration') : t('exerciseEntry.kind.repsWeight')}</p>
           </div>
-          <button type="button" data-action="remove-exercise" aria-label="Remove ${exerciseName} from workout">Remove Exercise</button>
+          <button type="button" data-action="remove-exercise" aria-label="${escapeHtml(t('exerciseEntry.action.removeExerciseAria', { name: exerciseName }))}">${t('action.remove')}</button>
         </div>
         <label>
-          Notes
-          <textarea rows="2" name="notes" placeholder="Exercise notes">${this.entryValue.notes}</textarea>
+          ${t('exerciseEntry.field.notes')}
+          <textarea rows="2" name="notes" placeholder="${t('exerciseEntry.field.notes.placeholder')}">${this.entryValue.notes}</textarea>
         </label>
         <div class="sets" aria-live="polite"></div>
         <div class="footer">
-          <button type="button" data-action="add-set" aria-label="Add set to ${exerciseName}">Add Set</button>
+          <button type="button" data-action="add-set" aria-label="${escapeHtml(t('exerciseEntry.action.addSetAria', { name: exerciseName }))}">${t('exerciseEntry.action.addSet')}</button>
         </div>
       </section>
     `
@@ -203,7 +204,7 @@ export class RrrExerciseEntry extends HTMLElement {
 
     if (container) {
       if (this.entryValue.sets.length === 0) {
-        container.innerHTML = '<p>No sets yet. Add one to start tracking.</p>'
+        container.innerHTML = `<p>${t('exerciseEntry.empty.sets')}</p>`
       } else {
         this.entryValue.sets.forEach((set) => {
           const setElement = document.createElement('rrr-set-entry') as HTMLElement & {
@@ -218,6 +219,10 @@ export class RrrExerciseEntry extends HTMLElement {
       }
     }
   }
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 customElements.define('rrr-exercise-entry', RrrExerciseEntry)

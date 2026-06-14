@@ -1,6 +1,6 @@
 import { storageService } from '../app/storage-instance.ts'
 import { getExerciseHistory, getPersonalRecord } from '../domain/history-service.ts'
-import { formatDate } from '../utils/date.ts'
+import { formatDate, t } from '../i18n/index.ts'
 
 const styles = `
   .history-list {
@@ -47,7 +47,7 @@ export class RrrExerciseHistory extends HTMLElement {
 
   private renderSets(): string {
     if (!this.selectedExerciseId) {
-      return '<p>No exercise selected.</p>'
+      return `<p>${t('history.empty.exerciseSelected')}</p>`
     }
 
     const history = getExerciseHistory(storageService.getData(), this.selectedExerciseId).sort((left, right) =>
@@ -55,19 +55,24 @@ export class RrrExerciseHistory extends HTMLElement {
     )
 
     if (history.length === 0) {
-      return '<p>No history yet for this exercise.</p>'
+      return `<p>${t('history.empty.exerciseHistory')}</p>`
     }
 
     return history
       .map((item) => {
+        const dateLabel = this.formatHistoryDate(item.date)
         const setSummary = item.sets
-          .map((set) => (set.kind === 'duration' ? `${set.seconds}s` : `${set.reps} reps @ ${set.weightKg ?? 0} kg`))
+          .map((set) =>
+            set.kind === 'duration'
+              ? t('history.set.duration', { seconds: set.seconds })
+              : t('history.set.repsWeight', { reps: set.reps, weightKg: set.weightKg ?? 0 }),
+          )
           .join(', ')
 
         return `
           <article class="history-item">
-            <strong>${formatDate(item.date)}</strong>
-            <p>${setSummary || 'No sets recorded'}</p>
+            <strong>${dateLabel}</strong>
+            <p>${setSummary || t('history.empty.setsRecorded')}</p>
           </article>
         `
       })
@@ -76,20 +81,38 @@ export class RrrExerciseHistory extends HTMLElement {
 
   private renderPersonalRecord(): string {
     if (!this.selectedExerciseId) {
-      return '<p>No personal record available.</p>'
+      return `<p>${t('history.empty.personalRecordAvailable')}</p>`
     }
 
     const record = getPersonalRecord(storageService.getData(), this.selectedExerciseId)
 
     if (!record) {
-      return '<p>No personal record yet.</p>'
+      return `<p>${t('history.empty.personalRecord')}</p>`
     }
+
+    const dateLabel = this.formatHistoryDate(record.date)
 
     if (record.kind === 'duration') {
-      return `<p>Longest duration: <strong>${record.seconds} seconds</strong> on ${formatDate(record.date)}</p>`
+      return `<p>${t('history.record.duration', { seconds: record.seconds, date: dateLabel })}</p>`
     }
 
-    return `<p>Best set: <strong>${record.reps} reps @ ${record.weightKg} kg</strong> on ${formatDate(record.date)}</p>`
+    return `<p>${t('history.record.bestSet', { reps: record.reps, weightKg: record.weightKg, date: dateLabel })}</p>`
+  }
+
+  private formatHistoryDate(value: string): string {
+    const date = new Date(`${value}T00:00:00Z`)
+
+    if (Number.isNaN(date.getTime())) {
+      return value
+    }
+
+    return formatDate(date, {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    })
   }
 
   private render(): void {
@@ -99,13 +122,13 @@ export class RrrExerciseHistory extends HTMLElement {
       <style>${styles}</style>
       <section class="page">
         <rrr-card size="lg">
-          <h2>Exercise History</h2>
+          <h2>${t('history.title')}</h2>
           ${
             exercises.length === 0
-              ? '<p>Add an exercise to start tracking history.</p>'
+              ? `<p>${t('history.empty.addExercise')}</p>`
               : `
                 <label>
-                  Exercise
+                  ${t('history.field.exercise')}
                   <select name="exercise">
                     ${exercises
                       .map(

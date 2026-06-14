@@ -1,5 +1,6 @@
 import { storageService } from '../app/storage-instance.ts'
 import { getActiveRoutines } from '../domain/routine-service.ts'
+import { t } from '../i18n/index.ts'
 import { todayIso } from '../utils/date.ts'
 import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
 
@@ -39,7 +40,7 @@ export class RrrRoutineList extends HTMLElement {
     const workout = createWorkoutFromRoutine(data, routineId, todayIso())
 
     if (!workout) {
-      window.alert('Could not start workout from this routine.')
+      window.alert(t('routineList.startError'))
       return
     }
 
@@ -57,27 +58,31 @@ export class RrrRoutineList extends HTMLElement {
       <section class="page">
         <div class="header">
           <div>
-            <h2>Routines</h2>
-            <p>Reusable workout templates</p>
+            <h2>${t('routineList.title')}</h2>
+            <p>${t('routineList.subtitle')}</p>
           </div>
-          <button type="button" data-action="new">New Routine</button>
+          <button type="button" data-action="new">${t('routineList.new')}</button>
         </div>
         <div class="list">
           ${
             routines.length === 0
-              ? '<p>No routines yet. Create your first routine.</p>'
+              ? `<p>${t('routineList.empty')}</p>`
               : routines
                   .map((routine) => {
                     const version = data.routineVersions.find((v) => v.id === routine.activeVersionId)
                     const exerciseCount = version?.exercises.length ?? 0
+                    const exerciseSummary =
+                      exerciseCount === 1
+                        ? t('routineList.exerciseCount.one', { count: exerciseCount })
+                        : t('routineList.exerciseCount.other', { count: exerciseCount })
 
                     return `
                       <rrr-card size="md">
                         <div class="card-title">${escapeHtml(routine.name)}</div>
-                        <div class="card-meta">${exerciseCount} exercise${exerciseCount === 1 ? '' : 's'}</div>
+                        <div class="card-meta">${exerciseSummary}</div>
                         <div class="actions">
-                          <button type="button" data-action="start" data-id="${routine.id}" aria-label="Start workout from ${escapeHtml(routine.name)}">Start Workout</button>
-                          <button type="button" data-action="edit" data-id="${routine.id}" aria-label="Edit ${escapeHtml(routine.name)} routine">Edit Routine</button>
+                          <button type="button" data-action="start" data-id="${routine.id}" aria-label="${escapeHtml(t('routineList.action.startAria', { name: routine.name }))}">${t('routineList.action.start')}</button>
+                          <button type="button" data-action="edit" data-id="${routine.id}" aria-label="${escapeHtml(t('routineList.action.editAria', { name: routine.name }))}">${t('action.edit')}</button>
                         </div>
                       </rrr-card>
                     `

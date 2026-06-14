@@ -1,6 +1,7 @@
 import { storageService } from '../app/storage-instance.ts'
 import { createNewExercise, isExerciseUsedInWorkouts } from '../domain/exercise-service.ts'
 import { confirmDialog, promptDialog } from '../utils/dialog-service.ts'
+import { t } from '../i18n/index.ts'
 
 const styles = `
   .list {
@@ -76,7 +77,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     const kind = kindField.value === 'duration' ? 'duration' : 'reps-weight'
 
     if (!name) {
-      this.setStatus('Please enter an exercise name.', 'error')
+      this.setStatus(t('exercise.validation.nameRequired'), 'error')
       nameField.setAttribute('aria-invalid', 'true')
       nameField.focus()
       return
@@ -86,7 +87,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
     storageService.saveExercise(createNewExercise(name, kind))
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    this.setStatus(`Created exercise ${name}.`, 'success')
+    this.setStatus(t('exercise.status.created', { name }), 'success')
 
     this.render()
   }
@@ -100,12 +101,12 @@ export class RrrExerciseCatalogue extends HTMLElement {
     }
 
     const nextName = await promptDialog({
-      title: 'Rename Exercise',
-      message: `Choose a new name for ${exercise.name}.`,
-      label: 'Exercise name',
+      title: t('exercise.dialog.rename.title'),
+      message: t('exercise.dialog.rename.message', { name: exercise.name }),
+      label: t('exercise.dialog.rename.label'),
       initialValue: exercise.name,
-      confirmLabel: 'Save',
-      cancelLabel: 'Cancel',
+      confirmLabel: t('action.save'),
+      cancelLabel: t('action.cancel'),
       required: true,
     })
 
@@ -119,15 +120,15 @@ export class RrrExerciseCatalogue extends HTMLElement {
       updatedAt: new Date().toISOString(),
     })
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    this.setStatus(`Renamed exercise to ${nextName}.`, 'success')
+    this.setStatus(t('exercise.status.renamed', { name: nextName }), 'success')
   }
 
   private async archiveExercise(id: string): Promise<void> {
     const confirmed = await confirmDialog({
-      title: 'Archive Exercise',
-      message: 'Archive this exercise? Existing workout history will be preserved.',
-      confirmLabel: 'Archive',
-      cancelLabel: 'Cancel',
+      title: t('exercise.dialog.archive.title'),
+      message: t('exercise.dialog.archive.message'),
+      confirmLabel: t('action.archive'),
+      cancelLabel: t('action.cancel'),
     })
 
     if (!confirmed) {
@@ -136,7 +137,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
     storageService.archiveExercise(id)
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    this.setStatus('Exercise archived.', 'success')
+    this.setStatus(t('exercise.status.archived'), 'success')
   }
 
   private renderList(showArchived: boolean): string {
@@ -146,25 +147,26 @@ export class RrrExerciseCatalogue extends HTMLElement {
       .sort((left, right) => left.name.localeCompare(right.name))
 
     if (exercises.length === 0) {
-      return '<p>No exercises in this section.</p>'
+      return `<p>${t('exercise.list.empty')}</p>`
     }
 
     return exercises
       .map((exercise) => {
         const used = isExerciseUsedInWorkouts(data, exercise.id)
+        const kindLabel = exercise.kind === 'duration' ? t('exercise.kind.duration') : t('exercise.kind.repsWeight')
 
         return `
           <article class="item">
             <div>
               <strong>${exercise.name}</strong>
               <div class="meta">
-                <span class="badge">${exercise.kind}</span>
-                ${used ? '<span class="badge">used in workouts</span>' : ''}
+                <span class="badge">${kindLabel}</span>
+                ${used ? `<span class="badge">${t('exercise.badge.used')}</span>` : ''}
               </div>
             </div>
             <div class="actions">
-              ${showArchived ? '' : `<button type="button" data-action="edit" data-id="${exercise.id}" aria-label="Edit ${exercise.name}">Edit</button>`}
-              ${showArchived ? '' : `<button type="button" data-action="archive" data-id="${exercise.id}" aria-label="Archive ${exercise.name}">Archive</button>`}
+              ${showArchived ? '' : `<button type="button" data-action="edit" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.editAria', { name: exercise.name }))}">${t('action.edit')}</button>`}
+              ${showArchived ? '' : `<button type="button" data-action="archive" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.archiveAria', { name: exercise.name }))}">${t('action.archive')}</button>`}
             </div>
           </article>
         `
@@ -178,32 +180,32 @@ export class RrrExerciseCatalogue extends HTMLElement {
       <section class="page">
         <rrr-card size="lg">
           <div>
-            <h2>Exercises</h2>
-            <p>Manage your exercise catalogue.</p>
+            <h2>${t('exercise.title')}</h2>
+            <p>${t('exercise.subtitle')}</p>
           </div>
-          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || 'Create, rename, or archive exercises used across workouts and routines.'}</p>
+          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('exercise.status.default')}</p>
           <div class="form">
             <label>
-              Name
-              <input name="name" type="text" placeholder="Exercise name" autocomplete="off" />
+              ${t('field.name')}
+              <input name="name" type="text" placeholder="${t('exercise.form.name.placeholder')}" autocomplete="off" />
             </label>
             <label>
-              Kind
+              ${t('exercise.form.kind.label')}
               <select name="kind">
-                <option value="reps-weight">Reps + weight</option>
-                <option value="duration">Duration</option>
+                <option value="reps-weight">${t('exercise.form.kind.repsWeight')}</option>
+                <option value="duration">${t('exercise.form.kind.duration')}</option>
               </select>
             </label>
-            <button type="button" data-action="add">Add Exercise</button>
+            <button type="button" data-action="add">${t('exercise.form.add')}</button>
           </div>
         </rrr-card>
         <rrr-card size="lg">
-          <h3>Active Exercises</h3>
+          <h3>${t('exercise.list.active')}</h3>
           <div class="list">${this.renderList(false)}</div>
         </rrr-card>
         <rrr-card size="lg">
           <details>
-            <summary>Archived Exercises</summary>
+            <summary>${t('exercise.list.archived')}</summary>
             <div class="list">${this.renderList(true)}</div>
           </details>
         </rrr-card>
@@ -246,6 +248,10 @@ export class RrrExerciseCatalogue extends HTMLElement {
       })
     })
   }
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 customElements.define('rrr-exercise-catalogue', RrrExerciseCatalogue)

@@ -1,4 +1,5 @@
 import './app/rrr-app.ts'
+import { initLocale } from './i18n/index.ts'
 import './components/rrr-workout-list.ts'
 import './components/rrr-workout-editor.ts'
 import './components/rrr-exercise-entry.ts'
@@ -10,3 +11,5 @@ import './components/rrr-import-export.ts'
 import './components/rrr-exercise-history.ts'
 import './components/rrr-routine-list.ts'
 import './components/rrr-routine-editor.ts'
+
+initLocale(navigator.language)

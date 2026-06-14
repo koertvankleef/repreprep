@@ -1,4 +1,5 @@
 import { storageService } from './storage-instance.ts'
+import { t } from '../i18n/index.ts'
 import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
 
 const styles = `
@@ -146,11 +147,11 @@ export class RrrApp extends HTMLElement {
       <style>${styles}</style>
       <div class="shell">
         <nav>
-          <a class="${this.linkClass('workouts', route.name)}" href="#/workouts">Workouts</a>
-          <a class="${this.linkClass('routines', route.name)}" href="#/routines">Routines</a>
-          <a class="${this.linkClass('exercises', route.name)}" href="#/exercises">Exercises</a>
-          <a class="${this.linkClass('history', route.name)}" href="#/history">History</a>
-          <a class="${this.linkClass('import-export', route.name)}" href="#/import-export">Import/Export</a>
+          <a class="${this.linkClass('workouts', route.name)}" href="#/workouts">${t('app.nav.workouts')}</a>
+          <a class="${this.linkClass('routines', route.name)}" href="#/routines">${t('app.nav.routines')}</a>
+          <a class="${this.linkClass('exercises', route.name)}" href="#/exercises">${t('app.nav.exercises')}</a>
+          <a class="${this.linkClass('history', route.name)}" href="#/history">${t('app.nav.history')}</a>
+          <a class="${this.linkClass('import-export', route.name)}" href="#/import-export">${t('app.nav.importExport')}</a>
         </nav>
         <main>
           <div id="view"></div>

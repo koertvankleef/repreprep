@@ -2,6 +2,7 @@ import { storageService } from '../app/storage-instance.ts'
 import { getActiveExercises } from '../domain/exercise-service.ts'
 import { createRoutineExercise, getActiveRoutineVersion, getRoutine } from '../domain/routine-service.ts'
 import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
+import { t } from '../i18n/index.ts'
 import type { PlannedSet, RoutineExercise } from '../domain/types.ts'
 import { todayIso } from '../utils/date.ts'
 
@@ -323,7 +324,7 @@ export class RrrRoutineEditor extends HTMLElement {
     this.readFields()
 
     if (!this.name.trim()) {
-      this.setStatus('Please provide a routine name.', 'error')
+      this.setStatus(t('routineEditor.status.nameRequired'), 'error')
       this.render()
       this.querySelector<HTMLInputElement>('input[name="routine-name"]')?.focus()
       return
@@ -338,7 +339,7 @@ export class RrrRoutineEditor extends HTMLElement {
 
   private startWorkout(): void {
     if (!this.routineIdValue) {
-      this.setStatus('Save the routine first before starting a workout.', 'error')
+      this.setStatus(t('routineEditor.status.saveFirst'), 'error')
       this.render()
       return
     }
@@ -347,7 +348,7 @@ export class RrrRoutineEditor extends HTMLElement {
     const workout = createWorkoutFromRoutine(data, this.routineIdValue, todayIso())
 
     if (!workout) {
-      this.setStatus('Could not start workout from this routine.', 'error')
+      this.setStatus(t('routineEditor.status.startError'), 'error')
       this.render()
       return
     }
@@ -361,15 +362,15 @@ export class RrrRoutineEditor extends HTMLElement {
     const data = storageService.getData()
     const activeExercises = getActiveExercises(data)
     const isEditing = this.routineIdValue !== null
-    const title = isEditing ? 'Edit Routine' : 'New Routine'
+    const title = isEditing ? t('routineEditor.title.edit') : t('routineEditor.title.new')
 
     if (isEditing && this.routineIdValue !== null && !getRoutine(data, this.routineIdValue)) {
       this.innerHTML = `
         <style>${styles}</style>
         <section class="page">
           <rrr-card size="lg">
-            <h2>Routine not found</h2>
-            <button type="button" data-action="back">Back to Routines</button>
+            <h2>${t('routineEditor.notFound.title')}</h2>
+            <button type="button" data-action="back">${t('routineEditor.notFound.back')}</button>
           </rrr-card>
         </section>
       `
@@ -377,51 +378,51 @@ export class RrrRoutineEditor extends HTMLElement {
     }
 
     const exerciseListHtml = this.exercises.length === 0
-      ? '<p>No exercises added yet.</p>'
+      ? `<p>${t('routineEditor.exercises.empty')}</p>`
       : this.exercises
           .map((routineExercise, index) => {
             const def = data.exercises.find((e) => e.id === routineExercise.exerciseId)
-            const exerciseName = def?.name ?? 'Unknown exercise'
+            const exerciseName = def?.name ?? t('routineEditor.exercises.unknown')
             const exerciseHeadingId = `routine-exercise-${routineExercise.id}`
             const isFirst = index === 0
             const isLast = index === this.exercises.length - 1
 
             const setsHtml = routineExercise.plannedSets.length === 0
-              ? '<p>No planned sets.</p>'
+              ? `<p>${t('routineEditor.sets.empty')}</p>`
               : routineExercise.plannedSets
                   .map((set, setIndex) => {
                     if (set.kind === 'reps-weight') {
                       return `
                         <div class="planned-set">
-                          <span>Set ${setIndex + 1}:</span>
-                          <label>Target reps <input type="number" min="0" placeholder="e.g. 10"
+                          <span>${t('routineEditor.set.label', { index: setIndex + 1 })}</span>
+                          <label>${t('routineEditor.field.targetReps')} <input type="number" min="0" placeholder="${t('routineEditor.field.targetReps.placeholder')}"
                             data-exercise-id="${routineExercise.id}"
                             data-set-index="${setIndex}"
                             data-field="reps"
                             value="${set.targetReps ?? ''}" /></label>
-                          <label>Target weight (kg) <input type="number" min="0" step="0.5" placeholder="optional"
+                          <label>${t('routineEditor.field.targetWeight')} <input type="number" min="0" step="0.5" placeholder="${t('routineEditor.field.targetWeight.placeholder')}"
                             data-exercise-id="${routineExercise.id}"
                             data-set-index="${setIndex}"
                             data-field="weight"
                             value="${set.targetWeightKg ?? ''}" /></label>
                           <button type="button" data-action="remove-set"
                             data-exercise-id="${routineExercise.id}"
-                            data-set-index="${setIndex}" aria-label="Remove set ${setIndex + 1} from ${escapeHtml(exerciseName)}">Remove</button>
+                            data-set-index="${setIndex}" aria-label="${escapeHtml(t('routineEditor.action.removeSetAria', { index: setIndex + 1, name: exerciseName }))}">${t('action.remove')}</button>
                         </div>
                       `
                     }
 
                     return `
                       <div class="planned-set">
-                        <span>Set ${setIndex + 1}:</span>
-                        <label>Target seconds <input type="number" min="0" placeholder="e.g. 30"
+                        <span>${t('routineEditor.set.label', { index: setIndex + 1 })}</span>
+                        <label>${t('routineEditor.field.targetSeconds')} <input type="number" min="0" placeholder="${t('routineEditor.field.targetSeconds.placeholder')}"
                           data-exercise-id="${routineExercise.id}"
                           data-set-index="${setIndex}"
                           data-field="seconds"
                           value="${set.targetSeconds ?? ''}" /></label>
                         <button type="button" data-action="remove-set"
                           data-exercise-id="${routineExercise.id}"
-                          data-set-index="${setIndex}" aria-label="Remove set ${setIndex + 1} from ${escapeHtml(exerciseName)}">Remove</button>
+                          data-set-index="${setIndex}" aria-label="${escapeHtml(t('routineEditor.action.removeSetAria', { index: setIndex + 1, name: exerciseName }))}">${t('action.remove')}</button>
                       </div>
                     `
                   })
@@ -433,15 +434,15 @@ export class RrrRoutineEditor extends HTMLElement {
                   <span class="exercise-name" id="${exerciseHeadingId}">${escapeHtml(exerciseName)}</span>
                   <div class="exercise-order">
                     <button type="button" data-action="move-up" data-id="${routineExercise.id}"
-                      ${isFirst ? 'disabled' : ''} aria-label="Move ${escapeHtml(exerciseName)} up">↑</button>
+                      ${isFirst ? 'disabled' : ''} aria-label="${escapeHtml(t('routineEditor.action.moveUpAria', { name: exerciseName }))}">↑</button>
                     <button type="button" data-action="move-down" data-id="${routineExercise.id}"
-                      ${isLast ? 'disabled' : ''} aria-label="Move ${escapeHtml(exerciseName)} down">↓</button>
-                    <button type="button" data-action="remove-exercise" data-id="${routineExercise.id}" aria-label="Remove ${escapeHtml(exerciseName)} from routine">Remove</button>
+                      ${isLast ? 'disabled' : ''} aria-label="${escapeHtml(t('routineEditor.action.moveDownAria', { name: exerciseName }))}">↓</button>
+                    <button type="button" data-action="remove-exercise" data-id="${routineExercise.id}" aria-label="${escapeHtml(t('routineEditor.action.removeExerciseAria', { name: exerciseName }))}">${t('action.remove')}</button>
                   </div>
                 </div>
                 <div class="planned-sets">${setsHtml}</div>
                 <div>
-                  <button type="button" data-action="add-set" data-id="${routineExercise.id}" aria-label="Add set to ${escapeHtml(exerciseName)}">Add Set</button>
+                  <button type="button" data-action="add-set" data-id="${routineExercise.id}" aria-label="${escapeHtml(t('routineEditor.action.addSetAria', { name: exerciseName }))}">${t('routineEditor.action.addSet')}</button>
                 </div>
               </section>
             `
@@ -455,30 +456,30 @@ export class RrrRoutineEditor extends HTMLElement {
           <div>
             <h2>${title}</h2>
           </div>
-          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || 'Define a routine structure, then save it as a reusable template.'}</p>
+          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('routineEditor.status.default')}</p>
           <div class="row">
             <label>
-              Name
-              <input class="field-input" name="routine-name" type="text" placeholder="Routine name" autocomplete="off" />
+              ${t('field.name')}
+              <input class="field-input" name="routine-name" type="text" placeholder="${t('routineEditor.field.name.placeholder')}" autocomplete="off" />
             </label>
           </div>
           <div>
-            <h3>Exercises</h3>
+            <h3>${t('routineEditor.section.exercises')}</h3>
             <div class="exercise-list" aria-live="polite">${exerciseListHtml}</div>
           </div>
           <div class="add-exercise-row">
             <label>
-              Add Exercise
+              ${t('label.addExercise')}
               <select class="field-select" name="add-exercise">
                 ${activeExercises.map((e) => `<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('')}
               </select>
             </label>
-            <button type="button" data-action="add-exercise">Add</button>
+            <button type="button" data-action="add-exercise">${t('action.add')}</button>
           </div>
           <div class="actions">
-            <button type="button" data-action="save">Save Routine</button>
-            ${isEditing ? '<button type="button" data-action="start-workout">Start Workout</button>' : ''}
-            <button type="button" data-action="back">Cancel</button>
+            <button type="button" data-action="save">${t('routineEditor.action.save')}</button>
+            ${isEditing ? `<button type="button" data-action="start-workout">${t('routineEditor.action.startWorkout')}</button>` : ''}
+            <button type="button" data-action="back">${t('action.cancel')}</button>
           </div>
         </rrr-card>
       </section>

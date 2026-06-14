@@ -1,3 +1,5 @@
+import { t } from '../i18n/index.ts'
+
 const styles = `
   :host {
     display: contents;
@@ -58,8 +60,8 @@ export class RrrDialogHost extends HTMLElement {
   private message = ''
   private label = ''
   private value = ''
-  private confirmLabel = 'Confirm'
-  private cancelLabel = 'Cancel'
+  private confirmLabel = t('action.confirm')
+  private cancelLabel = t('action.cancel')
   private required = false
   private inputError = ''
   private resolver: ((value: boolean | string | null) => void) | null = null
@@ -77,8 +79,8 @@ export class RrrDialogHost extends HTMLElement {
     this.mode = 'confirm'
     this.dialogTitle = options.title
     this.message = options.message
-    this.confirmLabel = options.confirmLabel ?? 'Confirm'
-    this.cancelLabel = options.cancelLabel ?? 'Cancel'
+    this.confirmLabel = options.confirmLabel ?? t('action.confirm')
+    this.cancelLabel = options.cancelLabel ?? t('action.cancel')
     this.inputError = ''
     this.render()
     this.openDialog()
@@ -102,8 +104,8 @@ export class RrrDialogHost extends HTMLElement {
     this.message = options.message
     this.label = options.label
     this.value = options.initialValue ?? ''
-    this.confirmLabel = options.confirmLabel ?? 'Save'
-    this.cancelLabel = options.cancelLabel ?? 'Cancel'
+    this.confirmLabel = options.confirmLabel ?? t('action.save')
+    this.cancelLabel = options.cancelLabel ?? t('action.cancel')
     this.required = options.required ?? false
     this.inputError = ''
     this.render()
@@ -171,7 +173,7 @@ export class RrrDialogHost extends HTMLElement {
     const value = field.value.trim()
 
     if (this.required && !value) {
-      this.inputError = 'This field is required.'
+      this.inputError = t('dialog.validation.required')
       field.setAttribute('aria-invalid', 'true')
       this.renderValidationState()
       field.focus()

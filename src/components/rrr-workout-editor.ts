@@ -2,6 +2,7 @@ import { storageService } from '../app/storage-instance.ts'
 import { getActiveExercises, getExercise } from '../domain/exercise-service.ts'
 import { createExerciseEntry, createNewWorkout } from '../domain/workout-service.ts'
 import type { ExerciseDefinition, Workout, WorkoutExerciseEntry } from '../domain/types.ts'
+import { t } from '../i18n/index.ts'
 import { todayIso } from '../utils/date.ts'
 import './rrr-exercise-entry.ts'
 
@@ -140,7 +141,7 @@ export class RrrWorkoutEditor extends HTMLElement {
         dateField.setAttribute('aria-invalid', 'true')
       }
 
-      this.setStatus('Please provide a workout date.', 'error')
+      this.setStatus(t('workout.validation.dateRequired'), 'error')
       this.render()
       this.querySelector<HTMLInputElement>('input[name="date"]')?.focus()
       return
@@ -163,7 +164,7 @@ export class RrrWorkoutEditor extends HTMLElement {
     }
 
     if (this.workout.exercises.length === 0) {
-      container.innerHTML = '<p>No exercises added yet.</p>'
+      container.innerHTML = `<p>${t('workout.section.emptyExercises')}</p>`
       return
     }
 
@@ -188,8 +189,8 @@ export class RrrWorkoutEditor extends HTMLElement {
         <style>${styles}</style>
         <section class="page">
           <rrr-card size="lg">
-            <h2>Workout not found</h2>
-            <button type="button" data-action="back">Back to Workouts</button>
+            <h2>${t('workout.notFound.title')}</h2>
+            <button type="button" data-action="back">${t('workout.notFound.back')}</button>
           </rrr-card>
         </section>
       `
@@ -200,7 +201,7 @@ export class RrrWorkoutEditor extends HTMLElement {
       return
     }
 
-    const title = this.workoutIdValue ? 'Edit Workout' : 'New Workout'
+    const title = this.workoutIdValue ? t('workout.title.edit') : t('workout.title.new')
 
     this.innerHTML = `
       <style>${styles}</style>
@@ -208,35 +209,35 @@ export class RrrWorkoutEditor extends HTMLElement {
         <rrr-card size="lg">
           <div>
             <h2>${title}</h2>
-            <p>Capture your training details for the day.</p>
+            <p>${t('workout.subtitle')}</p>
           </div>
-          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || 'Fill in workout details and save when finished.'}</p>
+          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('workout.status.default')}</p>
           <div class="row">
             <label>
-              Date
+              ${t('field.date')}
               <input class="field-input" name="date" type="date" />
             </label>
             <label>
-              Notes
-              <textarea class="field-textarea" name="notes" rows="3" placeholder="Workout notes"></textarea>
+              ${t('workout.form.notes')}
+              <textarea class="field-textarea" name="notes" rows="3" placeholder="${t('workout.form.notes.placeholder')}"></textarea>
             </label>
           </div>
           <div>
-            <h3>Exercises</h3>
+            <h3>${t('workout.section.exercises')}</h3>
             <div class="entries" aria-live="polite"></div>
           </div>
           <div class="row">
             <label>
-              Add Exercise
+              ${t('label.addExercise')}
               <select class="field-select" name="exercise">
                 ${activeExercises.map((exercise) => `<option value="${exercise.id}">${exercise.name}</option>`).join('')}
               </select>
             </label>
           </div>
           <div class="actions">
-            <button type="button" data-action="add-exercise" ${activeExercises.length === 0 ? 'disabled' : ''}>Add</button>
-            <button type="button" data-action="save">Save Workout</button>
-            <button type="button" data-action="cancel">Cancel</button>
+            <button type="button" data-action="add-exercise" ${activeExercises.length === 0 ? 'disabled' : ''}>${t('action.add')}</button>
+            <button type="button" data-action="save">${t('workout.action.save')}</button>
+            <button type="button" data-action="cancel">${t('action.cancel')}</button>
           </div>
         </rrr-card>
       </section>
