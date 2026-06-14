@@ -3,9 +3,20 @@ import { t } from '../i18n/index.ts'
 import { shadowTypographyStyles } from '../design-system/shadow-styles.ts'
 import { appRoutes, type AppRouteMeta } from '../domain/routes.ts'
 import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
+import { toastService } from '../foundation/toast.ts'
 import appStyles from './rrr-app.css?inline'
 
 const styles = `${shadowTypographyStyles}\n${appStyles}`
+
+type InstallPromptChoice = {
+  outcome: 'accepted' | 'dismissed'
+  platform: string
+}
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => unknown
+  userChoice: unknown
+}
 
 type Route =
   | { name: 'workouts' }
@@ -22,6 +33,9 @@ const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
 
 export class RrrApp extends HTMLElement {
   private route: Route = { name: 'workouts' }
+  private installPromptEvent: BeforeInstallPromptEvent | null = null
+  private installAvailable = false
+  private isStandalone = window.matchMedia('(display-mode: standalone)').matches
   private readonly styleguideEnabled = import.meta.env.DEV || localHosts.has(window.location.hostname)
   private readonly router = createHashRouter({
     routes: appRoutes,
@@ -37,12 +51,71 @@ export class RrrApp extends HTMLElement {
     this.attachShadow({ mode: 'open' })
   }
 
+  private readonly handleInstallPromptAvailable = (event: Event): void => {
+    event.preventDefault()
+    this.installPromptEvent = event as BeforeInstallPromptEvent
+    this.installAvailable = true
+    this.render()
+  }
+
+  private readonly handleAppInstalled = (): void => {
+    this.installPromptEvent = null
+    this.installAvailable = false
+    this.isStandalone = true
+    this.render()
+  }
+
+  private readonly handleClick = (event: Event): void => {
+    const actionTarget = event
+      .composedPath()
+      .find((node): node is HTMLElement => node instanceof HTMLElement && node.dataset.action !== undefined)
+
+    if (!actionTarget || actionTarget.dataset.action !== 'install-app') {
+      return
+    }
+
+    void this.promptInstall()
+  }
+
+  private async promptInstall(): Promise<void> {
+    const promptEvent = this.installPromptEvent
+    if (!promptEvent) {
+      if (import.meta.env.DEV) {
+        toastService.info(t('app.install.devHint'))
+      }
+      return
+    }
+
+    this.installAvailable = false
+    this.render()
+
+    await promptEvent.prompt()
+    const choice = (await promptEvent.userChoice) as InstallPromptChoice
+    this.installPromptEvent = null
+
+    if (choice.outcome !== 'accepted') {
+      this.installAvailable = false
+    }
+
+    this.render()
+  }
+
   connectedCallback(): void {
     void storageService.getData()
+    window.addEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
+    window.addEventListener('appinstalled', this.handleAppInstalled)
+    this.shadowRoot?.addEventListener('click', this.handleClick)
+    this.isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    if (this.isStandalone) {
+      this.installAvailable = false
+    }
     this.router.start()
   }
 
   disconnectedCallback(): void {
+    window.removeEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
+    window.removeEventListener('appinstalled', this.handleAppInstalled)
+    this.shadowRoot?.removeEventListener('click', this.handleClick)
     this.router.dispose()
   }
 
@@ -88,6 +161,14 @@ export class RrrApp extends HTMLElement {
     return ''
   }
 
+  private shouldShowInstallButton(): boolean {
+    if (this.isStandalone) {
+      return false
+    }
+
+    return import.meta.env.DEV || this.installAvailable
+  }
+
   private render(): void {
     if (!this.shadowRoot) {
       return
@@ -105,6 +186,7 @@ export class RrrApp extends HTMLElement {
           <a class="${this.linkClass('history', route.name)}" href="#/history">${t('app.nav.history')}</a>
           <a class="${this.linkClass('import-export', route.name)}" href="#/import-export">${t('app.nav.importExport')}</a>
           ${this.styleguideEnabled ? `<a class="${this.linkClass('styleguide', route.name)}" href="#/styleguide">${t('app.nav.styleguide')}</a>` : ''}
+          ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="secondary" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
         </nav>
         <main>
           <div id="view"></div>

@@ -150,19 +150,19 @@ class RrrToastElement extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         :host {
-          --toast-bg: var(--rrr-toast-info-bg, var(--rrr-colors-context-info-70));
-          --toast-fg: var(--rrr-toast-fg, var(--rrr-colors-grayscale-00));
-          --toast-action-bg: var(--rrr-toast-action-bg, color-mix(in oklch, white 25%, transparent));
-          --toast-action-bg-hover: var(--rrr-toast-action-bg-hover, color-mix(in oklch, white 35%, transparent));
-          --toast-close-bg-hover: var(--rrr-toast-close-bg-hover, color-mix(in oklch, white 20%, transparent));
+          --toast-bg: var(--rrr-toast-info-bg);
+          --toast-fg: var(--rrr-toast-fg);
+          --toast-action-bg: var(--rrr-toast-action-bg);
+          --toast-action-bg-hover: var(--rrr-toast-action-bg-hover);
+          --toast-close-bg-hover: var(--rrr-toast-close-bg-hover);
           display: block;
           pointer-events: auto;
           color: var(--toast-fg);
           background: var(--toast-bg);
-          border-radius: var(--rrr-toast-radius, var(--rrr-radius-m));
-          min-width: var(--rrr-toast-min-width, 18rem);
-          max-width: var(--rrr-toast-max-width, min(36rem, calc(100vw - 2rem)));
-          box-shadow: var(--rrr-toast-shadow, var(--rrr-depth-3-shadow));
+          border-radius: var(--rrr-toast-radius);
+          min-width: var(--rrr-toast-min-width);
+          max-width: var(--rrr-toast-max-width);
+          box-shadow: var(--rrr-toast-shadow);
           max-height: 0;
           opacity: 0;
           overflow: hidden;
@@ -171,25 +171,25 @@ class RrrToastElement extends HTMLElement {
         }
 
         :host([data-type='neutral']) {
-          --toast-bg: var(--rrr-toast-neutral-bg, var(--rrr-colors-grayscale-80));
+          --toast-bg: var(--rrr-toast-neutral-bg);
         }
 
         :host([data-type='success']) {
-          --toast-bg: var(--rrr-toast-success-bg, var(--rrr-colors-context-success-70));
+          --toast-bg: var(--rrr-toast-success-bg);
         }
 
         :host([data-type='warning']) {
-          --toast-bg: var(--rrr-toast-warning-bg, var(--rrr-colors-context-warning-70));
+          --toast-bg: var(--rrr-toast-warning-bg);
         }
 
         :host([data-type='danger']) {
-          --toast-bg: var(--rrr-toast-danger-bg, var(--rrr-colors-context-danger-70));
+          --toast-bg: var(--rrr-toast-danger-bg);
         }
 
         :host(.is-open) {
-          max-height: var(--rrr-toast-open-max-height, 12rem);
+          max-height: var(--rrr-toast-open-max-height);
           opacity: 1;
-          margin-bottom: var(--rrr-toast-stack-gap, var(--rrr-spacing-xs));
+          margin-bottom: var(--rrr-toast-stack-gap);
         }
 
         :host(.is-closing) {
@@ -200,15 +200,16 @@ class RrrToastElement extends HTMLElement {
 
         .toast {
           color: inherit;
-          padding: var(--rrr-toast-padding, var(--rrr-spacing-s) var(--rrr-spacing-l));
+          padding: var(--rrr-toast-padding);
           display: flex;
-          gap: var(--rrr-toast-content-gap, var(--rrr-spacing-s));
+          gap: var(--rrr-toast-content-gap);
           align-items: center;
           opacity: 1;
           transform: translateY(0);
           transition: opacity 180ms ease, transform 180ms ease;
-          font-family: var(--rrr-font-family);
-          font-size: var(--rrr-toast-font-size, var(--rrr-font-size-m));
+          font-family: var(--rrr-toast-font-family);
+          font-size: var(--rrr-toast-font-size);
+          font-weight: var(--rrr-toast-font-weight);
           line-height: 1.3;
         }
 
@@ -227,16 +228,16 @@ class RrrToastElement extends HTMLElement {
         .toast-action,
         .toast-close {
           border: 0;
-          border-radius: var(--rrr-toast-control-radius, var(--rrr-radius-s));
+          border-radius: var(--rrr-toast-control-radius);
           cursor: pointer;
-          font-weight: var(--rrr-font-weight-semibold);
-          font-size: var(--rrr-toast-control-font-size, var(--rrr-font-size-s));
+          font-weight: var(--rrr-toast-control-font-weight);
+          font-size: var(--rrr-toast-control-font-size);
           color: var(--toast-fg);
         }
 
         .toast-action {
           background: var(--toast-action-bg);
-          padding: var(--rrr-toast-action-padding, var(--rrr-spacing-xs) var(--rrr-spacing-s));
+          padding: var(--rrr-toast-action-padding);
           white-space: nowrap;
         }
 

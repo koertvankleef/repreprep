@@ -58,6 +58,8 @@ export const nlNlMessages = {
   'app.nav.history': 'Geschiedenis',
   'app.nav.importExport': 'Import/Export',
   'app.nav.styleguide': 'Stijlgids',
+  'app.action.install': 'App installeren',
+  'app.install.devHint': 'Installeren is alleen beschikbaar vanuit een installeerbare preview of productiebuild. In Brave kun je ook het installatie-icoon in de adresbalk gebruiken.',
 
   'styleguide.title': 'Stijlgids',
   'styleguide.subtitle': 'Design-system speelplaats voor lokaal ontwikkelen en componentcontrole.',

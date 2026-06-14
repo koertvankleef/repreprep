@@ -16,6 +16,11 @@ nav {
   border-bottom: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
   box-shadow: var(--rrr-shadow-card);
   flex-wrap: wrap;
+  align-items: center;
+}
+
+nav rrr-button {
+  margin-left: auto;
 }
 
 nav a {

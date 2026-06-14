@@ -58,6 +58,8 @@ export const enUsMessages = {
   'app.nav.history': 'History',
   'app.nav.importExport': 'Import/Export',
   'app.nav.styleguide': 'Styleguide',
+  'app.action.install': 'Install App',
+  'app.install.devHint': 'Install is only available from an installable preview or production build. In Brave, you can also use the install icon in the address bar.',
 
   'styleguide.title': 'Styleguide',
   'styleguide.subtitle': 'Design-system playground for local development and component review.',

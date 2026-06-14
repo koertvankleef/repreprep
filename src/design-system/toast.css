@@ -6,15 +6,22 @@
   --rrr-toast-warning-bg: var(--rrr-colors-context-warning-60);
   --rrr-toast-danger-bg: var(--rrr-colors-context-danger-60);
   --rrr-toast-neutral-bg: var(--rrr-colors-grayscale-80);
+  --rrr-toast-action-bg: color-mix(in oklch, white 25%, transparent);
+  --rrr-toast-action-bg-hover: color-mix(in oklch, white 35%, transparent);
+  --rrr-toast-close-bg-hover: color-mix(in oklch, white 20%, transparent);
   --rrr-toast-radius: var(--rrr-radius-m);
   --rrr-toast-shadow: var(--rrr-depth-3-shadow);
   --rrr-toast-padding: var(--rrr-spacing-m) var(--rrr-spacing-l);
   --rrr-toast-content-gap: var(--rrr-spacing-s);
+  --rrr-toast-font-family: var(--rrr-font-family);
   --rrr-toast-font-size: var(--rrr-font-size-m);
+  --rrr-toast-font-weight: var(--rrr-font-weight-light);
   --rrr-toast-control-radius: var(--rrr-radius-s);
+  --rrr-toast-control-font-weight: var(--rrr-font-weight-semibold);
   --rrr-toast-control-font-size: var(--rrr-font-size-s);
   --rrr-toast-action-padding: var(--rrr-spacing-xs) var(--rrr-spacing-s);
   --rrr-toast-min-width: 20rem;
+  --rrr-toast-max-width: min(36rem, calc(100vw - 2rem));
   --rrr-toast-open-max-height: 14rem;
 
   position: fixed;
