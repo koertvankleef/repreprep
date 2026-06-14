@@ -1,15 +1,7 @@
-import './app/rrr-app.ts'
 import { initLocale } from './i18n/index.ts'
-import './components/rrr-workout-list.ts'
-import './components/rrr-workout-editor.ts'
-import './components/rrr-exercise-entry.ts'
-import './components/rrr-set-entry.ts'
-import './components/rrr-card.ts'
-import './components/rrr-dialog-host.ts'
-import './components/rrr-exercise-catalogue.ts'
-import './components/rrr-import-export.ts'
-import './components/rrr-exercise-history.ts'
-import './components/rrr-routine-list.ts'
-import './components/rrr-routine-editor.ts'
+import { registerDesignSystemComponents } from './design-system/components/register.ts'
+import { registerAppComponents } from './app/register-app-components.ts'
 
 initLocale(navigator.language)
+registerDesignSystemComponents()
+registerAppComponents()

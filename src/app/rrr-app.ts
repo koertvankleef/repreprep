@@ -1,6 +1,8 @@
 import { storageService } from './storage-instance.ts'
 import { t } from '../i18n/index.ts'
 import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
+import { appRoutes, type AppRouteMeta } from '../domain/routes.ts'
+import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
 
 const styles = `
   ${shadowTypographyStyles}
@@ -45,7 +47,6 @@ const styles = `
 
 type Route =
   | { name: 'workouts' }
-  | { name: 'workout-new' }
   | { name: 'workout-edit'; workoutId: string }
   | { name: 'exercises' }
   | { name: 'history' }
@@ -55,21 +56,15 @@ type Route =
   | { name: 'routine-edit'; routineId: string }
 
 export class RrrApp extends HTMLElement {
-  private readonly handleRouteChange = (): void => {
-    const hash = window.location.hash
-
-    if (!hash || hash === '#' || hash === '#/') {
-      window.location.hash = '#/workouts'
-      return
-    }
-
-    if (hash === '#/workouts/new') {
-      window.location.hash = '#/workouts'
-      return
-    }
-
-    this.render()
-  }
+  private route: Route = { name: 'workouts' }
+  private readonly router = createHashRouter({
+    routes: appRoutes,
+    notFoundRouteId: 'workouts',
+    onRouteChange: (match) => {
+      this.route = this.toRoute(match)
+      this.render()
+    },
+  })
 
   constructor() {
     super()
@@ -78,53 +73,40 @@ export class RrrApp extends HTMLElement {
 
   connectedCallback(): void {
     void storageService.getData()
-    window.addEventListener('hashchange', this.handleRouteChange)
-    window.addEventListener('load', this.handleRouteChange)
-    this.handleRouteChange()
+    this.router.start()
   }
 
   disconnectedCallback(): void {
-    window.removeEventListener('hashchange', this.handleRouteChange)
-    window.removeEventListener('load', this.handleRouteChange)
+    this.router.dispose()
   }
 
-  private getRoute(): Route {
-    const hash = window.location.hash
-
-    if (hash === '#/workouts' || hash === '#/') {
-      return { name: 'workouts' }
+  private toRoute(match: HashRouteMatch<AppRouteMeta>): Route {
+    if (match.route.id === 'workout-edit') {
+      return { name: 'workout-edit', workoutId: match.params.workoutId ?? '' }
     }
 
-    if (hash === '#/workouts/new') {
-      return { name: 'workout-new' }
+    if (match.route.id === 'routine-edit') {
+      return { name: 'routine-edit', routineId: match.params.routineId ?? '' }
     }
 
-    if (hash.startsWith('#/workouts/')) {
-      return { name: 'workout-edit', workoutId: hash.replace('#/workouts/', '') }
-    }
-
-    if (hash === '#/exercises') {
-      return { name: 'exercises' }
-    }
-
-    if (hash === '#/history') {
-      return { name: 'history' }
-    }
-
-    if (hash === '#/import-export') {
-      return { name: 'import-export' }
-    }
-
-    if (hash === '#/routines') {
-      return { name: 'routines' }
-    }
-
-    if (hash === '#/routines/new') {
+    if (match.route.id === 'routine-new') {
       return { name: 'routine-new' }
     }
 
-    if (hash.startsWith('#/routines/')) {
-      return { name: 'routine-edit', routineId: hash.replace('#/routines/', '') }
+    if (match.route.id === 'routines') {
+      return { name: 'routines' }
+    }
+
+    if (match.route.id === 'exercises') {
+      return { name: 'exercises' }
+    }
+
+    if (match.route.id === 'history') {
+      return { name: 'history' }
+    }
+
+    if (match.route.id === 'import-export') {
+      return { name: 'import-export' }
     }
 
     return { name: 'workouts' }
@@ -141,7 +123,7 @@ export class RrrApp extends HTMLElement {
       return
     }
 
-    const route = this.getRoute()
+    const route = this.route
 
     this.shadowRoot.innerHTML = `
       <style>${styles}</style>
@@ -167,11 +149,6 @@ export class RrrApp extends HTMLElement {
 
     if (route.name === 'workouts') {
       view.append(document.createElement('rrr-workout-list'))
-      return
-    }
-
-    if (route.name === 'workout-new') {
-      view.append(document.createElement('rrr-workout-editor'))
       return
     }
 

@@ -1,4 +1,5 @@
-import { t } from '../i18n/index.ts'
+import { t } from '../../i18n/index.ts'
+import { defineCustomElementOnce } from './shared.ts'
 
 const styles = `
   :host {
@@ -255,4 +256,6 @@ function escapeHtml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
-customElements.define('rrr-dialog-host', RrrDialogHost)
+export function registerRrrDialogHost(): void {
+  defineCustomElementOnce('rrr-dialog-host', RrrDialogHost)
+}

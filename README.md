@@ -28,6 +28,18 @@ Then open http://localhost:5173 in your browser.
 npm test
 ```
 
+## Architecture Checks
+
+```bash
+npm run check:architecture
+```
+
+Layer boundaries are documented in docs/architecture-boundaries.md.
+
+## Manual QA
+
+Use docs/qa-checklist.md for repeatable smoke, localization, accessibility, and architecture checks.
+
 ## How localStorage Works
 
 All workout data is stored in your browser's localStorage under the key `repreprep:data`. Data persists between sessions on the same browser/device. Clearing browser data will erase your workouts—use the export feature regularly to back up your data.

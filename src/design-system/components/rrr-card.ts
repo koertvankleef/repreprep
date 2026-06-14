@@ -1,3 +1,5 @@
+import { defineCustomElementOnce } from './shared.ts'
+
 const styles = `
   :host {
     display: block;
@@ -51,4 +53,6 @@ export class RrrCard extends HTMLElement {
   }
 }
 
-customElements.define('rrr-card', RrrCard)
+export function registerRrrCard(): void {
+  defineCustomElementOnce('rrr-card', RrrCard)
+}

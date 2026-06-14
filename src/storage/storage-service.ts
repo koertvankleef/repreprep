@@ -2,6 +2,7 @@ import { createDefaultData } from '../domain/create-default-data.ts'
 import { addExercise, archiveExercise as archiveExerciseRecord, getExercise, updateExercise } from '../domain/exercise-service.ts'
 import { addWorkout, deleteWorkout as removeWorkout, getWorkout, updateWorkout } from '../domain/workout-service.ts'
 import { archiveRoutine as archiveRoutineRecord, editRoutine as editRoutineRecord, getRoutine, createRoutine as createRoutineRecord } from '../domain/routine-service.ts'
+import { DomainError } from '../domain/errors.ts'
 import type { AppData, ExerciseDefinition, Routine, RoutineExercise, Workout } from '../domain/types.ts'
 
 export interface StorageAdapter {
@@ -62,7 +63,7 @@ export class WorkoutStorageService {
       const updated = getRoutine(this.current, routineId)
 
       if (!updated) {
-        throw new Error('Failed to update routine')
+        throw new DomainError('ROUTINE_UPDATE_FAILED', 'Failed to update routine')
       }
 
       return updated
@@ -74,7 +75,7 @@ export class WorkoutStorageService {
     const created = this.current.routines.at(-1)
 
     if (!created) {
-      throw new Error('Failed to create routine')
+      throw new DomainError('ROUTINE_CREATE_FAILED', 'Failed to create routine')
     }
 
     return created
