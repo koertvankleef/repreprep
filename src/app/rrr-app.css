@@ -16,6 +16,7 @@
   --rrr-app-link-active-background: var(--rrr-colors-activity-indigo-60);
   --rrr-app-link-active-color: var(--rrr-colors-grayscale-00);
   --rrr-app-link-active-shadow: var(--rrr-shadow-button);
+  --rrr-app-link-font-family: var(--rrr-font-family-heading);
   --rrr-app-main-padding: var(--rrr-spacing-l);
 }
 
@@ -34,6 +35,7 @@ nav {
   box-shadow: var(--rrr-app-nav-shadow);
   flex-wrap: wrap;
   align-items: center;
+  font-family: var(--rrr-app-link-font-family);
 }
 
 nav rrr-button {

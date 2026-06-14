@@ -1,15 +1,15 @@
 :host {
   display: inline-block;
   --rrr-button-border-width: var(--rrr-border-width);
-  --rrr-button-border-color: var(--rrr-colors-activity-indigo-60);
+  --rrr-button-border-color: var(--rrr-colors-activity-indigo-70);
   --rrr-button-border-radius: var(--rrr-radius-s);
   --rrr-button-padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
-  --rrr-button-background: var(--rrr-colors-activity-indigo-50);
+  --rrr-button-background: var(--rrr-colors-activity-indigo-60);
   --rrr-button-color: var(--rrr-colors-grayscale-00);
   --rrr-button-shadow: var(--rrr-shadow-button);
   --rrr-button-transition: var(--rrr-default-transition);
-  --rrr-button-hover-background: var(--rrr-colors-activity-indigo-60);
-  --rrr-button-hover-border-color: var(--rrr-colors-activity-indigo-70);
+  --rrr-button-hover-background: var(--rrr-colors-activity-indigo-70);
+  --rrr-button-hover-border-color: var(--rrr-colors-activity-indigo-80);
   --rrr-button-hover-shadow: var(--rrr-depth-2-shadow);
   --rrr-button-active-shadow: var(--rrr-depth-1-shadow);
   --rrr-button-secondary-background: var(--rrr-colors-grayscale-00);

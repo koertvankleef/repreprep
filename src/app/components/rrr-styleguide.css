@@ -35,7 +35,7 @@
   border-radius: var(--rrr-radius-s);
   padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
   font: inherit;
-  font-weight: var(--rrr-font-weight-semibold);
+  font-weight: var(--rrr-font-weight-normal);
   cursor: pointer;
   transition: background var(--rrr-default-transition), color var(--rrr-default-transition), border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition);
 }
