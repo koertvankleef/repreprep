@@ -1,12 +1,14 @@
 import { enUsMessages } from './en-US.ts'
+import { nlNlMessages } from './nl-NL.ts'
 
-type LocaleCode = 'en-US'
+type LocaleCode = 'en-US' | 'nl-NL'
 type MessageEntry = string | { value: string; context?: string }
 type MessageDictionary = Record<string, MessageEntry>
 type MessageParams = Record<string, string | number>
 
 const catalogs: Record<LocaleCode, MessageDictionary> = {
   'en-US': enUsMessages,
+  'nl-NL': nlNlMessages,
 }
 
 const fallbackLocale: LocaleCode = 'en-US'
@@ -45,6 +47,10 @@ export function resolveLocale(preferred: string | null | undefined): LocaleCode 
 
   if (normalized.toLowerCase() === 'en' || normalized.toLowerCase().startsWith('en-')) {
     return 'en-US'
+  }
+
+  if (normalized.toLowerCase() === 'nl' || normalized.toLowerCase().startsWith('nl-')) {
+    return 'nl-NL'
   }
 
   return fallbackLocale
