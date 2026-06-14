@@ -1,44 +1,61 @@
+rrr-routine-editor {
+  --rrr-routine-editor-list-gap: var(--rrr-spacing-l);
+  --rrr-routine-editor-item-border-width: var(--rrr-border-width);
+  --rrr-routine-editor-item-border-color: var(--rrr-colors-grayscale-30);
+  --rrr-routine-editor-item-radius: var(--rrr-radius-m);
+  --rrr-routine-editor-item-padding: var(--rrr-spacing-l);
+  --rrr-routine-editor-item-background: var(--rrr-colors-grayscale-00);
+  --rrr-routine-editor-item-shadow: var(--rrr-depth-1-shadow);
+  --rrr-routine-editor-item-gap: var(--rrr-spacing-s);
+  --rrr-routine-editor-header-gap: var(--rrr-spacing-s);
+  --rrr-routine-editor-name-weight: var(--rrr-font-weight-bold);
+  --rrr-routine-editor-name-color: var(--rrr-colors-balpen-blauw-80);
+  --rrr-routine-editor-order-gap: var(--rrr-spacing-xs);
+  --rrr-routine-editor-planned-gap: var(--rrr-spacing-s);
+  --rrr-routine-editor-add-row-gap: var(--rrr-spacing-s);
+}
+
 .exercise-list {
   display: grid;
-  gap: var(--rrr-spacing-l);
+  gap: var(--rrr-routine-editor-list-gap);
 }
 
 .exercise-item {
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
-  border-radius: var(--rrr-radius-m);
-  padding: var(--rrr-spacing-l);
-  background: var(--rrr-colors-grayscale-00);
-  box-shadow: var(--rrr-depth-1-shadow);
+  border: var(--rrr-routine-editor-item-border-width) solid var(--rrr-routine-editor-item-border-color);
+  border-radius: var(--rrr-routine-editor-item-radius);
+  padding: var(--rrr-routine-editor-item-padding);
+  background: var(--rrr-routine-editor-item-background);
+  box-shadow: var(--rrr-routine-editor-item-shadow);
   display: grid;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-routine-editor-item-gap);
 }
 
 .exercise-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-routine-editor-header-gap);
   flex-wrap: wrap;
 }
 
 .exercise-name {
-  font-weight: var(--rrr-font-weight-bold);
-  color: var(--rrr-colors-balpen-blauw-80);
+  font-weight: var(--rrr-routine-editor-name-weight);
+  color: var(--rrr-routine-editor-name-color);
 }
 
 .exercise-order {
   display: flex;
-  gap: var(--rrr-spacing-xs);
+  gap: var(--rrr-routine-editor-order-gap);
 }
 
 .planned-sets {
   display: grid;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-routine-editor-planned-gap);
 }
 
 .planned-set {
   display: flex;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-routine-editor-planned-gap);
   align-items: center;
   flex-wrap: wrap;
 }
@@ -49,7 +66,7 @@
 
 .add-exercise-row {
   display: flex;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-routine-editor-add-row-gap);
   flex-wrap: wrap;
   align-items: flex-end;
 }

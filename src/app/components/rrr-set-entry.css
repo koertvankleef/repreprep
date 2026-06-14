@@ -1,16 +1,27 @@
+rrr-set-entry {
+  --rrr-set-entry-border-width: var(--rrr-border-width);
+  --rrr-set-entry-border-color: var(--rrr-colors-grayscale-30);
+  --rrr-set-entry-radius: var(--rrr-radius-m);
+  --rrr-set-entry-padding: var(--rrr-spacing-l);
+  --rrr-set-entry-background: var(--rrr-colors-grayscale-00);
+  --rrr-set-entry-shadow: var(--rrr-depth-1-shadow);
+  --rrr-set-entry-gap: var(--rrr-spacing-s);
+  --rrr-set-entry-fields-gap: var(--rrr-spacing-s);
+}
+
 .set {
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
-  border-radius: var(--rrr-radius-m);
-  padding: var(--rrr-spacing-l);
-  background: var(--rrr-colors-grayscale-00);
-  box-shadow: var(--rrr-depth-1-shadow);
+  border: var(--rrr-set-entry-border-width) solid var(--rrr-set-entry-border-color);
+  border-radius: var(--rrr-set-entry-radius);
+  padding: var(--rrr-set-entry-padding);
+  background: var(--rrr-set-entry-background);
+  box-shadow: var(--rrr-set-entry-shadow);
   display: grid;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-set-entry-gap);
 }
 
 .fields {
   display: grid;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-set-entry-fields-gap);
   grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
 }
 

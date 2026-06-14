@@ -1,4 +1,9 @@
+rrr-import-export {
+  --rrr-import-export-helper-color: var(--rrr-colors-grayscale-70);
+  --rrr-import-export-helper-size: var(--rrr-font-size-s);
+}
+
 .helper-text {
-  color: var(--rrr-colors-grayscale-70);
-  font-size: var(--rrr-font-size-s);
+  color: var(--rrr-import-export-helper-color);
+  font-size: var(--rrr-import-export-helper-size);
 }

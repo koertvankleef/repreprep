@@ -23,13 +23,15 @@
   --rrr-toast-min-width: 20rem;
   --rrr-toast-max-width: min(36rem, calc(100vw - 2rem));
   --rrr-toast-open-max-height: 14rem;
+  --rrr-toast-root-bottom: var(--rrr-spacing-l);
+  --rrr-toast-root-width: min(42rem, calc(100vw - var(--rrr-spacing-l)));
 
   position: fixed;
-  bottom: var(--rrr-spacing-l);
+  bottom: var(--rrr-toast-root-bottom);
   left: 50%;
   transform: translateX(-50%);
   z-index: 1100;
-  width: min(42rem, calc(100vw - var(--rrr-spacing-l)));
+  width: var(--rrr-toast-root-width);
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
@@ -43,6 +45,6 @@
 
 @media (min-width: 40rem) {
   .rrr-toast-root {
-    bottom: var(--rrr-spacing-l);
+    bottom: var(--rrr-toast-root-bottom);
   }
 }

@@ -1,27 +1,40 @@
+rrr-exercise-entry {
+  --rrr-exercise-entry-border-width: var(--rrr-border-width);
+  --rrr-exercise-entry-border-color: var(--rrr-colors-grayscale-30);
+  --rrr-exercise-entry-radius: var(--rrr-radius-l);
+  --rrr-exercise-entry-padding: var(--rrr-spacing-l);
+  --rrr-exercise-entry-background: var(--rrr-colors-grayscale-00);
+  --rrr-exercise-entry-shadow: var(--rrr-shadow-card);
+  --rrr-exercise-entry-gap: var(--rrr-spacing-l);
+  --rrr-exercise-entry-header-gap: var(--rrr-spacing-s);
+  --rrr-exercise-entry-sets-gap: var(--rrr-spacing-s);
+  --rrr-exercise-entry-footer-gap: var(--rrr-spacing-s);
+}
+
 .entry {
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
-  border-radius: var(--rrr-radius-l);
-  padding: var(--rrr-spacing-l);
-  background: var(--rrr-colors-grayscale-00);
-  box-shadow: var(--rrr-shadow-card);
+  border: var(--rrr-exercise-entry-border-width) solid var(--rrr-exercise-entry-border-color);
+  border-radius: var(--rrr-exercise-entry-radius);
+  padding: var(--rrr-exercise-entry-padding);
+  background: var(--rrr-exercise-entry-background);
+  box-shadow: var(--rrr-exercise-entry-shadow);
   display: grid;
-  gap: var(--rrr-spacing-l);
+  gap: var(--rrr-exercise-entry-gap);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-exercise-entry-header-gap);
   align-items: center;
 }
 
 .sets {
   display: grid;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-exercise-entry-sets-gap);
 }
 
 .footer {
   display: flex;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-exercise-entry-footer-gap);
   flex-wrap: wrap;
 }

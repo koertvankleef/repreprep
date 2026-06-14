@@ -1,6 +1,10 @@
+rrr-workout-editor {
+  --rrr-workout-editor-entries-gap: var(--rrr-spacing-l);
+}
+
 .entries {
   display: grid;
-  gap: var(--rrr-spacing-l);
+  gap: var(--rrr-workout-editor-entries-gap);
 }
 
 .field-input,

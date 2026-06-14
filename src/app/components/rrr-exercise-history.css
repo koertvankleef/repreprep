@@ -1,12 +1,22 @@
+rrr-exercise-history {
+  --rrr-exercise-history-list-gap: var(--rrr-spacing-s);
+  --rrr-exercise-history-item-border-width: var(--rrr-border-width);
+  --rrr-exercise-history-item-border-color: var(--rrr-colors-grayscale-30);
+  --rrr-exercise-history-item-radius: var(--rrr-radius-m);
+  --rrr-exercise-history-item-padding: var(--rrr-spacing-l);
+  --rrr-exercise-history-item-background: color-mix(in oklch, var(--rrr-colors-grayscale-00) 82%, var(--rrr-colors-balpen-blauw-10));
+  --rrr-exercise-history-item-shadow: var(--rrr-depth-1-shadow);
+}
+
 .history-list {
   display: grid;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-exercise-history-list-gap);
 }
 
 .history-item {
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
-  border-radius: var(--rrr-radius-m);
-  padding: var(--rrr-spacing-l);
-  background: color-mix(in oklch, var(--rrr-colors-grayscale-00) 82%, var(--rrr-colors-balpen-blauw-10));
-  box-shadow: var(--rrr-depth-1-shadow);
+  border: var(--rrr-exercise-history-item-border-width) solid var(--rrr-exercise-history-item-border-color);
+  border-radius: var(--rrr-exercise-history-item-radius);
+  padding: var(--rrr-exercise-history-item-padding);
+  background: var(--rrr-exercise-history-item-background);
+  box-shadow: var(--rrr-exercise-history-item-shadow);
 }

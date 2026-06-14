@@ -1,11 +1,16 @@
+rrr-workout-list {
+  --rrr-workout-list-gap: var(--rrr-spacing-l);
+  --rrr-workout-list-start-gap: var(--rrr-spacing-s);
+}
+
 .list {
   display: grid;
-  gap: var(--rrr-spacing-l);
+  gap: var(--rrr-workout-list-gap);
 }
 
 .start-panel {
   display: flex;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-workout-list-start-gap);
   align-items: end;
   flex-wrap: wrap;
 }

@@ -1,51 +1,72 @@
 :host {
   display: grid;
-  gap: var(--rrr-spacing-xs);
+  gap: var(--rrr-input-gap);
+  --rrr-input-gap: var(--rrr-spacing-xs);
+  --rrr-input-label-color: var(--rrr-colors-grayscale-90);
+  --rrr-input-label-font-weight: var(--rrr-font-weight-semibold);
+  --rrr-input-padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
+  --rrr-input-border-width: var(--rrr-border-width);
+  --rrr-input-border-color: var(--rrr-colors-grayscale-40);
+  --rrr-input-border-radius: var(--rrr-radius-m);
+  --rrr-input-background: var(--rrr-colors-grayscale-00);
+  --rrr-input-color: var(--rrr-colors-grayscale-100);
+  --rrr-input-transition: var(--rrr-default-transition);
+  --rrr-input-placeholder-color: var(--rrr-colors-grayscale-60);
+  --rrr-input-hover-border-color: var(--rrr-colors-balpen-blauw-30);
+  --rrr-input-focus-border-color: var(--rrr-colors-balpen-blauw-50);
+  --rrr-input-focus-outline-width: var(--global-focus-ring-width);
+  --rrr-input-focus-outline-color: var(--global-focus-ring-color);
+  --rrr-input-focus-outline-offset: var(--global-focus-ring-offset);
+  --rrr-input-focus-shadow: 0 0 0 4px var(--rrr-colors-balpen-blauw-10);
+  --rrr-input-invalid-border-color: var(--rrr-colors-context-danger-50);
+  --rrr-input-invalid-background: var(--rrr-colors-context-danger-10);
+  --rrr-input-invalid-focus-shadow: 0 0 0 4px var(--rrr-colors-context-danger-10);
+  --rrr-input-error-color: var(--rrr-colors-context-danger-70);
 }
 
 label {
   display: block;
-  color: var(--rrr-colors-grayscale-90);
-  font-weight: var(--rrr-font-weight-semibold);
+  color: var(--rrr-input-label-color);
+  font-weight: var(--rrr-input-label-font-weight);
 }
 
 input {
   width: 100%;
-  padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-40);
-  border-radius: var(--rrr-radius-m);
-  background: var(--rrr-colors-grayscale-00);
-  color: var(--rrr-colors-grayscale-100);
+  padding: var(--rrr-input-padding);
+  border: var(--rrr-input-border-width) solid var(--rrr-input-border-color);
+  border-radius: var(--rrr-input-border-radius);
+  background: var(--rrr-input-background);
+  color: var(--rrr-input-color);
   font: inherit;
-  transition: border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition), background var(--rrr-default-transition);
+  transition: border-color var(--rrr-input-transition), box-shadow var(--rrr-input-transition), background var(--rrr-input-transition);
 }
 
 input::placeholder {
-  color: var(--rrr-colors-grayscale-60);
+  color: var(--rrr-input-placeholder-color);
 }
 
 input:hover {
-  border-color: var(--rrr-colors-balpen-blauw-30);
+  border-color: var(--rrr-input-hover-border-color);
 }
 
 input:focus-visible {
-  border-color: var(--rrr-colors-balpen-blauw-50);
-  outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
-  outline-offset: var(--global-focus-ring-offset);
-  box-shadow: 0 0 0 4px var(--rrr-colors-balpen-blauw-10);
+  border-color: var(--rrr-input-focus-border-color);
+  outline: var(--rrr-input-focus-outline-width) solid var(--rrr-input-focus-outline-color);
+  outline-offset: var(--rrr-input-focus-outline-offset);
+  box-shadow: var(--rrr-input-focus-shadow);
 }
 
 input[aria-invalid="true"] {
-  border-color: var(--rrr-colors-context-danger-50);
-  background: var(--rrr-colors-context-danger-10);
+  border-color: var(--rrr-input-invalid-border-color);
+  background: var(--rrr-input-invalid-background);
 }
 
 input[aria-invalid="true"]:focus-visible {
-  box-shadow: 0 0 0 4px var(--rrr-colors-context-danger-10);
+  box-shadow: var(--rrr-input-invalid-focus-shadow);
 }
 
 .error {
-  color: var(--rrr-colors-context-danger-70);
+  color: var(--rrr-input-error-color);
   margin: 0;
   min-height: 1.25rem;
 }

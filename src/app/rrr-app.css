@@ -1,5 +1,21 @@
 :host {
   min-height: 100vh;
+  --rrr-app-nav-gap: var(--rrr-spacing-s);
+  --rrr-app-nav-padding: var(--rrr-spacing-l);
+  --rrr-app-nav-background: color-mix(in oklch, var(--rrr-colors-grayscale-00) 88%, var(--rrr-colors-balpen-blauw-10));
+  --rrr-app-nav-border-width: var(--rrr-border-width);
+  --rrr-app-nav-border-color: var(--rrr-colors-grayscale-30);
+  --rrr-app-nav-shadow: var(--rrr-shadow-card);
+  --rrr-app-link-padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
+  --rrr-app-link-radius: var(--rrr-radius-xl);
+  --rrr-app-link-color: var(--rrr-colors-grayscale-90);
+  --rrr-app-link-transition: var(--rrr-default-transition);
+  --rrr-app-link-hover-background: var(--rrr-colors-balpen-blauw-10);
+  --rrr-app-link-hover-color: var(--rrr-colors-balpen-blauw-80);
+  --rrr-app-link-active-background: var(--rrr-colors-balpen-blauw-60);
+  --rrr-app-link-active-color: var(--rrr-colors-grayscale-00);
+  --rrr-app-link-active-shadow: var(--rrr-shadow-button);
+  --rrr-app-main-padding: var(--rrr-spacing-2xl);
 }
 
 .shell {
@@ -10,11 +26,11 @@
 
 nav {
   display: flex;
-  gap: var(--rrr-spacing-s);
-  padding: var(--rrr-spacing-l);
-  background: color-mix(in oklch, var(--rrr-colors-grayscale-00) 88%, var(--rrr-colors-balpen-blauw-10));
-  border-bottom: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
-  box-shadow: var(--rrr-shadow-card);
+  gap: var(--rrr-app-nav-gap);
+  padding: var(--rrr-app-nav-padding);
+  background: var(--rrr-app-nav-background);
+  border-bottom: var(--rrr-app-nav-border-width) solid var(--rrr-app-nav-border-color);
+  box-shadow: var(--rrr-app-nav-shadow);
   flex-wrap: wrap;
   align-items: center;
 }
@@ -24,26 +40,26 @@ nav rrr-button {
 }
 
 nav a {
-  padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
-  border-radius: var(--rrr-radius-xl);
+  padding: var(--rrr-app-link-padding);
+  border-radius: var(--rrr-app-link-radius);
   text-decoration: none;
-  color: var(--rrr-colors-grayscale-90);
-  transition: background var(--rrr-default-transition), color var(--rrr-default-transition), box-shadow var(--rrr-default-transition);
+  color: var(--rrr-app-link-color);
+  transition: background var(--rrr-app-link-transition), color var(--rrr-app-link-transition), box-shadow var(--rrr-app-link-transition);
 }
 
 nav a:hover {
-  background: var(--rrr-colors-balpen-blauw-10);
-  color: var(--rrr-colors-balpen-blauw-80);
+  background: var(--rrr-app-link-hover-background);
+  color: var(--rrr-app-link-hover-color);
 }
 
 nav a.active {
-  background: var(--rrr-colors-balpen-blauw-60);
-  color: var(--rrr-colors-grayscale-00);
-  box-shadow: var(--rrr-shadow-button);
+  background: var(--rrr-app-link-active-background);
+  color: var(--rrr-app-link-active-color);
+  box-shadow: var(--rrr-app-link-active-shadow);
 }
 
 main {
-  padding: var(--rrr-spacing-2xl);
+  padding: var(--rrr-app-main-padding);
   max-width: 72rem;
   width: 100%;
   margin: 0 auto;
