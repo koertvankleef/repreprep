@@ -381,8 +381,8 @@ export class RrrStyleguide extends HTMLElement {
               <p class="sample-text">${t('styleguide.icons.description')}</p>
               <div class="icon-grid" aria-label="${t('styleguide.section.icons')}">
                 <div class="icon-item">
-                  <rrr-icon name="contrast"></rrr-icon>
-                  <span>contrast</span>
+                  <rrr-icon name="circle-half-fill"></rrr-icon>
+                  <span>circle-half-fill</span>
                 </div>
                 <div class="icon-item">
                   <rrr-icon name="weather-sunny"></rrr-icon>
