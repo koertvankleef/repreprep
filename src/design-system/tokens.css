@@ -13,29 +13,29 @@
   --rrr-colors-grayscale-10: oklch(97.69% 0.0066 264.90);
   --rrr-colors-grayscale-00: oklch(99.88% 0.0004 90.25);
 
-  /* Brand mapping: brand-inspired tone derived from --rrr-colors-magenta-60 (#E30075). */
-  /* Magenta remains the accent family in the imported palette. */
-  --rrr-colors-magenta-10: oklch(97.69% 0.0595 346.56);
-  --rrr-colors-magenta-20: oklch(90.02% 0.0957 349.55);
-  --rrr-colors-magenta-30: oklch(82.35% 0.1319 352.54);
-  --rrr-colors-magenta-40: oklch(74.67% 0.1680 355.54);
-  --rrr-colors-magenta-50: oklch(67.00% 0.2042 358.53);
-  --rrr-colors-magenta-60: oklch(59.33% 0.2404 1.52);
-  --rrr-colors-magenta-70: oklch(48.33% 0.2034 359.37);
-  --rrr-colors-magenta-80: oklch(37.32% 0.1664 357.22);
-  --rrr-colors-magenta-90: oklch(26.32% 0.1294 355.07);
+  /* Brand mapping: brand-inspired tone derived from --rrr-colors-magenta-60 (#108981). */
+  /* Magenta token names are retained for compatibility while serving as accent tokens. */
+  --rrr-colors-magenta-10: oklch(95.26% 0.0284 184.51);
+  --rrr-colors-magenta-20: oklch(87.59% 0.0456 187.50);
+  --rrr-colors-magenta-30: oklch(79.92% 0.0660 192.20);
+  --rrr-colors-magenta-40: oklch(72.24% 0.0800 193.49);
+  --rrr-colors-magenta-50: oklch(64.57% 0.0942 196.48);
+  --rrr-colors-magenta-60: oklch(56.90% 0.0962 199.47);
+  --rrr-colors-magenta-70: oklch(45.90% 0.0814 197.32);
+  --rrr-colors-magenta-80: oklch(34.89% 0.0666 195.17);
+  --rrr-colors-magenta-90: oklch(23.89% 0.0518 193.02);
 
-  /* Brand mapping: brand-inspired tone derived from --rrr-colors-balpen-blauw-60 (#0074A7). */
+  /* Brand mapping: brand-inspired tone derived from --rrr-colors-balpen-blauw-60 (#4F46E5). */
   /* Balpen Blauw remains the primary family in the imported palette. */
-  --rrr-colors-balpen-blauw-10: oklch(97.69% 0.0289 226.09);
-  --rrr-colors-balpen-blauw-20: oklch(88.78% 0.0467 228.49);
-  --rrr-colors-balpen-blauw-30: oklch(79.87% 0.0645 230.90);
-  --rrr-colors-balpen-blauw-40: oklch(70.97% 0.0824 233.30);
-  --rrr-colors-balpen-blauw-50: oklch(62.06% 0.1002 235.71);
-  --rrr-colors-balpen-blauw-60: oklch(53.15% 0.1180 238.11);
-  --rrr-colors-balpen-blauw-70: oklch(44.21% 0.1039 236.66);
-  --rrr-colors-balpen-blauw-80: oklch(35.26% 0.0898 235.20);
-  --rrr-colors-balpen-blauw-90: oklch(26.32% 0.0757 233.75);
+  --rrr-colors-balpen-blauw-10: oklch(95.60% 0.1410 268.20);
+  --rrr-colors-balpen-blauw-20: oklch(87.19% 0.1588 272.48);
+  --rrr-colors-balpen-blauw-30: oklch(77.78% 0.1766 269.76);
+  --rrr-colors-balpen-blauw-40: oklch(68.88% 0.1945 272.16);
+  --rrr-colors-balpen-blauw-50: oklch(59.97% 0.2123 274.57);
+  --rrr-colors-balpen-blauw-60: oklch(51.06% 0.2301 276.97);
+  --rrr-colors-balpen-blauw-70: oklch(42.12% 0.2160 275.52);
+  --rrr-colors-balpen-blauw-80: oklch(33.17% 0.2019 274.06);
+  --rrr-colors-balpen-blauw-90: oklch(24.23% 0.1878 272.61);
 
   /* Brand mapping: no direct brand-color equivalent in this set.*/
   --rrr-colors-context-danger-10: oklch(97.69% 0.0450 24.00);

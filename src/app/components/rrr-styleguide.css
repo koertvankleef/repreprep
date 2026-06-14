@@ -11,7 +11,7 @@
 .showcase-grid {
   display: grid;
   gap: var(--rrr-spacing-l);
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .showcase-block {
@@ -195,7 +195,7 @@
 .scale-groups {
   display: grid;
   gap: var(--rrr-spacing-l);
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .scale-group {
@@ -241,11 +241,29 @@
 }
 
 @media screen and (min-width: 62rem) {
+  .showcase-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .scale-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .swatch-row--primary {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .swatch-row--context {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media screen and (min-width: 80rem) {
+  .showcase-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .scale-groups {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
