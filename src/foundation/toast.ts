@@ -201,8 +201,7 @@ class RrrToastElement extends HTMLElement {
         .toast {
           color: inherit;
           padding: var(--rrr-toast-padding, var(--rrr-spacing-s) var(--rrr-spacing-l));
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) auto auto;
+          display: flex;
           gap: var(--rrr-toast-content-gap, var(--rrr-spacing-s));
           align-items: center;
           opacity: 1;
@@ -220,6 +219,8 @@ class RrrToastElement extends HTMLElement {
 
         .toast-text {
           margin: 0;
+          flex: 1 1 auto;
+          min-width: 0;
           word-break: break-word;
         }
 
