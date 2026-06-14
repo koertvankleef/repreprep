@@ -1,17 +1,17 @@
 :root {
   color-scheme: light dark;
 
-  --rrr-colors-grayscale-100: oklch(0.91% 0.0000 343.33);
-  --rrr-colors-grayscale-90: oklch(27.05% 0.0072 231.52);
-  --rrr-colors-grayscale-80: oklch(40.76% 0.0133 238.93);
-  --rrr-colors-grayscale-70: oklch(56.45% 0.0140 238.00);
-  --rrr-colors-grayscale-60: oklch(64.96% 0.0161 242.75);
-  --rrr-colors-grayscale-50: oklch(78.46% 0.0145 237.26);
-  --rrr-colors-grayscale-40: oklch(87.62% 0.0147 242.75);
-  --rrr-colors-grayscale-30: oklch(93.40% 0.0132 240.53);
-  --rrr-colors-grayscale-20: oklch(96.58% 0.0093 247.84);
-  --rrr-colors-grayscale-10: oklch(98.42% 0.0034 247.86);
-  --rrr-colors-grayscale-00: oklch(100.00% 0.0000 73.21);
+  --rrr-colors-grayscale-100: oklch(0.91% 0.0065 266.00);
+  --rrr-colors-grayscale-90: oklch(27.05% 0.0160 264.00);
+  --rrr-colors-grayscale-80: oklch(40.76% 0.0200 260.00);
+  --rrr-colors-grayscale-70: oklch(56.45% 0.0220 254.00);
+  --rrr-colors-grayscale-60: oklch(64.96% 0.0220 248.00);
+  --rrr-colors-grayscale-50: oklch(78.46% 0.0200 240.00);
+  --rrr-colors-grayscale-40: oklch(87.62% 0.0162 222.00);
+  --rrr-colors-grayscale-30: oklch(93.40% 0.0148 216.00);
+  --rrr-colors-grayscale-20: oklch(96.11% 0.0127 196.00);
+  --rrr-colors-grayscale-10: oklch(98.82% 0.0025 176.00);
+  --rrr-colors-grayscale-00: oklch(100.00% 0.0000 0.00);
 
   /* Brand mapping: brand-inspired tone derived from --rrr-colors-serene-mint-60 (#108981). */
   /* Magenta token names are retained for compatibility while serving as accent tokens. */
