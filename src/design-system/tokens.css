@@ -1,41 +1,41 @@
 :root {
   color-scheme: light dark;
 
-  --rrr-colors-grayscale-100: oklch(0.18% 0.0004 0.37);
-  --rrr-colors-grayscale-90: oklch(26.32% 0.0104 248.56);
-  --rrr-colors-grayscale-80: oklch(40.03% 0.0165 255.97);
-  --rrr-colors-grayscale-70: oklch(55.72% 0.0172 255.04);
-  --rrr-colors-grayscale-60: oklch(64.23% 0.0193 259.79);
-  --rrr-colors-grayscale-50: oklch(77.73% 0.0177 254.30);
-  --rrr-colors-grayscale-40: oklch(86.89% 0.0179 259.79);
-  --rrr-colors-grayscale-30: oklch(92.67% 0.0164 257.57);
-  --rrr-colors-grayscale-20: oklch(95.85% 0.0125 264.88);
-  --rrr-colors-grayscale-10: oklch(97.69% 0.0066 264.90);
-  --rrr-colors-grayscale-00: oklch(99.88% 0.0004 90.25);
+  --rrr-colors-grayscale-100: oklch(0.91% 0.0000 343.33);
+  --rrr-colors-grayscale-90: oklch(27.05% 0.0072 231.52);
+  --rrr-colors-grayscale-80: oklch(40.76% 0.0133 238.93);
+  --rrr-colors-grayscale-70: oklch(56.45% 0.0140 238.00);
+  --rrr-colors-grayscale-60: oklch(64.96% 0.0161 242.75);
+  --rrr-colors-grayscale-50: oklch(78.46% 0.0145 237.26);
+  --rrr-colors-grayscale-40: oklch(87.62% 0.0147 242.75);
+  --rrr-colors-grayscale-30: oklch(93.40% 0.0132 240.53);
+  --rrr-colors-grayscale-20: oklch(96.58% 0.0093 247.84);
+  --rrr-colors-grayscale-10: oklch(98.42% 0.0034 247.86);
+  --rrr-colors-grayscale-00: oklch(100.00% 0.0000 73.21);
 
-  /* Brand mapping: brand-inspired tone derived from --rrr-colors-magenta-60 (#108981). */
+  /* Brand mapping: brand-inspired tone derived from --rrr-colors-serene-mint-60 (#108981). */
   /* Magenta token names are retained for compatibility while serving as accent tokens. */
-  --rrr-colors-magenta-10: oklch(95.26% 0.0284 184.51);
-  --rrr-colors-magenta-20: oklch(87.59% 0.0456 187.50);
-  --rrr-colors-magenta-30: oklch(79.92% 0.0660 192.20);
-  --rrr-colors-magenta-40: oklch(72.24% 0.0800 193.49);
-  --rrr-colors-magenta-50: oklch(64.57% 0.0942 196.48);
-  --rrr-colors-magenta-60: oklch(56.90% 0.0962 199.47);
-  --rrr-colors-magenta-70: oklch(45.90% 0.0814 197.32);
-  --rrr-colors-magenta-80: oklch(34.89% 0.0666 195.17);
-  --rrr-colors-magenta-90: oklch(23.89% 0.0518 193.02);
+  --rrr-colors-serene-mint-10: oklch(95.26% 0.0284 184.51);
+  --rrr-colors-serene-mint-20: oklch(87.59% 0.0456 187.50);
+  --rrr-colors-serene-mint-30: oklch(79.92% 0.0660 192.20);
+  --rrr-colors-serene-mint-40: oklch(72.24% 0.0800 193.49);
+  --rrr-colors-serene-mint-50: oklch(64.57% 0.0942 196.48);
+  --rrr-colors-serene-mint-60: oklch(56.90% 0.0962 199.47);
+  --rrr-colors-serene-mint-70: oklch(45.90% 0.0814 197.32);
+  --rrr-colors-serene-mint-80: oklch(34.89% 0.0666 195.17);
+  --rrr-colors-serene-mint-90: oklch(23.89% 0.0518 193.02);
 
-  /* Brand mapping: brand-inspired tone derived from --rrr-colors-balpen-blauw-60 (#4F46E5). */
+  /* Brand mapping: brand-inspired tone derived from --rrr-colors-activity-indigo-60 (#4F46E5). */
   /* Balpen Blauw remains the primary family in the imported palette. */
-  --rrr-colors-balpen-blauw-10: oklch(95.60% 0.1410 268.20);
-  --rrr-colors-balpen-blauw-20: oklch(87.19% 0.1588 272.48);
-  --rrr-colors-balpen-blauw-30: oklch(77.78% 0.1766 269.76);
-  --rrr-colors-balpen-blauw-40: oklch(68.88% 0.1945 272.16);
-  --rrr-colors-balpen-blauw-50: oklch(59.97% 0.2123 274.57);
-  --rrr-colors-balpen-blauw-60: oklch(51.06% 0.2301 276.97);
-  --rrr-colors-balpen-blauw-70: oklch(42.12% 0.2160 275.52);
-  --rrr-colors-balpen-blauw-80: oklch(33.17% 0.2019 274.06);
-  --rrr-colors-balpen-blauw-90: oklch(24.23% 0.1878 272.61);
+  --rrr-colors-activity-indigo-10: oklch(96.60% 0.1410 275.20);
+  --rrr-colors-activity-indigo-20: oklch(87.19% 0.1588 272.48);
+  --rrr-colors-activity-indigo-30: oklch(77.78% 0.1766 269.76);
+  --rrr-colors-activity-indigo-40: oklch(68.88% 0.1945 272.16);
+  --rrr-colors-activity-indigo-50: oklch(59.97% 0.2123 274.57);
+  --rrr-colors-activity-indigo-60: oklch(51.06% 0.2301 276.97);
+  --rrr-colors-activity-indigo-70: oklch(42.12% 0.2160 275.52);
+  --rrr-colors-activity-indigo-80: oklch(33.17% 0.2019 274.06);
+  --rrr-colors-activity-indigo-90: oklch(24.23% 0.1878 272.61);
 
   /* Brand mapping: no direct brand-color equivalent in this set.*/
   --rrr-colors-context-danger-10: oklch(97.69% 0.0450 24.00);
@@ -167,7 +167,7 @@
 
   --rrr-anim-fromto-timingfunction: cubic-bezier(0.205, 0.000, 0.000, 1.000);
   /* Semantic aliases kept for the current app surface during token migration. */
-  --rrr-color-primary: var(--rrr-colors-balpen-blauw-60);
+  --rrr-color-primary: var(--rrr-colors-activity-indigo-60);
   --rrr-color-primary-contrast: var(--rrr-colors-grayscale-00);
   --rrr-color-secondary: var(--rrr-colors-grayscale-70);
   --rrr-color-background: var(--rrr-colors-grayscale-10);

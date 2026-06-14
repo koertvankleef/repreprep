@@ -12,12 +12,12 @@
   --rrr-input-color: var(--rrr-colors-grayscale-100);
   --rrr-input-transition: var(--rrr-default-transition);
   --rrr-input-placeholder-color: var(--rrr-colors-grayscale-60);
-  --rrr-input-hover-border-color: var(--rrr-colors-balpen-blauw-30);
-  --rrr-input-focus-border-color: var(--rrr-colors-balpen-blauw-50);
+  --rrr-input-hover-border-color: var(--rrr-colors-activity-indigo-30);
+  --rrr-input-focus-border-color: var(--rrr-colors-activity-indigo-50);
   --rrr-input-focus-outline-width: var(--global-focus-ring-width);
   --rrr-input-focus-outline-color: var(--global-focus-ring-color);
   --rrr-input-focus-outline-offset: var(--global-focus-ring-offset);
-  --rrr-input-focus-shadow: 0 0 0 4px var(--rrr-colors-balpen-blauw-10);
+  --rrr-input-focus-shadow: 0 0 0 4px var(--rrr-colors-activity-indigo-10);
   --rrr-input-invalid-border-color: var(--rrr-colors-context-danger-50);
   --rrr-input-invalid-background: var(--rrr-colors-context-danger-10);
   --rrr-input-invalid-focus-shadow: 0 0 0 4px var(--rrr-colors-context-danger-10);

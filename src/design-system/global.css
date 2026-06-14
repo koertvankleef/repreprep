@@ -45,19 +45,19 @@ textarea {
 }
 
 button {
-  border: var(--rrr-border-width) solid var(--rrr-colors-balpen-blauw-60);
+  border: var(--rrr-border-width) solid var(--rrr-colors-activity-indigo-60);
   border-radius: var(--rrr-radius-m);
   padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
   cursor: pointer;
-  background: var(--rrr-colors-balpen-blauw-60);
+  background: var(--rrr-colors-activity-indigo-60);
   color: var(--rrr-colors-grayscale-00);
   box-shadow: var(--rrr-shadow-button);
   transition: background var(--rrr-default-transition), border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition), transform var(--rrr-default-transition);
 }
 
 button:hover {
-  background: var(--rrr-colors-balpen-blauw-70);
-  border-color: var(--rrr-colors-balpen-blauw-70);
+  background: var(--rrr-colors-activity-indigo-70);
+  border-color: var(--rrr-colors-activity-indigo-70);
   box-shadow: var(--rrr-depth-2-shadow);
 }
 
@@ -90,14 +90,14 @@ textarea {
 input:hover,
 select:hover,
 textarea:hover {
-  border-color: var(--rrr-colors-balpen-blauw-30);
+  border-color: var(--rrr-colors-activity-indigo-30);
 }
 
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  border-color: var(--rrr-colors-balpen-blauw-50);
-  box-shadow: 0 0 0 4px var(--rrr-colors-balpen-blauw-10);
+  border-color: var(--rrr-colors-activity-indigo-50);
+  box-shadow: 0 0 0 4px var(--rrr-colors-activity-indigo-10);
 }
 
 label {
@@ -118,11 +118,11 @@ h3 {
 }
 
 a {
-  color: var(--rrr-colors-balpen-blauw-70);
+  color: var(--rrr-colors-activity-indigo-70);
 }
 
 a:hover {
-  color: var(--rrr-colors-magenta-70);
+  color: var(--rrr-colors-serene-mint-70);
 }
 
 :focus-visible {

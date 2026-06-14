@@ -3,7 +3,7 @@
   min-height: 100vh;
   --rrr-app-nav-gap: var(--rrr-spacing-s);
   --rrr-app-nav-padding: var(--rrr-spacing-s);
-  --rrr-app-nav-background: color-mix(in oklch, var(--rrr-colors-grayscale-00) 88%, var(--rrr-colors-balpen-blauw-10));
+  --rrr-app-nav-background: var(--rrr-colors-grayscale-00);
   --rrr-app-nav-border-width: var(--rrr-border-width);
   --rrr-app-nav-border-color: var(--rrr-colors-grayscale-30);
   --rrr-app-nav-shadow: var(--rrr-shadow-card);
@@ -11,9 +11,9 @@
   --rrr-app-link-radius: var(--rrr-radius-xl);
   --rrr-app-link-color: var(--rrr-colors-grayscale-90);
   --rrr-app-link-transition: var(--rrr-default-transition);
-  --rrr-app-link-hover-background: var(--rrr-colors-balpen-blauw-10);
-  --rrr-app-link-hover-color: var(--rrr-colors-balpen-blauw-80);
-  --rrr-app-link-active-background: var(--rrr-colors-balpen-blauw-60);
+  --rrr-app-link-hover-background: var(--rrr-colors-activity-indigo-10);
+  --rrr-app-link-hover-color: var(--rrr-colors-activity-indigo-80);
+  --rrr-app-link-active-background: var(--rrr-colors-activity-indigo-60);
   --rrr-app-link-active-color: var(--rrr-colors-grayscale-00);
   --rrr-app-link-active-shadow: var(--rrr-shadow-button);
   --rrr-app-main-padding: var(--rrr-spacing-l);

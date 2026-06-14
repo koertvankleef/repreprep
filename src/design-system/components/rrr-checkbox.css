@@ -3,7 +3,7 @@
   gap: var(--rrr-checkbox-gap);
   --rrr-checkbox-gap: var(--rrr-spacing-xs);
   --rrr-checkbox-label-gap: var(--rrr-spacing-s);
-  --rrr-checkbox-accent-color: var(--rrr-colors-balpen-blauw-60);
+  --rrr-checkbox-accent-color: var(--rrr-colors-activity-indigo-60);
   --rrr-checkbox-error-color: var(--rrr-colors-context-danger-70);
 }
 

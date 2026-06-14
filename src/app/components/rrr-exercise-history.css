@@ -4,7 +4,7 @@ rrr-exercise-history {
   --rrr-exercise-history-item-border-color: var(--rrr-colors-grayscale-30);
   --rrr-exercise-history-item-radius: var(--rrr-radius-m);
   --rrr-exercise-history-item-padding: var(--rrr-spacing-l);
-  --rrr-exercise-history-item-background: color-mix(in oklch, var(--rrr-colors-grayscale-00) 82%, var(--rrr-colors-balpen-blauw-10));
+  --rrr-exercise-history-item-background: color-mix(in oklch, var(--rrr-colors-grayscale-00) 82%, var(--rrr-colors-activity-indigo-10));
   --rrr-exercise-history-item-shadow: var(--rrr-depth-1-shadow);
 }
 

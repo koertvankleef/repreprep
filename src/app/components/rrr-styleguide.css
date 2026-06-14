@@ -81,15 +81,15 @@
 }
 
 .sg-button--tone-accent.sg-button--ghost {
-  color: var(--rrr-colors-magenta-80);
-  border-color: var(--rrr-colors-magenta-20);
-  background: var(--rrr-colors-magenta-10);
+  color: var(--rrr-colors-serene-mint-80);
+  border-color: var(--rrr-colors-serene-mint-20);
+  background: var(--rrr-colors-serene-mint-10);
 }
 
 .sg-button--tone-primary.sg-button--ghost {
-  color: var(--rrr-colors-balpen-blauw-80);
-  border-color: var(--rrr-colors-balpen-blauw-20);
-  background: var(--rrr-colors-balpen-blauw-10);
+  color: var(--rrr-colors-activity-indigo-80);
+  border-color: var(--rrr-colors-activity-indigo-20);
+  background: var(--rrr-colors-activity-indigo-10);
 }
 
 .sg-button:hover {
@@ -162,9 +162,9 @@
 
 .swatch-marker {
   border-radius: 999px;
-  border: var(--rrr-border-width) solid var(--rrr-colors-magenta-30);
-  background: var(--rrr-colors-magenta-10);
-  color: var(--rrr-colors-magenta-80);
+  border: var(--rrr-border-width) solid var(--rrr-colors-serene-mint-30);
+  background: var(--rrr-colors-serene-mint-10);
+  color: var(--rrr-colors-serene-mint-80);
   font-size: var(--rrr-font-size-s);
   padding: 0 var(--rrr-spacing-xs);
 }
@@ -221,7 +221,7 @@
   display: inline-block;
   block-size: 1.5rem;
   flex: 0 0 auto;
-  background: var(--rrr-colors-balpen-blauw-40);
+  background: var(--rrr-colors-activity-indigo-40);
 }
 
 .scale-preview.spacing {

@@ -2,7 +2,7 @@ rrr-routine-list {
   --rrr-routine-list-gap: var(--rrr-spacing-l);
   --rrr-routine-list-title-weight: var(--rrr-font-weight-bold);
   --rrr-routine-list-title-size: var(--rrr-font-size-l);
-  --rrr-routine-list-title-color: var(--rrr-colors-balpen-blauw-80);
+  --rrr-routine-list-title-color: var(--rrr-colors-activity-indigo-80);
   --rrr-routine-list-meta-color: var(--rrr-colors-grayscale-70);
   --rrr-routine-list-meta-size: var(--rrr-font-size-s);
 }

@@ -9,7 +9,7 @@ rrr-routine-editor {
   --rrr-routine-editor-item-gap: var(--rrr-spacing-s);
   --rrr-routine-editor-header-gap: var(--rrr-spacing-s);
   --rrr-routine-editor-name-weight: var(--rrr-font-weight-bold);
-  --rrr-routine-editor-name-color: var(--rrr-colors-balpen-blauw-80);
+  --rrr-routine-editor-name-color: var(--rrr-colors-activity-indigo-80);
   --rrr-routine-editor-order-gap: var(--rrr-spacing-xs);
   --rrr-routine-editor-planned-gap: var(--rrr-spacing-s);
   --rrr-routine-editor-add-row-gap: var(--rrr-spacing-s);
