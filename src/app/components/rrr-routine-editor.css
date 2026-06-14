@@ -1,41 +1,44 @@
 .exercise-list {
   display: grid;
-  gap: var(--rrr-space-md);
+  gap: var(--rrr-spacing-l);
 }
 
 .exercise-item {
-  border: 1px solid var(--rrr-color-border);
-  border-radius: var(--rrr-radius-md);
-  padding: var(--rrr-space-md);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border-radius: var(--rrr-radius-m);
+  padding: var(--rrr-spacing-l);
+  background: var(--rrr-colors-grayscale-00);
+  box-shadow: var(--rrr-depth-1-shadow);
   display: grid;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
 }
 
 .exercise-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
   flex-wrap: wrap;
 }
 
 .exercise-name {
-  font-weight: bold;
+  font-weight: var(--rrr-font-weight-bold);
+  color: var(--rrr-colors-balpen-blauw-80);
 }
 
 .exercise-order {
   display: flex;
-  gap: var(--rrr-space-xs, 0.25rem);
+  gap: var(--rrr-spacing-xs);
 }
 
 .planned-sets {
   display: grid;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
 }
 
 .planned-set {
   display: flex;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
   align-items: center;
   flex-wrap: wrap;
 }
@@ -46,7 +49,7 @@
 
 .add-exercise-row {
   display: flex;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
   flex-wrap: wrap;
   align-items: flex-end;
 }

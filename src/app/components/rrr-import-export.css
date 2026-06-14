@@ -1,4 +1,4 @@
 .helper-text {
-  color: var(--rrr-color-text-muted);
-  font-size: var(--rrr-font-size-sm);
+  color: var(--rrr-colors-grayscale-70);
+  font-size: var(--rrr-font-size-s);
 }

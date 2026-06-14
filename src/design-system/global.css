@@ -31,10 +31,10 @@ h6 {
 body {
   min-height: 100vh;
   font-family: var(--rrr-font-family);
-  font-size: var(--rrr-font-size-md);
+  font-size: var(--rrr-font-default-size);
   line-height: 1.5;
-  color: var(--rrr-color-text);
-  background: var(--rrr-color-background);
+  color: var(--rrr-colors-grayscale-100);
+  background: var(--rrr-colors-grayscale-10);
 }
 
 button,
@@ -45,94 +45,129 @@ textarea {
 }
 
 button {
-  border: 1px solid transparent;
-  border-radius: var(--rrr-radius-md);
-  padding: var(--rrr-space-sm) var(--rrr-space-md);
+  border: var(--rrr-border-width) solid var(--rrr-colors-balpen-blauw-60);
+  border-radius: var(--rrr-radius-m);
+  padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
   cursor: pointer;
-  background: var(--rrr-color-primary);
-  color: var(--rrr-color-primary-contrast);
+  background: var(--rrr-colors-balpen-blauw-60);
+  color: var(--rrr-colors-grayscale-00);
+  box-shadow: var(--rrr-shadow-button);
+  transition: background var(--rrr-default-transition), border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition), transform var(--rrr-default-transition);
+}
+
+button:hover {
+  background: var(--rrr-colors-balpen-blauw-70);
+  border-color: var(--rrr-colors-balpen-blauw-70);
+  box-shadow: var(--rrr-depth-2-shadow);
+}
+
+button:active {
+  transform: translateY(1px);
+  box-shadow: var(--rrr-depth-1-shadow);
 }
 
 button[disabled] {
   cursor: not-allowed;
   opacity: 0.6;
+  background: var(--rrr-colors-grayscale-30);
+  border-color: var(--rrr-colors-grayscale-30);
+  color: var(--rrr-colors-grayscale-70);
+  box-shadow: none;
 }
 
 input,
 select,
 textarea {
   width: 100%;
-  padding: var(--rrr-space-sm) var(--rrr-space-md);
-  border: 1px solid var(--rrr-color-border);
-  border-radius: var(--rrr-radius-md);
-  background: var(--rrr-color-surface);
-  color: var(--rrr-color-text);
+  padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-40);
+  border-radius: var(--rrr-radius-m);
+  background: var(--rrr-colors-grayscale-00);
+  color: var(--rrr-colors-grayscale-100);
+  transition: border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition), background var(--rrr-default-transition);
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--rrr-colors-balpen-blauw-30);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--rrr-colors-balpen-blauw-50);
+  box-shadow: 0 0 0 4px var(--rrr-colors-balpen-blauw-10);
 }
 
 label {
   display: grid;
-  gap: var(--rrr-space-xs);
+  gap: var(--rrr-spacing-xs);
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: var(--rrr-font-size-2xl);
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: var(--rrr-font-size-xl);
 }
 
 h3 {
-  font-size: 1.125rem;
+  font-size: var(--rrr-font-size-l);
 }
 
 a {
-  color: var(--rrr-color-primary);
+  color: var(--rrr-colors-balpen-blauw-70);
+}
+
+a:hover {
+  color: var(--rrr-colors-magenta-70);
 }
 
 :focus-visible {
-  outline: 3px solid rgba(37, 99, 235, 0.35);
-  outline-offset: 2px;
+  outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
+  outline-offset: var(--global-focus-ring-offset);
 }
 
 .page {
   display: grid;
-  gap: var(--rrr-space-lg);
+  gap: var(--rrr-spacing-xl);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  gap: var(--rrr-space-md);
+  gap: var(--rrr-spacing-l);
   align-items: center;
   flex-wrap: wrap;
 }
 
 .actions {
   display: flex;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
   flex-wrap: wrap;
 }
 
 .row {
   display: grid;
-  gap: var(--rrr-space-md);
+  gap: var(--rrr-spacing-l);
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 }
 
 .form {
   display: grid;
-  gap: var(--rrr-space-md);
+  gap: var(--rrr-spacing-l);
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   align-items: end;
 }
 
 .status-success {
-  color: var(--rrr-color-success);
+  color: var(--rrr-colors-context-success-70);
 }
 
 .status-error {
-  color: var(--rrr-color-danger);
+  color: var(--rrr-colors-context-danger-70);
 }
 
 .status-message {

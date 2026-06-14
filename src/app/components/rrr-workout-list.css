@@ -1,11 +1,11 @@
 .list {
   display: grid;
-  gap: var(--rrr-space-md);
+  gap: var(--rrr-spacing-l);
 }
 
 .start-panel {
   display: flex;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
   align-items: end;
   flex-wrap: wrap;
 }
@@ -13,3 +13,4 @@
 .start-panel label {
   min-width: 14rem;
 }
+

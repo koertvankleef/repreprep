@@ -1,10 +1,12 @@
 .history-list {
   display: grid;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
 }
 
 .history-item {
-  border: 1px solid var(--rrr-color-border);
-  border-radius: var(--rrr-radius-md);
-  padding: var(--rrr-space-md);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border-radius: var(--rrr-radius-m);
+  padding: var(--rrr-spacing-l);
+  background: color-mix(in oklch, var(--rrr-colors-grayscale-00) 82%, var(--rrr-colors-balpen-blauw-10));
+  box-shadow: var(--rrr-depth-1-shadow);
 }

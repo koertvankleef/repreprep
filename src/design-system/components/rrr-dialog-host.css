@@ -4,28 +4,28 @@
 
 dialog {
   width: min(32rem, calc(100vw - 2rem));
-  border: 1px solid var(--rrr-color-border);
-  border-radius: var(--rrr-radius-lg);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-20);
+  border-radius: var(--rrr-radius-xl);
   padding: 0;
-  background: var(--rrr-color-surface);
-  color: var(--rrr-color-text);
-  box-shadow: 0 1rem 2rem rgba(15, 23, 42, 0.18);
+  background: var(--rrr-colors-grayscale-00);
+  color: var(--rrr-colors-grayscale-100);
+  box-shadow: var(--rrr-shadow-dialog);
 }
 
 dialog::backdrop {
-  background: rgba(15, 23, 42, 0.4);
+  background: color-mix(in oklch, var(--rrr-colors-grayscale-100) 30%, transparent);
 }
 
 .dialog-panel {
-  padding: var(--rrr-space-lg);
+  padding: var(--rrr-spacing-xl);
   display: grid;
-  gap: var(--rrr-space-md);
+  gap: var(--rrr-spacing-l);
 }
 
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
   flex-wrap: wrap;
 }
 
@@ -35,7 +35,7 @@ dialog::backdrop {
 
 .dialog-field {
   display: grid;
-  gap: var(--rrr-space-xs);
+  gap: var(--rrr-spacing-xs);
 }
 
 .dialog-field input {
@@ -43,7 +43,7 @@ dialog::backdrop {
 }
 
 .dialog-error {
-  color: var(--rrr-color-danger);
+  color: var(--rrr-colors-context-danger-70);
   margin: 0;
   min-height: 1.25rem;
 }

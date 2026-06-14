@@ -3,15 +3,16 @@
 }
 
 .card {
-  background: var(--rrr-color-surface);
-  border: 1px solid var(--rrr-color-border);
-  border-radius: var(--rrr-radius-lg);
+  background: var(--rrr-colors-grayscale-00);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border-radius: var(--rrr-radius-l);
+  box-shadow: var(--rrr-shadow-card);
   display: grid;
 }
 
 :host([size="md"]) .card {
-  padding: var(--rrr-space-md);
-  gap: var(--rrr-space-sm);
+  padding: var(--rrr-spacing-l);
+  gap: var(--rrr-spacing-s);
 }
 
 :host(:not([size])),
@@ -21,6 +22,6 @@
 
 :host(:not([size])) .card,
 :host([size="lg"]) .card {
-  padding: var(--rrr-space-lg);
-  gap: var(--rrr-space-md);
+  padding: var(--rrr-spacing-xl);
+  gap: var(--rrr-spacing-l);
 }

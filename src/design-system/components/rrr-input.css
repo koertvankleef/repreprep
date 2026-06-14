@@ -1,28 +1,51 @@
 :host {
   display: grid;
-  gap: var(--rrr-space-xs);
+  gap: var(--rrr-spacing-xs);
 }
 
 label {
   display: block;
+  color: var(--rrr-colors-grayscale-90);
+  font-weight: var(--rrr-font-weight-semibold);
 }
 
 input {
   width: 100%;
-  padding: var(--rrr-space-sm) var(--rrr-space-md);
-  border: 1px solid var(--rrr-color-border);
-  border-radius: var(--rrr-radius-md);
-  background: var(--rrr-color-surface);
-  color: var(--rrr-color-text);
+  padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-40);
+  border-radius: var(--rrr-radius-m);
+  background: var(--rrr-colors-grayscale-00);
+  color: var(--rrr-colors-grayscale-100);
   font: inherit;
+  transition: border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition), background var(--rrr-default-transition);
+}
+
+input::placeholder {
+  color: var(--rrr-colors-grayscale-60);
+}
+
+input:hover {
+  border-color: var(--rrr-colors-balpen-blauw-30);
+}
+
+input:focus-visible {
+  border-color: var(--rrr-colors-balpen-blauw-50);
+  outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
+  outline-offset: var(--global-focus-ring-offset);
+  box-shadow: 0 0 0 4px var(--rrr-colors-balpen-blauw-10);
 }
 
 input[aria-invalid="true"] {
-  border-color: var(--rrr-color-danger);
+  border-color: var(--rrr-colors-context-danger-50);
+  background: var(--rrr-colors-context-danger-10);
+}
+
+input[aria-invalid="true"]:focus-visible {
+  box-shadow: 0 0 0 4px var(--rrr-colors-context-danger-10);
 }
 
 .error {
-  color: var(--rrr-color-danger);
+  color: var(--rrr-colors-context-danger-70);
   margin: 0;
   min-height: 1.25rem;
 }

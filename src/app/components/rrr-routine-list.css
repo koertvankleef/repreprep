@@ -1,14 +1,15 @@
 .list {
   display: grid;
-  gap: var(--rrr-space-md);
+  gap: var(--rrr-spacing-l);
 }
 
 .card-title {
-  font-weight: bold;
-  font-size: 1.1rem;
+  font-weight: var(--rrr-font-weight-bold);
+  font-size: var(--rrr-font-size-l);
+  color: var(--rrr-colors-balpen-blauw-80);
 }
 
 .card-meta {
-  color: var(--rrr-color-text-secondary, #666);
-  font-size: 0.9rem;
+  color: var(--rrr-colors-grayscale-70);
+  font-size: var(--rrr-font-size-s);
 }

@@ -3,27 +3,55 @@
 }
 
 button {
-  border: 1px solid transparent;
-  border-radius: var(--rrr-radius-md);
-  padding: var(--rrr-space-sm) var(--rrr-space-md);
+  border: var(--rrr-border-width) solid var(--rrr-colors-balpen-blauw-60);
+  border-radius: var(--rrr-radius-m);
+  padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
   cursor: pointer;
   font: inherit;
-  background: var(--rrr-color-primary);
-  color: var(--rrr-color-primary-contrast);
+  background: var(--rrr-colors-balpen-blauw-50);
+  color: var(--rrr-colors-grayscale-00);
+  box-shadow: var(--rrr-shadow-button);
+  transition: background var(--rrr-default-transition), border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition), transform var(--rrr-default-transition);
+}
+
+button:hover {
+  background: var(--rrr-colors-balpen-blauw-60);
+  border-color: var(--rrr-colors-balpen-blauw-70);
+  box-shadow: var(--rrr-depth-2-shadow);
+}
+
+button:active {
+  transform: translateY(1px);
+  box-shadow: var(--rrr-depth-1-shadow);
 }
 
 :host([variant="secondary"]) button {
-  background: var(--rrr-color-surface);
-  color: var(--rrr-color-text);
-  border-color: var(--rrr-color-border);
+  background: var(--rrr-colors-grayscale-00);
+  color: var(--rrr-colors-balpen-blauw-80);
+  border-color: var(--rrr-colors-grayscale-40);
+}
+
+:host([variant="secondary"]) button:hover {
+  background: var(--rrr-colors-balpen-blauw-10);
+  border-color: var(--rrr-colors-balpen-blauw-30);
 }
 
 :host([variant="danger"]) button {
-  background: var(--rrr-color-danger);
-  color: #fff;
+  background: var(--rrr-colors-context-danger-50);
+  border-color: var(--rrr-colors-context-danger-60);
+  color: var(--rrr-colors-grayscale-00);
+}
+
+:host([variant="danger"]) button:hover {
+  background: var(--rrr-colors-context-danger-60);
+  border-color: var(--rrr-colors-context-danger-70);
 }
 
 button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+  background: var(--rrr-colors-grayscale-30);
+  border-color: var(--rrr-colors-grayscale-30);
+  color: var(--rrr-colors-grayscale-70);
+  box-shadow: none;
 }

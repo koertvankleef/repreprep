@@ -1,6 +1,6 @@
 .entries {
   display: grid;
-  gap: var(--rrr-space-md);
+  gap: var(--rrr-spacing-l);
 }
 
 .field-input,
@@ -9,3 +9,4 @@
   display: block;
   width: 100%;
 }
+

@@ -1,26 +1,27 @@
 .entry {
-  border: 1px solid var(--rrr-color-border);
-  border-radius: var(--rrr-radius-lg);
-  padding: var(--rrr-space-md);
-  background: var(--rrr-color-surface);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border-radius: var(--rrr-radius-l);
+  padding: var(--rrr-spacing-l);
+  background: var(--rrr-colors-grayscale-00);
+  box-shadow: var(--rrr-shadow-card);
   display: grid;
-  gap: var(--rrr-space-md);
+  gap: var(--rrr-spacing-l);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
   align-items: center;
 }
 
 .sets {
   display: grid;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
 }
 
 .footer {
   display: flex;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
   flex-wrap: wrap;
 }

@@ -1,22 +1,24 @@
 .list {
   display: grid;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
 }
 
 .item {
-  border: 1px solid var(--rrr-color-border);
-  border-radius: var(--rrr-radius-md);
-  padding: var(--rrr-space-md);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border-radius: var(--rrr-radius-m);
+  padding: var(--rrr-spacing-l);
+  background: var(--rrr-colors-grayscale-00);
+  box-shadow: var(--rrr-depth-1-shadow);
   display: flex;
   justify-content: space-between;
-  gap: var(--rrr-space-md);
+  gap: var(--rrr-spacing-l);
   align-items: center;
   flex-wrap: wrap;
 }
 
 .meta {
   display: flex;
-  gap: var(--rrr-space-sm);
+  gap: var(--rrr-spacing-s);
   align-items: center;
   flex-wrap: wrap;
 }
@@ -24,11 +26,12 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: var(--rrr-space-xs) var(--rrr-space-sm);
+  padding: var(--rrr-spacing-xs) var(--rrr-spacing-s);
   border-radius: 999px;
-  background: var(--rrr-color-background);
-  color: var(--rrr-color-text-muted);
-  font-size: var(--rrr-font-size-sm);
+  border: var(--rrr-border-width) solid var(--rrr-colors-balpen-blauw-20);
+  background: var(--rrr-colors-balpen-blauw-10);
+  color: var(--rrr-colors-balpen-blauw-80);
+  font-size: var(--rrr-font-size-s);
 }
 
 .form input,
