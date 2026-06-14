@@ -1,6 +1,6 @@
 import { storageService } from '../app/storage-instance.ts'
 import { getActiveRoutines } from '../domain/routine-service.ts'
-import { t } from '../i18n/index.ts'
+import { t, tPlural } from '../i18n/index.ts'
 import { todayIso } from '../utils/date.ts'
 import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
 
@@ -71,10 +71,7 @@ export class RrrRoutineList extends HTMLElement {
                   .map((routine) => {
                     const version = data.routineVersions.find((v) => v.id === routine.activeVersionId)
                     const exerciseCount = version?.exercises.length ?? 0
-                    const exerciseSummary =
-                      exerciseCount === 1
-                        ? t('routineList.exerciseCount.one', { count: exerciseCount })
-                        : t('routineList.exerciseCount.other', { count: exerciseCount })
+                    const exerciseSummary = tPlural('message.routine.exerciseCount', exerciseCount)
 
                     return `
                       <rrr-card size="md">

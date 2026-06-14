@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'vitest'
-import { initLocale, resolveLocale, t } from '../i18n/index.ts'
+import { initLocale, resolveLocale, t, tPlural } from '../i18n/index.ts'
 
 describe('i18n runtime', () => {
   beforeEach(() => {
@@ -34,5 +34,16 @@ describe('i18n runtime', () => {
   test('returns Dutch translation after Dutch locale init', () => {
     initLocale('nl-NL')
     expect(t('exercise.title')).toBe('Oefeningen')
+  })
+
+  test('selects pluralized English message by count', () => {
+    expect(tPlural('message.routine.exerciseCount', 1)).toBe('1 exercise')
+    expect(tPlural('message.routine.exerciseCount', 2)).toBe('2 exercises')
+  })
+
+  test('selects pluralized Dutch message by count', () => {
+    initLocale('nl-NL')
+    expect(tPlural('message.routine.exerciseCount', 1)).toBe('1 oefening')
+    expect(tPlural('message.routine.exerciseCount', 2)).toBe('2 oefeningen')
   })
 })

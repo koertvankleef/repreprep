@@ -30,11 +30,15 @@ Examples:
 3. Keep placeholders semantically named (`name`, `count`, `seconds`).
 4. Add comments near complex keys if translator context is not obvious.
 
+Pluralization:
+Use the `message.*` namespace for count-driven strings and let the runtime choose variants with `tPlural(baseKey, count)`, e.g. `message.routine.exerciseCount.one` and `message.routine.exerciseCount.other`.
+
 ## Runtime Expectations
 
 1. Missing keys must throw.
 2. Missing placeholders must throw.
 3. Unsupported locales must resolve to `en-US` fallback.
+4. Pluralized messages should resolve via locale rules and fall back to `.other` when needed.
 
 ## Scaling Path
 

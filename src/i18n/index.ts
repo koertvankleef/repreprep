@@ -5,6 +5,7 @@ type LocaleCode = 'en-US' | 'nl-NL'
 type MessageEntry = string | { value: string; context?: string }
 type MessageDictionary = Record<string, MessageEntry>
 type MessageParams = Record<string, string | number>
+type PluralCategory = Intl.LDMLPluralRule
 
 const catalogs: Record<LocaleCode, MessageDictionary> = {
   'en-US': enUsMessages,
@@ -88,6 +89,15 @@ export function t(key: string, params?: MessageParams): string {
   }
 
   return template.replace(/\{([a-zA-Z0-9_.-]+)\}/g, (_, name: string) => String(values[name]))
+}
+
+export function tPlural(key: string, count: number, params?: MessageParams): string {
+  const category: PluralCategory = new Intl.PluralRules(activeLocale).select(count)
+  const variantKey = `${key}.${category}`
+  const fallbackKey = `${key}.other`
+  const templateKey = catalogs[activeLocale][variantKey] || catalogs[fallbackLocale][variantKey] ? variantKey : fallbackKey
+
+  return t(templateKey, { ...(params ?? {}), count })
 }
 
 export function formatDate(value: Date | string, options?: Intl.DateTimeFormatOptions): string {
