@@ -1,0 +1,41 @@
+.rrr-toast-root {
+  --rrr-toast-stack-gap: var(--rrr-spacing-s);
+  --rrr-toast-fg: var(--rrr-colors-grayscale-00);
+  --rrr-toast-info-bg: var(--rrr-colors-context-info-70);
+  --rrr-toast-success-bg: var(--rrr-colors-context-success-70);
+  --rrr-toast-warning-bg: var(--rrr-colors-context-warning-70);
+  --rrr-toast-danger-bg: var(--rrr-colors-context-danger-70);
+  --rrr-toast-neutral-bg: var(--rrr-colors-grayscale-80);
+  --rrr-toast-radius: var(--rrr-radius-m);
+  --rrr-toast-shadow: var(--rrr-depth-3-shadow);
+  --rrr-toast-padding: var(--rrr-spacing-m) var(--rrr-spacing-l);
+  --rrr-toast-content-gap: var(--rrr-spacing-s);
+  --rrr-toast-font-size: var(--rrr-font-size-m);
+  --rrr-toast-control-radius: var(--rrr-radius-s);
+  --rrr-toast-control-font-size: var(--rrr-font-size-s);
+  --rrr-toast-action-padding: var(--rrr-spacing-xs) var(--rrr-spacing-s);
+  --rrr-toast-min-width: 20rem;
+  --rrr-toast-open-max-height: 14rem;
+
+  position: fixed;
+  bottom: var(--rrr-spacing-l);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  width: min(42rem, calc(100vw - var(--rrr-spacing-l)));
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  pointer-events: none;
+}
+
+.rrr-toast-root > rrr-toast {
+  width: fit-content;
+  max-width: 100%;
+}
+
+@media (min-width: 40rem) {
+  .rrr-toast-root {
+    bottom: var(--rrr-spacing-l);
+  }
+}

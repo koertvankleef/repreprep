@@ -38,15 +38,15 @@
   --rrr-colors-balpen-blauw-90: oklch(26.32% 0.0757 233.75);
 
   /* Brand mapping: no direct brand-color equivalent in this set.*/
-  --rrr-colors-context-danger-10: oklch(97.69% 0.0261 17.97);
-  --rrr-colors-context-danger-20: oklch(85.92% 0.0692 20.58);
-  --rrr-colors-context-danger-30: oklch(74.16% 0.1123 23.18);
-  --rrr-colors-context-danger-40: oklch(67.11% 0.1512 25.64);
-  --rrr-colors-context-danger-50: oklch(58.61% 0.1901 28.10);
-  --rrr-colors-context-danger-60: oklch(50.61% 0.1819 28.57);
-  --rrr-colors-context-danger-70: oklch(42.61% 0.1729 29.27);
-  --rrr-colors-context-danger-80: oklch(34.61% 0.1579 29.07);
-  --rrr-colors-context-danger-90: oklch(26.32% 0.1429 28.87);
+  --rrr-colors-context-danger-10: oklch(97.69% 0.0400 22.10);
+  --rrr-colors-context-danger-20: oklch(88.60% 0.0890 24.40);
+  --rrr-colors-context-danger-30: oklch(79.10% 0.1380 26.20);
+  --rrr-colors-context-danger-40: oklch(71.00% 0.1880 27.70);
+  --rrr-colors-context-danger-50: oklch(63.00% 0.2400 29.23);
+  --rrr-colors-context-danger-60: oklch(50.00% 0.2300 28.80);
+  --rrr-colors-context-danger-70: oklch(42.00% 0.2050 27.30);
+  --rrr-colors-context-danger-80: oklch(34.20% 0.1750 26.10);
+  --rrr-colors-context-danger-90: oklch(26.32% 0.1450 24.90);
 
   /* Brand mapping: no direct brand-color equivalent in this set.*/
   --rrr-colors-context-success-10: oklch(97.69% 0.0224 154.49);
