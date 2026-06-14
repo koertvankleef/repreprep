@@ -377,6 +377,31 @@ export class RrrStyleguide extends HTMLElement {
 
           <rrr-card size="lg">
             <div class="showcase-block">
+              <h3>${t('styleguide.section.icons')}</h3>
+              <p class="sample-text">${t('styleguide.icons.description')}</p>
+              <div class="icon-grid" aria-label="${t('styleguide.section.icons')}">
+                <div class="icon-item">
+                  <rrr-icon name="contrast"></rrr-icon>
+                  <span>contrast</span>
+                </div>
+                <div class="icon-item">
+                  <rrr-icon name="weather-sunny"></rrr-icon>
+                  <span>weather-sunny</span>
+                </div>
+                <div class="icon-item">
+                  <rrr-icon name="weather-moon"></rrr-icon>
+                  <span>weather-moon</span>
+                </div>
+                <div class="icon-item">
+                  <rrr-icon name="chevron-down"></rrr-icon>
+                  <span>chevron-down</span>
+                </div>
+              </div>
+            </div>
+          </rrr-card>
+
+          <rrr-card size="lg">
+            <div class="showcase-block">
               <h3>${t('styleguide.section.checkboxes')}</h3>
               <div class="showcase-grid">
                 <div class="component-column">

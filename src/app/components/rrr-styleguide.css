@@ -190,6 +190,29 @@
 .component-column {
   display: grid;
   gap: var(--rrr-spacing-s);
+  min-inline-size: 0;
+}
+
+.icon-grid {
+  display: grid;
+  gap: var(--rrr-spacing-s);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+.icon-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rrr-spacing-s);
+  padding: var(--rrr-spacing-s) var(--rrr-spacing-m);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border-radius: var(--rrr-radius-s);
+  background: var(--rrr-colors-grayscale-00);
+  color: var(--rrr-colors-grayscale-90);
+}
+
+.icon-item rrr-icon {
+  font-size: 1.125rem;
+  color: var(--rrr-colors-activity-indigo-70);
 }
 
 .scale-groups {

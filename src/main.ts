@@ -1,6 +1,8 @@
 import { initLocale } from './i18n/index.ts'
+import { mountIconSprite } from './design-system/icons/sprite.ts'
 
 initLocale(navigator.language)
+mountIconSprite()
 
 if (!import.meta.env.DEV && 'serviceWorker' in navigator) {
 	window.addEventListener('load', () => {
