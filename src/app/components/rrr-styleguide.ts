@@ -381,14 +381,14 @@ export class RrrStyleguide extends HTMLElement {
               <h3>${t('styleguide.section.toasts')}</h3>
               <p class="sample-text">${t('styleguide.toasts.description')}</p>
               <div class="button-row trigger-grid">
-                <rrr-button type="button" data-toast-trigger="info">${t('styleguide.toasts.trigger.info')}</rrr-button>
-                <rrr-button type="button" data-toast-trigger="success">${t('styleguide.toasts.trigger.success')}</rrr-button>
-                <rrr-button type="button" data-toast-trigger="warning">${t('styleguide.toasts.trigger.warning')}</rrr-button>
-                <rrr-button type="button" data-toast-trigger="danger">${t('styleguide.toasts.trigger.danger')}</rrr-button>
-                <rrr-button type="button" data-toast-trigger="neutral">${t('styleguide.toasts.trigger.neutral')}</rrr-button>
-                <rrr-button type="button" variant="secondary" data-toast-trigger="closable">${t('styleguide.toasts.trigger.closable')}</rrr-button>
-                <rrr-button type="button" variant="secondary" data-toast-trigger="action">${t('styleguide.toasts.trigger.action')}</rrr-button>
-                <rrr-button type="button" variant="secondary" data-toast-trigger="burst">${t('styleguide.toasts.trigger.burst')}</rrr-button>
+                <button class="sg-button sg-button--solid sg-button--tone-info" type="button" data-toast-trigger="info">${t('styleguide.toasts.trigger.info')}</button>
+                <button class="sg-button sg-button--solid sg-button--tone-success" type="button" data-toast-trigger="success">${t('styleguide.toasts.trigger.success')}</button>
+                <button class="sg-button sg-button--solid sg-button--tone-warning" type="button" data-toast-trigger="warning">${t('styleguide.toasts.trigger.warning')}</button>
+                <button class="sg-button sg-button--solid sg-button--tone-danger" type="button" data-toast-trigger="danger">${t('styleguide.toasts.trigger.danger')}</button>
+                <button class="sg-button sg-button--outline sg-button--tone-neutral" type="button" data-toast-trigger="neutral">${t('styleguide.toasts.trigger.neutral')}</button>
+                <button class="sg-button sg-button--outline sg-button--tone-neutral" type="button" data-toast-trigger="closable">${t('styleguide.toasts.trigger.closable')}</button>
+                <button class="sg-button sg-button--ghost sg-button--tone-accent" type="button" data-toast-trigger="action">${t('styleguide.toasts.trigger.action')}</button>
+                <button class="sg-button sg-button--ghost sg-button--tone-primary" type="button" data-toast-trigger="burst">${t('styleguide.toasts.trigger.burst')}</button>
               </div>
             </div>
           </rrr-card>

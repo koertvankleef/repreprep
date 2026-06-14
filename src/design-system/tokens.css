@@ -38,15 +38,15 @@
   --rrr-colors-balpen-blauw-90: oklch(26.32% 0.0757 233.75);
 
   /* Brand mapping: no direct brand-color equivalent in this set.*/
-  --rrr-colors-context-danger-10: oklch(97.69% 0.0400 22.10);
-  --rrr-colors-context-danger-20: oklch(88.60% 0.0890 24.40);
-  --rrr-colors-context-danger-30: oklch(79.10% 0.1380 26.20);
-  --rrr-colors-context-danger-40: oklch(71.00% 0.1880 27.70);
-  --rrr-colors-context-danger-50: oklch(63.00% 0.2400 29.23);
-  --rrr-colors-context-danger-60: oklch(50.00% 0.2300 28.80);
-  --rrr-colors-context-danger-70: oklch(42.00% 0.2050 27.30);
-  --rrr-colors-context-danger-80: oklch(34.20% 0.1750 26.10);
-  --rrr-colors-context-danger-90: oklch(26.32% 0.1450 24.90);
+  --rrr-colors-context-danger-10: oklch(97.69% 0.0450 24.00);
+  --rrr-colors-context-danger-20: oklch(89.00% 0.0950 23.00);
+  --rrr-colors-context-danger-30: oklch(79.80% 0.1450 22.00);
+  --rrr-colors-context-danger-40: oklch(71.20% 0.1900 21.00);
+  --rrr-colors-context-danger-50: oklch(63.00% 0.2350 20.00);
+  --rrr-colors-context-danger-60: oklch(52.00% 0.2250 19.00);
+  --rrr-colors-context-danger-70: oklch(44.00% 0.2050 18.00);
+  --rrr-colors-context-danger-80: oklch(35.50% 0.1800 17.00);
+  --rrr-colors-context-danger-90: oklch(26.32% 0.1550 16.00);
 
   /* Brand mapping: no direct brand-color equivalent in this set.*/
   --rrr-colors-context-success-10: oklch(97.69% 0.0224 154.49);
@@ -71,15 +71,15 @@
   --rrr-colors-context-info-90: oklch(26.32% 0.1109 262.38);
 
   /* Brand mapping: no direct brand-color equivalent in this set.*/
-  --rrr-colors-context-warning-10: oklch(97.69% 0.0249 58.87);
-  --rrr-colors-context-warning-20: oklch(90.84% 0.0649 57.17);
-  --rrr-colors-context-warning-30: oklch(84.00% 0.1129 55.17);
-  --rrr-colors-context-warning-40: oklch(71.11% 0.1509 52.37);
-  --rrr-colors-context-warning-50: oklch(59.91% 0.1985 60.33);
-  --rrr-colors-context-warning-60: oklch(50.41% 0.1739 56.87);
-  --rrr-colors-context-warning-70: oklch(42.11% 0.1509 54.37);
-  --rrr-colors-context-warning-80: oklch(34.31% 0.1339 52.57);
-  --rrr-colors-context-warning-90: oklch(26.32% 0.1169 51.37);
+  --rrr-colors-context-warning-10: oklch(97.69% 0.0300 74.50);
+  --rrr-colors-context-warning-20: oklch(91.20% 0.0780 72.40);
+  --rrr-colors-context-warning-30: oklch(84.60% 0.1260 70.30);
+  --rrr-colors-context-warning-40: oklch(73.20% 0.1640 68.20);
+  --rrr-colors-context-warning-50: oklch(62.50% 0.2050 66.40);
+  --rrr-colors-context-warning-60: oklch(53.80% 0.1880 65.20);
+  --rrr-colors-context-warning-70: oklch(45.00% 0.1700 64.30);
+  --rrr-colors-context-warning-80: oklch(36.00% 0.1480 63.50);
+  --rrr-colors-context-warning-90: oklch(26.32% 0.1250 62.80);
 
   --rrr-radius-xs: .125rem;
   --rrr-radius-s: .25rem;

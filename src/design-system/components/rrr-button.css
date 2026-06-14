@@ -4,7 +4,7 @@
 
 button {
   border: var(--rrr-border-width) solid var(--rrr-colors-balpen-blauw-60);
-  border-radius: var(--rrr-radius-m);
+  border-radius: var(--rrr-radius-s);
   padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
   cursor: pointer;
   font: inherit;

@@ -3,8 +3,8 @@
   --rrr-toast-fg: var(--rrr-colors-grayscale-00);
   --rrr-toast-info-bg: var(--rrr-colors-context-info-70);
   --rrr-toast-success-bg: var(--rrr-colors-context-success-70);
-  --rrr-toast-warning-bg: var(--rrr-colors-context-warning-70);
-  --rrr-toast-danger-bg: var(--rrr-colors-context-danger-70);
+  --rrr-toast-warning-bg: var(--rrr-colors-context-warning-60);
+  --rrr-toast-danger-bg: var(--rrr-colors-context-danger-60);
   --rrr-toast-neutral-bg: var(--rrr-colors-grayscale-80);
   --rrr-toast-radius: var(--rrr-radius-m);
   --rrr-toast-shadow: var(--rrr-depth-3-shadow);

@@ -30,6 +30,72 @@
   align-items: stretch;
 }
 
+.sg-button {
+  border: var(--rrr-border-width) solid transparent;
+  border-radius: var(--rrr-radius-s);
+  padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
+  font: inherit;
+  font-weight: var(--rrr-font-weight-semibold);
+  cursor: pointer;
+  transition: background var(--rrr-default-transition), color var(--rrr-default-transition), border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition);
+}
+
+.sg-button--solid {
+  color: var(--rrr-colors-grayscale-00);
+  box-shadow: var(--rrr-depth-1-shadow);
+}
+
+.sg-button--outline {
+  background: var(--rrr-colors-grayscale-00);
+  box-shadow: none;
+}
+
+.sg-button--ghost {
+  background: transparent;
+  box-shadow: none;
+}
+
+.sg-button--tone-info.sg-button--solid {
+  background: var(--rrr-colors-context-info-60);
+  border-color: var(--rrr-colors-context-info-70);
+}
+
+.sg-button--tone-success.sg-button--solid {
+  background: var(--rrr-colors-context-success-60);
+  border-color: var(--rrr-colors-context-success-70);
+}
+
+.sg-button--tone-warning.sg-button--solid {
+  background: var(--rrr-colors-context-warning-60);
+  border-color: var(--rrr-colors-context-warning-70);
+}
+
+.sg-button--tone-danger.sg-button--solid {
+  background: var(--rrr-colors-context-danger-60);
+  border-color: var(--rrr-colors-context-danger-70);
+}
+
+.sg-button--tone-neutral.sg-button--outline {
+  color: var(--rrr-colors-grayscale-90);
+  border-color: var(--rrr-colors-grayscale-40);
+}
+
+.sg-button--tone-accent.sg-button--ghost {
+  color: var(--rrr-colors-magenta-80);
+  border-color: var(--rrr-colors-magenta-20);
+  background: var(--rrr-colors-magenta-10);
+}
+
+.sg-button--tone-primary.sg-button--ghost {
+  color: var(--rrr-colors-balpen-blauw-80);
+  border-color: var(--rrr-colors-balpen-blauw-20);
+  background: var(--rrr-colors-balpen-blauw-10);
+}
+
+.sg-button:hover {
+  box-shadow: var(--rrr-depth-2-shadow);
+}
+
 .role-row {
   border-bottom: var(--rrr-border-width) dashed var(--rrr-colors-grayscale-40);
   padding-bottom: var(--rrr-spacing-s);
