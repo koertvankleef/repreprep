@@ -1,57 +1,6 @@
 import { t } from '../../i18n/index.ts'
 import { defineCustomElementOnce } from './shared.ts'
-
-const styles = `
-  :host {
-    display: contents;
-  }
-
-  dialog {
-    width: min(32rem, calc(100vw - 2rem));
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-lg);
-    padding: 0;
-    background: var(--rrr-color-surface);
-    color: var(--rrr-color-text);
-    box-shadow: 0 1rem 2rem rgba(15, 23, 42, 0.18);
-  }
-
-  dialog::backdrop {
-    background: rgba(15, 23, 42, 0.4);
-  }
-
-  .dialog-panel {
-    padding: var(--rrr-space-lg);
-    display: grid;
-    gap: var(--rrr-space-md);
-  }
-
-  .dialog-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--rrr-space-sm);
-    flex-wrap: wrap;
-  }
-
-  .dialog-message {
-    margin: 0;
-  }
-
-  .dialog-field {
-    display: grid;
-    gap: var(--rrr-space-xs);
-  }
-
-  .dialog-field input {
-    width: 100%;
-  }
-
-  .dialog-error {
-    color: var(--rrr-color-danger);
-    margin: 0;
-    min-height: 1.25rem;
-  }
-`
+import styles from './rrr-dialog-host.css?inline'
 
 type DialogMode = 'confirm' | 'prompt' | null
 

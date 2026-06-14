@@ -5,20 +5,7 @@ import type { ExerciseDefinition, Workout, WorkoutExerciseEntry } from '../domai
 import { t } from '../i18n/index.ts'
 import { todayIso } from '../utils/date.ts'
 import './rrr-exercise-entry.ts'
-
-const styles = `
-  .entries {
-    display: grid;
-    gap: var(--rrr-space-md);
-  }
-
-  .field-input,
-  .field-textarea,
-  .field-select {
-    display: block;
-    width: 100%;
-  }
-`
+import styles from './rrr-workout-editor.css?inline'
 
 export class RrrWorkoutEditor extends HTMLElement {
   private workoutIdValue: string | null = null

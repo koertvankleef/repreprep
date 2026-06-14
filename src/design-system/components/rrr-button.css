@@ -1,0 +1,29 @@
+:host {
+  display: inline-block;
+}
+
+button {
+  border: 1px solid transparent;
+  border-radius: var(--rrr-radius-md);
+  padding: var(--rrr-space-sm) var(--rrr-space-md);
+  cursor: pointer;
+  font: inherit;
+  background: var(--rrr-color-primary);
+  color: var(--rrr-color-primary-contrast);
+}
+
+:host([variant="secondary"]) button {
+  background: var(--rrr-color-surface);
+  color: var(--rrr-color-text);
+  border-color: var(--rrr-color-border);
+}
+
+:host([variant="danger"]) button {
+  background: var(--rrr-color-danger);
+  color: #fff;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

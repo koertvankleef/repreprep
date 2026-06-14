@@ -1,0 +1,26 @@
+.entry {
+  border: 1px solid var(--rrr-color-border);
+  border-radius: var(--rrr-radius-lg);
+  padding: var(--rrr-space-md);
+  background: var(--rrr-color-surface);
+  display: grid;
+  gap: var(--rrr-space-md);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--rrr-space-sm);
+  align-items: center;
+}
+
+.sets {
+  display: grid;
+  gap: var(--rrr-space-sm);
+}
+
+.footer {
+  display: flex;
+  gap: var(--rrr-space-sm);
+  flex-wrap: wrap;
+}

@@ -1,0 +1,19 @@
+.set {
+  border: 1px solid var(--rrr-color-border);
+  border-radius: var(--rrr-radius-md);
+  padding: var(--rrr-space-md);
+  background: var(--rrr-color-surface);
+  display: grid;
+  gap: var(--rrr-space-sm);
+}
+
+.fields {
+  display: grid;
+  gap: var(--rrr-space-sm);
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}

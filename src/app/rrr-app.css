@@ -1,0 +1,36 @@
+:host {
+  min-height: 100vh;
+}
+
+.shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+nav {
+  display: flex;
+  gap: var(--rrr-space-sm);
+  padding: var(--rrr-space-md);
+  background: var(--rrr-color-surface);
+  border-bottom: 1px solid var(--rrr-color-border);
+  flex-wrap: wrap;
+}
+
+nav a {
+  padding: var(--rrr-space-sm) var(--rrr-space-md);
+  border-radius: var(--rrr-radius-md);
+  text-decoration: none;
+}
+
+nav a.active {
+  background: var(--rrr-color-primary);
+  color: var(--rrr-color-primary-contrast);
+}
+
+main {
+  padding: var(--rrr-space-lg);
+  max-width: 72rem;
+  width: 100%;
+  margin: 0 auto;
+}

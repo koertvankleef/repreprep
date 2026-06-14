@@ -3,23 +3,7 @@ import { getActiveRoutines } from '../domain/routine-service.ts'
 import { t, tPlural } from '../i18n/index.ts'
 import { todayIso } from '../utils/date.ts'
 import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
-
-const styles = `
-  .list {
-    display: grid;
-    gap: var(--rrr-space-md);
-  }
-
-  .card-title {
-    font-weight: bold;
-    font-size: 1.1rem;
-  }
-
-  .card-meta {
-    color: var(--rrr-color-text-secondary, #666);
-    font-size: 0.9rem;
-  }
-`
+import styles from './rrr-routine-list.css?inline'
 
 export class RrrRoutineList extends HTMLElement {
   private readonly handleDataChanged = (): void => {

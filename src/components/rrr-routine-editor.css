@@ -1,0 +1,63 @@
+.exercise-list {
+  display: grid;
+  gap: var(--rrr-space-md);
+}
+
+.exercise-item {
+  border: 1px solid var(--rrr-color-border);
+  border-radius: var(--rrr-radius-md);
+  padding: var(--rrr-space-md);
+  display: grid;
+  gap: var(--rrr-space-sm);
+}
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--rrr-space-sm);
+  flex-wrap: wrap;
+}
+
+.exercise-name {
+  font-weight: bold;
+}
+
+.exercise-order {
+  display: flex;
+  gap: var(--rrr-space-xs, 0.25rem);
+}
+
+.planned-sets {
+  display: grid;
+  gap: var(--rrr-space-sm);
+}
+
+.planned-set {
+  display: flex;
+  gap: var(--rrr-space-sm);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.planned-set input {
+  width: 6rem;
+}
+
+.add-exercise-row {
+  display: flex;
+  gap: var(--rrr-space-sm);
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.add-exercise-row label {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.field-input,
+.field-select {
+  display: block;
+  width: 100%;
+}

@@ -1,0 +1,10 @@
+.history-list {
+  display: grid;
+  gap: var(--rrr-space-sm);
+}
+
+.history-item {
+  border: 1px solid var(--rrr-color-border);
+  border-radius: var(--rrr-radius-md);
+  padding: var(--rrr-space-md);
+}

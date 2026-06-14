@@ -1,0 +1,28 @@
+:host {
+  display: grid;
+  gap: var(--rrr-space-xs);
+}
+
+label {
+  display: block;
+}
+
+input {
+  width: 100%;
+  padding: var(--rrr-space-sm) var(--rrr-space-md);
+  border: 1px solid var(--rrr-color-border);
+  border-radius: var(--rrr-radius-md);
+  background: var(--rrr-color-surface);
+  color: var(--rrr-color-text);
+  font: inherit;
+}
+
+input[aria-invalid="true"] {
+  border-color: var(--rrr-color-danger);
+}
+
+.error {
+  color: var(--rrr-color-danger);
+  margin: 0;
+  min-height: 1.25rem;
+}

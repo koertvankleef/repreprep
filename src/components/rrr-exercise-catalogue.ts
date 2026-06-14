@@ -2,47 +2,7 @@ import { storageService } from '../app/storage-instance.ts'
 import { createNewExercise, isExerciseUsedInWorkouts } from '../domain/exercise-service.ts'
 import { confirmDialog, promptDialog } from '../utils/dialog-service.ts'
 import { t } from '../i18n/index.ts'
-
-const styles = `
-  .list {
-    display: grid;
-    gap: var(--rrr-space-sm);
-  }
-
-  .item {
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-md);
-    padding: var(--rrr-space-md);
-    display: flex;
-    justify-content: space-between;
-    gap: var(--rrr-space-md);
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .meta {
-    display: flex;
-    gap: var(--rrr-space-sm);
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--rrr-space-xs) var(--rrr-space-sm);
-    border-radius: 999px;
-    background: var(--rrr-color-background);
-    color: var(--rrr-color-text-muted);
-    font-size: var(--rrr-font-size-sm);
-  }
-
-  .form input,
-  .form select {
-    display: block;
-    width: 100%;
-  }
-`
+import styles from './rrr-exercise-catalogue.css?inline'
 
 export class RrrExerciseCatalogue extends HTMLElement {
   private readonly handleDataChanged = (): void => {

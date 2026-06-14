@@ -1,0 +1,11 @@
+.entries {
+  display: grid;
+  gap: var(--rrr-space-md);
+}
+
+.field-input,
+.field-textarea,
+.field-select {
+  display: block;
+  width: 100%;
+}

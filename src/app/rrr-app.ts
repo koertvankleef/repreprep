@@ -3,47 +3,9 @@ import { t } from '../i18n/index.ts'
 import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
 import { appRoutes, type AppRouteMeta } from '../domain/routes.ts'
 import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
+import appStyles from './rrr-app.css?inline'
 
-const styles = `
-  ${shadowTypographyStyles}
-
-  :host {
-    min-height: 100vh;
-  }
-
-  .shell {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    min-height: 100vh;
-  }
-
-  nav {
-    display: flex;
-    gap: var(--rrr-space-sm);
-    padding: var(--rrr-space-md);
-    background: var(--rrr-color-surface);
-    border-bottom: 1px solid var(--rrr-color-border);
-    flex-wrap: wrap;
-  }
-
-  nav a {
-    padding: var(--rrr-space-sm) var(--rrr-space-md);
-    border-radius: var(--rrr-radius-md);
-    text-decoration: none;
-  }
-
-  nav a.active {
-    background: var(--rrr-color-primary);
-    color: var(--rrr-color-primary-contrast);
-  }
-
-  main {
-    padding: var(--rrr-space-lg);
-    max-width: 72rem;
-    width: 100%;
-    margin: 0 auto;
-  }
-`
+const styles = `${shadowTypographyStyles}\n${appStyles}`
 
 type Route =
   | { name: 'workouts' }

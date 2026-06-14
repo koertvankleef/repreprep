@@ -5,24 +5,7 @@ import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
 import { formatDate as formatLocalizedDate, t } from '../i18n/index.ts'
 import { confirmDialog } from '../utils/dialog-service.ts'
 import { todayIso } from '../utils/date.ts'
-
-const styles = `
-  .list {
-    display: grid;
-    gap: var(--rrr-space-md);
-  }
-
-  .start-panel {
-    display: flex;
-    gap: var(--rrr-space-sm);
-    align-items: end;
-    flex-wrap: wrap;
-  }
-
-  .start-panel label {
-    min-width: 14rem;
-  }
-`
+import styles from './rrr-workout-list.css?inline'
 
 export class RrrWorkoutList extends HTMLElement {
   private selectedRoutineId: string | null = null

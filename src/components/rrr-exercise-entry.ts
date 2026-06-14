@@ -3,37 +3,9 @@ import { t } from '../i18n/index.ts'
 import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
 import type { ExerciseDefinition, SetEntry, WorkoutExerciseEntry } from '../domain/types.ts'
 import './rrr-set-entry.ts'
+import componentStyles from './rrr-exercise-entry.css?inline'
 
-const styles = `
-  ${shadowTypographyStyles}
-
-  .entry {
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-lg);
-    padding: var(--rrr-space-md);
-    background: var(--rrr-color-surface);
-    display: grid;
-    gap: var(--rrr-space-md);
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--rrr-space-sm);
-    align-items: center;
-  }
-
-  .sets {
-    display: grid;
-    gap: var(--rrr-space-sm);
-  }
-
-  .footer {
-    display: flex;
-    gap: var(--rrr-space-sm);
-    flex-wrap: wrap;
-  }
-`
+const styles = `${shadowTypographyStyles}\n${componentStyles}`
 
 export class RrrExerciseEntry extends HTMLElement {
   private entryValue: WorkoutExerciseEntry | null = null

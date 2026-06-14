@@ -1,19 +1,7 @@
 import { storageService } from '../app/storage-instance.ts'
 import { getExerciseHistory, getPersonalRecord } from '../domain/history-service.ts'
 import { formatDate, t } from '../i18n/index.ts'
-
-const styles = `
-  .history-list {
-    display: grid;
-    gap: var(--rrr-space-sm);
-  }
-
-  .history-item {
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-md);
-    padding: var(--rrr-space-md);
-  }
-`
+import styles from './rrr-exercise-history.css?inline'
 
 export class RrrExerciseHistory extends HTMLElement {
   private selectedExerciseId: string | null = null

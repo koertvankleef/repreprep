@@ -1,33 +1,5 @@
 import { defineCustomElementOnce } from './shared.ts'
-
-const styles = `
-  :host {
-    display: block;
-  }
-
-  .card {
-    background: var(--rrr-color-surface);
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-lg);
-    display: grid;
-  }
-
-  :host([size="md"]) .card {
-    padding: var(--rrr-space-md);
-    gap: var(--rrr-space-sm);
-  }
-
-  :host(:not([size])),
-  :host([size="lg"]) {
-    padding: 0;
-  }
-
-  :host(:not([size])) .card,
-  :host([size="lg"]) .card {
-    padding: var(--rrr-space-lg);
-    gap: var(--rrr-space-md);
-  }
-`
+import styles from './rrr-card.css?inline'
 
 export class RrrCard extends HTMLElement {
   constructor() {

@@ -3,13 +3,7 @@ import { t } from '../i18n/index.ts'
 import { exportToJson } from '../import-export/json-export-service.ts'
 import { importFromJson } from '../import-export/json-import-service.ts'
 import { confirmDialog } from '../utils/dialog-service.ts'
-
-const styles = `
-  .helper-text {
-    color: var(--rrr-color-text-muted);
-    font-size: var(--rrr-font-size-sm);
-  }
-`
+import styles from './rrr-import-export.css?inline'
 
 export class RrrImportExport extends HTMLElement {
   private statusMessage = ''

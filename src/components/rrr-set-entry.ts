@@ -1,30 +1,9 @@
 import { t } from '../i18n/index.ts'
 import type { ExerciseKind, SetEntry } from '../domain/types.ts'
 import { shadowTypographyStyles } from '../styles/shadow-styles.ts'
+import componentStyles from './rrr-set-entry.css?inline'
 
-const styles = `
-  ${shadowTypographyStyles}
-
-  .set {
-    border: 1px solid var(--rrr-color-border);
-    border-radius: var(--rrr-radius-md);
-    padding: var(--rrr-space-md);
-    background: var(--rrr-color-surface);
-    display: grid;
-    gap: var(--rrr-space-sm);
-  }
-
-  .fields {
-    display: grid;
-    gap: var(--rrr-space-sm);
-    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
-  }
-
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-  }
-`
+const styles = `${shadowTypographyStyles}\n${componentStyles}`
 
 export class RrrSetEntry extends HTMLElement {
   private setValue: SetEntry | null = null
