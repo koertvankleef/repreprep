@@ -1,0 +1,32 @@
+/* Shadow DOM host — transparent wrapper that doesn't affect layout */
+:host {
+  display: contents;
+}
+
+/*
+  Global popup styles.
+  This sheet is adopted into document.adoptedStyleSheets so the rule below applies
+  to the singleton #rrr-tooltip-popup element that lives directly in <body>.
+  CSS variables resolve from :root, so design tokens work as normal.
+*/
+#rrr-tooltip-popup {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+
+  background: var(--rrr-colors-grayscale-90);
+  color: var(--rrr-colors-grayscale-00);
+  border-radius: var(--rrr-radius-s);
+  padding: var(--rrr-spacing-xs) var(--rrr-spacing-s);
+  font-size: var(--rrr-font-size-xs);
+  line-height: 1.4;
+  max-inline-size: 20rem;
+  box-shadow: var(--rrr-depth-3-shadow);
+
+  opacity: 0;
+  transition: opacity 150ms ease;
+
+  &[aria-hidden='false'] {
+    opacity: 1;
+  }
+}

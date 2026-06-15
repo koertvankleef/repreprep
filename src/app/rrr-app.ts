@@ -209,48 +209,48 @@ export class RrrApp extends HTMLElement {
     return `
       <div class="nav-controls" aria-label="${t('app.theme.controls')}" role="group">
         <div class="nav-control-group" aria-label="${t('app.theme.mode')}" role="group">
-          <rrr-button
+          <rrr-tooltip><rrr-button
             type="button"
             variant="ghost"
             data-action="theme-light"
             aria-pressed="${theme === 'light'}"
             aria-label="${t('app.theme.light')}"
             title="${t('app.theme.light')}"
-          ><rrr-icon name="weather-sunny"></rrr-icon></rrr-button>
-          <rrr-button
+          ><rrr-icon name="weather-sunny"></rrr-icon></rrr-button></rrr-tooltip>
+          <rrr-tooltip><rrr-button
             type="button"
             variant="ghost"
             data-action="theme-dark"
             aria-pressed="${theme === 'dark'}"
             aria-label="${t('app.theme.dark')}"
             title="${t('app.theme.dark')}"
-          ><rrr-icon name="weather-moon"></rrr-icon></rrr-button>
-          <rrr-button
+          ><rrr-icon name="weather-moon"></rrr-icon></rrr-button></rrr-tooltip>
+          <rrr-tooltip><rrr-button
             type="button"
             variant="ghost"
             data-action="theme-auto"
             aria-pressed="${theme === 'auto'}"
             aria-label="${t('app.theme.auto')}"
             title="${t('app.theme.auto')}"
-          ><rrr-icon name="arrow-sync"></rrr-icon></rrr-button>
+          ><rrr-icon name="arrow-sync"></rrr-icon></rrr-button></rrr-tooltip>
         </div>
         <div class="nav-control-group" aria-label="${t('app.theme.contrast')}" role="group">
-          <rrr-button
+          <rrr-tooltip><rrr-button
             type="button"
             variant="ghost"
             data-action="contrast-normal"
             aria-pressed="${contrast === 'normal'}"
             aria-label="${t('app.theme.contrastNormal')}"
             title="${t('app.theme.contrastNormal')}"
-          ><rrr-icon name="circle-half-fill"></rrr-icon></rrr-button>
-          <rrr-button
+          ><rrr-icon name="circle-half-fill"></rrr-icon></rrr-button></rrr-tooltip>
+          <rrr-tooltip><rrr-button
             type="button"
             variant="ghost"
             data-action="contrast-high"
             aria-pressed="${contrast === 'high'}"
             aria-label="${t('app.theme.contrastHigh')}"
             title="${t('app.theme.contrastHigh')}"
-          ><rrr-icon name="shield"></rrr-icon></rrr-button>
+          ><rrr-icon name="shield"></rrr-icon></rrr-button></rrr-tooltip>
         </div>
       </div>
     `

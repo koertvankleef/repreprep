@@ -6,6 +6,7 @@ import { registerRrrInput } from './rrr-input.ts'
 import { registerRrrIcon } from './rrr-icon.ts'
 import { registerRrrSelect } from './rrr-select.ts'
 import { registerRrrTextarea } from './rrr-textarea.ts'
+import { registerRrrTooltip } from './rrr-tooltip.ts'
 
 export function registerDesignSystemComponents(): void {
   registerRrrButton()
@@ -16,4 +17,5 @@ export function registerDesignSystemComponents(): void {
   registerRrrIcon()
   registerRrrCard()
   registerRrrDialogHost()
+  registerRrrTooltip()
 }

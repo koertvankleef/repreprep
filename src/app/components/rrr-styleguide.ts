@@ -343,6 +343,26 @@ export class RrrStyleguide extends HTMLElement {
         <div class="stack">
           <rrr-card size="lg">
             <div class="showcase-block">
+              <h3>${t('styleguide.section.tooltips')}</h3>
+              <p class="sample-text">${t('styleguide.tooltips.description')}</p>
+              <div class="button-row">
+                <rrr-tooltip>
+                  <rrr-button type="button" variant="ghost" tone="primary" aria-label="Settings" title="Settings">
+                    <rrr-icon name="settings"></rrr-icon>
+                  </rrr-button>
+                </rrr-tooltip>
+                <rrr-tooltip>
+                  <rrr-button type="button" tone="primary" title="${t('styleguide.tooltips.solid')}">${t('styleguide.tooltips.ghost')}</rrr-button>
+                </rrr-tooltip>
+                <rrr-tooltip>
+                  <rrr-button type="button" variant="outline" tone="neutral" disabled title="${t('styleguide.tooltips.disabled')}">${t('styleguide.tooltips.disabled')}</rrr-button>
+                </rrr-tooltip>
+              </div>
+            </div>
+          </rrr-card>
+
+          <rrr-card size="lg">
+            <div class="showcase-block">
               <h3>${t('styleguide.section.buttons')}</h3>
               <p class="sample-text">${t('styleguide.buttonGuidance')}</p>
               <div class="button-row role-row">
@@ -377,7 +397,7 @@ export class RrrStyleguide extends HTMLElement {
                 <rrr-button type="button" variant="ghost" tone="accent">ghost accent</rrr-button>
                 <rrr-button type="button" variant="ghost" tone="warning">ghost warning</rrr-button>
                 <rrr-button type="button" variant="ghost" tone="danger">ghost danger</rrr-button>
-                <rrr-button type="button" variant="ghost" tone="primary" aria-label="icon only ghost button" title="icon only ghost button"><rrr-icon name="settings"></rrr-icon></rrr-button>
+                <rrr-tooltip><rrr-button type="button" variant="ghost" tone="primary" aria-label="icon only ghost button" title="icon only ghost button"><rrr-icon name="settings"></rrr-icon></rrr-button></rrr-tooltip>
                 <rrr-button type="button" variant="ghost" tone="primary"><rrr-icon name="settings"></rrr-icon>icon before text</rrr-button>
                 <rrr-button type="button" variant="ghost" tone="primary">icon after text<rrr-icon name="settings"></rrr-icon></rrr-button>
               </div>
