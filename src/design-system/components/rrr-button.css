@@ -1,75 +1,107 @@
 :host {
   display: inline-block;
-  --rrr-button-border-width: var(--rrr-border-width);
-  --rrr-button-border-color: var(--rrr-color-primary);
-  --rrr-button-border-radius: var(--rrr-radius-s);
+  --rrr-button-radius: var(--rrr-radius-s);
   --rrr-button-padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
-  --rrr-button-background: var(--rrr-color-primary);
-  --rrr-button-color: var(--rrr-color-primary-contrast);
+  --rrr-button-border-width: var(--rrr-border-width);
   --rrr-button-shadow: var(--rrr-shadow-button);
   --rrr-button-transition: var(--rrr-default-transition);
-  --rrr-button-hover-background: var(--rrr-colors-activity-indigo-70);
-  --rrr-button-hover-border-color: var(--rrr-colors-activity-indigo-70);
   --rrr-button-hover-shadow: var(--rrr-depth-2-shadow);
   --rrr-button-active-shadow: var(--rrr-depth-1-shadow);
-  --rrr-button-secondary-background: var(--rrr-color-surface);
-  --rrr-button-secondary-color: var(--rrr-color-text);
-  --rrr-button-secondary-border-color: var(--rrr-color-border);
-  --rrr-button-secondary-hover-background: var(--rrr-colors-activity-indigo-10);
-  --rrr-button-secondary-hover-border-color: var(--rrr-colors-activity-indigo-50);
-  --rrr-button-danger-background: var(--rrr-colors-context-danger-50);
-  --rrr-button-danger-border-color: var(--rrr-colors-context-danger-60);
-  --rrr-button-danger-color: var(--rrr-color-primary-contrast);
-  --rrr-button-danger-hover-background: var(--rrr-colors-context-danger-60);
-  --rrr-button-danger-hover-border-color: var(--rrr-colors-context-danger-70);
   --rrr-button-disabled-background: var(--rrr-colors-grayscale-30);
   --rrr-button-disabled-border-color: var(--rrr-colors-grayscale-30);
   --rrr-button-disabled-color: var(--rrr-colors-grayscale-70);
+
+  --_bg: var(--rrr-color-primary);
+  --_bg-hover: var(--rrr-colors-activity-indigo-70);
+  --_fg: var(--rrr-color-primary-contrast);
+}
+
+:host([tone='neutral']) {
+  --_bg: var(--rrr-colors-grayscale-40);
+  --_bg-hover: var(--rrr-colors-grayscale-50);
+  --_fg: var(--rrr-color-text);
+}
+
+:host([tone='accent']) {
+  --_bg: var(--rrr-colors-serene-mint-60);
+  --_bg-hover: var(--rrr-colors-serene-mint-70);
+  --_fg: var(--rrr-color-primary-contrast);
+}
+
+:host([tone='info']) {
+  --_bg: var(--rrr-colors-context-info-60);
+  --_bg-hover: var(--rrr-colors-context-info-70);
+  --_fg: var(--rrr-color-primary-contrast);
+}
+
+:host([tone='success']) {
+  --_bg: var(--rrr-colors-context-success-60);
+  --_bg-hover: var(--rrr-colors-context-success-70);
+  --_fg: var(--rrr-color-primary-contrast);
+}
+
+:host([tone='warning']) {
+  --_bg: var(--rrr-colors-context-warning-60);
+  --_bg-hover: var(--rrr-colors-context-warning-70);
+  --_fg: var(--rrr-color-primary-contrast);
+}
+
+:host([tone='danger']),
+:host([variant='danger']) {
+  --_bg: var(--rrr-colors-context-danger-50);
+  --_bg-hover: var(--rrr-colors-context-danger-60);
+  --_fg: var(--rrr-color-primary-contrast);
 }
 
 button {
-  border: var(--rrr-button-border-width) solid var(--rrr-button-border-color);
-  border-radius: var(--rrr-button-border-radius);
+  font-family: inherit;
+  border-radius: var(--rrr-button-radius);
+  border: var(--rrr-button-border-width) solid var(--_bg);
   padding: var(--rrr-button-padding);
   cursor: pointer;
-  font: inherit;
-  background: var(--rrr-button-background);
-  color: var(--rrr-button-color);
+  background: var(--_bg);
+  color: var(--_fg);
   box-shadow: var(--rrr-button-shadow);
-  transition: background var(--rrr-button-transition), border-color var(--rrr-button-transition), box-shadow var(--rrr-button-transition), transform var(--rrr-button-transition);
+  font: inherit;
+  transition: background var(--rrr-button-transition), border-color var(--rrr-button-transition), color var(--rrr-button-transition), box-shadow var(--rrr-button-transition), transform var(--rrr-button-transition);
 }
 
-button:hover {
-  background: var(--rrr-button-hover-background);
-  border-color: var(--rrr-button-hover-border-color);
+button:hover:enabled {
+  background: var(--_bg-hover);
+  border-color: var(--_bg-hover);
   box-shadow: var(--rrr-button-hover-shadow);
 }
 
-button:active {
+button:active:enabled {
   transform: translateY(1px);
   box-shadow: var(--rrr-button-active-shadow);
 }
 
-:host([variant="secondary"]) button {
-  background: var(--rrr-button-secondary-background);
-  color: var(--rrr-button-secondary-color);
-  border-color: var(--rrr-button-secondary-border-color);
+:host([variant='outline']) button,
+:host([variant='secondary']) button {
+  background: transparent;
+  color: var(--_bg-hover);
+  border-color: var(--_bg-hover);
+  box-shadow: none;
 }
 
-:host([variant="secondary"]) button:hover {
-  background: var(--rrr-button-secondary-hover-background);
-  border-color: var(--rrr-button-secondary-hover-border-color);
+:host([variant='outline']) button:hover:enabled,
+:host([variant='secondary']) button:hover:enabled {
+  background: color-mix(in oklab, var(--_bg), white 88%);
+  color: var(--_bg-hover);
+  border-color: var(--_bg-hover);
 }
 
-:host([variant="danger"]) button {
-  background: var(--rrr-button-danger-background);
-  border-color: var(--rrr-button-danger-border-color);
-  color: var(--rrr-button-danger-color);
+:host([variant='ghost']) button {
+  background: transparent;
+  color: var(--_bg-hover);
+  border-color: transparent;
+  box-shadow: none;
 }
 
-:host([variant="danger"]) button:hover {
-  background: var(--rrr-button-danger-hover-background);
-  border-color: var(--rrr-button-danger-hover-border-color);
+:host([variant='ghost']) button:hover:enabled {
+  background: color-mix(in oklab, var(--_bg), white 90%);
+  color: var(--_bg-hover);
 }
 
 button:disabled {

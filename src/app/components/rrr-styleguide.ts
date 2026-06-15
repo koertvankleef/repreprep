@@ -356,6 +356,29 @@ export class RrrStyleguide extends HTMLElement {
                 <rrr-button type="button" variant="danger" disabled>${t('styleguide.buttons.danger')} (${t('styleguide.disabledExample')})</rrr-button>
               </div>
               <div class="button-row role-row">
+                <rrr-button type="button" tone="primary">tone=primary</rrr-button>
+                <rrr-button type="button" tone="neutral">tone=neutral</rrr-button>
+                <rrr-button type="button" tone="accent">tone=accent</rrr-button>
+                <rrr-button type="button" tone="info">tone=info</rrr-button>
+                <rrr-button type="button" tone="success">tone=success</rrr-button>
+                <rrr-button type="button" tone="warning">tone=warning</rrr-button>
+                <rrr-button type="button" tone="danger">tone=danger</rrr-button>
+              </div>
+              <div class="button-row role-row">
+                <rrr-button type="button" variant="outline" tone="primary">outline primary</rrr-button>
+                <rrr-button type="button" variant="outline" tone="neutral">outline neutral</rrr-button>
+                <rrr-button type="button" variant="outline" tone="accent">outline accent</rrr-button>
+                <rrr-button type="button" variant="outline" tone="success">outline success</rrr-button>
+                <rrr-button type="button" variant="outline" tone="danger">outline danger</rrr-button>
+              </div>
+              <div class="button-row">
+                <rrr-button type="button" variant="ghost" tone="primary">ghost primary</rrr-button>
+                <rrr-button type="button" variant="ghost" tone="neutral">ghost neutral</rrr-button>
+                <rrr-button type="button" variant="ghost" tone="accent">ghost accent</rrr-button>
+                <rrr-button type="button" variant="ghost" tone="warning">ghost warning</rrr-button>
+                <rrr-button type="button" variant="ghost" tone="danger">ghost danger</rrr-button>
+              </div>
+              <div class="button-row role-row">
                 <button class="sg-button sg-button--solid sg-button--tone-info" type="button">${t('styleguide.toasts.trigger.info')}</button>
                 <button class="sg-button sg-button--solid sg-button--tone-success" type="button">${t('styleguide.toasts.trigger.success')}</button>
                 <button class="sg-button sg-button--solid sg-button--tone-warning" type="button">${t('styleguide.toasts.trigger.warning')}</button>
