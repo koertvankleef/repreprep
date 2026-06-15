@@ -3,6 +3,7 @@
   --rrr-button-radius: var(--rrr-radius-s);
   --rrr-button-padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
   --rrr-button-border-width: var(--rrr-border-width);
+  --rrr-button-min-block-size: var(--rrr-control-min-block-size);
   --rrr-button-shadow: var(--rrr-shadow-button);
   --rrr-button-transition: var(--rrr-default-transition);
   --rrr-button-hover-shadow: var(--rrr-depth-2-shadow);
@@ -62,8 +63,10 @@
 
 button {
   font: inherit;
+  line-height: 1.25;
   border-radius: var(--rrr-button-radius);
   border: var(--rrr-button-border-width) solid var(--_bg);
+  min-block-size: var(--rrr-button-min-block-size);
   padding: var(--rrr-button-padding);
   cursor: pointer;
   background: var(--_bg);
@@ -73,6 +76,12 @@ button {
   align-items: center;
   gap: var(--rrr-spacing-s);
   transition: background var(--rrr-button-transition), border-color var(--rrr-button-transition), color var(--rrr-button-transition), box-shadow var(--rrr-button-transition), transform var(--rrr-button-transition);
+}
+
+:host([icon-only]) button {
+  inline-size: var(--rrr-button-min-block-size);
+  padding-inline: 0;
+  justify-content: center;
 }
 
 button:hover:enabled {

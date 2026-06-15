@@ -15,6 +15,7 @@ export class RrrButton extends HTMLElement {
   static observedAttributes = ['aria-label', 'aria-pressed', 'title', 'disabled']
 
   private readonly button: HTMLButtonElement
+  private readonly buttonSlot: HTMLSlotElement
 
   constructor() {
     super()
@@ -24,16 +25,22 @@ export class RrrButton extends HTMLElement {
     shadowRoot.appendChild(template.content.cloneNode(true))
 
     const button = shadowRoot.querySelector<HTMLButtonElement>('button')
+    const slot = shadowRoot.querySelector<HTMLSlotElement>('slot')
 
-    if (!button) {
+    if (!button || !slot) {
       throw new Error('rrr-button failed to initialize')
     }
 
     this.button = button
+    this.buttonSlot = slot
   }
 
   connectedCallback(): void {
     this.syncAll()
+    this.buttonSlot.addEventListener('slotchange', () => {
+      this.syncContentState()
+    })
+    this.syncContentState()
 
     this.button.addEventListener('click', () => {
       if (this.button.disabled) {
@@ -93,6 +100,30 @@ export class RrrButton extends HTMLElement {
     }
 
     reflectDisabled(this, this.button)
+    this.syncContentState()
+  }
+
+  private syncContentState(): void {
+    const assignedNodes = this.buttonSlot.assignedNodes({ flatten: true })
+    const hasVisibleText = assignedNodes.some((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return (node.textContent ?? '').trim().length > 0
+      }
+
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as Element
+
+        if (element.tagName.toLowerCase() === 'rrr-icon') {
+          return false
+        }
+
+        return (element.textContent ?? '').trim().length > 0
+      }
+
+      return false
+    })
+
+    this.toggleAttribute('icon-only', assignedNodes.length > 0 && !hasVisibleText)
   }
 }
 

@@ -45,7 +45,7 @@ export class RrrRoutineList extends HTMLElement {
             <h2>${t('routineList.title')}</h2>
             <p>${t('routineList.subtitle')}</p>
           </div>
-          <rrr-button type="button" data-action="new">${t('routineList.new')}</rrr-button>
+          <rrr-button type="button" tone="accent" data-action="new"><rrr-icon name="add"></rrr-icon>${t('routineList.new')}</rrr-button>
         </div>
         <div class="list">
           ${

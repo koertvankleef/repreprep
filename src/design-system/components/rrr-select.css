@@ -57,12 +57,14 @@ select {
   width: 100%;
   min-inline-size: 0;
   box-sizing: border-box;
+  min-block-size: var(--rrr-control-min-block-size);
   padding: var(--rrr-select-padding);
   border: var(--rrr-select-border-width) solid var(--rrr-select-border-color);
   border-radius: var(--rrr-select-border-radius);
   background: var(--rrr-select-background);
   color: var(--rrr-select-color);
   font: inherit;
+  line-height: 1.25;
   appearance: none;
   transition: border-color var(--rrr-select-transition), box-shadow var(--rrr-select-transition), background var(--rrr-select-transition);
 }

@@ -213,49 +213,44 @@ export class RrrApp extends HTMLElement {
             type="button"
             variant="ghost"
             data-action="theme-light"
-            data-selected="${theme === 'light'}"
             aria-pressed="${theme === 'light'}"
             aria-label="${t('app.theme.light')}"
             title="${t('app.theme.light')}"
-          ><rrr-icon name="weather-sunny"></rrr-icon><span class="sr-only">${t('app.theme.light')}</span></rrr-button>
+          ><rrr-icon name="weather-sunny"></rrr-icon></rrr-button>
           <rrr-button
             type="button"
             variant="ghost"
             data-action="theme-dark"
-            data-selected="${theme === 'dark'}"
             aria-pressed="${theme === 'dark'}"
             aria-label="${t('app.theme.dark')}"
             title="${t('app.theme.dark')}"
-          ><rrr-icon name="weather-moon"></rrr-icon><span class="sr-only">${t('app.theme.dark')}</span></rrr-button>
+          ><rrr-icon name="weather-moon"></rrr-icon></rrr-button>
           <rrr-button
             type="button"
             variant="ghost"
             data-action="theme-auto"
-            data-selected="${theme === 'auto'}"
             aria-pressed="${theme === 'auto'}"
             aria-label="${t('app.theme.auto')}"
             title="${t('app.theme.auto')}"
-          ><rrr-icon name="arrow-sync"></rrr-icon><span class="sr-only">${t('app.theme.auto')}</span></rrr-button>
+          ><rrr-icon name="arrow-sync"></rrr-icon></rrr-button>
         </div>
         <div class="nav-control-group" aria-label="${t('app.theme.contrast')}" role="group">
           <rrr-button
             type="button"
             variant="ghost"
             data-action="contrast-normal"
-            data-selected="${contrast === 'normal'}"
             aria-pressed="${contrast === 'normal'}"
             aria-label="${t('app.theme.contrastNormal')}"
             title="${t('app.theme.contrastNormal')}"
-          ><rrr-icon name="circle-half-fill"></rrr-icon><span class="sr-only">${t('app.theme.contrastNormal')}</span></rrr-button>
+          ><rrr-icon name="circle-half-fill"></rrr-icon></rrr-button>
           <rrr-button
             type="button"
             variant="ghost"
             data-action="contrast-high"
-            data-selected="${contrast === 'high'}"
             aria-pressed="${contrast === 'high'}"
             aria-label="${t('app.theme.contrastHigh')}"
             title="${t('app.theme.contrastHigh')}"
-          ><rrr-icon name="shield"></rrr-icon><span class="sr-only">${t('app.theme.contrastHigh')}</span></rrr-button>
+          ><rrr-icon name="shield"></rrr-icon></rrr-button>
         </div>
       </div>
     `

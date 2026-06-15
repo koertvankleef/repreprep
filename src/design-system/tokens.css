@@ -116,6 +116,8 @@
   --rrr-font-weight-semibold: 600;
   --rrr-font-weight-bold: 700;
 
+  --rrr-control-min-block-size: 2.5rem;
+
   --rrr-sizes-grid-space: .25rem;
   --rrr-sizes-grid-1: .5rem;
   --rrr-sizes-grid-2: 1rem;

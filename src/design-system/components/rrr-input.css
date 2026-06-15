@@ -39,12 +39,14 @@ input {
   width: 100%;
   min-inline-size: 0;
   box-sizing: border-box;
+  min-block-size: var(--rrr-control-min-block-size);
   padding: var(--rrr-input-padding);
   border: var(--rrr-input-border-width) solid var(--rrr-input-border-color);
   border-radius: var(--rrr-input-border-radius);
   background: var(--rrr-input-background);
   color: var(--rrr-input-color);
   font: inherit;
+  line-height: 1.25;
   transition: border-color var(--rrr-input-transition), box-shadow var(--rrr-input-transition), background var(--rrr-input-transition);
 }
 
