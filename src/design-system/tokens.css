@@ -163,6 +163,14 @@
   --rrr-anim-fromto-timingfunction: cubic-bezier(0.205, 0.000, 0.000, 1.000);
   /* Button interactive foreground for outline/ghost variants — dark mode overrides step down to 50. */
 
+  /* Button interactive foreground for outline/ghost variants — dark mode overrides step down to 50. */
+  --rrr-button-fg: var(--rrr-colors-activity-indigo-70);
+  --rrr-button-fg-accent: var(--rrr-colors-serene-mint-70);
+  --rrr-button-fg-info: var(--rrr-colors-context-info-70);
+  --rrr-button-fg-success: var(--rrr-colors-context-success-70);
+  --rrr-button-fg-warning: var(--rrr-colors-context-warning-70);
+  --rrr-button-fg-danger: var(--rrr-colors-context-danger-70);
+
   /* App-level semantic tokens used by the current UI surface. */
   --rrr-color-primary: var(--rrr-colors-activity-indigo-60);
   --rrr-color-primary-contrast: var(--rrr-colors-grayscale-00);
@@ -195,7 +203,6 @@
   --rrr-button-fg-success: var(--rrr-colors-context-success-50);
   --rrr-button-fg-warning: var(--rrr-colors-context-warning-50);
   --rrr-button-fg-danger: var(--rrr-colors-context-danger-50);
-  --rrr-mix-tint: black;
 
   --rrr-color-primary-contrast: var(--rrr-colors-grayscale-100);
   --rrr-color-background: var(--rrr-colors-grayscale-00);
