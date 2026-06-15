@@ -125,8 +125,8 @@ export class RrrExerciseCatalogue extends HTMLElement {
               </div>
             </div>
             <div class="actions">
-              ${showArchived ? '' : `<rrr-button type="button" variant="secondary" data-action="edit" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.editAria', { name: exercise.name }))}">${t('action.edit')}</rrr-button>`}
-              ${showArchived ? '' : `<rrr-button type="button" variant="secondary" data-action="archive" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.archiveAria', { name: exercise.name }))}">${t('action.archive')}</rrr-button>`}
+              ${showArchived ? '' : `<rrr-button type="button" variant="ghost" data-action="edit" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.editAria', { name: exercise.name }))}"><rrr-icon name="edit"></rrr-icon></rrr-button>`}
+              ${showArchived ? '' : `<rrr-button type="button" variant="ghost" tone="success" data-action="archive" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.archiveAria', { name: exercise.name }))}"><rrr-icon name="archive"></rrr-icon></rrr-button>`}
             </div>
           </article>
         `

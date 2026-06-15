@@ -211,7 +211,7 @@ export class RrrApp extends HTMLElement {
         <div class="nav-control-group" aria-label="${t('app.theme.mode')}" role="group">
           <rrr-button
             type="button"
-            variant="secondary"
+            variant="ghost"
             data-action="theme-light"
             data-selected="${theme === 'light'}"
             aria-pressed="${theme === 'light'}"
@@ -220,7 +220,7 @@ export class RrrApp extends HTMLElement {
           ><rrr-icon name="weather-sunny"></rrr-icon><span class="sr-only">${t('app.theme.light')}</span></rrr-button>
           <rrr-button
             type="button"
-            variant="secondary"
+            variant="ghost"
             data-action="theme-dark"
             data-selected="${theme === 'dark'}"
             aria-pressed="${theme === 'dark'}"
@@ -229,7 +229,7 @@ export class RrrApp extends HTMLElement {
           ><rrr-icon name="weather-moon"></rrr-icon><span class="sr-only">${t('app.theme.dark')}</span></rrr-button>
           <rrr-button
             type="button"
-            variant="secondary"
+            variant="ghost"
             data-action="theme-auto"
             data-selected="${theme === 'auto'}"
             aria-pressed="${theme === 'auto'}"
@@ -240,7 +240,7 @@ export class RrrApp extends HTMLElement {
         <div class="nav-control-group" aria-label="${t('app.theme.contrast')}" role="group">
           <rrr-button
             type="button"
-            variant="secondary"
+            variant="ghost"
             data-action="contrast-normal"
             data-selected="${contrast === 'normal'}"
             aria-pressed="${contrast === 'normal'}"
@@ -249,7 +249,7 @@ export class RrrApp extends HTMLElement {
           ><rrr-icon name="circle-half-fill"></rrr-icon><span class="sr-only">${t('app.theme.contrastNormal')}</span></rrr-button>
           <rrr-button
             type="button"
-            variant="secondary"
+            variant="ghost"
             data-action="contrast-high"
             data-selected="${contrast === 'high'}"
             aria-pressed="${contrast === 'high'}"

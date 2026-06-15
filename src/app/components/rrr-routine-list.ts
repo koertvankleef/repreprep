@@ -63,7 +63,7 @@ export class RrrRoutineList extends HTMLElement {
                         <div class="card-meta">${exerciseSummary}</div>
                         <div class="actions">
                           <rrr-button type="button" data-action="start" data-id="${routine.id}" aria-label="${escapeHtml(t('routineList.action.startAria', { name: routine.name }))}">${t('routineList.action.start')}</rrr-button>
-                          <rrr-button type="button" variant="secondary" data-action="edit" data-id="${routine.id}" aria-label="${escapeHtml(t('routineList.action.editAria', { name: routine.name }))}">${t('action.edit')}</rrr-button>
+                          <rrr-button type="button" variant="ghost" data-action="edit" data-id="${routine.id}" aria-label="${escapeHtml(t('routineList.action.editAria', { name: routine.name }))}"><rrr-icon name="edit"></rrr-icon></rrr-button>
                         </div>
                       </rrr-card>
                     `

@@ -90,7 +90,7 @@ export class RrrSetEntry extends HTMLElement {
           <input type="text" name="notes" value="${set.notes}" placeholder="${t('setEntry.field.notes.placeholder')}" />
         </label>
         <div class="actions">
-          <rrr-button type="button" variant="danger" data-action="remove" aria-label="${t('setEntry.action.removeAria')}">${t('action.remove')}</rrr-button>
+          <rrr-button type="button" variant="ghost" tone="danger" data-action="remove" aria-label="${t('setEntry.action.removeAria')}"><rrr-icon name="delete"></rrr-icon></rrr-button>
         </div>
       </div>
     `

@@ -125,8 +125,8 @@ export class RrrWorkoutList extends HTMLElement {
                         <p>${summary || t('workoutList.exercise.none')}</p>
                         <p>${workout.notes || t('workoutList.notes.none')}</p>
                         <div class="actions">
-                          <rrr-button type="button" variant="secondary" data-action="edit" data-id="${workout.id}" aria-label="${t('workoutList.action.editAria', { date: workoutDate })}">${t('action.edit')}</rrr-button>
-                          <rrr-button type="button" variant="danger" data-action="delete" data-id="${workout.id}" aria-label="${t('workoutList.action.deleteAria', { date: workoutDate })}">${t('action.delete')}</rrr-button>
+                          <rrr-button type="button" variant="ghost" data-action="edit" data-id="${workout.id}" aria-label="${t('workoutList.action.editAria', { date: workoutDate })}"><rrr-icon name="edit"></rrr-icon></rrr-button>
+                          <rrr-button type="button" variant="ghost" tone="danger" data-action="delete" data-id="${workout.id}" aria-label="${t('workoutList.action.deleteAria', { date: workoutDate })}"><rrr-icon name="delete"></rrr-icon></rrr-button>
                         </div>
                       </rrr-card>
                     `
