@@ -8,7 +8,7 @@
   --rrr-input-padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
   --rrr-input-border-width: var(--rrr-border-width);
   --rrr-input-border-color: var(--rrr-colors-grayscale-40);
-  --rrr-input-border-radius: var(--rrr-radius-m);
+  --rrr-input-border-radius: var(--rrr-radius-s);
   --rrr-input-background: var(--rrr-colors-grayscale-00);
   --rrr-input-color: var(--rrr-colors-grayscale-100);
   --rrr-input-transition: var(--rrr-default-transition);

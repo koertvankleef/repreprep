@@ -14,7 +14,7 @@
   --rrr-colors-grayscale-00: oklch(100.00% 0.0000 0.00);
 
   /* Brand mapping: brand-inspired tone derived from --rrr-colors-serene-mint-60 (#108981). */
-  /* Magenta token names are retained for compatibility while serving as accent tokens. */
+  /* Magenta-family names are kept as palette labels and used as accent tokens. */
   --rrr-colors-serene-mint-10: oklch(95.26% 0.0284 184.51);
   --rrr-colors-serene-mint-20: oklch(87.59% 0.0456 187.50);
   --rrr-colors-serene-mint-30: oklch(79.92% 0.0660 192.20);
@@ -37,7 +37,7 @@
   --rrr-colors-activity-indigo-80: oklch(33.17% 0.2019 274.06);
   --rrr-colors-activity-indigo-90: oklch(24.23% 0.1878 272.61);
 
-  /* Brand mapping: no direct brand-color equivalent in this set.*/
+  /* Brand mapping: no direct brand-color equivalent in this palette. */
   --rrr-colors-context-danger-10: oklch(97.69% 0.0450 24.00);
   --rrr-colors-context-danger-20: oklch(89.00% 0.0950 23.00);
   --rrr-colors-context-danger-30: oklch(79.80% 0.1450 22.00);
@@ -48,7 +48,7 @@
   --rrr-colors-context-danger-80: oklch(35.50% 0.1800 17.00);
   --rrr-colors-context-danger-90: oklch(26.32% 0.1550 16.00);
 
-  /* Brand mapping: no direct brand-color equivalent in this set.*/
+  /* Brand mapping: no direct brand-color equivalent in this palette. */
   --rrr-colors-context-success-10: oklch(97.69% 0.0224 154.49);
   --rrr-colors-context-success-20: oklch(90.84% 0.0612 152.83);
   --rrr-colors-context-success-30: oklch(84.00% 0.1001 151.17);
@@ -59,7 +59,7 @@
   --rrr-colors-context-success-80: oklch(35.21% 0.1269 146.54);
   --rrr-colors-context-success-90: oklch(26.32% 0.1149 146.55);
 
-  /* Brand mapping: no direct brand-color equivalent in this set.*/
+  /* Brand mapping: no direct brand-color equivalent in this palette. */
   --rrr-colors-context-info-10: oklch(97.69% 0.0225 266.13);
   --rrr-colors-context-info-20: oklch(88.14% 0.0579 266.18);
   --rrr-colors-context-info-30: oklch(78.60% 0.0933 266.23);
@@ -70,7 +70,7 @@
   --rrr-colors-context-info-80: oklch(35.11% 0.1269 262.41);
   --rrr-colors-context-info-90: oklch(26.32% 0.1109 262.38);
 
-  /* Brand mapping: no direct brand-color equivalent in this set.*/
+  /* Brand mapping: no direct brand-color equivalent in this palette. */
   --rrr-colors-context-warning-10: oklch(97.69% 0.0300 74.50);
   --rrr-colors-context-warning-20: oklch(91.20% 0.0780 72.40);
   --rrr-colors-context-warning-30: oklch(84.60% 0.1260 70.30);
@@ -109,7 +109,7 @@
   --rrr-font-size-l: 1.125rem;
   --rrr-font-size-xl: 1.5rem;
   --rrr-font-size-2xl: 2rem;
-  --rrr-font-default-size: var(--rrr-font-size-m);
+  --rrr-font-size-default: var(--rrr-font-size-m);
 
   --rrr-font-weight-light: 300;
   --rrr-font-weight-normal: 400;
@@ -145,19 +145,14 @@
   --rrr-shadow-card: var(--rrr-depth-2-shadow);
   --rrr-shadow-dialog: var(--rrr-depth-3-shadow);
 
-  /* Backward compatibility: legacy token points to max-1 depth */
-  --rrr-borders-shadow: var(--rrr-depth-4-shadow);
-
+  /* Core border primitive */
   --rrr-border-width: 1px;
-  --rrr-border-default-color: var(--rrr-colors-grayscale-30);
-
-  --rrr-default-background-color: var(--rrr-colors-grayscale-10);
 
   --global-focus-ring-color: var(--rrr-colors-grayscale-100);
   --global-focus-ring-offset: 2px;
   --global-focus-ring-width: 2px;
 
-  /* Anything smaller than 576px is default */
+  /* Default layout applies below 576px */
   --grid-breakpoint-s: 36rem;
   --grid-breakpoint-m: 48rem;
   --grid-breakpoint-l: 62rem;
@@ -166,37 +161,19 @@
   --rrr-default-transition: 128ms cubic-bezier(.4, 0, .2, 1);
 
   --rrr-anim-fromto-timingfunction: cubic-bezier(0.205, 0.000, 0.000, 1.000);
-  /* Semantic aliases kept for the current app surface during token migration. */
+  /* Button interactive foreground for outline/ghost variants — dark mode overrides step down to 50. */
+
+  /* App-level semantic tokens used by the current UI surface. */
   --rrr-color-primary: var(--rrr-colors-activity-indigo-60);
   --rrr-color-primary-contrast: var(--rrr-colors-grayscale-00);
-  --rrr-color-secondary: var(--rrr-colors-grayscale-70);
   --rrr-color-background: var(--rrr-colors-grayscale-10);
-  --rrr-color-surface: var(--rrr-colors-grayscale-00);
   --rrr-color-text: var(--rrr-colors-grayscale-100);
-  --rrr-color-text-muted: var(--rrr-colors-grayscale-70);
-  --rrr-color-text-secondary: var(--rrr-color-text-muted);
-  --rrr-color-border: var(--rrr-colors-grayscale-30);
-  --rrr-color-danger: var(--rrr-colors-context-danger-60);
-  --rrr-color-success: var(--rrr-colors-context-success-60);
   --rrr-color-link: var(--rrr-colors-activity-indigo-70);
   --rrr-color-link-hover: var(--rrr-colors-serene-mint-70);
   --rrr-color-scheme: light;
 
-  --rrr-space-xs: var(--rrr-spacing-xs);
-  --rrr-space-sm: var(--rrr-spacing-s);
-  --rrr-space-md: var(--rrr-spacing-l);
-  --rrr-space-lg: var(--rrr-spacing-xl);
-  --rrr-space-xl: var(--rrr-spacing-2xl);
-
-  --rrr-radius-sm: var(--rrr-radius-s);
-  --rrr-radius-md: var(--rrr-radius-m);
-  --rrr-radius-lg: var(--rrr-radius-l);
-
   --rrr-font-family: 'Exo 2', system-ui, -apple-system, sans-serif;
   --rrr-font-family-heading: 'Oxanium', system-ui, -apple-system, sans-serif;
-  --rrr-font-size-sm: var(--rrr-font-size-s);
-  --rrr-font-size-md: var(--rrr-font-size-m);
-  --rrr-font-size-lg: var(--rrr-font-size-l);
 }
 
 :root[data-theme='dark'] {
@@ -212,13 +189,17 @@
   --rrr-colors-grayscale-90: oklch(94.00% 0.0100 200.00);
   --rrr-colors-grayscale-100: oklch(98.00% 0.0050 180.00);
 
+  --rrr-button-fg: var(--rrr-colors-activity-indigo-50);
+  --rrr-button-fg-accent: var(--rrr-colors-serene-mint-50);
+  --rrr-button-fg-info: var(--rrr-colors-context-info-50);
+  --rrr-button-fg-success: var(--rrr-colors-context-success-50);
+  --rrr-button-fg-warning: var(--rrr-colors-context-warning-50);
+  --rrr-button-fg-danger: var(--rrr-colors-context-danger-50);
+  --rrr-mix-tint: black;
+
   --rrr-color-primary-contrast: var(--rrr-colors-grayscale-100);
-  --rrr-color-secondary: var(--rrr-colors-grayscale-70);
   --rrr-color-background: var(--rrr-colors-grayscale-00);
-  --rrr-color-surface: var(--rrr-colors-grayscale-10);
   --rrr-color-text: var(--rrr-colors-grayscale-100);
-  --rrr-color-text-muted: var(--rrr-colors-grayscale-70);
-  --rrr-color-border: var(--rrr-colors-grayscale-30);
   --rrr-color-link: var(--rrr-colors-activity-indigo-20);
   --rrr-color-link-hover: var(--rrr-colors-serene-mint-20);
   --rrr-color-scheme: dark;
@@ -245,12 +226,7 @@
   --rrr-color-primary: var(--rrr-colors-activity-indigo-30);
   --rrr-color-primary-contrast: #ffffff;
   --rrr-color-background: var(--rrr-colors-grayscale-00);
-  --rrr-color-surface: var(--rrr-colors-grayscale-10);
   --rrr-color-text: var(--rrr-colors-grayscale-100);
-  --rrr-color-text-muted: var(--rrr-colors-grayscale-80);
-  --rrr-color-border: var(--rrr-colors-grayscale-70);
-  --rrr-color-danger: var(--rrr-colors-context-danger-30);
-  --rrr-color-success: var(--rrr-colors-context-success-30);
   --rrr-color-link: var(--rrr-colors-activity-indigo-20);
   --rrr-color-link-hover: var(--rrr-colors-serene-mint-20);
   --global-focus-ring-width: 3px;

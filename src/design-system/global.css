@@ -31,7 +31,7 @@ h6 {
 body {
   min-height: 100vh;
   font-family: var(--rrr-font-family);
-  font-size: var(--rrr-font-default-size);
+  font-size: var(--rrr-font-size-default);
   line-height: 1.5;
   color: var(--rrr-color-text);
   background: var(--rrr-color-background);

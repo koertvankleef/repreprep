@@ -14,43 +14,50 @@
   --_bg: var(--rrr-color-primary);
   --_bg-hover: var(--rrr-colors-activity-indigo-70);
   --_fg: var(--rrr-color-primary-contrast);
+  --_interactive-fg: var(--rrr-button-fg);
 }
 
 :host([tone='neutral']) {
   --_bg: var(--rrr-colors-grayscale-40);
-  --_bg-hover: var(--rrr-colors-grayscale-50);
+  --_bg-hover: var(--rrr-colors-grayscale-70);
   --_fg: var(--rrr-color-text);
+  --_interactive-fg: var(--_bg-hover);
 }
 
 :host([tone='accent']) {
   --_bg: var(--rrr-colors-serene-mint-60);
   --_bg-hover: var(--rrr-colors-serene-mint-70);
   --_fg: var(--rrr-color-primary-contrast);
+  --_interactive-fg: var(--rrr-button-fg-accent);
 }
 
 :host([tone='info']) {
   --_bg: var(--rrr-colors-context-info-60);
   --_bg-hover: var(--rrr-colors-context-info-70);
   --_fg: var(--rrr-color-primary-contrast);
+  --_interactive-fg: var(--rrr-button-fg-info);
 }
 
 :host([tone='success']) {
   --_bg: var(--rrr-colors-context-success-60);
   --_bg-hover: var(--rrr-colors-context-success-70);
   --_fg: var(--rrr-color-primary-contrast);
+  --_interactive-fg: var(--rrr-button-fg-success);
 }
 
 :host([tone='warning']) {
   --_bg: var(--rrr-colors-context-warning-60);
   --_bg-hover: var(--rrr-colors-context-warning-70);
   --_fg: var(--rrr-color-primary-contrast);
+  --_interactive-fg: var(--rrr-button-fg-warning);
 }
 
 :host([tone='danger']),
 :host([variant='danger']) {
-  --_bg: var(--rrr-colors-context-danger-50);
-  --_bg-hover: var(--rrr-colors-context-danger-60);
+  --_bg: var(--rrr-colors-context-danger-60);
+  --_bg-hover: var(--rrr-colors-context-danger-70);
   --_fg: var(--rrr-color-primary-contrast);
+  --_interactive-fg: var(--rrr-button-fg-danger);
 }
 
 button {
@@ -82,28 +89,28 @@ button:active:enabled {
 :host([variant='outline']) button,
 :host([variant='secondary']) button {
   background: transparent;
-  color: var(--_bg-hover);
-  border-color: var(--_bg-hover);
+  color: var(--_interactive-fg);
+  border-color: var(--_interactive-fg);
   box-shadow: none;
 }
 
 :host([variant='outline']) button:hover:enabled,
 :host([variant='secondary']) button:hover:enabled {
-  background: color-mix(in oklab, var(--_bg), white 88%);
-  color: var(--_bg-hover);
-  border-color: var(--_bg-hover);
+  background: color-mix(in oklab, var(--_bg), transparent 82%);
+  color: var(--_interactive-fg);
+  border-color: var(--_interactive-fg);
 }
 
 :host([variant='ghost']) button {
   background: transparent;
-  color: var(--_bg-hover);
+  color: var(--_interactive-fg);
   border-color: transparent;
   box-shadow: none;
 }
 
 :host([variant='ghost']) button:hover:enabled {
-  background: color-mix(in oklab, var(--_bg), white 90%);
-  color: var(--_bg-hover);
+  background: color-mix(in oklab, var(--_bg), transparent 85%);
+  color: var(--_interactive-fg);
 }
 
 button:disabled {
