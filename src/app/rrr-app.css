@@ -14,10 +14,11 @@
   --rrr-app-link-hover-background: var(--rrr-colors-activity-indigo-10);
   --rrr-app-link-hover-color: var(--rrr-colors-activity-indigo-80);
   --rrr-app-link-active-background: var(--rrr-colors-activity-indigo-60);
-  --rrr-app-link-active-color: var(--rrr-colors-grayscale-00);
+  --rrr-app-link-active-color: var(--rrr-color-primary-contrast);
   --rrr-app-link-active-shadow: var(--rrr-shadow-button);
   --rrr-app-link-font-family: var(--rrr-font-family-heading);
   --rrr-app-main-padding: var(--rrr-spacing-l);
+  --rrr-app-control-radius: var(--rrr-radius-xl);
 }
 
 .shell {
@@ -40,6 +41,10 @@ nav {
 
 nav rrr-button {
   margin-left: 0;
+  width: auto;
+}
+
+nav rrr-button[data-action="install-app"] {
   width: 100%;
 }
 
@@ -62,6 +67,50 @@ nav a.active {
   box-shadow: var(--rrr-app-link-active-shadow);
 }
 
+.nav-controls {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: var(--rrr-spacing-xs);
+  margin-left: auto;
+}
+
+.nav-control-group {
+  display: inline-flex;
+  gap: var(--rrr-spacing-2xs);
+  padding: var(--rrr-spacing-2xs);
+  border-radius: var(--rrr-app-control-radius);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  background: var(--rrr-colors-grayscale-00);
+}
+
+.nav-control-group rrr-button::part(button) {
+  min-inline-size: 2.25rem;
+  padding: var(--rrr-spacing-xs);
+  border-radius: var(--rrr-radius-m);
+}
+
+.nav-control-group rrr-button[data-selected="true"]::part(button) {
+  background: var(--rrr-colors-activity-indigo-60);
+  border-color: var(--rrr-colors-activity-indigo-70);
+  color: var(--rrr-color-primary-contrast);
+}
+
+.nav-control-group rrr-button rrr-icon {
+  font-size: 1rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 main {
   padding: var(--rrr-app-main-padding);
   max-width: 72rem;
@@ -79,7 +128,12 @@ main {
   }
 
   nav rrr-button {
-    margin-left: auto;
+    margin-left: 0;
+    width: auto;
+  }
+
+  nav rrr-button[data-action="install-app"] {
+    margin-left: 0;
     width: auto;
   }
 }

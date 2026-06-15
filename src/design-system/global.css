@@ -5,7 +5,7 @@
 }
 
 html {
-  color-scheme: light;
+  color-scheme: var(--rrr-color-scheme, light);
 }
 
 body,
@@ -33,8 +33,8 @@ body {
   font-family: var(--rrr-font-family);
   font-size: var(--rrr-font-default-size);
   line-height: 1.5;
-  color: var(--rrr-colors-grayscale-100);
-  background: var(--rrr-colors-grayscale-10);
+  color: var(--rrr-color-text);
+  background: var(--rrr-color-background);
 }
 
 button,
@@ -45,12 +45,12 @@ textarea {
 }
 
 button {
-  border: var(--rrr-border-width) solid var(--rrr-colors-activity-indigo-60);
+  border: var(--rrr-border-width) solid var(--rrr-color-primary);
   border-radius: var(--rrr-radius-m);
   padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
   cursor: pointer;
-  background: var(--rrr-colors-activity-indigo-60);
-  color: var(--rrr-colors-grayscale-00);
+  background: var(--rrr-color-primary);
+  color: var(--rrr-color-primary-contrast);
   box-shadow: var(--rrr-shadow-button);
   transition: background var(--rrr-default-transition), border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition), transform var(--rrr-default-transition);
 }
@@ -118,11 +118,11 @@ h3 {
 }
 
 a {
-  color: var(--rrr-colors-activity-indigo-70);
+  color: var(--rrr-color-link);
 }
 
 a:hover {
-  color: var(--rrr-colors-serene-mint-70);
+  color: var(--rrr-color-link-hover);
 }
 
 :focus-visible {

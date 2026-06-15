@@ -4,6 +4,15 @@ import { shadowTypographyStyles } from '../design-system/shadow-styles.ts'
 import { appRoutes, type AppRouteMeta } from '../domain/routes.ts'
 import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
 import { toastService } from '../foundation/toast.ts'
+import {
+  applyDisplayPreferences,
+  loadDisplayPreferences,
+  saveDisplayPreferences,
+  watchSystemThemePreference,
+  type ContrastMode,
+  type DisplayPreferences,
+  type ThemeMode,
+} from './theme-preferences.ts'
 import appStyles from './rrr-app.css?inline'
 
 const styles = `${shadowTypographyStyles}\n${appStyles}`
@@ -33,9 +42,11 @@ const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
 
 export class RrrApp extends HTMLElement {
   private route: Route = { name: 'workouts' }
+  private displayPreferences: DisplayPreferences = loadDisplayPreferences()
   private installPromptEvent: BeforeInstallPromptEvent | null = null
   private installAvailable = false
   private isStandalone = window.matchMedia('(display-mode: standalone)').matches
+  private stopWatchingSystemThemePreference: (() => void) | null = null
   private readonly styleguideEnabled = import.meta.env.DEV || localHosts.has(window.location.hostname)
   private readonly router = createHashRouter({
     routes: appRoutes,
@@ -70,11 +81,73 @@ export class RrrApp extends HTMLElement {
       .composedPath()
       .find((node): node is HTMLElement => node instanceof HTMLElement && node.dataset.action !== undefined)
 
-    if (!actionTarget || actionTarget.dataset.action !== 'install-app') {
+    if (!actionTarget) {
       return
     }
 
-    void this.promptInstall()
+    const action = actionTarget.dataset.action
+
+    if (action === 'install-app') {
+      void this.promptInstall()
+      return
+    }
+
+    if (action === 'theme-light') {
+      this.setThemeMode('light')
+      return
+    }
+
+    if (action === 'theme-dark') {
+      this.setThemeMode('dark')
+      return
+    }
+
+    if (action === 'theme-auto') {
+      this.setThemeMode('auto')
+      return
+    }
+
+    if (action === 'contrast-normal') {
+      this.setContrastMode('normal')
+      return
+    }
+
+    if (action === 'contrast-high') {
+      this.setContrastMode('high')
+    }
+  }
+
+  private setThemeMode(theme: ThemeMode): void {
+    if (this.displayPreferences.theme === theme) {
+      return
+    }
+
+    this.displayPreferences = {
+      ...this.displayPreferences,
+      theme,
+    }
+
+    this.applyAndPersistDisplayPreferences()
+    this.render()
+  }
+
+  private setContrastMode(contrast: ContrastMode): void {
+    if (this.displayPreferences.contrast === contrast) {
+      return
+    }
+
+    this.displayPreferences = {
+      ...this.displayPreferences,
+      contrast,
+    }
+
+    this.applyAndPersistDisplayPreferences()
+    this.render()
+  }
+
+  private applyAndPersistDisplayPreferences(): void {
+    applyDisplayPreferences(this.displayPreferences)
+    saveDisplayPreferences(this.displayPreferences)
   }
 
   private async promptInstall(): Promise<void> {
@@ -102,6 +175,14 @@ export class RrrApp extends HTMLElement {
 
   connectedCallback(): void {
     void storageService.getData()
+    applyDisplayPreferences(this.displayPreferences)
+    this.stopWatchingSystemThemePreference = watchSystemThemePreference(() => {
+      if (this.displayPreferences.theme !== 'auto') {
+        return
+      }
+
+      applyDisplayPreferences(this.displayPreferences)
+    })
     window.addEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.addEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.addEventListener('click', this.handleClick)
@@ -113,10 +194,71 @@ export class RrrApp extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    this.stopWatchingSystemThemePreference?.()
+    this.stopWatchingSystemThemePreference = null
     window.removeEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.removeEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.removeEventListener('click', this.handleClick)
     this.router.dispose()
+  }
+
+  private renderThemeControls(): string {
+    const theme = this.displayPreferences.theme
+    const contrast = this.displayPreferences.contrast
+
+    return `
+      <div class="nav-controls" aria-label="${t('app.theme.controls')}" role="group">
+        <div class="nav-control-group" aria-label="${t('app.theme.mode')}" role="group">
+          <rrr-button
+            type="button"
+            variant="secondary"
+            data-action="theme-light"
+            data-selected="${theme === 'light'}"
+            aria-pressed="${theme === 'light'}"
+            aria-label="${t('app.theme.light')}"
+            title="${t('app.theme.light')}"
+          ><rrr-icon name="weather-sunny"></rrr-icon><span class="sr-only">${t('app.theme.light')}</span></rrr-button>
+          <rrr-button
+            type="button"
+            variant="secondary"
+            data-action="theme-dark"
+            data-selected="${theme === 'dark'}"
+            aria-pressed="${theme === 'dark'}"
+            aria-label="${t('app.theme.dark')}"
+            title="${t('app.theme.dark')}"
+          ><rrr-icon name="weather-moon"></rrr-icon><span class="sr-only">${t('app.theme.dark')}</span></rrr-button>
+          <rrr-button
+            type="button"
+            variant="secondary"
+            data-action="theme-auto"
+            data-selected="${theme === 'auto'}"
+            aria-pressed="${theme === 'auto'}"
+            aria-label="${t('app.theme.auto')}"
+            title="${t('app.theme.auto')}"
+          ><rrr-icon name="arrow-sync"></rrr-icon><span class="sr-only">${t('app.theme.auto')}</span></rrr-button>
+        </div>
+        <div class="nav-control-group" aria-label="${t('app.theme.contrast')}" role="group">
+          <rrr-button
+            type="button"
+            variant="secondary"
+            data-action="contrast-normal"
+            data-selected="${contrast === 'normal'}"
+            aria-pressed="${contrast === 'normal'}"
+            aria-label="${t('app.theme.contrastNormal')}"
+            title="${t('app.theme.contrastNormal')}"
+          ><rrr-icon name="circle-half-fill"></rrr-icon><span class="sr-only">${t('app.theme.contrastNormal')}</span></rrr-button>
+          <rrr-button
+            type="button"
+            variant="secondary"
+            data-action="contrast-high"
+            data-selected="${contrast === 'high'}"
+            aria-pressed="${contrast === 'high'}"
+            aria-label="${t('app.theme.contrastHigh')}"
+            title="${t('app.theme.contrastHigh')}"
+          ><rrr-icon name="shield"></rrr-icon><span class="sr-only">${t('app.theme.contrastHigh')}</span></rrr-button>
+        </div>
+      </div>
+    `
   }
 
   private toRoute(match: HashRouteMatch<AppRouteMeta>): Route {
@@ -186,6 +328,7 @@ export class RrrApp extends HTMLElement {
           <a class="${this.linkClass('history', route.name)}" href="#/history">${t('app.nav.history')}</a>
           <a class="${this.linkClass('import-export', route.name)}" href="#/import-export">${t('app.nav.importExport')}</a>
           ${this.styleguideEnabled ? `<a class="${this.linkClass('styleguide', route.name)}" href="#/styleguide">${t('app.nav.styleguide')}</a>` : ''}
+          ${this.renderThemeControls()}
           ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="secondary" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
         </nav>
         <main>

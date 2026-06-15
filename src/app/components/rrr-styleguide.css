@@ -60,9 +60,19 @@
   border-color: var(--rrr-colors-context-info-70);
 }
 
+.sg-button--tone-info.sg-button--solid:hover {
+  background: var(--rrr-colors-context-info-70);
+  border-color: var(--rrr-colors-context-info-80);
+}
+
 .sg-button--tone-success.sg-button--solid {
   background: var(--rrr-colors-context-success-60);
   border-color: var(--rrr-colors-context-success-70);
+}
+
+.sg-button--tone-success.sg-button--solid:hover {
+  background: var(--rrr-colors-context-success-70);
+  border-color: var(--rrr-colors-context-success-80);
 }
 
 .sg-button--tone-warning.sg-button--solid {
@@ -70,14 +80,30 @@
   border-color: var(--rrr-colors-context-warning-70);
 }
 
+.sg-button--tone-warning.sg-button--solid:hover {
+  background: var(--rrr-colors-context-warning-70);
+  border-color: var(--rrr-colors-context-warning-80);
+}
+
 .sg-button--tone-danger.sg-button--solid {
   background: var(--rrr-colors-context-danger-60);
   border-color: var(--rrr-colors-context-danger-70);
 }
 
+.sg-button--tone-danger.sg-button--solid:hover {
+  background: var(--rrr-colors-context-danger-70);
+  border-color: var(--rrr-colors-context-danger-80);
+}
+
 .sg-button--tone-neutral.sg-button--outline {
   color: var(--rrr-colors-grayscale-90);
   border-color: var(--rrr-colors-grayscale-40);
+}
+
+.sg-button--tone-neutral.sg-button--outline:hover {
+  color: var(--rrr-colors-grayscale-100);
+  border-color: var(--rrr-colors-grayscale-50);
+  background: var(--rrr-colors-grayscale-20);
 }
 
 .sg-button--tone-accent.sg-button--ghost {
@@ -86,10 +112,22 @@
   background: var(--rrr-colors-serene-mint-10);
 }
 
+.sg-button--tone-accent.sg-button--ghost:hover {
+  color: var(--rrr-colors-serene-mint-90);
+  border-color: var(--rrr-colors-serene-mint-30);
+  background: var(--rrr-colors-serene-mint-20);
+}
+
 .sg-button--tone-primary.sg-button--ghost {
   color: var(--rrr-colors-activity-indigo-80);
   border-color: var(--rrr-colors-activity-indigo-20);
   background: var(--rrr-colors-activity-indigo-10);
+}
+
+.sg-button--tone-primary.sg-button--ghost:hover {
+  color: var(--rrr-colors-activity-indigo-90);
+  border-color: var(--rrr-colors-activity-indigo-30);
+  background: var(--rrr-colors-activity-indigo-20);
 }
 
 .sg-button:hover {
