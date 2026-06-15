@@ -253,16 +253,6 @@
   color: var(--rrr-colors-activity-indigo-70);
 }
 
-.sg-icon-btn rrr-icon {
-  font-size: 1.375rem;
-}
-
-.sg-icon-btn::part(button) {
-  /* 9px matches the height of a standard text button (8px padding + 1.5 line-height at 16px) with a 1.375rem icon */
-  padding: 9px;
-  line-height: 0;
-}
-
 .scale-groups {
   display: grid;
   gap: var(--rrr-spacing-l);

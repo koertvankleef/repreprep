@@ -85,7 +85,6 @@ nav a.active {
 
 .nav-control-group rrr-button::part(button) {
   padding: 9px;
-  line-height: 0;
   border-radius: var(--rrr-radius-m);
 }
 

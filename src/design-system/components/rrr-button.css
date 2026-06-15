@@ -54,7 +54,7 @@
 }
 
 button {
-  font-family: inherit;
+  font: inherit;
   border-radius: var(--rrr-button-radius);
   border: var(--rrr-button-border-width) solid var(--_bg);
   padding: var(--rrr-button-padding);
@@ -62,7 +62,9 @@ button {
   background: var(--_bg);
   color: var(--_fg);
   box-shadow: var(--rrr-button-shadow);
-  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rrr-spacing-s);
   transition: background var(--rrr-button-transition), border-color var(--rrr-button-transition), color var(--rrr-button-transition), box-shadow var(--rrr-button-transition), transform var(--rrr-button-transition);
 }
 
@@ -111,4 +113,8 @@ button:disabled {
   border-color: var(--rrr-button-disabled-border-color);
   color: var(--rrr-button-disabled-color);
   box-shadow: none;
+}
+
+::slotted(rrr-icon) {
+  font-size: 1.25em;
 }
