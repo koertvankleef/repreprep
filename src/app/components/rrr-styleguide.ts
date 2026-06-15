@@ -377,6 +377,7 @@ export class RrrStyleguide extends HTMLElement {
                 <rrr-button type="button" variant="ghost" tone="accent">ghost accent</rrr-button>
                 <rrr-button type="button" variant="ghost" tone="warning">ghost warning</rrr-button>
                 <rrr-button type="button" variant="ghost" tone="danger">ghost danger</rrr-button>
+                <rrr-button class="sg-icon-btn" type="button" variant="ghost" tone="primary" aria-label="icon only ghost button" title="icon only ghost button"><rrr-icon name="settings"></rrr-icon></rrr-button>
               </div>
               <div class="button-row role-row">
                 <button class="sg-button sg-button--solid sg-button--tone-info" type="button">${t('styleguide.toasts.trigger.info')}</button>
