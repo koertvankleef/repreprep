@@ -86,7 +86,7 @@ export class RrrWorkoutEditor extends HTMLElement {
       return
     }
 
-    const dateField = this.querySelector<HTMLInputElement>('input[name="date"]')
+    const dateField = this.querySelector<HTMLInputElement>('rrr-input[name="date"]')
     const notesField = this.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')
 
     this.workout = {
@@ -122,15 +122,15 @@ export class RrrWorkoutEditor extends HTMLElement {
     this.updateWorkoutFields()
 
     if (!this.workout || !this.workout.date.trim()) {
-      const dateField = this.querySelector<HTMLInputElement>('input[name="date"]')
+      const dateField = this.querySelector<HTMLElement>('rrr-input[name="date"]')
 
       if (dateField) {
-        dateField.setAttribute('aria-invalid', 'true')
+        dateField.setAttribute('invalid', '')
       }
 
       this.setStatus(t('workout.validation.dateRequired'), 'error')
       this.render()
-      this.querySelector<HTMLInputElement>('input[name="date"]')?.focus()
+      this.querySelector<HTMLElement>('rrr-input[name="date"]')?.focus()
       return
     }
 
@@ -200,10 +200,7 @@ export class RrrWorkoutEditor extends HTMLElement {
           </div>
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('workout.status.default')}</p>
           <div class="row">
-            <label>
-              ${t('field.date')}
-              <input class="field-input" name="date" type="date" />
-            </label>
+            <rrr-input label="${t('field.date')}" name="date" type="date"></rrr-input>
             <label>
               ${t('workout.form.notes')}
               <textarea class="field-textarea" name="notes" rows="3" placeholder="${t('workout.form.notes.placeholder')}"></textarea>
@@ -230,13 +227,13 @@ export class RrrWorkoutEditor extends HTMLElement {
       </section>
     `
 
-    const dateField = this.querySelector<HTMLInputElement>('input[name="date"]')
+    const dateField = this.querySelector<HTMLElement>('rrr-input[name="date"]')
     const notesField = this.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')
     const exerciseField = this.querySelector<HTMLSelectElement>('select[name="exercise"]')
 
     if (dateField) {
-      dateField.value = this.workout.date
-      dateField.removeAttribute('aria-invalid')
+      dateField.setAttribute('value', this.workout.date)
+      dateField.removeAttribute('invalid')
     }
 
     if (notesField) {
@@ -249,7 +246,7 @@ export class RrrWorkoutEditor extends HTMLElement {
 
     this.renderExerciseEntries(activeExercises)
 
-    this.querySelector<HTMLInputElement>('input[name="date"]')?.addEventListener('input', () => {
+    this.querySelector<HTMLElement>('rrr-input[name="date"]')?.addEventListener('input', () => {
       this.updateWorkoutFields()
     })
 

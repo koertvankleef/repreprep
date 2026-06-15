@@ -26,19 +26,19 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private addExercise(): void {
-    const nameField = this.querySelector<HTMLInputElement>('input[name="name"]')
+    const nameField = this.querySelector<HTMLElement>('rrr-input[name="name"]')
     const kindField = this.querySelector<HTMLSelectElement>('select[name="kind"]')
 
     if (!nameField || !kindField) {
       return
     }
 
-    const name = nameField.value.trim()
+    const name = (nameField as HTMLInputElement).value.trim()
     const kind = kindField.value === 'duration' ? 'duration' : 'reps-weight'
 
     if (!name) {
       this.setStatus(t('exercise.validation.nameRequired'), 'error')
-      nameField.setAttribute('aria-invalid', 'true')
+      nameField.setAttribute('invalid', '')
       nameField.focus()
       return
     }
@@ -145,10 +145,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
           </div>
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('exercise.status.default')}</p>
           <div class="form">
-            <label>
-              ${t('field.name')}
-              <input name="name" type="text" placeholder="${t('exercise.form.name.placeholder')}" autocomplete="off" />
-            </label>
+            <rrr-input label="${t('field.name')}" name="name" placeholder="${t('exercise.form.name.placeholder')}"></rrr-input>
             <label>
               ${t('exercise.form.kind.label')}
               <select name="kind">
@@ -172,12 +169,12 @@ export class RrrExerciseCatalogue extends HTMLElement {
       </section>
     `
 
-    const nameField = this.querySelector<HTMLInputElement>('input[name="name"]')
+    const nameField = this.querySelector<HTMLElement>('rrr-input[name="name"]')
     const kindField = this.querySelector<HTMLSelectElement>('select[name="kind"]')
 
     if (nameField) {
-      nameField.value = ''
-      nameField.removeAttribute('aria-invalid')
+      nameField.setAttribute('value', '')
+      nameField.removeAttribute('invalid')
     }
 
     if (kindField) {

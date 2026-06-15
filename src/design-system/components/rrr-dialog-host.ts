@@ -4,6 +4,10 @@ import styles from './rrr-dialog-host.css?inline'
 
 type DialogMode = 'confirm' | 'prompt' | null
 
+type PromptFieldElement = HTMLElement & {
+  value: string
+}
+
 export class RrrDialogHost extends HTMLElement {
   private mode: DialogMode = null
   private dialogTitle = ''
@@ -63,7 +67,7 @@ export class RrrDialogHost extends HTMLElement {
 
     const field = this.getPromptField()
     if (field) {
-      field.value = this.value
+      field.setAttribute('value', this.value)
     }
 
     return new Promise<string | null>((resolve) => {
@@ -93,8 +97,8 @@ export class RrrDialogHost extends HTMLElement {
     return this.querySelector<HTMLDialogElement>('dialog')
   }
 
-  private getPromptField(): HTMLInputElement | null {
-    return this.querySelector<HTMLInputElement>('input[name="dialog-prompt"]')
+  private getPromptField(): PromptFieldElement | null {
+    return this.querySelector<PromptFieldElement>('rrr-input[name="dialog-prompt"]')
   }
 
   private closeWith(result: boolean | string | null): void {
@@ -124,37 +128,33 @@ export class RrrDialogHost extends HTMLElement {
 
     if (this.required && !value) {
       this.inputError = t('dialog.validation.required')
-      field.setAttribute('aria-invalid', 'true')
-      this.renderValidationState()
+      field.setAttribute('invalid', '')
+      field.setAttribute('error-text', this.inputError)
       field.focus()
       return
     }
 
-    field.removeAttribute('aria-invalid')
+    field.removeAttribute('invalid')
+    field.removeAttribute('error-text')
     this.closeWith(value)
-  }
-
-  private renderValidationState(): void {
-    const error = this.querySelector<HTMLElement>('[data-role="dialog-error"]')
-
-    if (error) {
-      error.textContent = this.inputError
-    }
   }
 
   private render(): void {
     const titleId = 'rrr-dialog-title'
     const messageId = 'rrr-dialog-message'
-    const promptId = 'rrr-dialog-prompt'
-    const errorId = 'rrr-dialog-error'
 
     const promptContent =
       this.mode === 'prompt'
         ? `
           <div class="dialog-field">
-            <label for="${promptId}">${escapeHtml(this.label)}</label>
-            <input id="${promptId}" name="dialog-prompt" type="text" value="${escapeHtml(this.value)}" aria-describedby="${errorId}" />
-            <p class="dialog-error" id="${errorId}" data-role="dialog-error" role="alert">${escapeHtml(this.inputError)}</p>
+            <rrr-input
+              name="dialog-prompt"
+              label="${escapeHtml(this.label)}"
+              value="${escapeHtml(this.value)}"
+              ${this.required ? 'required' : ''}
+              ${this.inputError ? 'invalid' : ''}
+              error-text="${escapeHtml(this.inputError)}"
+            ></rrr-input>
           </div>
         `
         : ''
@@ -195,8 +195,8 @@ export class RrrDialogHost extends HTMLElement {
       }
 
       this.inputError = ''
-      this.renderValidationState()
-      this.getPromptField()?.removeAttribute('aria-invalid')
+      this.getPromptField()?.removeAttribute('invalid')
+      this.getPromptField()?.removeAttribute('error-text')
     })
   }
 }

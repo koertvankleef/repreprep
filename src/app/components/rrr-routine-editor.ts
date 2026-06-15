@@ -143,7 +143,7 @@ export class RrrRoutineEditor extends HTMLElement {
   }
 
   private readFields(): void {
-    const nameInput = this.querySelector<HTMLInputElement>('input[name="routine-name"]')
+    const nameInput = this.querySelector<HTMLInputElement>('rrr-input[name="routine-name"]')
 
     if (nameInput) {
       this.name = nameInput.value
@@ -261,7 +261,7 @@ export class RrrRoutineEditor extends HTMLElement {
     if (!this.name.trim()) {
       this.setStatus(t('routineEditor.status.nameRequired'), 'error')
       this.render()
-      this.querySelector<HTMLInputElement>('input[name="routine-name"]')?.focus()
+      this.querySelector<HTMLElement>('rrr-input[name="routine-name"]')?.focus()
       return
     }
 
@@ -395,7 +395,7 @@ export class RrrRoutineEditor extends HTMLElement {
           <div class="row">
             <label>
               ${t('field.name')}
-              <input class="field-input" name="routine-name" type="text" placeholder="${t('routineEditor.field.name.placeholder')}" autocomplete="off" />
+              <rrr-input label="${t('field.name')}" name="routine-name" placeholder="${t('routineEditor.field.name.placeholder')}"></rrr-input>
             </label>
           </div>
           <div>
@@ -420,11 +420,11 @@ export class RrrRoutineEditor extends HTMLElement {
       </section>
     `
 
-    const nameField = this.querySelector<HTMLInputElement>('input[name="routine-name"]')
+    const nameField = this.querySelector<HTMLElement>('rrr-input[name="routine-name"]')
     const exerciseField = this.querySelector<HTMLSelectElement>('select[name="add-exercise"]')
 
     if (nameField) {
-      nameField.value = this.name
+      nameField.setAttribute('value', this.name)
     }
 
     if (exerciseField) {
