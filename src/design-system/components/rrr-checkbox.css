@@ -13,6 +13,10 @@ label {
   gap: var(--rrr-checkbox-label-gap);
 }
 
+:host([invalid]) label {
+  color: var(--rrr-checkbox-error-color);
+}
+
 input[type="checkbox"] {
   width: 1rem;
   height: 1rem;
@@ -21,6 +25,13 @@ input[type="checkbox"] {
 
 .error {
   color: var(--rrr-checkbox-error-color);
+  font-size: var(--rrr-font-size-xs);
+  line-height: 1.4;
   margin: 0;
-  min-height: 1.25rem;
+  min-height: calc(var(--rrr-font-size-xs) * 1.4);
+  visibility: hidden;
+}
+
+.error:not(:empty) {
+  visibility: visible;
 }

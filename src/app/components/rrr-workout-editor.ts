@@ -87,7 +87,7 @@ export class RrrWorkoutEditor extends HTMLElement {
     }
 
     const dateField = this.querySelector<HTMLInputElement>('rrr-input[name="date"]')
-    const notesField = this.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')
+    const notesField = this.querySelector<HTMLElement & { value: string }>('rrr-textarea[name="notes"]')
 
     this.workout = {
       ...this.workout,
@@ -102,7 +102,7 @@ export class RrrWorkoutEditor extends HTMLElement {
       return
     }
 
-    const select = this.querySelector<HTMLSelectElement>('select[name="exercise"]')
+    const select = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="exercise"]')
     const exerciseId = String(select?.value ?? '')
 
     if (!exerciseId) {
@@ -201,22 +201,16 @@ export class RrrWorkoutEditor extends HTMLElement {
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('workout.status.default')}</p>
           <div class="row">
             <rrr-input label="${t('field.date')}" name="date" type="date"></rrr-input>
-            <label>
-              ${t('workout.form.notes')}
-              <textarea class="field-textarea" name="notes" rows="3" placeholder="${t('workout.form.notes.placeholder')}"></textarea>
-            </label>
+            <rrr-textarea label="${t('workout.form.notes')}" name="notes" rows="3" placeholder="${t('workout.form.notes.placeholder')}"></rrr-textarea>
           </div>
           <div>
             <h3>${t('workout.section.exercises')}</h3>
             <div class="entries" aria-live="polite"></div>
           </div>
           <div class="row">
-            <label>
-              ${t('label.addExercise')}
-              <select class="field-select" name="exercise">
-                ${activeExercises.map((exercise) => `<option value="${exercise.id}">${exercise.name}</option>`).join('')}
-              </select>
-            </label>
+            <rrr-select label="${t('label.addExercise')}" name="exercise">
+              ${activeExercises.map((exercise) => `<option value="${exercise.id}">${exercise.name}</option>`).join('')}
+            </rrr-select>
           </div>
           <div class="actions">
             <rrr-button type="button" data-action="add-exercise" ${activeExercises.length === 0 ? 'disabled' : ''}>${t('action.add')}</rrr-button>
@@ -228,8 +222,8 @@ export class RrrWorkoutEditor extends HTMLElement {
     `
 
     const dateField = this.querySelector<HTMLElement>('rrr-input[name="date"]')
-    const notesField = this.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')
-    const exerciseField = this.querySelector<HTMLSelectElement>('select[name="exercise"]')
+    const notesField = this.querySelector<HTMLElement & { value: string }>('rrr-textarea[name="notes"]')
+    const exerciseField = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="exercise"]')
 
     if (dateField) {
       dateField.setAttribute('value', this.workout.date)
@@ -237,11 +231,11 @@ export class RrrWorkoutEditor extends HTMLElement {
     }
 
     if (notesField) {
-      notesField.value = this.workout.notes
+      notesField.setAttribute('value', this.workout.notes)
     }
 
     if (exerciseField) {
-      exerciseField.value = activeExercises[0]?.id ?? ''
+      exerciseField.setAttribute('value', activeExercises[0]?.id ?? '')
     }
 
     this.renderExerciseEntries(activeExercises)
@@ -250,7 +244,7 @@ export class RrrWorkoutEditor extends HTMLElement {
       this.updateWorkoutFields()
     })
 
-    this.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')?.addEventListener('input', () => {
+    this.querySelector<HTMLElement>('rrr-textarea[name="notes"]')?.addEventListener('input', () => {
       this.updateWorkoutFields()
     })
 

@@ -138,10 +138,7 @@ export class RrrExerciseEntry extends HTMLElement {
           </div>
           <rrr-button type="button" variant="ghost" tone="danger" data-action="remove-exercise" aria-label="${escapeHtml(t('exerciseEntry.action.removeExerciseAria', { name: exerciseName }))}"><rrr-icon name="delete"></rrr-icon></rrr-button>
         </div>
-        <label>
-          ${t('exerciseEntry.field.notes')}
-          <textarea rows="2" name="notes" placeholder="${t('exerciseEntry.field.notes.placeholder')}">${this.entryValue.notes}</textarea>
-        </label>
+        <rrr-textarea label="${t('exerciseEntry.field.notes')}" rows="2" name="notes" placeholder="${t('exerciseEntry.field.notes.placeholder')}" value="${escapeHtml(this.entryValue.notes)}"></rrr-textarea>
         <div class="sets" aria-live="polite"></div>
         <div class="footer">
           <rrr-button type="button" data-action="add-set" aria-label="${escapeHtml(t('exerciseEntry.action.addSetAria', { name: exerciseName }))}">${t('exerciseEntry.action.addSet')}</rrr-button>
@@ -149,8 +146,8 @@ export class RrrExerciseEntry extends HTMLElement {
       </section>
     `
 
-    this.shadowRoot.querySelector<HTMLTextAreaElement>('textarea[name="notes"]')?.addEventListener('input', (event) => {
-      const target = event.currentTarget as HTMLTextAreaElement
+    this.shadowRoot.querySelector<HTMLElement & { value: string }>('rrr-textarea[name="notes"]')?.addEventListener('input', (event) => {
+      const target = event.currentTarget as HTMLElement & { value: string }
 
       if (!this.entryValue) {
         return

@@ -1,0 +1,87 @@
+:host {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--rrr-textarea-gap);
+  --rrr-textarea-gap: var(--rrr-spacing-xs);
+  --rrr-textarea-label-color: var(--rrr-colors-grayscale-90);
+  --rrr-textarea-label-font-weight: var(--rrr-font-weight-semibold);
+  --rrr-textarea-padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
+  --rrr-textarea-border-width: var(--rrr-border-width);
+  --rrr-textarea-border-color: var(--rrr-colors-grayscale-40);
+  --rrr-textarea-border-radius: var(--rrr-radius-s);
+  --rrr-textarea-background: var(--rrr-colors-grayscale-00);
+  --rrr-textarea-color: var(--rrr-colors-grayscale-100);
+  --rrr-textarea-transition: var(--rrr-default-transition);
+  --rrr-textarea-placeholder-color: var(--rrr-colors-grayscale-60);
+  --rrr-textarea-hover-border-color: var(--rrr-colors-activity-indigo-30);
+  --rrr-textarea-focus-border-color: var(--rrr-colors-activity-indigo-50);
+  --rrr-textarea-focus-outline-width: var(--global-focus-ring-width);
+  --rrr-textarea-focus-outline-color: var(--global-focus-ring-color);
+  --rrr-textarea-focus-outline-offset: var(--global-focus-ring-offset);
+  --rrr-textarea-focus-shadow: 0 0 0 4px var(--rrr-colors-activity-indigo-10);
+  --rrr-textarea-invalid-border-color: var(--rrr-colors-context-danger-50);
+  --rrr-textarea-invalid-background: var(--rrr-colors-context-danger-10);
+  --rrr-textarea-invalid-focus-shadow: 0 0 0 4px var(--rrr-colors-context-danger-10);
+  --rrr-textarea-error-color: var(--rrr-colors-context-danger-70);
+}
+
+label {
+  display: block;
+  color: var(--rrr-textarea-label-color);
+  font-weight: var(--rrr-textarea-label-font-weight);
+}
+
+:host([invalid]) label {
+  color: var(--rrr-textarea-error-color);
+}
+
+textarea {
+  width: 100%;
+  min-inline-size: 0;
+  box-sizing: border-box;
+  padding: var(--rrr-textarea-padding);
+  border: var(--rrr-textarea-border-width) solid var(--rrr-textarea-border-color);
+  border-radius: var(--rrr-textarea-border-radius);
+  background: var(--rrr-textarea-background);
+  color: var(--rrr-textarea-color);
+  font: inherit;
+  resize: vertical;
+  transition: border-color var(--rrr-textarea-transition), box-shadow var(--rrr-textarea-transition), background var(--rrr-textarea-transition);
+}
+
+textarea::placeholder {
+  color: var(--rrr-textarea-placeholder-color);
+}
+
+textarea:hover {
+  border-color: var(--rrr-textarea-hover-border-color);
+}
+
+textarea:focus-visible {
+  border-color: var(--rrr-textarea-focus-border-color);
+  outline: var(--rrr-textarea-focus-outline-width) solid var(--rrr-textarea-focus-outline-color);
+  outline-offset: var(--rrr-textarea-focus-outline-offset);
+  box-shadow: var(--rrr-textarea-focus-shadow);
+}
+
+textarea[aria-invalid="true"] {
+  border-color: var(--rrr-textarea-invalid-border-color);
+  background: var(--rrr-textarea-invalid-background);
+}
+
+textarea[aria-invalid="true"]:focus-visible {
+  box-shadow: var(--rrr-textarea-invalid-focus-shadow);
+}
+
+.error {
+  color: var(--rrr-textarea-error-color);
+  font-size: var(--rrr-font-size-xs);
+  line-height: 1.4;
+  margin: 0;
+  min-height: calc(var(--rrr-font-size-xs) * 1.4);
+  visibility: hidden;
+}
+
+.error:not(:empty) {
+  visibility: visible;
+}

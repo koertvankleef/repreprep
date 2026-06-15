@@ -402,10 +402,20 @@ export class RrrStyleguide extends HTMLElement {
                 <div class="component-column">
                   <rrr-input label="${t('field.name')}" name="sample-name" placeholder="${t('exercise.form.name.placeholder')}" value="Bench Press"></rrr-input>
                   <rrr-input label="${t('field.date')}" type="date" name="sample-date" value="2026-06-14"></rrr-input>
+                  <rrr-select label="${t('exercise.form.kind.label')}" name="sample-kind" value="reps-weight">
+                    <option value="reps-weight">${t('exercise.form.kind.repsWeight')}</option>
+                    <option value="duration">${t('exercise.form.kind.duration')}</option>
+                  </rrr-select>
+                  <rrr-textarea label="${t('workout.form.notes')}" name="sample-notes" rows="3" placeholder="${t('workout.form.notes.placeholder')}" value="Focus on controlled tempo and full range of motion."></rrr-textarea>
                 </div>
                 <div class="component-column">
                   <rrr-input label="${t('styleguide.invalidExample')}" invalid error-text="${t('dialog.validation.required')}" value=""></rrr-input>
                   <rrr-input label="${t('styleguide.disabledExample')}" disabled value="${t('action.save')}"></rrr-input>
+                  <rrr-select label="${t('styleguide.disabledExample')}" name="sample-kind-disabled" value="duration" disabled>
+                    <option value="reps-weight">${t('exercise.form.kind.repsWeight')}</option>
+                    <option value="duration">${t('exercise.form.kind.duration')}</option>
+                  </rrr-select>
+                  <rrr-textarea label="${t('styleguide.invalidExample')}" invalid error-text="${t('dialog.validation.required')}" rows="3" value=""></rrr-textarea>
                 </div>
               </div>
             </div>

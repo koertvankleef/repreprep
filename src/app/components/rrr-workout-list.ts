@@ -90,17 +90,14 @@ export class RrrWorkoutList extends HTMLElement {
               ? `<rrr-button type="button" data-action="create-routine">${t('workoutList.createRoutine')}</rrr-button>`
               : `
                 <div class="start-panel">
-                  <label>
-                    ${t('workoutList.routineLabel')}
-                    <select name="routine">
-                      ${routines
-                        .map(
-                          (routine) =>
-                            `<option value="${routine.id}" ${routine.id === this.selectedRoutineId ? 'selected' : ''}>${routine.name}</option>`,
-                        )
-                        .join('')}
-                    </select>
-                  </label>
+                  <rrr-select label="${t('workoutList.routineLabel')}" name="routine" value="${this.selectedRoutineId ?? ''}">
+                    ${routines
+                      .map(
+                        (routine) =>
+                          `<option value="${routine.id}">${routine.name}</option>`,
+                      )
+                      .join('')}
+                  </rrr-select>
                   <rrr-button type="button" data-action="start">${t('workoutList.startWorkout')}</rrr-button>
                 </div>
               `
@@ -141,8 +138,8 @@ export class RrrWorkoutList extends HTMLElement {
       window.location.hash = '#/routines/new'
     })
 
-    this.querySelector<HTMLSelectElement>('select[name="routine"]')?.addEventListener('change', (event) => {
-      const target = event.currentTarget as HTMLSelectElement
+    this.querySelector<HTMLElement & { value: string }>('rrr-select[name="routine"]')?.addEventListener('change', (event) => {
+      const target = event.currentTarget as HTMLElement & { value: string }
       this.selectedRoutineId = target.value
     })
 

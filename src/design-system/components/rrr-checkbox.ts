@@ -10,7 +10,7 @@ template.innerHTML = `
     <input part="input" type="checkbox" />
     <span part="text"><slot></slot></span>
   </label>
-  <p class="error" part="error" hidden></p>
+  <p class="error" part="error"></p>
 `
 
 export class RrrCheckbox extends HTMLElement {
@@ -79,13 +79,11 @@ export class RrrCheckbox extends HTMLElement {
     if (isInvalid && errorText) {
       this.checkbox.setAttribute('aria-invalid', 'true')
       this.error.textContent = errorText
-      this.error.hidden = false
       return
     }
 
     this.checkbox.removeAttribute('aria-invalid')
     this.error.textContent = ''
-    this.error.hidden = true
   }
 }
 

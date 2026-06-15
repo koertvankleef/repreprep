@@ -7,10 +7,3 @@ rrr-workout-editor {
   gap: var(--rrr-workout-editor-entries-gap);
 }
 
-.field-input,
-.field-textarea,
-.field-select {
-  display: block;
-  width: 100%;
-}
-

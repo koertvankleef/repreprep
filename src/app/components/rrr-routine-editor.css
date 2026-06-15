@@ -71,13 +71,7 @@ rrr-routine-editor {
   align-items: flex-end;
 }
 
-.add-exercise-row label {
+.add-exercise-row rrr-select {
   flex: 1;
   min-width: 12rem;
-}
-
-.field-input,
-.field-select {
-  display: block;
-  width: 100%;
 }

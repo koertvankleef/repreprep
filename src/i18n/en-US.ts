@@ -74,7 +74,7 @@ export const enUsMessages = {
   'styleguide.localOnly': 'This page is only available when the app runs locally.',
   'styleguide.localeInfo': 'Browser locale: {browserLocale}. Active locale: {activeLocale}.',
   'styleguide.section.buttons': 'Buttons',
-  'styleguide.section.inputs': 'Inputs',
+  'styleguide.section.inputs': 'Form Elements',
   'styleguide.section.icons': 'Icons',
   'styleguide.section.checkboxes': 'Checkboxes',
   'styleguide.section.toasts': 'Toasts',

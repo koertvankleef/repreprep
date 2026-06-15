@@ -31,6 +31,10 @@ label {
   font-weight: var(--rrr-input-label-font-weight);
 }
 
+:host([invalid]) label {
+  color: var(--rrr-input-error-color);
+}
+
 input {
   width: 100%;
   min-inline-size: 0;
@@ -70,6 +74,13 @@ input[aria-invalid="true"]:focus-visible {
 
 .error {
   color: var(--rrr-input-error-color);
+  font-size: var(--rrr-font-size-xs);
+  line-height: 1.4;
   margin: 0;
-  min-height: 1.25rem;
+  min-height: calc(var(--rrr-font-size-xs) * 1.4);
+  visibility: hidden;
+}
+
+.error:not(:empty) {
+  visibility: visible;
 }

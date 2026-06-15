@@ -74,7 +74,7 @@ export const nlNlMessages = {
   'styleguide.localOnly': 'Deze pagina is alleen beschikbaar wanneer de app lokaal draait.',
   'styleguide.localeInfo': 'Browsertaal: {browserLocale}. Actieve taal: {activeLocale}.',
   'styleguide.section.buttons': 'Knoppen',
-  'styleguide.section.inputs': 'Invoervelden',
+  'styleguide.section.inputs': 'Formulierelementen',
   'styleguide.section.icons': 'Iconen',
   'styleguide.section.checkboxes': 'Selectievakjes',
   'styleguide.section.toasts': 'Toasts',

@@ -1,0 +1,101 @@
+:host {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--rrr-select-gap);
+  --rrr-select-gap: var(--rrr-spacing-xs);
+  --rrr-select-label-color: var(--rrr-colors-grayscale-90);
+  --rrr-select-label-font-weight: var(--rrr-font-weight-semibold);
+  --rrr-select-padding: var(--rrr-spacing-s) calc(var(--rrr-spacing-l) + 1.25rem) var(--rrr-spacing-s) var(--rrr-spacing-l);
+  --rrr-select-border-width: var(--rrr-border-width);
+  --rrr-select-border-color: var(--rrr-colors-grayscale-40);
+  --rrr-select-border-radius: var(--rrr-radius-s);
+  --rrr-select-background: var(--rrr-colors-grayscale-00);
+  --rrr-select-color: var(--rrr-colors-grayscale-100);
+  --rrr-select-transition: var(--rrr-default-transition);
+  --rrr-select-hover-border-color: var(--rrr-colors-activity-indigo-30);
+  --rrr-select-focus-border-color: var(--rrr-colors-activity-indigo-50);
+  --rrr-select-focus-outline-width: var(--global-focus-ring-width);
+  --rrr-select-focus-outline-color: var(--global-focus-ring-color);
+  --rrr-select-focus-outline-offset: var(--global-focus-ring-offset);
+  --rrr-select-focus-shadow: 0 0 0 4px var(--rrr-colors-activity-indigo-10);
+  --rrr-select-invalid-border-color: var(--rrr-colors-context-danger-50);
+  --rrr-select-invalid-background: var(--rrr-colors-context-danger-10);
+  --rrr-select-invalid-focus-shadow: 0 0 0 4px var(--rrr-colors-context-danger-10);
+  --rrr-select-error-color: var(--rrr-colors-context-danger-70);
+}
+
+label {
+  display: block;
+  color: var(--rrr-select-label-color);
+  font-weight: var(--rrr-select-label-font-weight);
+}
+
+:host([invalid]) label {
+  color: var(--rrr-select-error-color);
+}
+
+.select-shell {
+  position: relative;
+}
+
+.select-shell::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: var(--rrr-spacing-l);
+  inset-block-start: 50%;
+  inline-size: 0.625rem;
+  block-size: 0.625rem;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  color: var(--rrr-select-color);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+select {
+  width: 100%;
+  min-inline-size: 0;
+  box-sizing: border-box;
+  padding: var(--rrr-select-padding);
+  border: var(--rrr-select-border-width) solid var(--rrr-select-border-color);
+  border-radius: var(--rrr-select-border-radius);
+  background: var(--rrr-select-background);
+  color: var(--rrr-select-color);
+  font: inherit;
+  appearance: none;
+  transition: border-color var(--rrr-select-transition), box-shadow var(--rrr-select-transition), background var(--rrr-select-transition);
+}
+
+select:hover {
+  border-color: var(--rrr-select-hover-border-color);
+}
+
+select:focus-visible {
+  border-color: var(--rrr-select-focus-border-color);
+  outline: var(--rrr-select-focus-outline-width) solid var(--rrr-select-focus-outline-color);
+  outline-offset: var(--rrr-select-focus-outline-offset);
+  box-shadow: var(--rrr-select-focus-shadow);
+}
+
+select[aria-invalid="true"] {
+  border-color: var(--rrr-select-invalid-border-color);
+  background: var(--rrr-select-invalid-background);
+}
+
+select[aria-invalid="true"]:focus-visible {
+  box-shadow: var(--rrr-select-invalid-focus-shadow);
+}
+
+.error {
+  color: var(--rrr-select-error-color);
+  font-size: var(--rrr-font-size-xs);
+  line-height: 1.4;
+  margin: 0;
+  min-height: calc(var(--rrr-font-size-xs) * 1.4);
+  visibility: hidden;
+}
+
+.error:not(:empty) {
+  visibility: visible;
+}

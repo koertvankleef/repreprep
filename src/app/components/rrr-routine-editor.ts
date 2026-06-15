@@ -183,7 +183,7 @@ export class RrrRoutineEditor extends HTMLElement {
   private addExercise(): void {
     this.readFields()
 
-    const select = this.querySelector<HTMLSelectElement>('select[name="add-exercise"]')
+    const select = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="add-exercise"]')
     const exerciseId = String(select?.value ?? '')
 
     if (!exerciseId) {
@@ -393,22 +393,16 @@ export class RrrRoutineEditor extends HTMLElement {
           </div>
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('routineEditor.status.default')}</p>
           <div class="row">
-            <label>
-              ${t('field.name')}
-              <rrr-input label="${t('field.name')}" name="routine-name" placeholder="${t('routineEditor.field.name.placeholder')}"></rrr-input>
-            </label>
+            <rrr-input label="${t('field.name')}" name="routine-name" placeholder="${t('routineEditor.field.name.placeholder')}"></rrr-input>
           </div>
           <div>
             <h3>${t('routineEditor.section.exercises')}</h3>
             <div class="exercise-list" aria-live="polite">${exerciseListHtml}</div>
           </div>
           <div class="add-exercise-row">
-            <label>
-              ${t('label.addExercise')}
-              <select class="field-select" name="add-exercise">
-                ${activeExercises.map((e) => `<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('')}
-              </select>
-            </label>
+            <rrr-select label="${t('label.addExercise')}" name="add-exercise">
+              ${activeExercises.map((e) => `<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('')}
+            </rrr-select>
             <rrr-button type="button" data-action="add-exercise">${t('action.add')}</rrr-button>
           </div>
           <div class="actions">
@@ -421,14 +415,14 @@ export class RrrRoutineEditor extends HTMLElement {
     `
 
     const nameField = this.querySelector<HTMLElement>('rrr-input[name="routine-name"]')
-    const exerciseField = this.querySelector<HTMLSelectElement>('select[name="add-exercise"]')
+    const exerciseField = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="add-exercise"]')
 
     if (nameField) {
       nameField.setAttribute('value', this.name)
     }
 
     if (exerciseField) {
-      exerciseField.value = activeExercises[0]?.id ?? ''
+      exerciseField.setAttribute('value', activeExercises[0]?.id ?? '')
     }
   }
 }

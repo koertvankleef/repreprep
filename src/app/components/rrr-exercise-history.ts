@@ -115,17 +115,14 @@ export class RrrExerciseHistory extends HTMLElement {
             exercises.length === 0
               ? `<p>${t('history.empty.addExercise')}</p>`
               : `
-                <label>
-                  ${t('history.field.exercise')}
-                  <select name="exercise">
-                    ${exercises
-                      .map(
-                        (exercise) =>
-                          `<option value="${exercise.id}" ${exercise.id === this.selectedExerciseId ? 'selected' : ''}>${exercise.name}</option>`,
-                      )
-                      .join('')}
-                  </select>
-                </label>
+                <rrr-select label="${t('history.field.exercise')}" name="exercise" value="${this.selectedExerciseId ?? ''}">
+                  ${exercises
+                    .map(
+                      (exercise) =>
+                        `<option value="${exercise.id}">${exercise.name}</option>`,
+                    )
+                    .join('')}
+                </rrr-select>
                 <div role="status" aria-live="polite" aria-atomic="true">${this.renderPersonalRecord()}</div>
                 <div class="history-list" aria-live="polite">${this.renderSets()}</div>
               `
@@ -134,8 +131,8 @@ export class RrrExerciseHistory extends HTMLElement {
       </section>
     `
 
-    this.querySelector<HTMLSelectElement>('select[name="exercise"]')?.addEventListener('change', (event) => {
-      const target = event.currentTarget as HTMLSelectElement
+    this.querySelector<HTMLElement & { value: string }>('rrr-select[name="exercise"]')?.addEventListener('change', (event) => {
+      const target = event.currentTarget as HTMLElement & { value: string }
       this.selectedExerciseId = target.value
       this.render()
     })
