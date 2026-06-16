@@ -17,6 +17,8 @@ tooltipSheet.replaceSync(styles)
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export class RrrTooltip extends HTMLElement {
+  static observedAttributes = ['open']
+
   // ─── Shared singleton state (static) ───────────────────────────────────────
 
   private static activeOwner: RrrTooltip | null = null
@@ -132,6 +134,20 @@ export class RrrTooltip extends HTMLElement {
   connectedCallback(): void {
     this.contentSlot.addEventListener('slotchange', this.onSlotChange)
     this.onSlotChange()
+    if (this.hasAttribute('open')) {
+      this.doShow()
+    }
+  }
+
+  attributeChangedCallback(name: string): void {
+    if (name === 'open') {
+      if (this.hasAttribute('open')) {
+        RrrTooltip.clearTimers()
+        this.doShow()
+      } else if (RrrTooltip.activeOwner === this) {
+        RrrTooltip.hide()
+      }
+    }
   }
 
   disconnectedCallback(): void {

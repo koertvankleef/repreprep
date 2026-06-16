@@ -18,7 +18,7 @@
   color: var(--rrr-colors-grayscale-00);
   border-radius: var(--rrr-radius-s);
   padding: var(--rrr-spacing-xs) var(--rrr-spacing-s);
-  font-size: var(--rrr-font-size-xs);
+  font-size: var(--rrr-font-size-s);
   line-height: 1.4;
   max-inline-size: 20rem;
   box-shadow: var(--rrr-depth-3-shadow);
