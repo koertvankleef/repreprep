@@ -131,6 +131,3 @@ button:disabled {
   box-shadow: none;
 }
 
-::slotted(rrr-icon) {
-  font-size: 1.25em;
-}
