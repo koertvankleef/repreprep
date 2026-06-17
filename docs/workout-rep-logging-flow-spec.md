@@ -57,6 +57,13 @@ Each exercise has a logging type:
 
 The logging type controls interaction model and state machine.
 
+Weight is orthogonal to logging type and may be present with either type.
+
+Examples:
+
+- reps + weight (for example, dumbbell row)
+- time + weight (for example, weighted plank)
+
 ## Interaction Contracts
 
 ### Rep-Based Contract
@@ -287,7 +294,7 @@ type RepSetResult = {
   exerciseId: string
   setIndex: number
   reps: number
-  weight?: number
+  loadKg?: number
   loggedAt: string
   source: 'confirmed-suggested' | 'adjusted-confirmed'
 }
@@ -303,6 +310,7 @@ type TimedSetResult = {
   setIndex: number
   targetDurationSeconds: number
   actualDurationSeconds: number
+  loadKg?: number
   startedAt: string
   completedAt: string
   completionType: 'target-reached' | 'stopped-early' | 'manual-complete'
@@ -404,6 +412,133 @@ Post-MVP candidates:
 - Pause/resume/restart rest variants.
 - Per-set rest customization UX.
 - Rep-set duration tracking.
+
+## Phase 0 Terminology and State Lock
+
+This section locks naming for implementation.
+
+### Canonical terms
+
+- suggested reps: prefilled recommendation shown before confirmation.
+- current reps: editable value currently shown in control.
+- confirmed result: value explicitly logged by user confirmation.
+- grace period: 5-second post-confirmation window before rest starts.
+- rest: timer between completed set and next item focus.
+- auto-advance: move attention to next item without implying start.
+
+### Canonical logging type names
+
+UI and workflow terminology should use:
+
+- reps
+- time
+
+Naming model note:
+
+- Treat reps and time as mutually exclusive set measurement modes in MVP.
+- Treat weight/load as an optional orthogonal attribute.
+
+Future extensibility note:
+
+- Reserve room for additional measurement modes later (for example, distance).
+
+### Canonical state names
+
+Rep flow states:
+
+- rep-ready
+- rep-editing
+- rep-confirmed
+- grace
+- resting
+- completed
+
+Timed flow states:
+
+- timed-ready
+- timed-active
+- timed-completed
+- grace
+- resting
+- completed
+
+### Rename policy
+
+Adopt canonical naming with a big-bang rename.
+
+- No legacy aliasing layer.
+- No transitional state-name mapping retained in code.
+- Existing prototype names are replaced directly during implementation.
+- Persisted domain enum values are also renamed in the same big-bang change.
+- No backward-compatibility layer and no data migration path will be implemented.
+
+Operational note:
+
+- Existing local data may become incompatible after rename.
+- Users are expected to clear browser data/cache before using the updated build.
+
+### Extension seam for future measurement modes
+
+MVP measurement modes are:
+
+- reps
+- time
+
+Design constraint:
+
+- New modes (for example, distance) must be addable without rewriting rep/time flow semantics.
+
+Recommended seam:
+
+- Treat set measurement mode as a discriminant on set config and set result.
+- Keep mode-specific fields inside mode-specific result branches.
+- Keep shared workflow controls (grace, rest, auto-advance, edit policy) mode-agnostic.
+
+Example future shape:
+
+```ts
+type SetMeasurementMode = 'reps' | 'time' | 'distance'
+
+type SetResult =
+  | { mode: 'reps'; reps: number; loadKg?: number }
+  | { mode: 'time'; actualDurationSeconds: number; loadKg?: number }
+  | { mode: 'distance'; meters: number; paceSecondsPerKm?: number; loadKg?: number }
+```
+
+Non-goal for current implementation:
+
+- Do not implement distance now.
+- Do not add UI branching for distance now.
+- Only preserve an architecture seam so future addition is low-risk.
+
+### Event naming lock
+
+Treat these events as canonical behavior boundaries:
+
+- repValueChanged (editing only)
+- repResultConfirmed (logging trigger)
+- gracePeriodStarted
+- gracePeriodCancelled
+- restStarted
+- restCompleted
+- timedSetStarted
+- timedSetCompleted
+
+### Minimum rule lock
+
+For rep sets, logging must be triggered by confirmation, not by value change.
+
+For timed sets, progression must be triggered by explicit Start, not by visibility/focus.
+
+No automatic transition from `timed-ready` to `timed-active` is allowed.
+
+### Compatibility policy lock
+
+For this rollout:
+
+- Prioritize clean canonical model over compatibility.
+- Validate with regression testing only.
+- Do not add migration code or schema fallback logic.
 
 ## Product Summary
 
