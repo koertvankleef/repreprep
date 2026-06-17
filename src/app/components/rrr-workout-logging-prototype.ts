@@ -366,27 +366,6 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       element.dataset.state = timelineState
 
       const item = TIMELINE[index]
-      if (item?.kind === 'set') {
-        const isActiveSet = timelineState === 'active' && this.stage === 'set'
-        const isCompletedSet = timelineState === 'complete'
-        const exercise = getExercise(item.exerciseIndex)
-
-        const statusEl = element.querySelector<HTMLElement>('.item-status--set')
-        if (statusEl) {
-          statusEl.classList.toggle('is-complete', isCompletedSet)
-          statusEl.setAttribute('aria-label', isCompletedSet ? 'Set completed' : 'Set pending')
-        }
-      }
-
-      if (item?.kind === 'rest') {
-        const isCompletedRest = timelineState === 'complete'
-        const statusEl = element.querySelector<HTMLElement>('.item-status--rest')
-        if (statusEl) {
-          statusEl.classList.toggle('is-complete', isCompletedRest)
-          statusEl.setAttribute('aria-label', isCompletedRest ? 'Rest completed' : 'Rest pending')
-        }
-      }
-
       if (item?.kind === 'transition') {
         const isActiveTransition = timelineState === 'active' && (this.stage === 'transition' || this.stage === 'transition-paused')
 
@@ -552,17 +531,12 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
             const isActive = state === 'active'
 
             if (item.kind === 'set') {
-              const isActiveSet = isActive && this.stage === 'set'
-              const isCompletedSet = state === 'complete'
-              const isFinalSet = item.setNumber === exercise.totalSets
-              const completedSetCount = this.completedSetsByExercise[item.exerciseIndex] ?? 0
-              const isExerciseDone = completedSetCount >= exercise.totalSets
               const repDisplay = exercise.name === 'Plank' ? `${this.repValue * 5} sec` : `${this.repValue} reps`
               return `
                 <section class="timeline-item timeline-item--set" data-state="${state}">
                   <div class="set-header">
                     <h2 class="name"><span class="name-prefix">Doing&nbsp;</span><span class="name-text">${exercise.name}</span></h2>
-                    <span class="item-status item-status--set${isCompletedSet ? ' is-complete' : ''}" aria-label="${isCompletedSet ? 'Set completed' : 'Set pending'}"></span>
+                    <span class="set-count">${item.setNumber} / ${exercise.totalSets}</span>
                   </div>
                   <div class="set-detail">
                     <div class="set-detail__inner">
@@ -576,13 +550,6 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
                     </div>
                   </div>
                 </section>
-                ${isFinalSet
-                  ? `
-                    <div class="exercise-done-divider${isExerciseDone ? ' is-complete' : ''}">
-                      ${exercise.name} done
-                    </div>
-                  `
-                  : ''}
               `
             }
 
@@ -602,7 +569,6 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
                   </div>
                   <div class="rest-header">
                     <div class="rest-title"><rrr-icon name="water-bottle"></rrr-icon>Rest</div>
-                    <span class="item-status item-status--rest${isCompletedRest ? ' is-complete' : ''}" aria-label="${isCompletedRest ? 'Rest completed' : 'Rest pending'}"></span>
                   </div>
                   <div class="rest-detail">
                     <div class="rest-detail__inner">
@@ -675,8 +641,11 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
         return
       }
 
-      fill.style.height = `${overallProgressPercent}%`
-      this.overallProgressVisualPercent = overallProgressPercent
+      // Set the target on the next frame so the initial inline height is painted first.
+      requestAnimationFrame(() => {
+        fill.style.height = `${overallProgressPercent}%`
+        this.overallProgressVisualPercent = overallProgressPercent
+      })
     })
   }
 }
