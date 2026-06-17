@@ -1,9 +1,9 @@
 import type {
   AppData,
-  DurationSetEntry,
+  TimeSetEntry,
   ExerciseDefinition,
   PlannedSet,
-  RepsWeightSetEntry,
+  RepsSetEntry,
   Routine,
   RoutineExercise,
   RoutineVersion,
@@ -16,35 +16,35 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
 
-function isValidRepsWeightSet(obj: unknown): obj is RepsWeightSetEntry {
+function isValidRepsSet(obj: unknown): obj is RepsSetEntry {
   if (!isRecord(obj)) {
     return false
   }
 
   return (
     typeof obj.id === 'string' &&
-    obj.kind === 'reps-weight' &&
+    obj.kind === 'reps' &&
     typeof obj.reps === 'number' &&
     (typeof obj.weightKg === 'number' || obj.weightKg === null) &&
     typeof obj.notes === 'string'
   )
 }
 
-function isValidDurationSet(obj: unknown): obj is DurationSetEntry {
+function isValidTimeSet(obj: unknown): obj is TimeSetEntry {
   if (!isRecord(obj)) {
     return false
   }
 
   return (
     typeof obj.id === 'string' &&
-    obj.kind === 'duration' &&
+    obj.kind === 'time' &&
     typeof obj.seconds === 'number' &&
     typeof obj.notes === 'string'
   )
 }
 
 function isValidSetEntry(obj: unknown): obj is SetEntry {
-  return isValidRepsWeightSet(obj) || isValidDurationSet(obj)
+  return isValidRepsSet(obj) || isValidTimeSet(obj)
 }
 
 function isValidWorkoutExerciseEntry(obj: unknown): obj is WorkoutExerciseEntry {
@@ -69,7 +69,7 @@ export function isValidExercise(obj: unknown): obj is ExerciseDefinition {
   return (
     typeof obj.id === 'string' &&
     typeof obj.name === 'string' &&
-    (obj.kind === 'reps-weight' || obj.kind === 'duration') &&
+    (obj.kind === 'reps' || obj.kind === 'time') &&
     (typeof obj.defaultUnit === 'string' || obj.defaultUnit === null) &&
     typeof obj.archived === 'boolean' &&
     typeof obj.createdAt === 'string' &&
@@ -100,14 +100,14 @@ function isValidPlannedSet(obj: unknown): obj is PlannedSet {
     return false
   }
 
-  if (obj.kind === 'reps-weight') {
+  if (obj.kind === 'reps') {
     return (
       (typeof obj.targetReps === 'number' || obj.targetReps === null) &&
       (typeof obj.targetWeightKg === 'number' || obj.targetWeightKg === null)
     )
   }
 
-  if (obj.kind === 'duration') {
+  if (obj.kind === 'time') {
     return typeof obj.targetSeconds === 'number' || obj.targetSeconds === null
   }
 

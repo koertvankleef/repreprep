@@ -8,9 +8,9 @@ describe('createDefaultData', () => {
 
     expect(data.schemaVersion).toBe(2)
     expect(data.exercises).toHaveLength(7)
-    expect(byName.get('Push-ups')).toBe('reps-weight')
-    expect(byName.get('Plank')).toBe('duration')
-    expect(data.exercises.filter((exercise) => exercise.name !== 'Plank').every((exercise) => exercise.kind === 'reps-weight')).toBe(true)
+    expect(byName.get('Push-ups')).toBe('reps')
+    expect(byName.get('Plank')).toBe('time')
+    expect(data.exercises.filter((exercise) => exercise.name !== 'Plank').every((exercise) => exercise.kind === 'reps')).toBe(true)
     expect(data.workouts).toEqual([])
   })
 

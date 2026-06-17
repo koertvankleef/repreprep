@@ -6,7 +6,7 @@ export interface AppData {
   routineVersions: RoutineVersion[]
 }
 
-export type ExerciseKind = 'reps-weight' | 'duration'
+export type ExerciseKind = 'reps' | 'time'
 
 export interface ExerciseDefinition {
   id: string
@@ -54,16 +54,16 @@ export interface RoutineExercise {
   notes?: string
 }
 
-export type PlannedSet = RepsWeightPlannedSet | DurationPlannedSet
+export type PlannedSet = RepsPlannedSet | TimePlannedSet
 
-export interface RepsWeightPlannedSet {
-  kind: 'reps-weight'
+export interface RepsPlannedSet {
+  kind: 'reps'
   targetReps: number | null
   targetWeightKg: number | null
 }
 
-export interface DurationPlannedSet {
-  kind: 'duration'
+export interface TimePlannedSet {
+  kind: 'time'
   targetSeconds: number | null
 }
 
@@ -74,19 +74,19 @@ export interface WorkoutExerciseEntry {
   notes: string
 }
 
-export type SetEntry = RepsWeightSetEntry | DurationSetEntry
+export type SetEntry = RepsSetEntry | TimeSetEntry
 
-export interface RepsWeightSetEntry {
+export interface RepsSetEntry {
   id: string
-  kind: 'reps-weight'
+  kind: 'reps'
   reps: number
   weightKg: number | null
   notes: string
 }
 
-export interface DurationSetEntry {
+export interface TimeSetEntry {
   id: string
-  kind: 'duration'
+  kind: 'time'
   seconds: number
   notes: string
 }

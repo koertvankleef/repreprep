@@ -32,7 +32,7 @@ describe('migration', () => {
     const exercise = {
       id: 'ex-1',
       name: 'Push-ups',
-      kind: 'reps-weight',
+      kind: 'reps',
       defaultUnit: 'kg',
       archived: false,
       createdAt: '2026-01-01T00:00:00.000Z',

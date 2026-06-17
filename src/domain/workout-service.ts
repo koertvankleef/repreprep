@@ -1,8 +1,8 @@
 import type {
   AppData,
-  DurationSetEntry,
+  TimeSetEntry,
   PlannedSet,
-  RepsWeightSetEntry,
+  RepsSetEntry,
   SetEntry,
   Workout,
   WorkoutExerciseEntry,
@@ -101,31 +101,31 @@ export function createExerciseEntry(exerciseId: string): WorkoutExerciseEntry {
   }
 }
 
-export function createRepsWeightSet(reps: number, weightKg: number | null): RepsWeightSetEntry {
+export function createRepsSet(reps: number, weightKg: number | null): RepsSetEntry {
   return {
     id: generateId(),
-    kind: 'reps-weight',
+    kind: 'reps',
     reps,
     weightKg,
     notes: '',
   }
 }
 
-export function createDurationSet(seconds: number): DurationSetEntry {
+export function createTimeSet(seconds: number): TimeSetEntry {
   return {
     id: generateId(),
-    kind: 'duration',
+    kind: 'time',
     seconds,
     notes: '',
   }
 }
 
 function createSetFromPlannedSet(plannedSet: PlannedSet): SetEntry {
-  if (plannedSet.kind === 'reps-weight') {
-    return createRepsWeightSet(plannedSet.targetReps ?? 0, plannedSet.targetWeightKg)
+  if (plannedSet.kind === 'reps') {
+    return createRepsSet(plannedSet.targetReps ?? 0, plannedSet.targetWeightKg)
   }
 
-  return createDurationSet(plannedSet.targetSeconds ?? 0)
+  return createTimeSet(plannedSet.targetSeconds ?? 0)
 }
 
 export function createWorkoutFromRoutine(data: AppData, routineId: string, date: string): Workout | null {

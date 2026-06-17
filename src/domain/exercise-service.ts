@@ -57,7 +57,7 @@ export function createNewExercise(name: string, kind: ExerciseKind): ExerciseDef
     id: generateId(),
     name,
     kind,
-    defaultUnit: kind === 'duration' ? 'seconds' : 'kg',
+    defaultUnit: kind === 'time' ? 'seconds' : 'kg',
     archived: false,
     createdAt: timestamp,
     updatedAt: timestamp,

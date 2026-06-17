@@ -29,10 +29,10 @@ Reference specification: `docs/workout-rep-logging-flow-spec.md`
 - [x] Phase 0c: lock model rule that weight/load is orthogonal to set measurement mode (`reps` or `time`).
 - [x] Phase 0d: document extension seam for future measurement modes (for example, distance) without implementing it yet.
 - [ ] [in progress] Phase 1: align domain models for exercise logging type (`reps` vs `time`) and result payloads (rep result, timed result, rest period runtime state).
-- [ ] Phase 1a: hard-rename persisted enum values from `reps-weight`/`duration` to canonical `reps`/`time` (no migration layer).
-- [ ] Phase 1b: apply same canonical rename in runtime state names and workflow branches in one big-bang change.
-- [ ] Phase 1c: execute regression-only validation (tests + manual QA), and explicitly skip backward-compat checks.
-- [ ] Phase 1d: add release note that existing local data must be cleared for this rollout.
+- [x] Phase 1a: hard-rename persisted enum values from `reps-weight`/`duration` to canonical `reps`/`time` (no migration layer).
+- [x] Phase 1b: apply same canonical rename in runtime state names and workflow branches in one big-bang change.
+- [ ] [in progress] Phase 1c: execute regression-only validation (tests + manual QA), and explicitly skip backward-compat checks.
+- [x] Phase 1d: add release note that existing local data must be cleared for this rollout.
 - [ ] Phase 2: implement rep-set confirmation pipeline (`editable value -> confirm -> grace -> auto-rest`) with explicit `repResultConfirmed` as logging trigger.
 - [ ] Phase 3: implement timed-set pipeline (`ready -> Start -> active -> complete -> grace -> auto-rest`) with explicit start semantics.
 - [ ] Phase 4: implement grace-period interruption controls (`Edit`, `Start rest now`) and required cancellation behavior.

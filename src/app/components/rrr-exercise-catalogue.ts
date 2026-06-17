@@ -34,7 +34,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     }
 
     const name = (nameField as HTMLInputElement).value.trim()
-    const kind = kindField.value === 'duration' ? 'duration' : 'reps-weight'
+    const kind = kindField.value === 'time' ? 'time' : 'reps'
 
     if (!name) {
       this.setStatus(t('exercise.validation.nameRequired'), 'error')
@@ -113,7 +113,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     return exercises
       .map((exercise) => {
         const used = isExerciseUsedInWorkouts(data, exercise.id)
-        const kindLabel = exercise.kind === 'duration' ? t('exercise.kind.duration') : t('exercise.kind.repsWeight')
+        const kindLabel = exercise.kind === 'time' ? t('exercise.kind.duration') : t('exercise.kind.repsWeight')
 
         return `
           <article class="item">
@@ -146,9 +146,9 @@ export class RrrExerciseCatalogue extends HTMLElement {
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('exercise.status.default')}</p>
           <div class="form">
             <rrr-input label="${t('field.name')}" name="name" placeholder="${t('exercise.form.name.placeholder')}"></rrr-input>
-            <rrr-select label="${t('exercise.form.kind.label')}" name="kind" value="reps-weight">
-              <option value="reps-weight">${t('exercise.form.kind.repsWeight')}</option>
-              <option value="duration">${t('exercise.form.kind.duration')}</option>
+            <rrr-select label="${t('exercise.form.kind.label')}" name="kind" value="reps">
+              <option value="reps">${t('exercise.form.kind.repsWeight')}</option>
+              <option value="time">${t('exercise.form.kind.duration')}</option>
             </rrr-select>
             <rrr-button type="button" data-action="add">${t('exercise.form.add')}</rrr-button>
           </div>
@@ -175,7 +175,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     }
 
     if (kindField) {
-      kindField.setAttribute('value', 'reps-weight')
+      kindField.setAttribute('value', 'reps')
     }
 
     this.querySelector<HTMLElement>('rrr-button[data-action="add"]')?.addEventListener('click', () => {

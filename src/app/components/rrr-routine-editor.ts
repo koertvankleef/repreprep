@@ -151,7 +151,7 @@ export class RrrRoutineEditor extends HTMLElement {
 
     this.exercises = this.exercises.map((exercise) => {
       const sets = exercise.plannedSets.map((set, index) => {
-        if (set.kind === 'reps-weight') {
+        if (set.kind === 'reps') {
           const repsInput = this.querySelector<HTMLInputElement>(
             `input[data-exercise-id="${exercise.id}"][data-set-index="${index}"][data-field="reps"]`,
           )
@@ -160,7 +160,7 @@ export class RrrRoutineEditor extends HTMLElement {
           )
 
           return {
-            kind: 'reps-weight' as const,
+            kind: 'reps' as const,
             targetReps: repsInput?.value ? Number(repsInput.value) : null,
             targetWeightKg: weightInput?.value ? Number(weightInput.value) : null,
           }
@@ -171,7 +171,7 @@ export class RrrRoutineEditor extends HTMLElement {
         )
 
         return {
-          kind: 'duration' as const,
+          kind: 'time' as const,
           targetSeconds: secondsInput?.value ? Number(secondsInput.value) : null,
         }
       })
@@ -233,11 +233,11 @@ export class RrrRoutineEditor extends HTMLElement {
     this.readFields()
     const data = storageService.getData()
     const exerciseDef = data.exercises.find((e) => e.id === exerciseId)
-    const kind = exerciseDef?.kind ?? 'reps-weight'
+    const kind = exerciseDef?.kind ?? 'reps'
     const newSet: PlannedSet =
-      kind === 'duration'
-        ? { kind: 'duration', targetSeconds: null }
-        : { kind: 'reps-weight', targetReps: null, targetWeightKg: null }
+      kind === 'time'
+        ? { kind: 'time', targetSeconds: null }
+        : { kind: 'reps', targetReps: null, targetWeightKg: null }
 
     this.exercises = this.exercises.map((e) =>
       e.id === exerciseId ? { ...e, plannedSets: [...e.plannedSets, newSet] } : e,
@@ -326,7 +326,7 @@ export class RrrRoutineEditor extends HTMLElement {
               ? `<p>${t('routineEditor.sets.empty')}</p>`
               : routineExercise.plannedSets
                   .map((set, setIndex) => {
-                    if (set.kind === 'reps-weight') {
+                    if (set.kind === 'reps') {
                       return `
                         <div class="planned-set">
                           <span>${t('routineEditor.set.label', { index: setIndex + 1 })}</span>

@@ -44,6 +44,12 @@ Use docs/qa-checklist.md for repeatable smoke, localization, accessibility, and 
 
 All workout data is stored in your browser's localStorage under the key `repreprep:data`. Data persists between sessions on the same browser/device. Clearing browser data will erase your workouts—use the export feature regularly to back up your data.
 
+## Data Compatibility Note
+
+The workout kind model was hard-renamed from legacy values to canonical values (`reps` and `time`) without backward-compatibility or migration.
+
+If you used a build from before this change, clear local browser data for this app before using the updated build.
+
 ## Import/Export
 
 - **Export**: Click "Export Data" on the Import/Export page to download a `.json` file containing all your workout data.

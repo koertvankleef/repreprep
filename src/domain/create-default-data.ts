@@ -8,13 +8,13 @@ interface SeedExercise {
 }
 
 const seedExercises: SeedExercise[] = [
-  { name: 'Push-ups', kind: 'reps-weight', defaultUnit: 'kg' },
-  { name: 'Overhead Press', kind: 'reps-weight', defaultUnit: 'kg' },
-  { name: 'Dumbbell Row', kind: 'reps-weight', defaultUnit: 'kg' },
-  { name: 'Bulgarian Split Squat', kind: 'reps-weight', defaultUnit: 'kg' },
-  { name: 'Bicep Curl', kind: 'reps-weight', defaultUnit: 'kg' },
-  { name: 'Romanian Deadlift', kind: 'reps-weight', defaultUnit: 'kg' },
-  { name: 'Plank', kind: 'duration', defaultUnit: 'seconds' },
+  { name: 'Push-ups', kind: 'reps', defaultUnit: 'kg' },
+  { name: 'Overhead Press', kind: 'reps', defaultUnit: 'kg' },
+  { name: 'Dumbbell Row', kind: 'reps', defaultUnit: 'kg' },
+  { name: 'Bulgarian Split Squat', kind: 'reps', defaultUnit: 'kg' },
+  { name: 'Bicep Curl', kind: 'reps', defaultUnit: 'kg' },
+  { name: 'Romanian Deadlift', kind: 'reps', defaultUnit: 'kg' },
+  { name: 'Plank', kind: 'time', defaultUnit: 'seconds' },
 ]
 
 export function generateId(): string {
@@ -45,10 +45,10 @@ export function createDefaultData(): AppData {
   const routineExercises: RoutineExercise[] = exercises.map((exercise) => {
     const isPlank = exercise.name === 'Plank'
     const plannedSets: PlannedSet[] = isPlank
-      ? [{ kind: 'duration', targetSeconds: 30 }]
+      ? [{ kind: 'time', targetSeconds: 30 }]
       : [
-          { kind: 'reps-weight', targetReps: 10, targetWeightKg: null },
-          { kind: 'reps-weight', targetReps: 10, targetWeightKg: null },
+          { kind: 'reps', targetReps: 10, targetWeightKg: null },
+          { kind: 'reps', targetReps: 10, targetWeightKg: null },
         ]
 
     return {

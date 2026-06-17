@@ -16,7 +16,7 @@ function makeExercise(exerciseId: string): RoutineExercise {
   return {
     id: 're-1',
     exerciseId,
-    plannedSets: [{ kind: 'reps-weight', targetReps: 10, targetWeightKg: null }],
+    plannedSets: [{ kind: 'reps', targetReps: 10, targetWeightKg: null }],
   }
 }
 

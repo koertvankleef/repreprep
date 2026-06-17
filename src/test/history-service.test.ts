@@ -5,10 +5,10 @@ import {
   addExerciseToWorkout,
   addSetToExerciseEntry,
   addWorkout,
-  createDurationSet,
+  createTimeSet,
   createExerciseEntry,
   createNewWorkout,
-  createRepsWeightSet,
+  createRepsSet,
 } from '../domain/workout-service.ts'
 
 describe('history-service', () => {
@@ -22,7 +22,7 @@ describe('history-service', () => {
   test('getExerciseHistory returns entries from matching workouts', () => {
     const data = createDefaultData()
     const exerciseId = data.exercises[0]?.id ?? ''
-    const entry = addSetToExerciseEntry(createExerciseEntry(exerciseId), createRepsWeightSet(8, 40))
+    const entry = addSetToExerciseEntry(createExerciseEntry(exerciseId), createRepsSet(8, 40))
     const workout = addExerciseToWorkout(createNewWorkout('2026-06-13'), entry)
     const updated = addWorkout(data, workout)
     const history = getExerciseHistory(updated, exerciseId)
@@ -43,16 +43,16 @@ describe('history-service', () => {
     const exerciseId = data.exercises[1]?.id ?? ''
     const firstWorkout = addExerciseToWorkout(
       createNewWorkout('2026-06-13'),
-      addSetToExerciseEntry(createExerciseEntry(exerciseId), createRepsWeightSet(5, 50)),
+      addSetToExerciseEntry(createExerciseEntry(exerciseId), createRepsSet(5, 50)),
     )
     const secondWorkout = addExerciseToWorkout(
       createNewWorkout('2026-06-20'),
-      addSetToExerciseEntry(createExerciseEntry(exerciseId), createRepsWeightSet(3, 60)),
+      addSetToExerciseEntry(createExerciseEntry(exerciseId), createRepsSet(3, 60)),
     )
     const updated = addWorkout(addWorkout(data, firstWorkout), secondWorkout)
 
     expect(getPersonalRecord(updated, exerciseId)).toEqual({
-      kind: 'reps-weight',
+      kind: 'reps',
       reps: 3,
       weightKg: 60,
       date: '2026-06-20',
@@ -61,19 +61,19 @@ describe('history-service', () => {
 
   test('getPersonalRecord returns max seconds for duration exercise', () => {
     const data = createDefaultData()
-    const plank = data.exercises.find((exercise) => exercise.kind === 'duration')
+    const plank = data.exercises.find((exercise) => exercise.kind === 'time')
     const firstWorkout = addExerciseToWorkout(
       createNewWorkout('2026-06-13'),
-      addSetToExerciseEntry(createExerciseEntry(plank?.id ?? ''), createDurationSet(60)),
+      addSetToExerciseEntry(createExerciseEntry(plank?.id ?? ''), createTimeSet(60)),
     )
     const secondWorkout = addExerciseToWorkout(
       createNewWorkout('2026-06-20'),
-      addSetToExerciseEntry(createExerciseEntry(plank?.id ?? ''), createDurationSet(75)),
+      addSetToExerciseEntry(createExerciseEntry(plank?.id ?? ''), createTimeSet(75)),
     )
     const updated = addWorkout(addWorkout(data, firstWorkout), secondWorkout)
 
     expect(getPersonalRecord(updated, plank?.id ?? '')).toEqual({
-      kind: 'duration',
+      kind: 'time',
       seconds: 75,
       date: '2026-06-20',
     })
