@@ -9,10 +9,11 @@ export type AppRouteId =
   | 'routines'
   | 'routine-new'
   | 'routine-edit'
+  | 'workout-logging-prototype'
   | 'styleguide'
 
 export type AppRouteMeta = {
-  nav: 'workouts' | 'routines' | 'exercises' | 'history' | 'import-export' | 'styleguide'
+  nav: 'workouts' | 'routines' | 'exercises' | 'history' | 'import-export' | 'styleguide' | 'workout-logging-prototype'
 }
 
 export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
@@ -21,6 +22,7 @@ export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
   { id: 'exercises', pattern: '/exercises', meta: { nav: 'exercises' } },
   { id: 'history', pattern: '/history', meta: { nav: 'history' } },
   { id: 'import-export', pattern: '/import-export', meta: { nav: 'import-export' } },
+  { id: 'workout-logging-prototype', pattern: '/prototype/workout-logging', meta: { nav: 'workout-logging-prototype' } },
   { id: 'styleguide', pattern: '/styleguide', meta: { nav: 'styleguide' } },
   { id: 'routines', pattern: '/routines', meta: { nav: 'routines' } },
   { id: 'routine-new', pattern: '/routines/new', meta: { nav: 'routines' } },

@@ -36,6 +36,7 @@ type Route =
   | { name: 'routines' }
   | { name: 'routine-new' }
   | { name: 'routine-edit'; routineId: string }
+  | { name: 'workout-logging-prototype' }
   | { name: 'styleguide' }
 
 const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
@@ -285,6 +286,10 @@ export class RrrApp extends HTMLElement {
       return { name: 'import-export' }
     }
 
+    if (match.route.id === 'workout-logging-prototype') {
+      return { name: 'workout-logging-prototype' }
+    }
+
     if (match.route.id === 'styleguide' && this.styleguideEnabled) {
       return { name: 'styleguide' }
     }
@@ -312,6 +317,23 @@ export class RrrApp extends HTMLElement {
     }
 
     const route = this.route
+
+    if (route.name === 'workout-logging-prototype') {
+      this.shadowRoot.innerHTML = `
+        <style>${styles}</style>
+        <main>
+          <div id="view"></div>
+        </main>
+      `
+
+      const view = this.shadowRoot.querySelector<HTMLDivElement>('#view')
+      if (!view) {
+        return
+      }
+
+      view.append(document.createElement('rrr-workout-logging-prototype'))
+      return
+    }
 
     this.shadowRoot.innerHTML = `
       <style>${styles}</style>

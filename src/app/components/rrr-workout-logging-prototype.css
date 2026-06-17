@@ -1,0 +1,278 @@
+:host {
+  display: block;
+  --proto-surface: var(--rrr-colors-grayscale-00);
+  --proto-border: var(--rrr-colors-grayscale-40);
+  --proto-text-muted: var(--rrr-colors-grayscale-70);
+  --proto-accent: var(--rrr-colors-activity-indigo-60);
+  --proto-stack-width: 28rem;
+}
+
+.prototype {
+  display: grid;
+  gap: var(--rrr-spacing-m);
+  max-width: var(--proto-stack-width);
+  margin: 0 auto;
+}
+
+.overall-progress {
+  position: fixed;
+  inset-block: 0;
+  left: max(.35rem, calc((100vw - var(--proto-stack-width)) / 2 - .8rem));
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.overall-progress__track {
+  width: .32rem;
+  height: 100dvh;
+  background: color-mix(in oklab, var(--rrr-colors-activity-indigo-20), transparent 45%);
+  border-radius: var(--rrr-radius-pill);
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.overall-progress__fill {
+  width: 100%;
+  height: 0;
+  background: var(--rrr-colors-activity-indigo-60);
+  transition: height 420ms ease;
+}
+
+.stack {
+  display: grid;
+}
+
+.timeline-item {
+  border: 1px solid var(--proto-border);
+  background: var(--proto-surface);
+  padding: var(--rrr-spacing-m);
+  display: grid;
+  gap: var(--rrr-spacing-s);
+  transition: opacity 180ms ease, transform 180ms ease, border-radius 180ms ease, box-shadow 180ms ease, background 180ms ease, padding 180ms ease, margin 180ms ease;
+}
+
+.timeline-item[data-state='future'],
+.timeline-item[data-state='complete'] {
+  opacity: 0.5;
+}
+
+.timeline-item[data-state='active'] {
+  z-index: 1;
+  border-radius: var(--rrr-radius-l);
+  box-shadow: var(--rrr-depth-4-shadow);
+  margin-inline: -.4rem;
+  padding-block: calc(var(--rrr-spacing-m) + .35rem);
+}
+
+.timeline-item--rest[data-state='active'] {
+  box-shadow: var(--rrr-depth-4-shadow);
+  margin-inline: -.4rem;
+  padding-block: calc(var(--rrr-spacing-s) + .35rem);
+  padding-left: calc(var(--rrr-spacing-m) + .75rem);
+}
+
+.timeline-item--rest {
+  position: relative;
+  padding: var(--rrr-spacing-s) var(--rrr-spacing-m);
+  padding-left: calc(var(--rrr-spacing-m) + .75rem);
+  gap: var(--rrr-spacing-xs);
+  border-style: dashed;
+  background: color-mix(in oklab, var(--proto-surface), var(--rrr-colors-serene-mint-20) 30%);
+}
+
+.rest-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rrr-spacing-s);
+}
+
+.set-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--rrr-spacing-s);
+}
+
+.rest-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rrr-spacing-2xs);
+  font-size: var(--rrr-font-size-s);
+  color: var(--proto-text-muted);
+}
+
+.item-status {
+  inline-size: .95rem;
+  block-size: .95rem;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.item-status--set {
+  border: 1.5px solid var(--rrr-colors-activity-indigo-60);
+}
+
+.item-status--rest {
+  border: 1.5px solid var(--rrr-colors-serene-mint-60);
+}
+
+.item-status--set.is-complete {
+  background: var(--rrr-colors-activity-indigo-60);
+  color: var(--rrr-colors-grayscale-00);
+}
+
+.item-status--rest.is-complete {
+  background: var(--rrr-colors-serene-mint-60);
+  color: var(--rrr-colors-grayscale-00);
+}
+
+.item-status.is-complete::before {
+  content: '✓';
+  font-size: .625rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.timeline-item--transition {
+  border-style: dashed;
+  background: color-mix(in oklab, var(--proto-surface), var(--proto-accent) 5%);
+}
+
+.exercise-done-divider {
+  margin: var(--rrr-spacing-xs) 0;
+  padding: var(--rrr-spacing-2xs) var(--rrr-spacing-s);
+  border: 1px dashed var(--rrr-colors-serene-mint-40);
+  border-radius: var(--rrr-radius-s);
+  background: color-mix(in oklab, var(--proto-surface), var(--rrr-colors-serene-mint-20) 35%);
+  color: var(--rrr-colors-serene-mint-80);
+  font-size: var(--rrr-font-size-xs);
+  line-height: 1.1;
+  text-transform: none;
+  opacity: 0.55;
+  transition: opacity 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.exercise-done-divider.is-complete {
+  opacity: 1;
+  border-color: var(--rrr-colors-serene-mint-60);
+  background: color-mix(in oklab, var(--proto-surface), var(--rrr-colors-serene-mint-30) 45%);
+}
+
+.timeline-item--start {
+  border-style: dashed;
+  background: color-mix(in oklab, var(--proto-surface), var(--rrr-colors-serene-mint-20) 20%);
+}
+
+.timeline-item--start[data-state='active'] {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--rrr-colors-serene-mint-60), transparent 68%);
+}
+
+.timeline-item--start .actions {
+  justify-content: center;
+}
+
+.timeline-item--start .actions rrr-button {
+  width: min(18rem, 100%);
+}
+
+.name {
+  margin: 0;
+  font-size: var(--rrr-font-size-l);
+}
+
+.last-time {
+  font-size: var(--rrr-font-size-s);
+  color: var(--proto-text-muted);
+}
+
+.rep-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--rrr-spacing-s);
+  align-items: center;
+}
+
+.rep-value {
+  text-align: center;
+  font-size: var(--rrr-font-size-xl);
+  font-weight: var(--rrr-font-weight-bold);
+  padding: var(--rrr-spacing-xs);
+}
+
+.actions {
+  display: flex;
+  gap: var(--rrr-spacing-s);
+  flex-wrap: wrap;
+}
+
+.complete {
+  border: 1px dashed var(--proto-border);
+  border-radius: var(--rrr-radius-l);
+  padding: var(--rrr-spacing-m);
+  background: color-mix(in oklab, var(--proto-surface), var(--proto-accent) 5%);
+  display: grid;
+  gap: var(--rrr-spacing-s);
+}
+
+.timer {
+  font-size: var(--rrr-font-size-xl);
+  font-weight: var(--rrr-font-weight-bold);
+}
+
+.countdown {
+  display: grid;
+  gap: var(--rrr-spacing-xs);
+}
+
+.countdown--vertical {
+  position: absolute;
+  left: .375rem;
+  top: .375rem;
+  bottom: .375rem;
+  display: block;
+}
+
+.bar {
+  height: .5rem;
+  border-radius: var(--rrr-radius-pill);
+  background: var(--rrr-colors-grayscale-30);
+  overflow: hidden;
+}
+
+.bar > span {
+  display: block;
+  height: 100%;
+  background: var(--proto-accent);
+  transition: width 1s linear;
+}
+
+.bar--vertical {
+  display: flex;
+  align-items: flex-end;
+  width: .25rem;
+  height: 100%;
+  border-radius: var(--rrr-radius-pill);
+}
+
+.bar--vertical > span {
+  width: 100%;
+  height: 0;
+  background: var(--rrr-colors-serene-mint-60);
+  transition: height 1s linear;
+}
+
+.count {
+  font-size: var(--rrr-font-size-xl);
+  font-weight: var(--rrr-font-weight-bold);
+}
+
+.hint {
+  font-size: var(--rrr-font-size-xs);
+  color: var(--proto-text-muted);
+}
