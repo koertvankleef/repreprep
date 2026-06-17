@@ -229,10 +229,13 @@ export class RrrRoutineEditor extends HTMLElement {
     this.render()
   }
 
-  private addPlannedSet(exerciseId: string): void {
+  private addPlannedSet(routineExerciseId: string): void {
     this.readFields()
     const data = storageService.getData()
-    const exerciseDef = data.exercises.find((e) => e.id === exerciseId)
+    const routineExercise = this.exercises.find((exercise) => exercise.id === routineExerciseId)
+    const exerciseDef = routineExercise
+      ? data.exercises.find((exercise) => exercise.id === routineExercise.exerciseId)
+      : undefined
     const kind = exerciseDef?.kind ?? 'reps'
     const newSet: PlannedSet =
       kind === 'time'
@@ -240,7 +243,7 @@ export class RrrRoutineEditor extends HTMLElement {
         : { kind: 'reps', targetReps: null, targetWeightKg: null }
 
     this.exercises = this.exercises.map((e) =>
-      e.id === exerciseId ? { ...e, plannedSets: [...e.plannedSets, newSet] } : e,
+      e.id === routineExerciseId ? { ...e, plannedSets: [...e.plannedSets, newSet] } : e,
     )
     this.render()
   }

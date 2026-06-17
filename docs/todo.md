@@ -28,10 +28,10 @@ Reference specification: `docs/workout-rep-logging-flow-spec.md`
 - [x] Phase 0b: lock big-bang rename policy for stage/state names (no migration layer).
 - [x] Phase 0c: lock model rule that weight/load is orthogonal to set measurement mode (`reps` or `time`).
 - [x] Phase 0d: document extension seam for future measurement modes (for example, distance) without implementing it yet.
-- [ ] [in progress] Phase 1: align domain models for exercise logging type (`reps` vs `time`) and result payloads (rep result, timed result, rest period runtime state).
+- [x] Phase 1: align domain models for exercise logging type (`reps` vs `time`) and result payloads (rep result, timed result, rest period runtime state).
 - [x] Phase 1a: hard-rename persisted enum values from `reps-weight`/`duration` to canonical `reps`/`time` (no migration layer).
 - [x] Phase 1b: apply same canonical rename in runtime state names and workflow branches in one big-bang change.
-- [ ] [in progress] Phase 1c: execute regression-only validation (tests + manual QA), and explicitly skip backward-compat checks.
+- [x] Phase 1c: execute regression-only validation (tests + manual QA), and explicitly skip backward-compat checks.
 - [x] Phase 1d: add release note that existing local data must be cleared for this rollout.
 - [ ] Phase 2: implement rep-set confirmation pipeline (`editable value -> confirm -> grace -> auto-rest`) with explicit `repResultConfirmed` as logging trigger.
 - [ ] Phase 3: implement timed-set pipeline (`ready -> Start -> active -> complete -> grace -> auto-rest`) with explicit start semantics.

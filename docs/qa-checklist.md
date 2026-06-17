@@ -9,6 +9,15 @@
 5. Create, rename, and archive an exercise.
 6. Verify history updates after saving workout data.
 
+## Workout Logging Regressions
+
+1. Create a new routine with at least one `time` exercise and one `reps` exercise.
+2. In routine editor, add a new set to the `time` exercise and verify only seconds input is shown.
+3. Start a workout from that routine and verify newly started session shows "new workout" context copy, not edit context copy.
+4. Open an already updated workout and verify edit-context copy is shown.
+5. Create a workout shortly after local midnight and verify workout list date and history date show the local calendar day.
+6. Verify export/import still works with current schema and no compatibility fallback is required.
+
 ## Localization
 
 1. Verify English copy with browser locale `en-*`.

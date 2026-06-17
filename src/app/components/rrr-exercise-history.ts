@@ -88,7 +88,7 @@ export class RrrExerciseHistory extends HTMLElement {
   }
 
   private formatHistoryDate(value: string): string {
-    const date = new Date(`${value}T00:00:00Z`)
+    const date = new Date(`${value}T12:00:00`)
 
     if (Number.isNaN(date.getTime())) {
       return value
@@ -99,7 +99,6 @@ export class RrrExerciseHistory extends HTMLElement {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
-      timeZone: 'UTC',
     })
   }
 

@@ -188,7 +188,10 @@ export class RrrWorkoutEditor extends HTMLElement {
       return
     }
 
-    const title = this.workoutIdValue ? t('workout.title.edit') : t('workout.title.new')
+    const isEditContext = this.workoutIdValue !== null && this.workout.updatedAt !== this.workout.createdAt
+    const title = isEditContext ? t('workout.title.edit') : t('workout.title.new')
+    const subtitle = isEditContext ? t('workout.subtitle.edit') : t('workout.subtitle.new')
+    const defaultStatus = isEditContext ? t('workout.status.default.edit') : t('workout.status.default.new')
 
     this.innerHTML = `
       <style>${styles}</style>
@@ -196,9 +199,9 @@ export class RrrWorkoutEditor extends HTMLElement {
         <rrr-card size="lg">
           <div>
             <h2>${title}</h2>
-            <p>${t('workout.subtitle')}</p>
+            <p>${subtitle}</p>
           </div>
-          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('workout.status.default')}</p>
+          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || defaultStatus}</p>
           <div class="row">
             <rrr-input label="${t('field.date')}" name="date" type="date"></rrr-input>
             <rrr-textarea label="${t('workout.form.notes')}" name="notes" rows="3" placeholder="${t('workout.form.notes.placeholder')}"></rrr-textarea>
