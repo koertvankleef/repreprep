@@ -4,8 +4,10 @@
   --proto-border: var(--rrr-colors-grayscale-40);
   --proto-text-muted: var(--rrr-colors-grayscale-70);
   --proto-accent: var(--rrr-colors-activity-indigo-60);
-  /* --proto-transition-duration: 220ms; */
-  --proto-transition: var(--rrr-transition-fromto);
+  --proto-transition-duration: 220ms;
+  --proto-transition-duration-exit: calc(var(--proto-transition-duration) * 4);
+  --proto-transition: var(--rrr-anim-fromto-timingfunction);
+  --proto-transition-shorthand: var(--proto-transition-duration) var(--proto-transition);
   --proto-stack-width: 28rem;
 }
 
@@ -56,7 +58,7 @@
   inset: 0;
   background: var(--rrr-colors-grayscale-00);
   opacity: 0;
-  transition: opacity var(--proto-transition);
+  transition: opacity var(--proto-transition-shorthand);
   pointer-events: none;
   z-index: 2;
 }
@@ -130,7 +132,7 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: grid-template-rows var(--proto-transition), opacity var(--proto-transition), visibility 0s linear var(--proto-transition-duration);
+  transition: grid-template-rows var(--proto-transition-shorthand), opacity var(--proto-transition-shorthand), visibility 0s linear var(--proto-transition-duration);
 }
 
 .set-detail__inner,
@@ -156,26 +158,8 @@
   color: var(--rrr-colors-activity-indigo-70);
 }
 
-.timeline-item--set[data-state='active'] .set-detail {
-  grid-template-rows: 1fr;
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transition-delay: 0s, 0s, 0s;
-}
-
-
-
-.timeline-item--rest[data-state='active'] .rest-detail {
-  grid-template-rows: 1fr;
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transition-delay: 0s, 0s, 0s;
-}
-
-
-
+.timeline-item--set[data-state='active'] .set-detail,
+.timeline-item--rest[data-state='active'] .rest-detail,
 .timeline-item--transition[data-state='active'] .transition-detail--actions {
   grid-template-rows: 1fr;
   opacity: 1;
@@ -198,12 +182,18 @@
   font-weight: var(--rrr-font-weight-normal);
   line-height: 1;
   flex: 0 0 auto;
+  transition: font-size var(--proto-transition-shorthand);
 }
 
 .rest-title {
   display: inline-flex;
   align-items: center;
   gap: var(--rrr-spacing-m);
+}
+
+.timeline-item--rest .rest-header,
+.timeline-item--transition .rest-header {
+  transition: font-size var(--proto-transition-shorthand);
 }
 
 .stage-count {
@@ -241,11 +231,49 @@
 }
 
 .timeline-item--start .actions {
+  display: none;
   justify-content: center;
+}
+
+.timeline-item--start .hint {
+  display: none;
+}
+
+.timeline-item--start .actions.is-visible,
+.timeline-item--start .hint.is-visible {
+  display: flex;
+}
+
+.timeline-item--start .hint.is-visible {
+  display: block;
 }
 
 .timeline-item--start .actions rrr-button {
   width: min(18rem, 100%);
+}
+
+.timeline-item[data-motion='exiting'],
+.timeline-item[data-motion='exiting'] .set-detail,
+.timeline-item[data-motion='exiting'] .rest-detail,
+.timeline-item[data-motion='exiting'] .transition-detail,
+.timeline-item[data-motion='exiting'] .name,
+.timeline-item[data-motion='exiting'] .name-prefix,
+.timeline-item[data-motion='exiting'] .set-count,
+.timeline-item[data-motion='exiting'] .rest-header,
+.timeline-item[data-motion='exiting'] .countdown--vertical {
+  transition-duration: var(--proto-transition-duration-exit);
+}
+
+.timeline-item[data-motion='entering'],
+.timeline-item[data-motion='entering'] .set-detail,
+.timeline-item[data-motion='entering'] .rest-detail,
+.timeline-item[data-motion='entering'] .transition-detail,
+.timeline-item[data-motion='entering'] .name,
+.timeline-item[data-motion='entering'] .name-prefix,
+.timeline-item[data-motion='entering'] .set-count,
+.timeline-item[data-motion='entering'] .rest-header,
+.timeline-item[data-motion='entering'] .countdown--vertical {
+  transition-duration: var(--proto-transition-duration);
 }
 
 .name {
@@ -253,7 +281,7 @@
   font-size: var(--rrr-font-size-l);
   font-family: var(--rrr-font-family-heading);
   color: var(--rrr-colors-activity-indigo-70);
-  transition: font-size var(--proto-transition);
+  transition: font-size var(--proto-transition-shorthand);
   display: flex;
   align-items: baseline;
   flex-wrap: nowrap;
@@ -267,7 +295,7 @@
   opacity: 0;
   font-weight: var(--rrr-font-weight-normal);
   white-space: nowrap;
-  transition: max-width var(--proto-transition), opacity var(--proto-transition);
+  transition: max-width var(--proto-transition-shorthand), opacity var(--proto-transition-shorthand);
 }
 
 .timeline-item[data-state='active'] .name-prefix {
@@ -321,7 +349,7 @@
   bottom: 0;
   display: block;
   opacity: 0;
-  transition: opacity var(--proto-transition);
+  transition: opacity var(--proto-transition-shorthand);
 }
 
 .timeline-item--rest[data-state='active'] .countdown--vertical,

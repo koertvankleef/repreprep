@@ -77,7 +77,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
   private nextExerciseRemainingSeconds = EXERCISE_TRANSITION_SECONDS
   private restIntervalId: number | null = null
   private exerciseCountdownIntervalId: number | null = null
-  private deferredRenderId: number | null = null
+  private motionCleanupId: number | null = null
   private readonly completedSetsByExercise = EXERCISES.map(() => 0)
   private overallProgressVisualPercent = 0
 
@@ -93,7 +93,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
   disconnectedCallback(): void {
     this.shadowRoot?.removeEventListener('click', this.handleClick)
-    this.clearDeferredRender()
+    this.clearMotionCleanup()
     this.clearTimers()
   }
 
@@ -115,13 +115,13 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
     if (action === 'rep-minus') {
       this.repValue = Math.max(0, this.repValue - 1)
-      this.render()
+      this.syncActiveSetRepValue()
       return
     }
 
     if (action === 'rep-plus') {
       this.repValue += 1
-      this.render()
+      this.syncActiveSetRepValue()
       return
     }
 
@@ -166,17 +166,14 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     }
 
     this.completedSetsByExercise[currentItem.exerciseIndex] = currentItem.setNumber
+    this.syncOverallProgress()
     this.moveToNextTimelineItem()
   }
 
   private moveToNextTimelineItem(): void {
     if (this.activeTimelineIndex >= TIMELINE.length - 1) {
       this.stage = 'workout-complete'
-      if (!this.patchTimelineStateInPlace()) {
-        this.render()
-        return
-      }
-      this.queueDeferredRender()
+      this.render()
       return
     }
 
@@ -232,7 +229,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
     this.clearRestTimer()
     this.stage = 'rest-paused'
-    this.render()
+    this.patchTimelineStateInPlace()
   }
 
   private resumeRest(): void {
@@ -250,7 +247,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       }
       this.updateLiveStageVisuals()
     }, 1000)
-    this.render()
+    this.patchTimelineStateInPlace()
   }
 
   private skipRest(): void {
@@ -287,7 +284,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
     this.clearExerciseCountdownTimer()
     this.stage = 'transition-paused'
-    this.render()
+    this.patchTimelineStateInPlace()
   }
 
   private clearRestTimer(): void {
@@ -309,27 +306,15 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     this.clearExerciseCountdownTimer()
   }
 
-  private clearDeferredRender(): void {
-    if (this.deferredRenderId !== null) {
-      clearTimeout(this.deferredRenderId)
-      this.deferredRenderId = null
+  private clearMotionCleanup(): void {
+    if (this.motionCleanupId !== null) {
+      clearTimeout(this.motionCleanupId)
+      this.motionCleanupId = null
     }
   }
 
-  private queueDeferredRender(scrollAfterRender = false): void {
-    const transitionDurationMs = this.getTransitionDurationMs()
-    this.clearDeferredRender()
-    this.deferredRenderId = window.setTimeout(() => {
-      this.deferredRenderId = null
-      this.render()
-      if (scrollAfterRender) {
-        this.scrollActiveIntoView('smooth')
-      }
-    }, transitionDurationMs + RrrWorkoutLoggingPrototype.STATE_TRANSITION_BUFFER_MS)
-  }
-
-  private getTransitionDurationMs(): number {
-    const rawDuration = getComputedStyle(this).getPropertyValue('--proto-transition-duration').trim()
+  private getTransitionDurationMs(variableName: '--proto-transition-duration' | '--proto-transition-duration-exit'): number {
+    const rawDuration = getComputedStyle(this).getPropertyValue(variableName).trim()
     const durationMatch = rawDuration.match(/^(\d*\.?\d+)(ms|s)$/)
 
     if (!durationMatch) {
@@ -347,6 +332,21 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     return unit === 's' ? parsed * 1000 : parsed
   }
 
+  private scheduleMotionCleanup(): void {
+    const cleanupDelay = Math.max(
+      this.getTransitionDurationMs('--proto-transition-duration'),
+      this.getTransitionDurationMs('--proto-transition-duration-exit')
+    ) + RrrWorkoutLoggingPrototype.STATE_TRANSITION_BUFFER_MS
+
+    this.clearMotionCleanup()
+    this.motionCleanupId = window.setTimeout(() => {
+      this.motionCleanupId = null
+      this.shadowRoot?.querySelectorAll<HTMLElement>('.timeline-item[data-motion]').forEach((element) => {
+        element.removeAttribute('data-motion')
+      })
+    }, cleanupDelay)
+  }
+
   private patchTimelineStateInPlace(): boolean {
     if (!this.shadowRoot) {
       return false
@@ -354,23 +354,67 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
     const startItem = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--start')
     const timelineItems = Array.from(this.shadowRoot.querySelectorAll<HTMLElement>('.timeline-item:not(.timeline-item--start)'))
+    const previousActive = this.shadowRoot.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
 
     if (!startItem || timelineItems.length !== TIMELINE.length) {
       return false
     }
 
     startItem.dataset.state = this.stage === 'locked' ? 'active' : 'complete'
+    this.syncStartSectionState(startItem)
 
     timelineItems.forEach((element, index) => {
       const timelineState = this.getTimelineState(index)
       element.dataset.state = timelineState
 
       const item = TIMELINE[index]
+      if (item?.kind === 'set') {
+        const isActiveSet = timelineState === 'active' && this.stage === 'set'
+
+        const repValueEl = element.querySelector<HTMLElement>('.rep-value')
+        if (repValueEl && isActiveSet) {
+          const exercise = getExercise(item.exerciseIndex)
+          repValueEl.textContent = exercise.name === 'Plank' ? `${this.repValue * 5} sec` : `${this.repValue} reps`
+        }
+      }
+
+      if (item?.kind === 'rest') {
+        const isActiveRest = timelineState === 'active' && (this.stage === 'rest' || this.stage === 'rest-paused')
+
+        const countEl = element.querySelector<HTMLElement>('.stage-count--rest')
+        if (countEl) {
+          countEl.classList.toggle('is-visible', isActiveRest)
+          countEl.textContent = isActiveRest ? this.formatClock(this.restRemainingSeconds) : this.formatClock(item.durationSeconds)
+        }
+
+        const primaryActionEl = element.querySelector<HTMLElement>('.rest-primary-action')
+        if (primaryActionEl) {
+          if (this.stage === 'rest') {
+            primaryActionEl.dataset.action = 'pause-rest'
+            primaryActionEl.textContent = 'Pause'
+          } else {
+            primaryActionEl.dataset.action = 'resume-rest'
+            primaryActionEl.textContent = 'Resume'
+          }
+        }
+
+        const progressEl = element.querySelector<HTMLElement>('.bar--vertical > span')
+        if (progressEl) {
+          const restRemainingPercent = isActiveRest
+            ? `${(this.restRemainingSeconds / item.durationSeconds) * 100}%`
+            : timelineState === 'complete'
+              ? '0%'
+              : '100%'
+          progressEl.style.height = restRemainingPercent
+        }
+      }
+
       if (item?.kind === 'transition') {
         const isActiveTransition = timelineState === 'active' && (this.stage === 'transition' || this.stage === 'transition-paused')
 
         const countEl = element.querySelector<HTMLElement>('.stage-count--transition')
         if (countEl) {
+          countEl.classList.toggle('is-visible', isActiveTransition)
           countEl.textContent = `${isActiveTransition ? this.nextExerciseRemainingSeconds : item.durationSeconds}`
         }
 
@@ -397,6 +441,20 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       }
     })
 
+    this.shadowRoot.querySelectorAll<HTMLElement>('.timeline-item[data-motion]').forEach((element) => {
+      element.removeAttribute('data-motion')
+    })
+
+    const currentActive = this.shadowRoot.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
+    if (previousActive && previousActive !== currentActive) {
+      previousActive.dataset.motion = 'exiting'
+    }
+    if (currentActive) {
+      currentActive.dataset.motion = 'entering'
+    }
+
+    this.scheduleMotionCleanup()
+
     return true
   }
 
@@ -407,7 +465,45 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       return
     }
 
-    this.queueDeferredRender(true)
+    this.scrollActiveIntoView('smooth')
+  }
+
+  private syncStartSectionState(startItem: HTMLElement): void {
+    const startActions = startItem.querySelector<HTMLElement>('.start-actions')
+    const startHint = startItem.querySelector<HTMLElement>('.start-hint')
+    const isLocked = this.stage === 'locked'
+
+    startActions?.classList.toggle('is-visible', isLocked)
+    startHint?.classList.toggle('is-visible', !isLocked)
+  }
+
+  private syncActiveSetRepValue(): void {
+    const currentItem = this.currentItem()
+    if (!currentItem || currentItem.kind !== 'set') {
+      return
+    }
+
+    const activeSetValue = this.shadowRoot?.querySelector<HTMLElement>('.timeline-item--set[data-state="active"] .rep-value')
+    if (!activeSetValue) {
+      return
+    }
+
+    const exercise = getExercise(currentItem.exerciseIndex)
+    activeSetValue.textContent = exercise.name === 'Plank' ? `${this.repValue * 5} sec` : `${this.repValue} reps`
+  }
+
+  private syncOverallProgress(): void {
+    const fill = this.shadowRoot?.querySelector<HTMLElement>('.overall-progress__fill')
+    if (!fill) {
+      return
+    }
+
+    const totalSetCount = this.getTotalSetCount()
+    const completedSetCount = this.getCompletedSetCount()
+    const overallProgressPercent = totalSetCount > 0 ? (completedSetCount / totalSetCount) * 100 : 0
+
+    fill.style.height = `${overallProgressPercent}%`
+    this.overallProgressVisualPercent = overallProgressPercent
   }
 
   private currentItem(): TimelineItem | null {
@@ -501,8 +597,6 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       return
     }
 
-    this.clearDeferredRender()
-
     const currentItem = this.currentItem()
     const startState = this.stage === 'locked' ? 'active' : 'complete'
     const completedSetCount = this.getCompletedSetCount()
@@ -520,9 +614,8 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
         <div class="stack is-dimmed">
           <section class="timeline-item timeline-item--start" data-state="${startState}">
             <h2 class="name">Ready?</h2>
-            ${this.stage === 'locked'
-              ? `<div class="actions"><rrr-button data-action="go" type="button" tone="accent">GO</rrr-button></div>`
-              : `<div class="hint">Workout flow is running. Active section is centered when possible.</div>`}
+            <div class="actions start-actions${this.stage === 'locked' ? ' is-visible' : ''}"><rrr-button data-action="go" type="button" tone="accent">GO</rrr-button></div>
+            <div class="hint start-hint${this.stage === 'locked' ? '' : ' is-visible'}">Workout flow is running. Active section is centered when possible.</div>
           </section>
 
           ${TIMELINE.map((item, index) => {
@@ -574,9 +667,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
                   <div class="rest-detail">
                     <div class="rest-detail__inner">
                       <div class="actions">
-                        ${this.stage === 'rest'
-                          ? `<rrr-button type="button" variant="secondary" tone="accent" data-action="pause-rest">Pause</rrr-button>`
-                          : `<rrr-button type="button" variant="secondary" tone="accent" data-action="resume-rest">Resume</rrr-button>`}
+                        <rrr-button type="button" variant="secondary" tone="accent" data-action="${this.stage === 'rest' ? 'pause-rest' : 'resume-rest'}" class="rest-primary-action">${this.stage === 'rest' ? 'Pause' : 'Resume'}</rrr-button>
                         <rrr-button type="button" variant="outline" tone="accent" data-action="skip-rest">Skip Rest</rrr-button>
                       </div>
                     </div>
