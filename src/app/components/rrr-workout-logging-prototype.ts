@@ -369,7 +369,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       if (item?.kind === 'transition') {
         const isActiveTransition = timelineState === 'active' && (this.stage === 'transition' || this.stage === 'transition-paused')
 
-        const countEl = element.querySelector<HTMLElement>('.count')
+        const countEl = element.querySelector<HTMLElement>('.stage-count--transition')
         if (countEl) {
           countEl.textContent = `${isActiveTransition ? this.nextExerciseRemainingSeconds : item.durationSeconds}`
         }
@@ -467,7 +467,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
         return
       }
 
-      const timer = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--rest[data-state="active"] .timer')
+      const timer = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--rest[data-state="active"] .stage-count--rest')
       const fill = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--rest[data-state="active"] .bar--vertical > span')
 
       if (timer) {
@@ -482,7 +482,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     }
 
     if (this.stage === 'transition') {
-      const timer = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--transition[data-state="active"] .count')
+      const timer = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--transition[data-state="active"] .stage-count--transition')
       const fill = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--transition[data-state="active"] .bar--vertical--transition > span')
 
       if (timer) {
@@ -569,10 +569,10 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
                   </div>
                   <div class="rest-header">
                     <div class="rest-title"><rrr-icon name="water-bottle"></rrr-icon>Rest</div>
+                    <span class="stage-count stage-count--rest${isActiveRest ? ' is-visible' : ''}">${restDisplayTime}</span>
                   </div>
                   <div class="rest-detail">
                     <div class="rest-detail__inner">
-                      <div class="timer">${restDisplayTime}</div>
                       <div class="actions">
                         ${this.stage === 'rest'
                           ? `<rrr-button type="button" variant="secondary" tone="accent" data-action="pause-rest">Pause</rrr-button>`
@@ -587,7 +587,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
             const nextExercise = EXERCISES[item.exerciseIndex + 1]
             const isActiveTransition = isActive && (this.stage === 'transition' || this.stage === 'transition-paused')
-            const transitionCountValue = isActiveTransition ? this.nextExerciseRemainingSeconds : item.durationSeconds
+            const transitionDisplayTime = isActiveTransition ? this.nextExerciseRemainingSeconds : item.durationSeconds
             const transitionRemainingPercent = isActiveTransition
               ? Math.max(0, Math.min(100, (this.nextExerciseRemainingSeconds / item.durationSeconds) * 100))
               : state === 'complete'
@@ -602,13 +602,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
                 </div>
                 <div class="rest-header">
                   <div class="rest-title">Time to switch to: ${nextExercise ? nextExercise.name : 'Workout complete'}</div>
-                </div>
-                <div class="transition-count">
-                  <div class="transition-count__inner">
-                    <div class="countdown">
-                      <div class="count">${transitionCountValue}</div>
-                    </div>
-                  </div>
+                  <span class="stage-count stage-count--transition${isActiveTransition ? ' is-visible' : ''}">${transitionDisplayTime}</span>
                 </div>
                 <div class="transition-detail transition-detail--actions">
                   <div class="transition-detail__inner">
