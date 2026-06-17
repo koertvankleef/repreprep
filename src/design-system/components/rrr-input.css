@@ -11,7 +11,7 @@
   --rrr-input-border-radius: var(--rrr-radius-s);
   --rrr-input-background: var(--rrr-colors-grayscale-00);
   --rrr-input-color: var(--rrr-colors-grayscale-100);
-  --rrr-input-transition: var(--rrr-default-transition);
+  --rrr-input-transition: var(--rrr-transition-default);
   --rrr-input-placeholder-color: var(--rrr-colors-grayscale-60);
   --rrr-input-hover-border-color: var(--rrr-colors-activity-indigo-30);
   --rrr-input-focus-border-color: var(--rrr-colors-activity-indigo-50);

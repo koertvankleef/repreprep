@@ -160,9 +160,10 @@
   --grid-breakpoint-l: 62rem;
   --grid-breakpoint-xl: 80rem;
 
-  --rrr-default-transition: 128ms cubic-bezier(.4, 0, .2, 1);
-
+  --rrr-transition-default: 128ms cubic-bezier(.4, 0, .2, 1);
   --rrr-anim-fromto-timingfunction: cubic-bezier(0.205, 0.000, 0.000, 1.000);
+  --rrr-transition-fromto: 160ms var(--rrr-anim-fromto-timingfunction);
+
   /* Button interactive foreground for outline/ghost variants — dark mode overrides step down to 50. */
 
   /* Button interactive foreground for outline/ghost variants — dark mode overrides step down to 50. */

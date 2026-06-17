@@ -37,7 +37,7 @@
   font: inherit;
   font-weight: var(--rrr-font-weight-normal);
   cursor: pointer;
-  transition: background var(--rrr-default-transition), color var(--rrr-default-transition), border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition);
+  transition: background var(--rrr-transition-default), color var(--rrr-transition-default), border-color var(--rrr-transition-default), box-shadow var(--rrr-transition-default);
 }
 
 .sg-button--solid {

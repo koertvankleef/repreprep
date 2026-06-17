@@ -637,8 +637,12 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
                 <div class="rest-header">
                   <div class="rest-title">Time to switch to: ${nextExercise ? nextExercise.name : 'Workout complete'}</div>
                 </div>
-                <div class="countdown">
-                  <div class="count">${transitionCountValue}</div>
+                <div class="transition-count">
+                  <div class="transition-count__inner">
+                    <div class="countdown">
+                      <div class="count">${transitionCountValue}</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="transition-detail transition-detail--actions">
                   <div class="transition-detail__inner">

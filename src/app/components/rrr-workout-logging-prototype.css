@@ -4,7 +4,8 @@
   --proto-border: var(--rrr-colors-grayscale-40);
   --proto-text-muted: var(--rrr-colors-grayscale-70);
   --proto-accent: var(--rrr-colors-activity-indigo-60);
-  --proto-transition-duration: 220ms;
+  /* --proto-transition-duration: 220ms; */
+  --proto-transition: var(--rrr-transition-fromto);
   --proto-stack-width: 28rem;
 }
 
@@ -55,7 +56,7 @@
   inset: 0;
   background: var(--rrr-colors-grayscale-00);
   opacity: 0;
-  transition: opacity var(--proto-transition-duration) ease;
+  transition: opacity var(--proto-transition);
   pointer-events: none;
   z-index: 2;
 }
@@ -67,19 +68,23 @@
 .timeline-item {
   position: relative;
   z-index: 1;
-  border: 1px solid var(--proto-border);
   background: var(--proto-surface);
   padding: var(--rrr-spacing-m);
   display: grid;
   gap: var(--rrr-spacing-s);
-  transition: opacity var(--proto-transition-duration) ease, transform var(--proto-transition-duration) ease, border-radius var(--proto-transition-duration) ease, box-shadow var(--proto-transition-duration) ease, background var(--proto-transition-duration) ease, padding var(--proto-transition-duration) ease, padding-left var(--proto-transition-duration) ease, margin var(--proto-transition-duration) ease, border-color var(--proto-transition-duration) ease;
+  transition: opacity var(--proto-transition), transform var(--proto-transition), border-radius var(--proto-transition), box-shadow var(--proto-transition), background var(--proto-transition), padding var(--proto-transition), padding-left var(--proto-transition), margin var(--proto-transition), border-color var(--proto-transition);
+  border: 1.5px solid transparent;
+}
+
+.timeline-item:not([data-state='active']) {
+  border-bottom-color: var(--proto-border);
+  border-bottom-width: 1px;
 }
 
 .timeline-item--rest {
   position: relative;
   padding: var(--rrr-spacing-s) var(--rrr-spacing-m);
   gap: var(--rrr-spacing-xs);
-  border-style: dashed;
   background: var(--rrr-colors-serene-mint-10);
   color: var(--rrr-colors-serene-mint-80);
   overflow: hidden;
@@ -99,6 +104,7 @@
 
 .timeline-item--rest[data-state='active'] {
   padding-left: calc(var(--rrr-spacing-m) + .75rem);
+  border-color: var(--rrr-colors-serene-mint-60);
 }
 
 .rest-header {
@@ -116,13 +122,18 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: grid-template-rows var(--proto-transition-duration) ease, opacity var(--proto-transition-duration) ease, visibility 0s linear var(--proto-transition-duration);
+  transition: grid-template-rows var(--proto-transition), opacity var(--proto-transition), visibility 0s linear var(--proto-transition-duration);
 }
 
 .set-detail__inner {
   overflow: hidden;
   display: grid;
   gap: var(--rrr-spacing-s);
+}
+
+.timeline-item--set[data-state='active'] {
+  background: linear-gradient(to bottom, var(--rrr-colors-activity-indigo-10), 5%, white);
+  border-color: var(--rrr-colors-activity-indigo-60);
 }
 
 .timeline-item--set[data-state='active'] .set-detail {
@@ -139,7 +150,7 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: grid-template-rows var(--proto-transition-duration) ease, opacity var(--proto-transition-duration) ease, visibility 0s linear var(--proto-transition-duration);
+  transition: grid-template-rows var(--proto-transition), opacity var(--proto-transition), visibility 0s linear var(--proto-transition-duration);
 }
 
 .rest-detail__inner {
@@ -162,7 +173,7 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: grid-template-rows var(--proto-transition-duration) ease, opacity var(--proto-transition-duration) ease, visibility 0s linear var(--proto-transition-duration);
+  transition: grid-template-rows var(--proto-transition), opacity var(--proto-transition), visibility 0s linear var(--proto-transition-duration);
 }
 
 .transition-detail__inner {
@@ -174,6 +185,25 @@
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+  transition-delay: 0s, 0s, 0s;
+}
+
+.transition-count {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition: grid-template-rows var(--proto-transition), opacity var(--proto-transition), visibility 0s linear var(--proto-transition-duration);
+}
+
+.transition-count__inner {
+  overflow: hidden;
+}
+
+.timeline-item--transition[data-state='active'] .transition-count {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
   transition-delay: 0s, 0s, 0s;
 }
 
@@ -225,13 +255,14 @@
 }
 
 .timeline-item--transition {
-  background: var(--rrr-colors-serene-mint-10);
   overflow: hidden;
   color: var(--rrr-colors-serene-mint-80);
 }
 
 .timeline-item--transition[data-state='active'] {
+  background: linear-gradient(to bottom, var(--rrr-colors-serene-mint-10), 5%, white);
   padding-left: calc(var(--rrr-spacing-m) + .75rem);
+  border-color: var(--rrr-colors-serene-mint-60);
 }
 
 .exercise-done-divider {
@@ -245,7 +276,7 @@
   line-height: 1.1;
   text-transform: none;
   opacity: 0.55;
-  transition: opacity var(--proto-transition-duration) ease, background var(--proto-transition-duration) ease, border-color var(--proto-transition-duration) ease;
+  transition: opacity var(--proto-transition), background var(--proto-transition), border-color var(--proto-transition);
 }
 
 .exercise-done-divider.is-complete {
@@ -281,7 +312,7 @@
   font-size: var(--rrr-font-size-xl);
   font-family: var(--rrr-font-family-heading);
   color: var(--rrr-colors-activity-indigo-70);
-  transition: font-size var(--proto-transition-duration) ease;
+  transition: font-size var(--proto-transition);
   display: flex;
   align-items: baseline;
   flex-wrap: nowrap;
@@ -294,7 +325,7 @@
   max-width: 0;
   opacity: 0;
   white-space: nowrap;
-  transition: max-width var(--proto-transition-duration) ease, opacity var(--proto-transition-duration) ease;
+  transition: max-width var(--proto-transition), opacity var(--proto-transition);
 }
 
 .timeline-item[data-state='active'] .name-prefix {
@@ -328,7 +359,6 @@
 }
 
 .complete {
-  border: 1px dashed var(--proto-border);
   border-radius: var(--rrr-radius-l);
   padding: var(--rrr-spacing-m);
   background: color-mix(in oklab, var(--proto-surface), var(--proto-accent) 5%);
@@ -353,7 +383,7 @@
   bottom: 0;
   display: block;
   opacity: 0;
-  transition: opacity var(--proto-transition-duration) ease;
+  transition: opacity var(--proto-transition);
 }
 
 .timeline-item--rest[data-state='active'] .countdown--vertical,

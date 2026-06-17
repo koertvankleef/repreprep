@@ -5,7 +5,7 @@
   --rrr-button-border-width: var(--rrr-border-width);
   --rrr-button-min-block-size: var(--rrr-control-min-block-size);
   --rrr-button-shadow: var(--rrr-shadow-button);
-  --rrr-button-transition: var(--rrr-default-transition);
+  --rrr-button-transition: var(--rrr-transition-default);
   --rrr-button-hover-shadow: var(--rrr-depth-2-shadow);
   --rrr-button-active-shadow: var(--rrr-depth-1-shadow);
   --rrr-button-disabled-background: var(--rrr-colors-grayscale-30);
