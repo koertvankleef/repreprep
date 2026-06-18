@@ -30,7 +30,7 @@ export class RrrRoutineList extends HTMLElement {
 
     storageService.saveWorkout(workout)
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    window.location.hash = `#/workouts/${workout.id}`
+    window.location.hash = `#/workouts/${workout.id}/log`
   }
 
   private render(): void {

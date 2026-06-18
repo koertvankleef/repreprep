@@ -123,4 +123,29 @@ describe('rrr-workout-logging-prototype motion invariants', () => {
 
     component.clearTimers()
   })
+
+  it('renders completion as active and emits finish event for handoff', () => {
+    const element = document.createElement('rrr-workout-logging-prototype') as HTMLElement & Record<string, unknown>
+    document.body.appendChild(element)
+
+    const component = element as unknown as {
+      stage: string
+      render: () => void
+    }
+
+    const finishedSpy = vi.fn()
+    element.addEventListener('rrr-workout-flow-finished', finishedSpy)
+
+    component.stage = 'workout-complete'
+    component.render()
+
+    const completionCard = element.shadowRoot?.querySelector<HTMLElement>('.timeline-item--complete')
+    expect(completionCard).toBeTruthy()
+    expect(completionCard?.dataset.state).toBe('active')
+
+    const finishButton = completionCard?.querySelector<HTMLElement>('rrr-button[data-action="finish-workout"]')
+    expect(finishButton).toBeTruthy()
+    finishButton?.click()
+    expect(finishedSpy).toHaveBeenCalledTimes(1)
+  })
 })

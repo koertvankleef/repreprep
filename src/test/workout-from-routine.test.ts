@@ -8,6 +8,7 @@ function makeRoutineExercise(exerciseId: string): RoutineExercise {
   return {
     id: `re-${exerciseId}`,
     exerciseId,
+    restSeconds: 35,
     plannedSets: [
       { kind: 'reps', targetReps: 8, targetWeightKg: 40 },
       { kind: 'reps', targetReps: 10, targetWeightKg: null },
@@ -35,6 +36,8 @@ describe('createWorkoutFromRoutine', () => {
     expect(workout?.date).toBe('2026-06-14')
     expect(workout?.exercises).toHaveLength(1)
     expect(workout?.exercises[0]?.exerciseId).toBe(exerciseId)
+    expect(workout?.transitionSeconds).toBe(10)
+    expect(workout?.exercises[0]?.restSeconds).toBe(35)
   })
 
   test('workout stores routineId', () => {

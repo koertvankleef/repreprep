@@ -220,6 +220,8 @@ export const nlNlMessages = {
   'routineEditor.status.saveFirst': 'Sla de routine eerst op voordat je een workout start.',
   'routineEditor.status.startError': 'Kon geen workout starten vanuit deze routine.',
   'routineEditor.field.name.placeholder': 'Naam van routine',
+  'routineEditor.field.transitionSeconds': 'Overgangsseconden tussen oefeningen',
+  'routineEditor.field.restSeconds': 'Rustseconden tussen sets',
   'routineEditor.section.exercises': 'Oefeningen',
   'routineEditor.exercises.empty': 'Nog geen oefeningen toegevoegd.',
   'routineEditor.exercises.unknown': 'Onbekende oefening',

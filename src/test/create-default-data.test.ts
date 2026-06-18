@@ -27,6 +27,8 @@ describe('createDefaultData', () => {
     const version = data.routineVersions[0]
 
     expect(version?.exercises).toHaveLength(7)
+    expect(version?.transitionSeconds).toBe(10)
+    expect(version?.exercises.every((exercise) => exercise.restSeconds === 20)).toBe(true)
   })
 
   test('default routine version exercises reference valid exercise ids', () => {

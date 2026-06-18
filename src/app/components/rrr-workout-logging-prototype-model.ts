@@ -130,7 +130,7 @@ export type ActivationPlan =
       nextExerciseRemainingSeconds: number
     }
 
-export const EXERCISES: Exercise[] = [
+const DEFAULT_EXERCISES: Exercise[] = [
   { name: 'Push-ups', loggingType: 'reps', totalSets: 3, restSeconds: 20, previousPerformance: '10 reps', suggestedReps: 12 },
   {
     name: 'Dumbbell Row',
@@ -143,22 +143,17 @@ export const EXERCISES: Exercise[] = [
   { name: 'Plank', loggingType: 'time', totalSets: 1, restSeconds: 0, previousPerformance: '45 sec', targetDurationSeconds: 30 },
 ]
 
-export const EXERCISE_TRANSITION_SECONDS = 10
+const DEFAULT_EXERCISE_TRANSITION_SECONDS = 10
 export const REP_CONFIRM_GRACE_SECONDS = 5
 export const REP_ADJUST_AUTO_PROCEED_SECONDS = 3
 
-export function getExercise(index: number): Exercise {
-  const exercise = EXERCISES[index]
-  if (!exercise) {
-    throw new Error(`Missing exercise at index ${index}`)
-  }
-  return exercise
-}
+export let EXERCISES: Exercise[] = DEFAULT_EXERCISES
+export let EXERCISE_TRANSITION_SECONDS = DEFAULT_EXERCISE_TRANSITION_SECONDS
 
-export function buildTimeline(): TimelineItem[] {
+export function buildTimeline(exercises: Exercise[], exerciseTransitionSeconds: number): TimelineItem[] {
   const timeline: TimelineItem[] = []
 
-  EXERCISES.forEach((exercise, exerciseIndex) => {
+  exercises.forEach((exercise, exerciseIndex) => {
     for (let setNumber = 1; setNumber <= exercise.totalSets; setNumber += 1) {
       timeline.push({ kind: 'set', exerciseIndex, setNumber })
 
@@ -167,12 +162,36 @@ export function buildTimeline(): TimelineItem[] {
       }
     }
 
-    if (exerciseIndex < EXERCISES.length - 1) {
-      timeline.push({ kind: 'transition', exerciseIndex, durationSeconds: EXERCISE_TRANSITION_SECONDS })
+    if (exerciseIndex < exercises.length - 1) {
+      timeline.push({ kind: 'transition', exerciseIndex, durationSeconds: exerciseTransitionSeconds })
     }
   })
 
   return timeline
 }
 
-export const TIMELINE = buildTimeline()
+export let TIMELINE = buildTimeline(EXERCISES, EXERCISE_TRANSITION_SECONDS)
+
+export function configureWorkoutLoggingPrototypeModel(input: {
+  exercises: Exercise[]
+  timeline?: TimelineItem[]
+  exerciseTransitionSeconds?: number
+}): void {
+  EXERCISE_TRANSITION_SECONDS = Math.max(0, input.exerciseTransitionSeconds ?? DEFAULT_EXERCISE_TRANSITION_SECONDS)
+  EXERCISES = [...input.exercises]
+  TIMELINE = input.timeline ? [...input.timeline] : buildTimeline(EXERCISES, EXERCISE_TRANSITION_SECONDS)
+}
+
+export function resetWorkoutLoggingPrototypeModel(): void {
+  EXERCISES = DEFAULT_EXERCISES
+  EXERCISE_TRANSITION_SECONDS = DEFAULT_EXERCISE_TRANSITION_SECONDS
+  TIMELINE = buildTimeline(EXERCISES, EXERCISE_TRANSITION_SECONDS)
+}
+
+export function getExercise(index: number): Exercise {
+  const exercise = EXERCISES[index]
+  if (!exercise) {
+    throw new Error(`Missing exercise at index ${index}`)
+  }
+  return exercise
+}

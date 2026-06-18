@@ -56,9 +56,9 @@ export class WorkoutStorageService {
     this.adapter.save(this.current)
   }
 
-  saveRoutine(routineId: string | null, name: string, exercises: RoutineExercise[]): Routine {
+  saveRoutine(routineId: string | null, name: string, exercises: RoutineExercise[], transitionSeconds: number): Routine {
     if (routineId && getRoutine(this.current, routineId)) {
-      this.current = editRoutineRecord(this.current, routineId, name, exercises)
+      this.current = editRoutineRecord(this.current, routineId, name, exercises, transitionSeconds)
       this.adapter.save(this.current)
       const updated = getRoutine(this.current, routineId)
 
@@ -69,7 +69,7 @@ export class WorkoutStorageService {
       return updated
     }
 
-    this.current = createRoutineRecord(this.current, name, exercises)
+    this.current = createRoutineRecord(this.current, name, exercises, transitionSeconds)
     this.adapter.save(this.current)
 
     const created = this.current.routines.at(-1)

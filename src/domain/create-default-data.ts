@@ -1,6 +1,9 @@
 import type { AppData, ExerciseDefinition, ExerciseKind, PlannedSet, Routine, RoutineExercise, RoutineVersion } from './types.ts'
 import { generateId as generateUniqueId } from '../utils/id.ts'
 
+const DEFAULT_REST_SECONDS = 20
+const DEFAULT_TRANSITION_SECONDS = 10
+
 interface SeedExercise {
   name: string
   kind: ExerciseKind
@@ -55,6 +58,7 @@ export function createDefaultData(): AppData {
       id: generateId(),
       exerciseId: exercise.id,
       plannedSets,
+      restSeconds: DEFAULT_REST_SECONDS,
     }
   })
 
@@ -63,6 +67,7 @@ export function createDefaultData(): AppData {
     routineId,
     previousVersionId: null,
     createdAt: timestamp,
+    transitionSeconds: DEFAULT_TRANSITION_SECONDS,
     exercises: routineExercises,
   }
 

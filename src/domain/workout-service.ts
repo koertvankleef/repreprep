@@ -9,6 +9,9 @@ import type {
 } from './types.ts'
 import { generateId } from '../utils/id.ts'
 
+const DEFAULT_REST_SECONDS = 20
+const DEFAULT_TRANSITION_SECONDS = 10
+
 export function addWorkout(data: AppData, workout: Workout): AppData {
   return {
     ...data,
@@ -147,6 +150,7 @@ export function createWorkoutFromRoutine(data: AppData, routineId: string, date:
     id: generateId(),
     exerciseId: re.exerciseId,
     sets: re.plannedSets.map((ps) => createSetFromPlannedSet(ps)),
+    restSeconds: Math.max(0, re.restSeconds ?? DEFAULT_REST_SECONDS),
     notes: re.notes ?? '',
   }))
 
@@ -155,6 +159,7 @@ export function createWorkoutFromRoutine(data: AppData, routineId: string, date:
     date,
     notes: '',
     exercises,
+    transitionSeconds: Math.max(0, version.transitionSeconds ?? DEFAULT_TRANSITION_SECONDS),
     createdAt: timestamp,
     updatedAt: timestamp,
     routineId,

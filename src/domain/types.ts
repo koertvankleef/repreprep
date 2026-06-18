@@ -23,6 +23,7 @@ export interface Workout {
   date: string
   notes: string
   exercises: WorkoutExerciseEntry[]
+  transitionSeconds?: number
   createdAt: string
   updatedAt: string
   routineId?: string
@@ -44,6 +45,7 @@ export interface RoutineVersion {
   routineId: string
   previousVersionId: string | null
   createdAt: string
+  transitionSeconds?: number
   exercises: RoutineExercise[]
 }
 
@@ -51,6 +53,7 @@ export interface RoutineExercise {
   id: string
   exerciseId: string
   plannedSets: PlannedSet[]
+  restSeconds?: number
   notes?: string
 }
 
@@ -71,6 +74,7 @@ export interface WorkoutExerciseEntry {
   id: string
   exerciseId: string
   sets: SetEntry[]
+  restSeconds?: number
   notes: string
 }
 

@@ -220,6 +220,8 @@ export const enUsMessages = {
   'routineEditor.status.saveFirst': 'Save the routine first before starting a workout.',
   'routineEditor.status.startError': 'Could not start workout from this routine.',
   'routineEditor.field.name.placeholder': 'Routine name',
+  'routineEditor.field.transitionSeconds': 'Transition seconds between exercises',
+  'routineEditor.field.restSeconds': 'Rest seconds between sets',
   'routineEditor.section.exercises': 'Exercises',
   'routineEditor.exercises.empty': 'No exercises added yet.',
   'routineEditor.exercises.unknown': 'Unknown exercise',

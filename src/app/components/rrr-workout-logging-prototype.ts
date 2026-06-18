@@ -153,6 +153,16 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
     if (action === 'next-now' || action === 'next') {
       this.moveToNextTimelineItem()
+      return
+    }
+
+    if (action === 'finish-workout') {
+      this.dispatchEvent(
+        new CustomEvent('rrr-workout-flow-finished', {
+          bubbles: true,
+          composed: true,
+        }),
+      )
     }
   }
 
@@ -389,6 +399,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       this.clearTimers()
       this.stage = 'workout-complete'
       this.render()
+      this.scrollCompleteIntoView()
       return
     }
 
@@ -758,6 +769,13 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     requestAnimationFrame(() => {
       const active = this.shadowRoot?.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
       active?.scrollIntoView({ behavior, block: 'center' })
+    })
+  }
+
+  private scrollCompleteIntoView(): void {
+    requestAnimationFrame(() => {
+      const complete = this.shadowRoot?.querySelector<HTMLElement>('.timeline-item--complete')
+      complete?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     })
   }
 

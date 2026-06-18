@@ -159,10 +159,13 @@ export function renderPrototypeMarkup(state: PrototypeViewState, styles: string,
 
         ${state.stage === 'workout-complete'
           ? `
-            <section class="complete">
+            <section class="timeline-item timeline-item--complete" data-state="active">
               <h2 class="name">Workout complete</h2>
               <div class="hint">Logged sets: ${state.completedSetCount}</div>
-              <div class="hint">Prototype success condition: you should feel guided without extra taps.</div>
+              <div class="hint">Your logged values were saved during the flow.</div>
+              <div class="actions">
+                <rrr-button type="button" tone="accent" data-action="finish-workout">Review Workout</rrr-button>
+              </div>
             </section>
           `
           : ''}

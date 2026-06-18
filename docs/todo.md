@@ -20,6 +20,10 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] Prototype segmented workout rail where section ranges are encoded as mint/indigo zones that reflect workout structure.
 - [ ] Prototype marker color/state changes based on active workout segment while keeping the underlying rail visually subtle.
 - [ ] remind user via an app level warning after a certain time (days?) that the app stores in browser cache by default and that they should save the JSON as backup intermittently. Perhaps even store in the cache when they last exported so that the reminder comes up based on that.
+- [ ] [in progress] Introduce layered messaging and error reporting with clear severity semantics.
+- [ ] Add app-level banner messaging for truly global states: internal app failure, stale client warning, and local-only storage backup reminder.
+- [ ] Add toast-level messaging rules for non-blocking issues that may have consequences.
+- [ ] Keep inline feedback for local form or import/export validation issues and field-level corrections.
 
 ## Workout Rep Logging Flow Thread
 
@@ -40,7 +44,12 @@ Reference specification: `docs/workout-rep-logging-flow-spec.md`
 - [x] Phase 4: implement grace-period interruption controls (`Edit`, `Start rest now`) and required cancellation behavior.
 - [x] Phase 5: wire rest lifecycle and auto-focus/auto-advance behavior without implying timed-set auto-start.
 - [x] Phase 6: formalize edit-mode split (`during grace` in live flow affects flow; `historical edit` is outside the flow screen and affects data only).
-- [ ] Phase 7: accessibility pass for rep control names, dynamic confirm labels, and confirmation announcements.
-- [ ] Phase 8: tests for state transitions, event emission order, and edge cases (unchanged suggested value confirm, edit during grace, timed stop early).
-- [ ] Phase 9: integrate workout logging flow from prototype into main product surfaces (start workout, active logging UI, and saved workout editing boundaries).
+- [x] Phase 7: accessibility pass for rep control names, dynamic confirm labels, and confirmation announcements.
+- [x] Phase 8: tests for state transitions, event emission order, and edge cases (unchanged suggested value confirm, edit during grace, timed stop early).
+- [ ] [in progress] Phase 9: integrate workout logging flow from prototype into main product surfaces (start workout, active logging UI, and saved workout editing boundaries).
+- [x] Phase 9a: route start-workout into active logging screen via #/workouts/:workoutId/log.
+- [x] Phase 9b: map stored workout data into logging timeline via workout-to-logging adapter.
+- [x] Phase 9c: persist logging events incrementally into workout set entries during active flow.
+- [x] Phase 9d: support rest and transition preferences from routine metadata instead of temporary defaults.
+- [x] Phase 9e: align active logging completion and exit path with product workout summary or editor entrypoint.
 - [ ] Phase 10: retire prototype-only path after parity QA, keeping the prototype only as optional dev playground if still useful.

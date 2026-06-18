@@ -99,7 +99,7 @@
   }
 
   &[data-state='active'] .rest-header {
-    font-size: var(--rrr-font-size-l);
+    font-size: var(--rrr-font-size-xl);
   }
 }
 
@@ -174,9 +174,11 @@
   justify-content: space-between;
   gap: var(--rrr-spacing-s);
   font-size: var(--rrr-font-size-2xl);
+  font-family: var(--rrr-font-family-heading);
 }
 
 .set-count {
+  font-family: var(--rrr-font-family);
   font-size: var(--rrr-font-size-s);
   color: currentColor;
   font-weight: var(--rrr-font-weight-normal);
@@ -197,8 +199,8 @@
 }
 
 .stage-count {
-  font-size: inherit;
-  font-family: inherit;
+  font-family: var(--rrr-font-family);
+  font-size: var(--rrr-font-size-l);
   font-weight: var(--rrr-font-weight-normal);
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -329,12 +331,16 @@
   min-height: 3rem;
 }
 
-.complete {
+.timeline-item--complete {
   border-radius: var(--rrr-radius-l);
   padding: var(--rrr-spacing-m);
   background: color-mix(in oklab, var(--proto-surface), var(--proto-accent) 5%);
   display: grid;
   gap: var(--rrr-spacing-s);
+}
+
+.timeline-item--complete[data-state='active'] {
+  border-color: var(--rrr-colors-activity-indigo-40);
 }
 
 .countdown {

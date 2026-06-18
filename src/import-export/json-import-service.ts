@@ -57,6 +57,7 @@ function isValidWorkoutExerciseEntry(obj: unknown): obj is WorkoutExerciseEntry 
     typeof obj.exerciseId === 'string' &&
     Array.isArray(obj.sets) &&
     obj.sets.every((set) => isValidSetEntry(set)) &&
+    (obj.restSeconds === undefined || typeof obj.restSeconds === 'number') &&
     typeof obj.notes === 'string'
   )
 }
@@ -88,6 +89,7 @@ export function isValidWorkout(obj: unknown): obj is Workout {
     typeof obj.notes === 'string' &&
     Array.isArray(obj.exercises) &&
     obj.exercises.every((entry) => isValidWorkoutExerciseEntry(entry)) &&
+    (obj.transitionSeconds === undefined || typeof obj.transitionSeconds === 'number') &&
     typeof obj.createdAt === 'string' &&
     typeof obj.updatedAt === 'string' &&
     (obj.routineId === undefined || typeof obj.routineId === 'string') &&
@@ -124,6 +126,7 @@ function isValidRoutineExercise(obj: unknown): obj is RoutineExercise {
     typeof obj.exerciseId === 'string' &&
     Array.isArray(obj.plannedSets) &&
     obj.plannedSets.every((ps) => isValidPlannedSet(ps)) &&
+    (obj.restSeconds === undefined || typeof obj.restSeconds === 'number') &&
     (obj.notes === undefined || typeof obj.notes === 'string')
   )
 }
@@ -138,6 +141,7 @@ function isValidRoutineVersion(obj: unknown): obj is RoutineVersion {
     typeof obj.routineId === 'string' &&
     (typeof obj.previousVersionId === 'string' || obj.previousVersionId === null) &&
     typeof obj.createdAt === 'string' &&
+    (obj.transitionSeconds === undefined || typeof obj.transitionSeconds === 'number') &&
     Array.isArray(obj.exercises) &&
     obj.exercises.every((re) => isValidRoutineExercise(re))
   )
