@@ -27,6 +27,12 @@ type TimelineItem =
     }
 
 type ActiveStage = 'locked' | 'set' | 'rest' | 'rest-paused' | 'transition' | 'transition-paused' | 'workout-complete'
+type WorkoutEvent = {
+  type: 'repResultConfirmed'
+  exerciseIndex: number
+  setNumber: number
+  reps: number
+}
 
 const EXERCISES: Exercise[] = [
   { name: 'Push-ups', totalSets: 3, restSeconds: 20, previousPerformance: '10 reps', suggestedReps: 12 },
@@ -35,6 +41,7 @@ const EXERCISES: Exercise[] = [
 ]
 
 const EXERCISE_TRANSITION_SECONDS = 10
+const REP_CONFIRM_GRACE_SECONDS = 5
 
 function getExercise(index: number): Exercise {
   const exercise = EXERCISES[index]
@@ -72,12 +79,15 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
   private activeTimelineIndex = 0
   private repValue = getExercise(0).suggestedReps
-  private stage: ActiveStage = 'locked'
+  private stage: ActiveStage | 'set-grace' = 'locked'
   private restRemainingSeconds = 0
+  private repConfirmGraceRemainingSeconds = REP_CONFIRM_GRACE_SECONDS
   private nextExerciseRemainingSeconds = EXERCISE_TRANSITION_SECONDS
   private restIntervalId: number | null = null
+  private repConfirmGraceIntervalId: number | null = null
   private exerciseCountdownIntervalId: number | null = null
   private motionCleanupId: number | null = null
+  private lastConfirmedRepValue: number | null = null
   private readonly completedSetsByExercise = EXERCISES.map(() => 0)
   private overallProgressVisualPercent = 0
 
@@ -114,19 +124,25 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     }
 
     if (action === 'rep-minus') {
+      if (this.stage !== 'set') {
+        return
+      }
       this.repValue = Math.max(0, this.repValue - 1)
       this.syncActiveSetRepValue()
       return
     }
 
     if (action === 'rep-plus') {
+      if (this.stage !== 'set') {
+        return
+      }
       this.repValue += 1
       this.syncActiveSetRepValue()
       return
     }
 
     if (action === 'done-set') {
-      this.completeSet()
+      this.confirmRepResult()
       return
     }
 
@@ -159,15 +175,57 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     this.activateCurrentTimelineItem()
   }
 
-  private completeSet(): void {
+  private confirmRepResult(): void {
     const currentItem = TIMELINE[this.activeTimelineIndex]
-    if (!currentItem || currentItem.kind !== 'set') {
+    if (!currentItem || currentItem.kind !== 'set' || this.stage !== 'set') {
       return
     }
 
     this.completedSetsByExercise[currentItem.exerciseIndex] = currentItem.setNumber
+    this.lastConfirmedRepValue = this.repValue
+    this.emitWorkoutEvent({
+      type: 'repResultConfirmed',
+      exerciseIndex: currentItem.exerciseIndex,
+      setNumber: currentItem.setNumber,
+      reps: this.repValue,
+    })
     this.syncOverallProgress()
+
+    if (this.nextTimelineItem()?.kind === 'rest') {
+      this.enterRepConfirmGracePeriod()
+      return
+    }
+
     this.moveToNextTimelineItem()
+  }
+
+  private emitWorkoutEvent(detail: WorkoutEvent): void {
+    this.dispatchEvent(
+      new CustomEvent<WorkoutEvent>('rrr-workout-event', {
+        detail,
+        bubbles: true,
+        composed: true,
+      }),
+    )
+  }
+
+  private enterRepConfirmGracePeriod(): void {
+    this.clearRepConfirmGraceTimer()
+    this.repConfirmGraceRemainingSeconds = REP_CONFIRM_GRACE_SECONDS
+    this.stage = 'set-grace'
+
+    this.repConfirmGraceIntervalId = window.setInterval(() => {
+      this.repConfirmGraceRemainingSeconds -= 1
+      if (this.repConfirmGraceRemainingSeconds <= 0) {
+        this.clearRepConfirmGraceTimer()
+        this.moveToNextTimelineItem()
+        return
+      }
+
+      this.updateLiveStageVisuals()
+    }, 1000)
+
+    this.transitionToCurrentActiveItem()
   }
 
   private moveToNextTimelineItem(): void {
@@ -190,6 +248,8 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     }
 
     if (item.kind === 'set') {
+      this.clearRepConfirmGraceTimer()
+      this.lastConfirmedRepValue = null
       this.stage = 'set'
       this.repValue = getExercise(item.exerciseIndex).suggestedReps
       this.transitionToCurrentActiveItem()
@@ -294,6 +354,13 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     }
   }
 
+  private clearRepConfirmGraceTimer(): void {
+    if (this.repConfirmGraceIntervalId !== null) {
+      clearInterval(this.repConfirmGraceIntervalId)
+      this.repConfirmGraceIntervalId = null
+    }
+  }
+
   private clearExerciseCountdownTimer(): void {
     if (this.exerciseCountdownIntervalId !== null) {
       clearInterval(this.exerciseCountdownIntervalId)
@@ -302,6 +369,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
   }
 
   private clearTimers(): void {
+    this.clearRepConfirmGraceTimer()
     this.clearRestTimer()
     this.clearExerciseCountdownTimer()
   }
@@ -369,12 +437,20 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
       const item = TIMELINE[index]
       if (item?.kind === 'set') {
-        const isActiveSet = timelineState === 'active' && this.stage === 'set'
+        const isActiveSet = timelineState === 'active' && (this.stage === 'set' || this.stage === 'set-grace')
 
         const repValueEl = element.querySelector<HTMLElement>('.rep-value')
         if (repValueEl && isActiveSet) {
           const exercise = getExercise(item.exerciseIndex)
-          repValueEl.textContent = exercise.name === 'Plank' ? `${this.repValue * 5} sec` : `${this.repValue} reps`
+          const displayedRepValue = this.stage === 'set-grace' && this.lastConfirmedRepValue !== null
+            ? this.lastConfirmedRepValue
+            : this.repValue
+          repValueEl.textContent = exercise.name === 'Plank' ? `${displayedRepValue * 5} sec` : `${displayedRepValue} reps`
+        }
+
+        const graceCountdownValueEl = element.querySelector<HTMLElement>('.grace-countdown-value')
+        if (graceCountdownValueEl && timelineState === 'active' && this.stage === 'set-grace') {
+          graceCountdownValueEl.textContent = `${this.repConfirmGraceRemainingSeconds}`
         }
       }
 
@@ -510,6 +586,10 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     return TIMELINE[this.activeTimelineIndex] ?? null
   }
 
+  private nextTimelineItem(): TimelineItem | null {
+    return TIMELINE[this.activeTimelineIndex + 1] ?? null
+  }
+
   private scrollActiveIntoView(behavior: ScrollBehavior = 'smooth'): void {
     requestAnimationFrame(() => {
       const active = this.shadowRoot?.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
@@ -589,6 +669,14 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
         const transitionRemainingPercent = `${(this.nextExerciseRemainingSeconds / EXERCISE_TRANSITION_SECONDS) * 100}%`
         fill.style.height = transitionRemainingPercent
       }
+      return
+    }
+
+    if (this.stage === 'set-grace') {
+      const countdown = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--set[data-state="active"] .grace-countdown-value')
+      if (countdown) {
+        countdown.textContent = `${this.repConfirmGraceRemainingSeconds}`
+      }
     }
   }
 
@@ -624,7 +712,10 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
             const isActive = state === 'active'
 
             if (item.kind === 'set') {
-              const repDisplay = exercise.name === 'Plank' ? `${this.repValue * 5} sec` : `${this.repValue} reps`
+              const isActiveSet = isActive && this.stage === 'set'
+              const isActiveGrace = isActive && this.stage === 'set-grace'
+              const displayRepValue = isActiveGrace && this.lastConfirmedRepValue !== null ? this.lastConfirmedRepValue : this.repValue
+              const repDisplay = exercise.name === 'Plank' ? `${displayRepValue * 5} sec` : `${displayRepValue} reps`
               return `
                 <section class="timeline-item timeline-item--set" data-state="${state}">
                   <div class="set-header">
@@ -634,12 +725,21 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
                   <div class="set-detail">
                     <div class="set-detail__inner">
                       <div class="last-time">Previously: ${exercise.previousPerformance}</div>
-                      <div class="rep-row">
-                        <rrr-button type="button" variant="outline" data-action="rep-minus" aria-label="decrease reps">-</rrr-button>
-                        <div class="rep-value">${repDisplay}</div>
-                        <rrr-button type="button" variant="outline" data-action="rep-plus" aria-label="increase reps">+</rrr-button>
-                      </div>
-                      <div class="actions"><rrr-button type="button" data-action="done-set">Done</rrr-button></div>
+                      ${isActiveGrace
+                        ? `
+                          <div class="rep-row">
+                            <div class="rep-value">${repDisplay}</div>
+                          </div>
+                          <div class="hint">Logged. Rest starts in <span class="grace-countdown-value">${this.repConfirmGraceRemainingSeconds}</span>...</div>
+                        `
+                        : `
+                          <div class="rep-row">
+                            <rrr-button type="button" variant="outline" data-action="rep-minus" aria-label="decrease reps" ${isActiveSet ? '' : 'disabled'}>-</rrr-button>
+                            <div class="rep-value">${repDisplay}</div>
+                            <rrr-button type="button" variant="outline" data-action="rep-plus" aria-label="increase reps" ${isActiveSet ? '' : 'disabled'}>+</rrr-button>
+                          </div>
+                          <div class="actions"><rrr-button type="button" data-action="done-set" ${isActiveSet ? '' : 'disabled'}>Confirm</rrr-button></div>
+                        `}
                     </div>
                   </div>
                 </section>

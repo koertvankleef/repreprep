@@ -33,10 +33,12 @@ Reference specification: `docs/workout-rep-logging-flow-spec.md`
 - [x] Phase 1b: apply same canonical rename in runtime state names and workflow branches in one big-bang change.
 - [x] Phase 1c: execute regression-only validation (tests + manual QA), and explicitly skip backward-compat checks.
 - [x] Phase 1d: add release note that existing local data must be cleared for this rollout.
-- [ ] Phase 2: implement rep-set confirmation pipeline (`editable value -> confirm -> grace -> auto-rest`) with explicit `repResultConfirmed` as logging trigger.
+- [x] Phase 2: implement rep-set confirmation pipeline (`editable value -> confirm -> grace -> auto-rest`) with explicit `repResultConfirmed` as logging trigger.
 - [ ] Phase 3: implement timed-set pipeline (`ready -> Start -> active -> complete -> grace -> auto-rest`) with explicit start semantics.
 - [ ] Phase 4: implement grace-period interruption controls (`Edit`, `Start rest now`) and required cancellation behavior.
 - [ ] Phase 5: wire rest lifecycle and auto-focus/auto-advance behavior without implying timed-set auto-start.
 - [ ] Phase 6: add edit-mode split (`during grace` affects flow, `historical edit` affects data only).
 - [ ] Phase 7: accessibility pass for rep control names, dynamic confirm labels, and confirmation announcements.
 - [ ] Phase 8: tests for state transitions, event emission order, and edge cases (unchanged suggested value confirm, edit during grace, timed stop early).
+- [ ] Phase 9: integrate workout logging flow from prototype into main product surfaces (start workout, active logging UI, and saved workout editing boundaries).
+- [ ] Phase 10: retire prototype-only path after parity QA, keeping the prototype only as optional dev playground if still useful.
