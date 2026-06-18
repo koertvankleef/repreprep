@@ -212,6 +212,41 @@ Behavior:
 - Start now: cancel grace and start rest immediately.
 - No interaction: rest auto-starts when grace reaches zero.
 
+## Edit-Mode Split (Live Flow vs Historical Data)
+
+The product must treat Edit as two distinct modes.
+
+### Live-Flow Edit (during grace)
+
+Scope:
+
+- Only for the currently active set while grace is running.
+
+Behavior:
+
+- May affect workflow state.
+- Cancels grace.
+- Returns to editable set state for the active item.
+- Re-enters confirm and grace behavior after user confirmation.
+
+### Historical Edit (outside live flow)
+
+Scope:
+
+- Outside the live workout flow screen (for example, history or workout review surfaces).
+
+Behavior:
+
+- Data-only correction.
+- Must not drive live flow state.
+- Must not start/cancel timers.
+- Must not trigger rest/auto-advance behavior.
+
+Acceptance boundary:
+
+- The live workout flow screen does not expose historical edit operations.
+- Historical edit operations do not mutate live flow runtime state.
+
 ## Rest and Auto-Advance
 
 Rest requirements:
