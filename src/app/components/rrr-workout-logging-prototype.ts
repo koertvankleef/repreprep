@@ -301,7 +301,9 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       this.updateLiveStageVisuals()
     }, 1000)
 
-    this.render()
+    if (!this.patchTimelineStateInPlace()) {
+      this.render()
+    }
   }
 
   private stopTimedSetEarly(): void {
@@ -400,7 +402,9 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       this.updateLiveStageVisuals()
     }, 1000)
 
-    this.render()
+    if (!this.patchTimelineStateInPlace()) {
+      this.render()
+    }
   }
 
   private editDuringGrace(): void {
@@ -683,13 +687,75 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
         const exercise = getExercise(item.exerciseIndex)
         const isActiveSet = timelineState === 'active' && (this.stage === 'set' || this.stage === 'set-debounce' || this.stage === 'set-grace')
         const isActiveTimedSet = timelineState === 'active' && (this.stage === 'timed-ready' || this.stage === 'timed-active')
+        const isActiveGrace = timelineState === 'active' && this.stage === 'set-grace'
+        const isActiveDebounce = timelineState === 'active' && this.stage === 'set-debounce'
+
+        if (timelineState === 'active') {
+          element.dataset.stage = this.stage
+        } else {
+          delete element.dataset.stage
+        }
 
         const repValueEl = element.querySelector<HTMLElement>('.rep-value')
         if (repValueEl && exercise.loggingType === 'reps' && isActiveSet) {
-          const displayedRepValue = this.stage === 'set-grace' && this.lastConfirmedSummary !== null
-            ? this.repValue
-            : this.repValue
-          repValueEl.textContent = `${displayedRepValue} reps`
+          repValueEl.textContent = `${this.repValue} reps`
+        }
+
+        if (exercise.loggingType === 'reps') {
+          const minusButton = element.querySelector<HTMLButtonElement>('[data-action="rep-minus"]')
+          const plusButton = element.querySelector<HTMLButtonElement>('[data-action="rep-plus"]')
+          const confirmButton = element.querySelector<HTMLButtonElement>('.rep-confirm-action')
+          const startRestNowButton = element.querySelector<HTMLButtonElement>('.rep-start-rest-now-action')
+          const debounceHint = element.querySelector<HTMLElement>('.rep-debounce-hint')
+          const graceHint = element.querySelector<HTMLElement>('.rep-grace-hint')
+
+          if (minusButton) {
+            minusButton.disabled = !isActiveSet
+          }
+          if (plusButton) {
+            plusButton.disabled = !isActiveSet
+          }
+          if (confirmButton) {
+            confirmButton.disabled = !isActiveSet
+          }
+          if (startRestNowButton) {
+            startRestNowButton.disabled = !isActiveGrace
+            this.setElementHidden(startRestNowButton, !isActiveGrace)
+          }
+          if (debounceHint) {
+            this.setElementHidden(debounceHint, !isActiveDebounce)
+          }
+          if (graceHint) {
+            this.setElementHidden(graceHint, !isActiveGrace)
+          }
+        }
+
+        if (exercise.loggingType === 'time') {
+          const timedMainGroup = element.querySelector<HTMLElement>('.timed-main-group')
+          const timedGraceGroup = element.querySelector<HTMLElement>('.timed-grace-group')
+          const timedStartButton = element.querySelector<HTMLButtonElement>('.timed-start-action')
+          const timedStopButton = element.querySelector<HTMLButtonElement>('.timed-stop-action')
+          const timedEditButton = element.querySelector<HTMLButtonElement>('.timed-edit-grace-action')
+          const timedStartRestNowButton = element.querySelector<HTMLButtonElement>('.timed-start-rest-now-action')
+
+          if (timedMainGroup) {
+            this.setElementHidden(timedMainGroup, isActiveGrace)
+          }
+          if (timedGraceGroup) {
+            this.setElementHidden(timedGraceGroup, !isActiveGrace)
+          }
+          if (timedStartButton) {
+            timedStartButton.disabled = !(timelineState === 'active' && this.stage === 'timed-ready')
+          }
+          if (timedStopButton) {
+            timedStopButton.disabled = !(timelineState === 'active' && this.stage === 'timed-active')
+          }
+          if (timedEditButton) {
+            timedEditButton.disabled = !isActiveGrace
+          }
+          if (timedStartRestNowButton) {
+            timedStartRestNowButton.disabled = !isActiveGrace
+          }
         }
 
         const timedCountEl = element.querySelector<HTMLElement>('.timed-count-value')
@@ -698,17 +764,17 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
         }
 
         const graceCountdownValueEl = element.querySelector<HTMLElement>('.grace-countdown-value')
-        if (graceCountdownValueEl && timelineState === 'active' && this.stage === 'set-grace') {
+        if (graceCountdownValueEl && isActiveGrace) {
           graceCountdownValueEl.textContent = `${this.repConfirmGraceRemainingSeconds}`
         }
 
         const graceSummaryEl = element.querySelector<HTMLElement>('.grace-summary')
-        if (graceSummaryEl && timelineState === 'active' && this.stage === 'set-grace' && this.lastConfirmedSummary) {
+        if (graceSummaryEl && isActiveGrace && this.lastConfirmedSummary) {
           graceSummaryEl.textContent = this.lastConfirmedSummary
         }
 
         const debounceCountdownValueEl = element.querySelector<HTMLElement>('.debounce-countdown-value')
-        if (debounceCountdownValueEl && timelineState === 'active' && this.stage === 'set-debounce') {
+        if (debounceCountdownValueEl && isActiveDebounce) {
           debounceCountdownValueEl.textContent = `${this.repAdjustmentDebounceRemainingSeconds}`
         }
       }
@@ -794,14 +860,6 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
   }
 
   private transitionToCurrentActiveItem(): void {
-    // Set cards have stage-dependent controls (confirm/start/stop/grace actions).
-    // Re-render set items so disabled attributes and conditional blocks stay correct.
-    if (this.currentItem()?.kind === 'set') {
-      this.render()
-      this.scrollActiveIntoView()
-      return
-    }
-
     if (!this.patchTimelineStateInPlace()) {
       this.render()
       this.scrollActiveIntoView()
@@ -818,6 +876,16 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
     startActions?.classList.toggle('is-visible', isLocked)
     startHint?.classList.toggle('is-visible', !isLocked)
+  }
+
+  private setElementHidden(element: HTMLElement, hidden: boolean): void {
+    element.toggleAttribute('hidden', hidden)
+    if (hidden) {
+      element.setAttribute('aria-hidden', 'true')
+      return
+    }
+
+    element.removeAttribute('aria-hidden')
   }
 
   private syncActiveSetRepValue(): void {
@@ -1015,10 +1083,11 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
               const repDisplay = `${displayRepValue} reps`
               const timedTarget = exercise.targetDurationSeconds ?? 0
               const timedDisplay = this.formatClock(this.timedSetElapsedSeconds)
+              const stageDataAttribute = isActive ? ` data-stage="${this.stage}"` : ''
 
               if (exercise.loggingType === 'time') {
                 return `
-                  <section class="timeline-item timeline-item--set" data-state="${state}">
+                  <section class="timeline-item timeline-item--set" data-state="${state}"${stageDataAttribute}>
                     <div class="set-header">
                       <h2 class="name"><span class="name-prefix">Doing&nbsp;</span><span class="name-text">${exercise.name}</span></h2>
                       <span class="set-count">${item.setNumber} / ${exercise.totalSets}</span>
@@ -1026,27 +1095,26 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
                     <div class="set-detail">
                       <div class="set-detail__inner">
                         <div class="last-time">Previously: ${exercise.previousPerformance}</div>
-                        ${isActiveGrace
-                          ? `
-                            <div class="rep-row">
-                              <div class="rep-value grace-summary">${this.lastConfirmedSummary ?? ''}</div>
-                            </div>
-                            <div class="hint">Rest starts in <span class="grace-countdown-value">${this.repConfirmGraceRemainingSeconds}</span>...</div>
-                            <div class="actions">
-                              <rrr-button type="button" variant="outline" data-action="edit-grace">Edit</rrr-button>
-                              <rrr-button type="button" data-action="start-rest-now">Start Rest Now</rrr-button>
-                            </div>
-                          `
-                          : `
-                            <div class="rep-row">
-                              <div class="rep-value timed-count-value">${timedDisplay}</div>
-                            </div>
-                            <div class="hint">Target: ${this.formatClock(timedTarget)}</div>
-                            <div class="actions">
-                              <rrr-button type="button" data-action="start-timed-set" ${isActiveTimedReady ? '' : 'disabled'}>Start</rrr-button>
-                              <rrr-button type="button" variant="outline" data-action="stop-timed-set" ${isActiveTimed ? '' : 'disabled'}>Stop</rrr-button>
-                            </div>
-                          `}
+                        <div class="timed-main-group"${isActiveGrace ? ' hidden aria-hidden="true"' : ''}>
+                          <div class="rep-row">
+                            <div class="rep-value timed-count-value">${timedDisplay}</div>
+                          </div>
+                          <div class="hint">Target: ${this.formatClock(timedTarget)}</div>
+                          <div class="actions">
+                            <rrr-button type="button" data-action="start-timed-set" class="timed-start-action" ${isActiveTimedReady ? '' : 'disabled'}>Start</rrr-button>
+                            <rrr-button type="button" variant="outline" data-action="stop-timed-set" class="timed-stop-action" ${isActiveTimed ? '' : 'disabled'}>Stop</rrr-button>
+                          </div>
+                        </div>
+                        <div class="timed-grace-group"${isActiveGrace ? '' : ' hidden aria-hidden="true"'}>
+                          <div class="rep-row">
+                            <div class="rep-value grace-summary">${this.lastConfirmedSummary ?? ''}</div>
+                          </div>
+                          <div class="hint">Rest starts in <span class="grace-countdown-value">${this.repConfirmGraceRemainingSeconds}</span>...</div>
+                          <div class="actions">
+                            <rrr-button type="button" variant="outline" data-action="edit-grace" class="timed-edit-grace-action" ${isActiveGrace ? '' : 'disabled'}>Edit</rrr-button>
+                            <rrr-button type="button" data-action="start-rest-now" class="timed-start-rest-now-action" ${isActiveGrace ? '' : 'disabled'}>Start Rest Now</rrr-button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </section>
@@ -1054,7 +1122,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
               }
 
               return `
-                <section class="timeline-item timeline-item--set" data-state="${state}">
+                <section class="timeline-item timeline-item--set" data-state="${state}"${stageDataAttribute}>
                   <div class="set-header">
                     <h2 class="name"><span class="name-prefix">Doing&nbsp;</span><span class="name-text">${exercise.name}</span></h2>
                     <span class="set-count">${item.setNumber} / ${exercise.totalSets}</span>
@@ -1067,15 +1135,11 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
                         <div class="rep-value">${repDisplay}</div>
                         <rrr-button type="button" variant="outline" data-action="rep-plus" aria-label="increase reps" ${isActiveSet ? '' : 'disabled'}>+</rrr-button>
                       </div>
-                      ${isActiveDebounce
-                        ? `<div class="hint">Auto-confirm in <span class="debounce-countdown-value">${this.repAdjustmentDebounceRemainingSeconds}</span>...</div>`
-                        : ''}
-                      ${isActiveGrace
-                        ? `<div class="hint">Rest starts in <span class="grace-countdown-value">${this.repConfirmGraceRemainingSeconds}</span>...</div>`
-                        : ''}
+                      <div class="hint rep-debounce-hint"${isActiveDebounce ? '' : ' hidden aria-hidden="true"'}>Auto-confirm in <span class="debounce-countdown-value">${this.repAdjustmentDebounceRemainingSeconds}</span>...</div>
+                      <div class="hint rep-grace-hint"${isActiveGrace ? '' : ' hidden aria-hidden="true"'}>Rest starts in <span class="grace-countdown-value">${this.repConfirmGraceRemainingSeconds}</span>...</div>
                       <div class="actions">
-                        <rrr-button type="button" data-action="done-set" ${isActiveSet ? '' : 'disabled'}>Confirm</rrr-button>
-                        ${isActiveGrace ? '<rrr-button type="button" data-action="start-rest-now">Start Rest Now</rrr-button>' : ''}
+                        <rrr-button type="button" data-action="done-set" class="rep-confirm-action" ${isActiveSet ? '' : 'disabled'}>Confirm</rrr-button>
+                        <rrr-button type="button" data-action="start-rest-now" class="rep-start-rest-now-action" ${isActiveGrace ? '' : 'disabled'}${isActiveGrace ? '' : ' hidden aria-hidden="true"'}>Start Rest Now</rrr-button>
                       </div>
                     </div>
                   </div>
