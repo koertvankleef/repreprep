@@ -1,5 +1,24 @@
-const CACHE_NAME = 'repreprep-runtime-v1'
-const APP_SHELL = ['./', './index.html', './site.webmanifest', './apple-touch-icon.png', './android-chrome-192x192.png', './android-chrome-512x512.png']
+const CACHE_NAME = 'repreprep-runtime-v2'
+const APP_SHELL = [
+  './',
+  './index.html',
+  './site.webmanifest',
+  './apple-touch-icon.png',
+  './android-chrome-192x192.png',
+  './android-chrome-512x512.png',
+  './fonts/7cHmv4okm5zmbtYlK-4E4Q.woff2',
+  './fonts/7cHmv4okm5zmbtYmK-4E4Q.woff2',
+  './fonts/7cHmv4okm5zmbtYnK-4E4Q.woff2',
+  './fonts/7cHmv4okm5zmbtYoK-4.woff2',
+  './fonts/7cHmv4okm5zmbtYsK-4E4Q.woff2',
+  './fonts/7cHov4okm5zmbtYtG-Ec5UIo.woff2',
+  './fonts/7cHov4okm5zmbtYtG-gc5UIo.woff2',
+  './fonts/7cHov4okm5zmbtYtG-Ic5UIo.woff2',
+  './fonts/7cHov4okm5zmbtYtG-Mc5UIo.woff2',
+  './fonts/7cHov4okm5zmbtYtG-wc5Q.woff2',
+  './fonts/RrQQboN_4yJ0JmiMe2LE0Q.woff2',
+  './fonts/RrQQboN_4yJ0JmiMe2zE0YBB.woff2',
+]
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

@@ -39,7 +39,7 @@ Reference specification: `docs/workout-rep-logging-flow-spec.md`
 - [x] Phase 3: implement timed-set pipeline (`ready -> Start -> active -> complete -> grace -> auto-rest`) with explicit start semantics.
 - [x] Phase 4: implement grace-period interruption controls (`Edit`, `Start rest now`) and required cancellation behavior.
 - [x] Phase 5: wire rest lifecycle and auto-focus/auto-advance behavior without implying timed-set auto-start.
-- [ ] Phase 6: add edit-mode split (`during grace` affects flow, `historical edit` affects data only).
+- [ ] Phase 6: formalize edit-mode split (`during grace` in live flow affects flow; `historical edit` is outside the flow screen and affects data only).
 - [ ] Phase 7: accessibility pass for rep control names, dynamic confirm labels, and confirmation announcements.
 - [ ] Phase 8: tests for state transitions, event emission order, and edge cases (unchanged suggested value confirm, edit during grace, timed stop early).
 - [ ] Phase 9: integrate workout logging flow from prototype into main product surfaces (start workout, active logging UI, and saved workout editing boundaries).
