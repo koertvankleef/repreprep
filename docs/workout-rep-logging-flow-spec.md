@@ -131,9 +131,12 @@ A confirmed value is logging state.
 This distinction is mandatory for reliability:
 
 - Suggested `12`, user performs `12`, no edits made.
-- Without explicit confirm action, system has no certainty trigger.
+- Without explicit confirm action, system should use a short post-adjust debounce before auto-confirm.
 
-Therefore, confirmation must be represented by an explicit user action.
+Therefore, the rep flow supports two confirmation paths:
+
+- Explicit confirm action by user.
+- Debounce-based auto-confirm after user adjustment.
 
 ## Rep Flow
 
@@ -142,12 +145,13 @@ Canonical flow:
 1. Set is ready and visible.
 2. User performs set.
 3. User checks/edits reps.
-4. User confirms reps.
-5. Result is logged.
-6. Grace period runs.
-7. Rest starts automatically.
-8. Rest completes.
-9. Next set or exercise is focused.
+4. If reps were adjusted: short debounce runs.
+5. User may press confirm at any point to skip debounce.
+6. Result is logged.
+7. Grace period runs.
+8. Rest starts automatically.
+9. Rest completes.
+10. Next set or exercise is focused.
 
 Happy path requirement:
 
@@ -157,7 +161,9 @@ Happy path requirement:
 Adjusted path requirement:
 
 - User can edit value before confirm.
-- Editing alone does not log.
+- Editing starts a short debounce (default 3 seconds).
+- If no further input occurs during debounce, reps auto-confirm.
+- If user presses confirm, grace starts immediately (debounce is skipped).
 
 ## Timed Flow
 
@@ -177,7 +183,12 @@ Rule:
 
 ## Grace Period (Post-Confirmation Delay)
 
-The grace period is a control and clarity window, not a debounce mechanism.
+The grace period is a control and clarity window that starts after the rep/timed result is confirmed.
+
+For rep sets, debounce and grace are distinct:
+
+- Debounce: post-adjust auto-confirm delay (default 3 seconds).
+- Grace: post-confirm auto-proceed delay (default 5 seconds).
 
 Default value:
 
@@ -211,7 +222,10 @@ Rest requirements:
 Useful rest interventions:
 
 - Skip rest.
-- Add time.
+- Pause and resume rest.
+
+Rest duration is not a logged workout metric in MVP.
+If the user needs more rest, they can pause and resume when ready.
 
 Auto-advance requirements:
 
@@ -231,6 +245,7 @@ Core states:
 
 - `rep-ready`
 - `rep-editing`
+- `rep-debounce`
 - `rep-confirmed`
 - `grace`
 - `resting`
@@ -239,8 +254,11 @@ Core states:
 Allowed transitions:
 
 - `rep-ready -> rep-editing` on value change.
+- `rep-editing -> rep-debounce` on adjustment commit.
+- `rep-debounce -> rep-confirmed` on debounce elapsed.
 - `rep-ready -> rep-confirmed` on confirm.
 - `rep-editing -> rep-confirmed` on confirm.
+- `rep-debounce -> rep-confirmed` on confirm.
 - `rep-confirmed -> grace` immediately.
 - `grace -> rep-editing` on Edit.
 - `grace -> resting` on grace completion or Start rest now.
@@ -270,7 +288,7 @@ Allowed transitions:
 Key principle:
 
 - `repValueChanged` is an editing event.
-- `repResultConfirmed` is the logging event.
+- `repResultConfirmed` is the logging event (from explicit confirm or debounce completion).
 
 Recommended event set:
 

@@ -5,6 +5,7 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] During a workout, use the Screen Wake Lock API so the phone does not lock.
 - [ ] Non-MVP follow-up: let the user toggle the wake lock feature on or off.
 - [ ] Add a user-facing toggle for auto-advance / auto-continue in workout flow, separate from the actual auto-advance behavior design.
+- [ ] Refine timed-exercise IxD: current grace/Edit behavior can restart the timed set, which feels wrong and needs a cleaner interaction model.
 - [ ] [in progress] Bottom main navigation on mobile; left side of screen navigation on desktop; minimised variant on tablet.
 - [ ] [in progress] Routine detail page after creation/editing: routine name as title, small edit affordance, exercise list, add-exercise action, and start button.
 - [ ] Prefill routine names automatically; do not require the user to invent one from scratch.
@@ -36,7 +37,7 @@ Reference specification: `docs/workout-rep-logging-flow-spec.md`
 - [x] Phase 1d: add release note that existing local data must be cleared for this rollout.
 - [x] Phase 2: implement rep-set confirmation pipeline (`editable value -> confirm -> grace -> auto-rest`) with explicit `repResultConfirmed` as logging trigger.
 - [x] Phase 3: implement timed-set pipeline (`ready -> Start -> active -> complete -> grace -> auto-rest`) with explicit start semantics.
-- [ ] Phase 4: implement grace-period interruption controls (`Edit`, `Start rest now`) and required cancellation behavior.
+- [x] Phase 4: implement grace-period interruption controls (`Edit`, `Start rest now`) and required cancellation behavior.
 - [ ] Phase 5: wire rest lifecycle and auto-focus/auto-advance behavior without implying timed-set auto-start.
 - [ ] Phase 6: add edit-mode split (`during grace` affects flow, `historical edit` affects data only).
 - [ ] Phase 7: accessibility pass for rep control names, dynamic confirm labels, and confirmation announcements.
