@@ -38,7 +38,7 @@ Reference specification: `docs/workout-rep-logging-flow-spec.md`
 - [x] Phase 2: implement rep-set confirmation pipeline (`editable value -> confirm -> grace -> auto-rest`) with explicit `repResultConfirmed` as logging trigger.
 - [x] Phase 3: implement timed-set pipeline (`ready -> Start -> active -> complete -> grace -> auto-rest`) with explicit start semantics.
 - [x] Phase 4: implement grace-period interruption controls (`Edit`, `Start rest now`) and required cancellation behavior.
-- [ ] Phase 5: wire rest lifecycle and auto-focus/auto-advance behavior without implying timed-set auto-start.
+- [x] Phase 5: wire rest lifecycle and auto-focus/auto-advance behavior without implying timed-set auto-start.
 - [ ] Phase 6: add edit-mode split (`during grace` affects flow, `historical edit` affects data only).
 - [ ] Phase 7: accessibility pass for rep control names, dynamic confirm labels, and confirmation announcements.
 - [ ] Phase 8: tests for state transitions, event emission order, and edge cases (unchanged suggested value confirm, edit during grace, timed stop early).
