@@ -18,6 +18,7 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] Revisit workout progress rail UX: prefer article-scroll style position indicator with a marker over filled progress to improve glance readability and reduce visual distraction.
 - [ ] Prototype segmented workout rail where section ranges are encoded as mint/indigo zones that reflect workout structure.
 - [ ] Prototype marker color/state changes based on active workout segment while keeping the underlying rail visually subtle.
+- [ ] remind user via an app level warning after a certain time (days?) that the app stores in browser cache by default and that they should save the JSON as backup intermittently. Perhaps even store in the cache when they last exported so that the reminder comes up based on that.
 
 ## Workout Rep Logging Flow Thread
 
@@ -34,7 +35,7 @@ Reference specification: `docs/workout-rep-logging-flow-spec.md`
 - [x] Phase 1c: execute regression-only validation (tests + manual QA), and explicitly skip backward-compat checks.
 - [x] Phase 1d: add release note that existing local data must be cleared for this rollout.
 - [x] Phase 2: implement rep-set confirmation pipeline (`editable value -> confirm -> grace -> auto-rest`) with explicit `repResultConfirmed` as logging trigger.
-- [ ] Phase 3: implement timed-set pipeline (`ready -> Start -> active -> complete -> grace -> auto-rest`) with explicit start semantics.
+- [x] Phase 3: implement timed-set pipeline (`ready -> Start -> active -> complete -> grace -> auto-rest`) with explicit start semantics.
 - [ ] Phase 4: implement grace-period interruption controls (`Edit`, `Start rest now`) and required cancellation behavior.
 - [ ] Phase 5: wire rest lifecycle and auto-focus/auto-advance behavior without implying timed-set auto-start.
 - [ ] Phase 6: add edit-mode split (`during grace` affects flow, `historical edit` affects data only).
