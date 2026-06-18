@@ -62,6 +62,75 @@ type WorkoutEvent =
       completionType: 'target-reached' | 'stopped-early'
     }
 
+type TimelineState = 'future' | 'active' | 'complete'
+
+type SetItemViewModel = {
+  timelineState: TimelineState
+  exercise: Exercise
+  setNumber: number
+  stageDataAttribute: string
+  isActiveSet: boolean
+  isActiveTimedReady: boolean
+  isActiveTimed: boolean
+  isActiveTimedSet: boolean
+  isActiveDebounce: boolean
+  isActiveGrace: boolean
+  repDisplay: string
+  timedDisplay: string
+  timedTargetDisplay: string
+  graceCountdownText: string
+  debounceCountdownText: string
+  graceSummary: string
+}
+
+type RestItemViewModel = {
+  timelineState: TimelineState
+  durationSeconds: number
+  isActiveRest: boolean
+  restDisplayTime: string
+  restRemainingPercent: string
+  primaryAction: 'pause-rest' | 'resume-rest'
+  primaryLabel: 'Pause' | 'Resume'
+}
+
+type TransitionItemViewModel = {
+  timelineState: TimelineState
+  durationSeconds: number
+  isActiveTransition: boolean
+  transitionDisplayTime: string
+  transitionRemainingPercent: string
+  transitionPrimaryAction: 'stay-here' | 'next'
+  transitionPrimaryLabel: 'Stay Here' | 'Next'
+  nextExerciseName: string
+}
+
+type ActivationPlan =
+  | {
+      kind: 'complete'
+    }
+  | {
+      kind: 'set'
+      stage: 'set'
+      repValue: number
+      clearLastConfirmedSummary: boolean
+    }
+  | {
+      kind: 'timed-set'
+      stage: 'timed-ready'
+      timedSetElapsedSeconds: number
+      clearLastConfirmedSummary: boolean
+    }
+  | {
+      kind: 'rest'
+      stage: 'rest'
+      restRemainingSeconds: number
+    }
+  | {
+      kind: 'transition'
+      stage: 'transition'
+      nextExerciseRemainingSeconds: number
+    }
+
 const EXERCISES: Exercise[] = [
   { name: 'Push-ups', loggingType: 'reps', totalSets: 3, restSeconds: 20, previousPerformance: '10 reps', suggestedReps: 12 },
   {
@@ -245,7 +314,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
   }
 
   private adjustRepValue(delta: number): void {
-    if (this.stage !== 'set' && this.stage !== 'set-debounce' && this.stage !== 'set-grace') {
+    if (!this.isSetInteractionStage()) {
       return
     }
     this.repValue = Math.max(0, this.repValue + delta)
@@ -257,7 +326,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     if (
       !currentItem
       || currentItem.kind !== 'set'
-      || (this.stage !== 'set' && this.stage !== 'set-debounce' && this.stage !== 'set-grace')
+      || !this.isSetInteractionStage()
     ) {
       return
     }
@@ -392,12 +461,12 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
   }
 
   private scheduleRepAdjustmentAutoProceed(): void {
-    if (this.stage !== 'set' && this.stage !== 'set-debounce' && this.stage !== 'set-grace') {
+    if (!this.isSetInteractionStage()) {
       return
     }
 
     const currentItem = this.currentItem()
-    if (this.stage === 'set-grace' && currentItem && currentItem.kind === 'set') {
+    if (this.isSetGraceStage() && currentItem && currentItem.kind === 'set') {
       this.graceTimer.clear()
       this.completedSetsByExercise[currentItem.exerciseIndex] = Math.max(0, currentItem.setNumber - 1)
       this.syncOverallProgress()
@@ -481,37 +550,79 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     // This prevents stale interval callbacks when users advance quickly.
     this.clearTimers()
 
-    const item = TIMELINE[this.activeTimelineIndex]
-    if (!item) {
-      this.clearTimers()
+    const activationPlan = this.getActivationPlan(TIMELINE[this.activeTimelineIndex] ?? null)
+
+    if (activationPlan.kind === 'complete') {
       this.stage = 'workout-complete'
       this.render()
       return
     }
 
-    if (item.kind === 'set') {
-      this.lastConfirmedSummary = null
-
-      const exercise = getExercise(item.exerciseIndex)
-      if (exercise.loggingType === 'time') {
-        this.stage = 'timed-ready'
-        this.timedSetElapsedSeconds = 0
-        this.transitionToCurrentActiveItem()
-        return
+    if (activationPlan.kind === 'set') {
+      if (activationPlan.clearLastConfirmedSummary) {
+        this.lastConfirmedSummary = null
       }
-
-      this.stage = 'set'
-      this.repValue = exercise.suggestedReps ?? 0
+      this.stage = activationPlan.stage
+      this.repValue = activationPlan.repValue
       this.transitionToCurrentActiveItem()
       return
     }
 
-    if (item.kind === 'rest') {
-      this.beginRest(item.durationSeconds)
+    if (activationPlan.kind === 'timed-set') {
+      if (activationPlan.clearLastConfirmedSummary) {
+        this.lastConfirmedSummary = null
+      }
+      this.stage = activationPlan.stage
+      this.timedSetElapsedSeconds = activationPlan.timedSetElapsedSeconds
+      this.transitionToCurrentActiveItem()
       return
     }
 
-    this.beginExerciseTransition(item.durationSeconds)
+    if (activationPlan.kind === 'rest') {
+      this.beginRest(activationPlan.restRemainingSeconds)
+      return
+    }
+
+    this.beginExerciseTransition(activationPlan.nextExerciseRemainingSeconds)
+  }
+
+  private getActivationPlan(item: TimelineItem | null): ActivationPlan {
+    if (!item) {
+      return { kind: 'complete' }
+    }
+
+    if (item.kind === 'set') {
+      const exercise = getExercise(item.exerciseIndex)
+      if (exercise.loggingType === 'time') {
+        return {
+          kind: 'timed-set',
+          stage: 'timed-ready',
+          timedSetElapsedSeconds: 0,
+          clearLastConfirmedSummary: true,
+        }
+      }
+
+      return {
+        kind: 'set',
+        stage: 'set',
+        repValue: exercise.suggestedReps ?? 0,
+        clearLastConfirmedSummary: true,
+      }
+    }
+
+    if (item.kind === 'rest') {
+      return {
+        kind: 'rest',
+        stage: 'rest',
+        restRemainingSeconds: item.durationSeconds,
+      }
+    }
+
+    return {
+      kind: 'transition',
+      stage: 'transition',
+      nextExerciseRemainingSeconds: item.durationSeconds,
+    }
   }
 
   private beginRest(seconds: number): void {
@@ -565,7 +676,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
   }
 
   private skipRest(): void {
-    if ((this.stage !== 'rest' && this.stage !== 'rest-paused') || this.currentItem()?.kind !== 'rest') {
+    if (!this.isRestActiveOrPausedStage() || this.currentItem()?.kind !== 'rest') {
       return
     }
 
@@ -620,6 +731,46 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     return unit === 's' ? parsed * 1000 : parsed
   }
 
+  private isSetInteractionStage(): boolean {
+    return this.stage === 'set' || this.stage === 'set-debounce' || this.stage === 'set-grace'
+  }
+
+  private isSetGraceStage(): boolean {
+    return this.stage === 'set-grace'
+  }
+
+  private isSetDebounceStage(): boolean {
+    return this.stage === 'set-debounce'
+  }
+
+  private isTimedReadyStage(): boolean {
+    return this.stage === 'timed-ready'
+  }
+
+  private isTimedActiveStage(): boolean {
+    return this.stage === 'timed-active'
+  }
+
+  private isTimedReadyOrActiveStage(): boolean {
+    return this.isTimedReadyStage() || this.isTimedActiveStage()
+  }
+
+  private isRestActiveOrPausedStage(): boolean {
+    return this.stage === 'rest' || this.stage === 'rest-paused'
+  }
+
+  private isRestActiveStage(): boolean {
+    return this.stage === 'rest'
+  }
+
+  private isTransitionActiveOrPausedStage(): boolean {
+    return this.stage === 'transition' || this.stage === 'transition-paused'
+  }
+
+  private isTransitionActiveStage(): boolean {
+    return this.stage === 'transition'
+  }
+
   private scheduleMotionCleanup(): void {
     const cleanupDelay = Math.max(
       this.getTransitionDurationMs('--proto-transition-duration'),
@@ -652,26 +803,33 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
     timelineItems.forEach((element, index) => {
       const timelineState = this.getTimelineState(index)
+
+      if (element === previousActive && timelineState !== 'active') {
+        element.dataset.motion = 'exiting'
+      }
+
       element.dataset.state = timelineState
 
       const item = TIMELINE[index]
       if (item?.kind === 'set') {
-        this.patchSetItem(element, item, timelineState)
+        this.patchSetItem(element, this.buildSetItemViewModel(item, timelineState))
       }
 
       if (item?.kind === 'rest') {
-        this.patchRestItem(element, item, timelineState)
+        this.patchRestItem(element, this.buildRestItemViewModel(item, timelineState))
       }
 
       if (item?.kind === 'transition') {
-        this.patchTransitionItem(element, item, timelineState)
+        this.patchTransitionItem(element, this.buildTransitionItemViewModel(item, timelineState))
       }
     })
 
     const currentActive = this.shadowRoot.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
     if (previousActive !== currentActive) {
       this.shadowRoot.querySelectorAll<HTMLElement>('.timeline-item[data-motion]').forEach((element) => {
-        element.removeAttribute('data-motion')
+        if (element !== previousActive && element !== currentActive) {
+          element.removeAttribute('data-motion')
+        }
       })
 
       if (previousActive) {
@@ -687,22 +845,18 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     return true
   }
 
-  private patchSetItem(element: HTMLElement, item: Extract<TimelineItem, { kind: 'set' }>, timelineState: 'future' | 'active' | 'complete'): void {
-    const exercise = getExercise(item.exerciseIndex)
-    const isActiveSet = timelineState === 'active' && (this.stage === 'set' || this.stage === 'set-debounce' || this.stage === 'set-grace')
-    const isActiveTimedSet = timelineState === 'active' && (this.stage === 'timed-ready' || this.stage === 'timed-active')
-    const isActiveGrace = timelineState === 'active' && this.stage === 'set-grace'
-    const isActiveDebounce = timelineState === 'active' && this.stage === 'set-debounce'
+  private patchSetItem(element: HTMLElement, viewModel: SetItemViewModel): void {
+    const { exercise } = viewModel
 
-    if (timelineState === 'active') {
+    if (viewModel.timelineState === 'active') {
       element.dataset.stage = this.stage
     } else {
       delete element.dataset.stage
     }
 
     const repValueEl = element.querySelector<HTMLElement>('.rep-value')
-    if (repValueEl && exercise.loggingType === 'reps' && isActiveSet) {
-      repValueEl.textContent = `${this.repValue} reps`
+    if (repValueEl && exercise.loggingType === 'reps' && viewModel.isActiveSet) {
+      repValueEl.textContent = viewModel.repDisplay
     }
 
     if (exercise.loggingType === 'reps') {
@@ -714,23 +868,23 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       const graceHint = element.querySelector<HTMLElement>('.rep-grace-hint')
 
       if (minusButton) {
-        minusButton.disabled = !isActiveSet
+        minusButton.disabled = !viewModel.isActiveSet
       }
       if (plusButton) {
-        plusButton.disabled = !isActiveSet
+        plusButton.disabled = !viewModel.isActiveSet
       }
       if (confirmButton) {
-        confirmButton.disabled = !isActiveSet
+        confirmButton.disabled = !viewModel.isActiveSet
       }
       if (startRestNowButton) {
-        startRestNowButton.disabled = !isActiveGrace
-        this.setElementHidden(startRestNowButton, !isActiveGrace)
+        startRestNowButton.disabled = !viewModel.isActiveGrace
+        this.setElementHidden(startRestNowButton, !viewModel.isActiveGrace)
       }
       if (debounceHint) {
-        this.setElementHidden(debounceHint, !isActiveDebounce)
+        this.setElementHidden(debounceHint, !viewModel.isActiveDebounce)
       }
       if (graceHint) {
-        this.setElementHidden(graceHint, !isActiveGrace)
+        this.setElementHidden(graceHint, !viewModel.isActiveGrace)
       }
     }
 
@@ -743,105 +897,81 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       const timedStartRestNowButton = element.querySelector<HTMLButtonElement>('.timed-start-rest-now-action')
 
       if (timedMainGroup) {
-        this.setElementHidden(timedMainGroup, isActiveGrace)
+        this.setElementHidden(timedMainGroup, viewModel.isActiveGrace)
       }
       if (timedGraceGroup) {
-        this.setElementHidden(timedGraceGroup, !isActiveGrace)
+        this.setElementHidden(timedGraceGroup, !viewModel.isActiveGrace)
       }
       if (timedStartButton) {
-        timedStartButton.disabled = !(timelineState === 'active' && this.stage === 'timed-ready')
+        timedStartButton.disabled = !(viewModel.timelineState === 'active' && viewModel.isActiveTimedReady)
       }
       if (timedStopButton) {
-        timedStopButton.disabled = !(timelineState === 'active' && this.stage === 'timed-active')
+        timedStopButton.disabled = !(viewModel.timelineState === 'active' && viewModel.isActiveTimed)
       }
       if (timedEditButton) {
-        timedEditButton.disabled = !isActiveGrace
+        timedEditButton.disabled = !viewModel.isActiveGrace
       }
       if (timedStartRestNowButton) {
-        timedStartRestNowButton.disabled = !isActiveGrace
+        timedStartRestNowButton.disabled = !viewModel.isActiveGrace
       }
     }
 
     const timedCountEl = element.querySelector<HTMLElement>('.timed-count-value')
-    if (timedCountEl && exercise.loggingType === 'time' && isActiveTimedSet) {
-      timedCountEl.textContent = this.formatClock(this.timedSetElapsedSeconds)
+    if (timedCountEl && exercise.loggingType === 'time' && viewModel.isActiveTimedSet) {
+      timedCountEl.textContent = viewModel.timedDisplay
     }
 
     const graceCountdownValueEl = element.querySelector<HTMLElement>('.grace-countdown-value')
-    if (graceCountdownValueEl && isActiveGrace) {
-      graceCountdownValueEl.textContent = `${this.repConfirmGraceRemainingSeconds}`
+    if (graceCountdownValueEl && viewModel.isActiveGrace) {
+      graceCountdownValueEl.textContent = viewModel.graceCountdownText
     }
 
     const graceSummaryEl = element.querySelector<HTMLElement>('.grace-summary')
-    if (graceSummaryEl && isActiveGrace && this.lastConfirmedSummary) {
-      graceSummaryEl.textContent = this.lastConfirmedSummary
+    if (graceSummaryEl && viewModel.isActiveGrace && viewModel.graceSummary) {
+      graceSummaryEl.textContent = viewModel.graceSummary
     }
 
     const debounceCountdownValueEl = element.querySelector<HTMLElement>('.debounce-countdown-value')
-    if (debounceCountdownValueEl && isActiveDebounce) {
-      debounceCountdownValueEl.textContent = `${this.repAdjustmentDebounceRemainingSeconds}`
+    if (debounceCountdownValueEl && viewModel.isActiveDebounce) {
+      debounceCountdownValueEl.textContent = viewModel.debounceCountdownText
     }
   }
 
-  private patchRestItem(element: HTMLElement, item: Extract<TimelineItem, { kind: 'rest' }>, timelineState: 'future' | 'active' | 'complete'): void {
-    const isActiveRest = timelineState === 'active' && (this.stage === 'rest' || this.stage === 'rest-paused')
-
+  private patchRestItem(element: HTMLElement, viewModel: RestItemViewModel): void {
     const countEl = element.querySelector<HTMLElement>('.stage-count--rest')
     if (countEl) {
-      this.setElementHidden(countEl, !isActiveRest)
-      countEl.textContent = isActiveRest ? this.formatClock(this.restRemainingSeconds) : this.formatClock(item.durationSeconds)
+      this.setElementHidden(countEl, !viewModel.isActiveRest)
+      countEl.textContent = viewModel.restDisplayTime
     }
 
     const primaryActionEl = element.querySelector<HTMLElement>('.rest-primary-action')
     if (primaryActionEl) {
-      if (this.stage === 'rest') {
-        primaryActionEl.dataset.action = 'pause-rest'
-        primaryActionEl.textContent = 'Pause'
-      } else {
-        primaryActionEl.dataset.action = 'resume-rest'
-        primaryActionEl.textContent = 'Resume'
-      }
+      primaryActionEl.dataset.action = viewModel.primaryAction
+      primaryActionEl.textContent = viewModel.primaryLabel
     }
 
     const progressEl = element.querySelector<HTMLElement>('.bar--vertical > span')
     if (progressEl) {
-      const restRemainingPercent = isActiveRest
-        ? `${(this.restRemainingSeconds / item.durationSeconds) * 100}%`
-        : timelineState === 'complete'
-          ? '0%'
-          : '100%'
-      progressEl.style.height = restRemainingPercent
+      progressEl.style.height = viewModel.restRemainingPercent
     }
   }
 
-  private patchTransitionItem(element: HTMLElement, item: Extract<TimelineItem, { kind: 'transition' }>, timelineState: 'future' | 'active' | 'complete'): void {
-    const isActiveTransition = timelineState === 'active' && (this.stage === 'transition' || this.stage === 'transition-paused')
-
+  private patchTransitionItem(element: HTMLElement, viewModel: TransitionItemViewModel): void {
     const countEl = element.querySelector<HTMLElement>('.stage-count--transition')
     if (countEl) {
-      this.setElementHidden(countEl, !isActiveTransition)
-      countEl.textContent = `${isActiveTransition ? this.nextExerciseRemainingSeconds : item.durationSeconds}`
+      this.setElementHidden(countEl, !viewModel.isActiveTransition)
+      countEl.textContent = viewModel.transitionDisplayTime
     }
 
     const progressEl = element.querySelector<HTMLElement>('.bar--vertical--transition > span')
     if (progressEl) {
-      const transitionRemainingPercent = isActiveTransition
-        ? `${(this.nextExerciseRemainingSeconds / EXERCISE_TRANSITION_SECONDS) * 100}%`
-        : timelineState === 'complete'
-          ? '0%'
-          : '100%'
-      progressEl.style.height = transitionRemainingPercent
+      progressEl.style.height = viewModel.transitionRemainingPercent
     }
 
     const primaryActionEl = element.querySelector<HTMLElement>('.transition-primary-action')
     if (primaryActionEl) {
-      if (this.stage === 'transition') {
-        primaryActionEl.dataset.action = 'stay-here'
-        primaryActionEl.textContent = 'Stay Here'
-      } else {
-        primaryActionEl.dataset.action = 'next'
-        primaryActionEl.textContent = 'Next'
-      }
+      primaryActionEl.dataset.action = viewModel.transitionPrimaryAction
+      primaryActionEl.textContent = viewModel.transitionPrimaryLabel
     }
   }
 
@@ -903,7 +1033,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     })
   }
 
-  private getTimelineState(index: number): 'future' | 'active' | 'complete' {
+  private getTimelineState(index: number): TimelineState {
     if (this.stage === 'locked') {
       return 'future'
     }
@@ -941,115 +1071,163 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
   private renderTimelineItem(item: TimelineItem, index: number): string {
     const state = this.getTimelineState(index)
     if (item.kind === 'set') {
-      return this.renderActivityItem(item, state)
+      return this.renderActivityItem(this.buildSetItemViewModel(item, state))
     }
 
     if (item.kind === 'rest') {
-      return this.renderRestTimelineItem(item, state)
+      return this.renderRestTimelineItem(this.buildRestItemViewModel(item, state))
     }
 
-    return this.renderTransitionTimelineItem(item, state)
+    return this.renderTransitionTimelineItem(this.buildTransitionItemViewModel(item, state))
   }
 
-  private renderActivityItem(item: Extract<TimelineItem, { kind: 'set' }>, state: 'future' | 'active' | 'complete'): string {
+  private buildSetItemViewModel(item: Extract<TimelineItem, { kind: 'set' }>, timelineState: TimelineState): SetItemViewModel {
     const exercise = getExercise(item.exerciseIndex)
-    const isActive = state === 'active'
-    const isActiveSet = isActive && (this.stage === 'set' || this.stage === 'set-debounce' || this.stage === 'set-grace')
-    const isActiveTimedReady = isActive && this.stage === 'timed-ready'
-    const isActiveTimed = isActive && this.stage === 'timed-active'
-    const isActiveDebounce = isActive && this.stage === 'set-debounce'
-    const isActiveGrace = isActive && this.stage === 'set-grace'
-    const timedTarget = exercise.targetDurationSeconds ?? 0
-    const timedDisplay = this.formatClock(this.timedSetElapsedSeconds)
+    const isActive = timelineState === 'active'
+    const isActiveSet = isActive && this.isSetInteractionStage()
+    const isActiveTimedReady = isActive && this.isTimedReadyStage()
+    const isActiveTimed = isActive && this.isTimedActiveStage()
+    const isActiveDebounce = isActive && this.isSetDebounceStage()
+    const isActiveGrace = isActive && this.isSetGraceStage()
     const stageDataAttribute = isActive ? ` data-stage="${this.stage}"` : ''
 
-    if (exercise.loggingType === 'time') {
-      return `
-        <section class="timeline-item timeline-item--set" data-state="${state}"${stageDataAttribute}>
-          <div class="set-header">
-            <h2 class="name"><span class="name-prefix">Doing&nbsp;</span><span class="name-text">${exercise.name}</span></h2>
-            <span class="set-count">${item.setNumber} / ${exercise.totalSets}</span>
-          </div>
-          <div class="set-detail">
-            <div class="set-detail__inner">
-              <div class="last-time">Previously: ${exercise.previousPerformance}</div>
-              <div class="timed-main-group"${isActiveGrace ? ' hidden aria-hidden="true"' : ''}>
-                <div class="rep-row">
-                  <div class="rep-value timed-count-value">${timedDisplay}</div>
-                </div>
-                <div class="hint">Target: ${this.formatClock(timedTarget)}</div>
-                <div class="actions">
-                  <rrr-button type="button" data-action="start-timed-set" class="timed-start-action" ${isActiveTimedReady ? '' : 'disabled'}>Start</rrr-button>
-                  <rrr-button type="button" variant="outline" data-action="stop-timed-set" class="timed-stop-action" ${isActiveTimed ? '' : 'disabled'}>Stop</rrr-button>
-                </div>
-              </div>
-              <div class="timed-grace-group"${isActiveGrace ? '' : ' hidden aria-hidden="true"'}>
-                <div class="rep-row">
-                  <div class="rep-value grace-summary">${this.lastConfirmedSummary ?? ''}</div>
-                </div>
-                <div class="hint">Rest starts in <span class="grace-countdown-value">${this.repConfirmGraceRemainingSeconds}</span>...</div>
-                <div class="actions">
-                  <rrr-button type="button" variant="outline" data-action="edit-grace" class="timed-edit-grace-action" ${isActiveGrace ? '' : 'disabled'}>Edit</rrr-button>
-                  <rrr-button type="button" data-action="start-rest-now" class="timed-start-rest-now-action" ${isActiveGrace ? '' : 'disabled'}>Start Rest Now</rrr-button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      `
+    return {
+      timelineState,
+      exercise,
+      setNumber: item.setNumber,
+      stageDataAttribute,
+      isActiveSet,
+      isActiveTimedReady,
+      isActiveTimed,
+      isActiveTimedSet: isActive && this.isTimedReadyOrActiveStage(),
+      isActiveDebounce,
+      isActiveGrace,
+      repDisplay: `${this.repValue} reps`,
+      timedDisplay: this.formatClock(this.timedSetElapsedSeconds),
+      timedTargetDisplay: this.formatClock(exercise.targetDurationSeconds ?? 0),
+      graceCountdownText: `${this.repConfirmGraceRemainingSeconds}`,
+      debounceCountdownText: `${this.repAdjustmentDebounceRemainingSeconds}`,
+      graceSummary: this.lastConfirmedSummary ?? '',
+    }
+  }
+
+  private buildRestItemViewModel(item: Extract<TimelineItem, { kind: 'rest' }>, timelineState: TimelineState): RestItemViewModel {
+    const isActiveRest = timelineState === 'active' && this.isRestActiveOrPausedStage()
+    return {
+      timelineState,
+      durationSeconds: item.durationSeconds,
+      isActiveRest,
+      restDisplayTime: isActiveRest ? this.formatClock(this.restRemainingSeconds) : this.formatClock(item.durationSeconds),
+      restRemainingPercent: isActiveRest
+        ? `${Math.max(0, Math.min(100, (this.restRemainingSeconds / item.durationSeconds) * 100))}%`
+        : timelineState === 'complete'
+          ? '0%'
+          : '100%',
+      primaryAction: this.isRestActiveStage() ? 'pause-rest' : 'resume-rest',
+      primaryLabel: this.isRestActiveStage() ? 'Pause' : 'Resume',
+    }
+  }
+
+  private buildTransitionItemViewModel(item: Extract<TimelineItem, { kind: 'transition' }>, timelineState: TimelineState): TransitionItemViewModel {
+    const nextExercise = EXERCISES[item.exerciseIndex + 1]
+    const isActiveTransition = timelineState === 'active' && this.isTransitionActiveOrPausedStage()
+    return {
+      timelineState,
+      durationSeconds: item.durationSeconds,
+      isActiveTransition,
+      transitionDisplayTime: `${isActiveTransition ? this.nextExerciseRemainingSeconds : item.durationSeconds}`,
+      transitionRemainingPercent: isActiveTransition
+        ? `${Math.max(0, Math.min(100, (this.nextExerciseRemainingSeconds / item.durationSeconds) * 100))}%`
+        : timelineState === 'complete'
+          ? '0%'
+          : '100%',
+      transitionPrimaryAction: this.isTransitionActiveStage() ? 'stay-here' : 'next',
+      transitionPrimaryLabel: this.isTransitionActiveStage() ? 'Stay Here' : 'Next',
+      nextExerciseName: nextExercise ? nextExercise.name : 'Workout complete',
+    }
+  }
+
+  private renderActivityItem(viewModel: SetItemViewModel): string {
+    if (viewModel.exercise.loggingType === 'time') {
+      return this.renderSetCard(viewModel, this.renderTimedSetDetail(viewModel))
     }
 
-    const repDisplay = `${this.repValue} reps`
+    return this.renderSetCard(viewModel, this.renderRepSetDetail(viewModel))
+  }
+
+  private renderSetCard(viewModel: SetItemViewModel, detailMarkup: string): string {
     return `
-      <section class="timeline-item timeline-item--set" data-state="${state}"${stageDataAttribute}>
+      <section class="timeline-item timeline-item--set" data-state="${viewModel.timelineState}"${viewModel.stageDataAttribute}>
         <div class="set-header">
-          <h2 class="name"><span class="name-prefix">Doing&nbsp;</span><span class="name-text">${exercise.name}</span></h2>
-          <span class="set-count">${item.setNumber} / ${exercise.totalSets}</span>
+          <h2 class="name"><span class="name-prefix">Doing&nbsp;</span><span class="name-text">${viewModel.exercise.name}</span></h2>
+          <span class="set-count">${viewModel.setNumber} / ${viewModel.exercise.totalSets}</span>
         </div>
         <div class="set-detail">
           <div class="set-detail__inner">
-            <div class="last-time">Previously: ${exercise.previousPerformance}</div>
-            <div class="rep-row">
-              <rrr-button type="button" variant="outline" data-action="rep-minus" aria-label="decrease reps" ${isActiveSet ? '' : 'disabled'}>-</rrr-button>
-              <div class="rep-value">${repDisplay}</div>
-              <rrr-button type="button" variant="outline" data-action="rep-plus" aria-label="increase reps" ${isActiveSet ? '' : 'disabled'}>+</rrr-button>
-            </div>
-            <div class="hint rep-debounce-hint"${isActiveDebounce ? '' : ' hidden aria-hidden="true"'}>Auto-confirm in <span class="debounce-countdown-value">${this.repAdjustmentDebounceRemainingSeconds}</span>...</div>
-            <div class="hint rep-grace-hint"${isActiveGrace ? '' : ' hidden aria-hidden="true"'}>Rest starts in <span class="grace-countdown-value">${this.repConfirmGraceRemainingSeconds}</span>...</div>
-            <div class="actions">
-              <rrr-button type="button" data-action="done-set" class="rep-confirm-action" ${isActiveSet ? '' : 'disabled'}>Confirm</rrr-button>
-              <rrr-button type="button" data-action="start-rest-now" class="rep-start-rest-now-action" ${isActiveGrace ? '' : 'disabled'}${isActiveGrace ? '' : ' hidden aria-hidden="true"'}>Start Rest Now</rrr-button>
-            </div>
+            <div class="last-time">Previously: ${viewModel.exercise.previousPerformance}</div>
+            ${detailMarkup}
           </div>
         </div>
       </section>
     `
   }
 
-  private renderRestTimelineItem(item: Extract<TimelineItem, { kind: 'rest' }>, state: 'future' | 'active' | 'complete'): string {
-    const isActive = state === 'active'
-    const isActiveRest = isActive && (this.stage === 'rest' || this.stage === 'rest-paused')
-    const isCompletedRest = state === 'complete'
-    const restRemainingPercent = isActiveRest
-      ? Math.max(0, Math.min(100, (this.restRemainingSeconds / item.durationSeconds) * 100))
-      : isCompletedRest
-        ? 0
-        : 100
-    const restDisplayTime = isActiveRest ? this.formatClock(this.restRemainingSeconds) : this.formatClock(item.durationSeconds)
+  private renderTimedSetDetail(viewModel: SetItemViewModel): string {
+    return `
+      <div class="timed-main-group"${viewModel.isActiveGrace ? ' hidden aria-hidden="true"' : ''}>
+        <div class="rep-row">
+          <div class="rep-value timed-count-value">${viewModel.timedDisplay}</div>
+        </div>
+        <div class="hint">Target: ${viewModel.timedTargetDisplay}</div>
+        <div class="actions">
+          <rrr-button type="button" data-action="start-timed-set" class="timed-start-action" ${viewModel.isActiveTimedReady ? '' : 'disabled'}>Start</rrr-button>
+          <rrr-button type="button" variant="outline" data-action="stop-timed-set" class="timed-stop-action" ${viewModel.isActiveTimed ? '' : 'disabled'}>Stop</rrr-button>
+        </div>
+      </div>
+      <div class="timed-grace-group"${viewModel.isActiveGrace ? '' : ' hidden aria-hidden="true"'}>
+        <div class="rep-row">
+          <div class="rep-value grace-summary">${viewModel.graceSummary}</div>
+        </div>
+        <div class="hint">Rest starts in <span class="grace-countdown-value">${viewModel.graceCountdownText}</span>...</div>
+        <div class="actions">
+          <rrr-button type="button" variant="outline" data-action="edit-grace" class="timed-edit-grace-action" ${viewModel.isActiveGrace ? '' : 'disabled'}>Edit</rrr-button>
+          <rrr-button type="button" data-action="start-rest-now" class="timed-start-rest-now-action" ${viewModel.isActiveGrace ? '' : 'disabled'}>Start Rest Now</rrr-button>
+        </div>
+      </div>
+    `
+  }
+
+  private renderRepSetDetail(viewModel: SetItemViewModel): string {
+    return `
+      <div class="rep-row">
+        <rrr-button type="button" variant="outline" data-action="rep-minus" aria-label="decrease reps" ${viewModel.isActiveSet ? '' : 'disabled'}>-</rrr-button>
+        <div class="rep-value">${viewModel.repDisplay}</div>
+        <rrr-button type="button" variant="outline" data-action="rep-plus" aria-label="increase reps" ${viewModel.isActiveSet ? '' : 'disabled'}>+</rrr-button>
+      </div>
+      <div class="hint rep-debounce-hint"${viewModel.isActiveDebounce ? '' : ' hidden aria-hidden="true"'}>Auto-confirm in <span class="debounce-countdown-value">${viewModel.debounceCountdownText}</span>...</div>
+      <div class="hint rep-grace-hint"${viewModel.isActiveGrace ? '' : ' hidden aria-hidden="true"'}>Rest starts in <span class="grace-countdown-value">${viewModel.graceCountdownText}</span>...</div>
+      <div class="actions">
+        <rrr-button type="button" data-action="done-set" class="rep-confirm-action" ${viewModel.isActiveSet ? '' : 'disabled'}>Confirm</rrr-button>
+        <rrr-button type="button" data-action="start-rest-now" class="rep-start-rest-now-action" ${viewModel.isActiveGrace ? '' : 'disabled'}${viewModel.isActiveGrace ? '' : ' hidden aria-hidden="true"'}>Start Rest Now</rrr-button>
+      </div>
+    `
+  }
+
+  private renderRestTimelineItem(viewModel: RestItemViewModel): string {
 
     return `
-      <section class="timeline-item timeline-item--rest" data-state="${state}">
+      <section class="timeline-item timeline-item--rest" data-state="${viewModel.timelineState}">
         <div class="countdown countdown--vertical" aria-hidden="true">
-          <div class="bar bar--vertical"><span style="height: ${restRemainingPercent}%;"></span></div>
+          <div class="bar bar--vertical"><span style="height: ${viewModel.restRemainingPercent};"></span></div>
         </div>
         <div class="rest-header">
           <div class="rest-title"><rrr-icon name="water-bottle"></rrr-icon>Rest</div>
-          <span class="stage-count stage-count--rest"${isActiveRest ? '' : ' hidden aria-hidden="true"'}>${restDisplayTime}</span>
+          <span class="stage-count stage-count--rest"${viewModel.isActiveRest ? '' : ' hidden aria-hidden="true"'}>${viewModel.restDisplayTime}</span>
         </div>
         <div class="rest-detail">
           <div class="rest-detail__inner">
             <div class="actions">
-              <rrr-button type="button" variant="secondary" tone="accent" data-action="${this.stage === 'rest' ? 'pause-rest' : 'resume-rest'}" class="rest-primary-action">${this.stage === 'rest' ? 'Pause' : 'Resume'}</rrr-button>
+              <rrr-button type="button" variant="secondary" tone="accent" data-action="${viewModel.primaryAction}" class="rest-primary-action">${viewModel.primaryLabel}</rrr-button>
               <rrr-button type="button" variant="outline" tone="accent" data-action="skip-rest">Skip Rest</rrr-button>
             </div>
           </div>
@@ -1058,32 +1236,21 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     `
   }
 
-  private renderTransitionTimelineItem(item: Extract<TimelineItem, { kind: 'transition' }>, state: 'future' | 'active' | 'complete'): string {
-    const nextExercise = EXERCISES[item.exerciseIndex + 1]
-    const isActive = state === 'active'
-    const isActiveTransition = isActive && (this.stage === 'transition' || this.stage === 'transition-paused')
-    const transitionDisplayTime = isActiveTransition ? this.nextExerciseRemainingSeconds : item.durationSeconds
-    const transitionRemainingPercent = isActiveTransition
-      ? Math.max(0, Math.min(100, (this.nextExerciseRemainingSeconds / item.durationSeconds) * 100))
-      : state === 'complete'
-        ? 0
-        : 100
-    const transitionPrimaryLabel = this.stage === 'transition' ? 'Stay Here' : 'Next'
-    const transitionPrimaryAction = this.stage === 'transition' ? 'stay-here' : 'next'
+  private renderTransitionTimelineItem(viewModel: TransitionItemViewModel): string {
 
     return `
-      <section class="timeline-item timeline-item--transition" data-state="${state}">
+      <section class="timeline-item timeline-item--transition" data-state="${viewModel.timelineState}">
         <div class="countdown countdown--vertical" aria-hidden="true">
-          <div class="bar bar--vertical bar--vertical--transition"><span style="height: ${transitionRemainingPercent}%;"></span></div>
+          <div class="bar bar--vertical bar--vertical--transition"><span style="height: ${viewModel.transitionRemainingPercent};"></span></div>
         </div>
         <div class="rest-header">
-          <div class="rest-title">Time to switch to: ${nextExercise ? nextExercise.name : 'Workout complete'}</div>
-          <span class="stage-count stage-count--transition"${isActiveTransition ? '' : ' hidden aria-hidden="true"'}>${transitionDisplayTime}</span>
+          <div class="rest-title">Time to switch to: ${viewModel.nextExerciseName}</div>
+          <span class="stage-count stage-count--transition"${viewModel.isActiveTransition ? '' : ' hidden aria-hidden="true"'}>${viewModel.transitionDisplayTime}</span>
         </div>
         <div class="transition-detail transition-detail--actions">
           <div class="transition-detail__inner">
             <div class="actions">
-              <rrr-button type="button" variant="secondary" tone="accent" data-action="${transitionPrimaryAction}" class="transition-primary-action">${transitionPrimaryLabel}</rrr-button>
+              <rrr-button type="button" variant="secondary" tone="accent" data-action="${viewModel.transitionPrimaryAction}" class="transition-primary-action">${viewModel.transitionPrimaryLabel}</rrr-button>
               <rrr-button type="button" variant="outline" tone="accent" data-action="next-now">Next Now</rrr-button>
             </div>
           </div>
