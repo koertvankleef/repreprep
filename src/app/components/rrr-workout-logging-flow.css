@@ -74,7 +74,7 @@
   padding: var(--rrr-spacing-m);
   display: grid;
   transition: opacity var(--proto-transition), transform var(--proto-transition), border-radius var(--proto-transition), box-shadow var(--proto-transition), background var(--proto-transition), padding var(--proto-transition), padding-right var(--proto-transition), margin var(--proto-transition), border-color var(--proto-transition);
-  border: 1.5px solid transparent;
+  border: .125rem solid transparent;
 }
 
 .timeline-item:not([data-state='active']) {
@@ -105,9 +105,9 @@
 
 .timeline-item[data-state='active'] {
   z-index: 3;
-  border-radius: var(--rrr-radius-m);
-  box-shadow: var(--rrr-depth-4-shadow);
-  margin-inline: -.4rem;
+  border-radius: var(--rrr-radius-s);
+  box-shadow: var(--rrr-depth-2-shadow);
+  /* margin-inline: -.4rem; */
   padding-block: calc(var(--rrr-spacing-m) + .35rem);
 
   .name {

@@ -2,6 +2,8 @@
 
 Use this file to capture product and prototype follow-up tasks that should not be forgotten.
 
+- [ ] [top priority] In active workout logging, always show the current exercise load/weight prominently so the user can execute sets without guessing.
+- [ ] [top priority] During transition between exercises in an active workout, show the upcoming exercise load/weight so the user can prepare equipment in time.
 - [ ] During a workout, use the Screen Wake Lock API so the phone does not lock.
 - [ ] Non-MVP follow-up: let the user toggle the wake lock feature on or off.
 - [ ] Add a user-facing toggle for auto-advance / auto-continue in workout flow, separate from the actual auto-advance behavior design.
@@ -25,6 +27,7 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] Add user-facing route-mismatch messaging when a stale or removed path is opened (for example an old tab to a retired route) so fallback to home is explicit.
 - [ ] Add toast-level messaging rules for non-blocking issues that may have consequences.
 - [ ] Keep inline feedback for local form or import/export validation issues and field-level corrections.
+- [ ] In places with item lists like the History page: use swipe right/left actions for things like delete (with an undo toast with grace period!). This also requires that we hint at this functionality the first time the user sees an item in this list (by letting the swipe movement show for a second as a 'peek')
 
 ## Workout Rep Logging Flow Thread
 

@@ -254,7 +254,7 @@ function renderRestTimelineItem(viewModel: RestItemViewModel): string {
         <div class="rest-detail__inner">
           <div class="actions">
             <rrr-button type="button" variant="secondary" tone="accent" data-action="${viewModel.primaryAction}" class="rest-primary-action">${viewModel.primaryLabel}</rrr-button>
-            <rrr-button type="button" variant="outline" tone="accent" data-action="skip-rest">Skip Rest</rrr-button>
+            <rrr-button type="button" variant="outline" tone="accent" data-action="skip-rest"><rrr-icon name="next"></rrr-icon></rrr-button>
           </div>
         </div>
       </div>
