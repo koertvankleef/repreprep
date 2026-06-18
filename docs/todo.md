@@ -46,10 +46,12 @@ Reference specification: `docs/workout-rep-logging-flow-spec.md`
 - [x] Phase 6: formalize edit-mode split (`during grace` in live flow affects flow; `historical edit` is outside the flow screen and affects data only).
 - [x] Phase 7: accessibility pass for rep control names, dynamic confirm labels, and confirmation announcements.
 - [x] Phase 8: tests for state transitions, event emission order, and edge cases (unchanged suggested value confirm, edit during grace, timed stop early).
-- [ ] [in progress] Phase 9: integrate workout logging flow from prototype into main product surfaces (start workout, active logging UI, and saved workout editing boundaries).
+- [x] Phase 9: integrate workout logging flow from prototype into main product surfaces (start workout, active logging UI, and saved workout editing boundaries).
 - [x] Phase 9a: route start-workout into active logging screen via #/workouts/:workoutId/log.
 - [x] Phase 9b: map stored workout data into logging timeline via workout-to-logging adapter.
 - [x] Phase 9c: persist logging events incrementally into workout set entries during active flow.
 - [x] Phase 9d: support rest and transition preferences from routine metadata instead of temporary defaults.
 - [x] Phase 9e: align active logging completion and exit path with product workout summary or editor entrypoint.
-- [ ] Phase 10: retire prototype-only path after parity QA, keeping the prototype only as optional dev playground if still useful.
+- [ ] [in progress] Phase 10: retire prototype-only path after parity QA, keeping the prototype only as optional dev playground if still useful.
+- [x] Phase 10a: remove standalone prototype route and app-shell rendering path.
+- [ ] Phase 10b: rename remaining prototype-labeled modules to product names once churn risk is lower.

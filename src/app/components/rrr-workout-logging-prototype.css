@@ -231,9 +231,6 @@
   justify-content: center;
 }
 
-.timeline-item--start .hint {
-}
-
 .timeline-item--start .actions rrr-button {
   width: min(18rem, 100%);
 }
