@@ -148,7 +148,7 @@
   --rrr-shadow-dialog: var(--rrr-depth-3-shadow);
 
   /* Core border primitive */
-  --rrr-border-width: 1px;
+  --rrr-border-width: 1.44px;
 
   --global-focus-ring-color: var(--rrr-colors-grayscale-100);
   --global-focus-ring-offset: 2px;

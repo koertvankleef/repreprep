@@ -253,7 +253,7 @@ function renderRestTimelineItem(viewModel: RestItemViewModel): string {
       <div class="rest-detail">
         <div class="rest-detail__inner">
           <div class="actions">
-            <rrr-button type="button" variant="secondary" tone="accent" data-action="${viewModel.primaryAction}" class="rest-primary-action">${viewModel.primaryLabel}</rrr-button>
+            <rrr-button type="button" variant="outline" tone="accent" data-action="${viewModel.primaryAction}" class="rest-primary-action">${viewModel.primaryLabel}</rrr-button>
             <rrr-button type="button" variant="outline" tone="accent" data-action="skip-rest"><rrr-icon name="next"></rrr-icon></rrr-button>
           </div>
         </div>
@@ -275,7 +275,7 @@ function renderTransitionTimelineItem(viewModel: TransitionItemViewModel): strin
       <div class="transition-detail transition-detail--actions">
         <div class="transition-detail__inner">
           <div class="actions">
-            <rrr-button type="button" variant="secondary" tone="accent" data-action="${viewModel.transitionPrimaryAction}" class="transition-primary-action">${viewModel.transitionPrimaryLabel}</rrr-button>
+            <rrr-button type="button" variant="outline" tone="accent" data-action="${viewModel.transitionPrimaryAction}" class="transition-primary-action">${viewModel.transitionPrimaryLabel}</rrr-button>
             <rrr-button type="button" variant="outline" tone="accent" data-action="next-now">Next Now</rrr-button>
           </div>
         </div>

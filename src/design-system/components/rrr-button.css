@@ -84,6 +84,15 @@ button {
   justify-content: center;
 }
 
+:host([rounded]) button {
+  border-radius: 999px;
+}
+
+:host([rounded][icon-only]) button {
+  border-radius: 50%;
+  aspect-ratio: 1 / 1;
+}
+
 button:hover:enabled {
   background: var(--_bg-hover);
   border-color: var(--_bg-hover);
@@ -95,16 +104,14 @@ button:active:enabled {
   box-shadow: var(--rrr-button-active-shadow);
 }
 
-:host([variant='outline']) button,
-:host([variant='secondary']) button {
+:host([variant='outline']) button {
   background: transparent;
   color: var(--_interactive-fg);
   border-color: var(--_interactive-fg);
   box-shadow: none;
 }
 
-:host([variant='outline']) button:hover:enabled,
-:host([variant='secondary']) button:hover:enabled {
+:host([variant='outline']) button:hover:enabled {
   background: color-mix(in oklab, var(--_bg), transparent 82%);
   color: var(--_interactive-fg);
   border-color: var(--_interactive-fg);

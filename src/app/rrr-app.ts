@@ -329,7 +329,7 @@ export class RrrApp extends HTMLElement {
           <a class="${this.linkClass('import-export', route.name)}" href="#/import-export">${t('app.nav.importExport')}</a>
           ${this.styleguideEnabled ? `<a class="${this.linkClass('styleguide', route.name)}" href="#/styleguide">${t('app.nav.styleguide')}</a>` : ''}
           ${this.renderThemeControls()}
-          ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="secondary" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
+          ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="outline" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
         </nav>
         <main>
           <div id="view"></div>

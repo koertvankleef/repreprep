@@ -167,7 +167,7 @@ export class RrrDialogHost extends HTMLElement {
           <p class="dialog-message" id="${messageId}">${escapeHtml(this.message)}</p>
           ${promptContent}
           <div class="dialog-actions">
-            <rrr-button type="button" variant="secondary" data-action="cancel">${escapeHtml(this.cancelLabel)}</rrr-button>
+            <rrr-button type="button" variant="outline" data-action="cancel">${escapeHtml(this.cancelLabel)}</rrr-button>
             <rrr-button type="button" data-action="confirm">${escapeHtml(this.confirmLabel)}</rrr-button>
           </div>
         </div>

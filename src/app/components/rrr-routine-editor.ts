@@ -335,7 +335,7 @@ export class RrrRoutineEditor extends HTMLElement {
         <section class="page">
           <rrr-card size="lg">
             <h2>${t('routineEditor.notFound.title')}</h2>
-            <rrr-button type="button" variant="secondary" data-action="back">${t('routineEditor.notFound.back')}</rrr-button>
+            <rrr-button type="button" variant="outline" data-action="back">${t('routineEditor.notFound.back')}</rrr-button>
           </rrr-card>
         </section>
       `
@@ -398,9 +398,9 @@ export class RrrRoutineEditor extends HTMLElement {
                 <div class="exercise-header">
                   <span class="exercise-name" id="${exerciseHeadingId}">${escapeHtml(exerciseName)}</span>
                   <div class="exercise-order">
-                    <rrr-button type="button" variant="secondary" data-action="move-up" data-id="${routineExercise.id}"
+                    <rrr-button type="button" variant="outline" data-action="move-up" data-id="${routineExercise.id}"
                       ${isFirst ? 'disabled' : ''} aria-label="${escapeHtml(t('routineEditor.action.moveUpAria', { name: exerciseName }))}">↑</rrr-button>
-                    <rrr-button type="button" variant="secondary" data-action="move-down" data-id="${routineExercise.id}"
+                    <rrr-button type="button" variant="outline" data-action="move-down" data-id="${routineExercise.id}"
                       ${isLast ? 'disabled' : ''} aria-label="${escapeHtml(t('routineEditor.action.moveDownAria', { name: exerciseName }))}">↓</rrr-button>
                     <rrr-button type="button" variant="ghost" tone="danger" data-action="remove-exercise" data-id="${routineExercise.id}" aria-label="${escapeHtml(t('routineEditor.action.removeExerciseAria', { name: exerciseName }))}"><rrr-icon name="delete"></rrr-icon></rrr-button>
                   </div>
@@ -449,7 +449,7 @@ export class RrrRoutineEditor extends HTMLElement {
           <div class="actions">
             <rrr-button type="button" data-action="save">${t('routineEditor.action.save')}</rrr-button>
             ${isEditing ? `<rrr-button type="button" data-action="start-workout">${t('routineEditor.action.startWorkout')}</rrr-button>` : ''}
-            <rrr-button type="button" variant="secondary" data-action="back">${t('action.cancel')}</rrr-button>
+            <rrr-button type="button" variant="outline" data-action="back">${t('action.cancel')}</rrr-button>
           </div>
         </rrr-card>
       </section>
