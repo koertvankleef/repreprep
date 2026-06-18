@@ -99,7 +99,7 @@ export type TransitionItemViewModel = {
   transitionDisplayTime: string
   transitionRemainingPercent: string
   transitionPrimaryAction: 'stay-here' | 'next'
-  transitionPrimaryLabel: 'Stay Here' | 'Next'
+  transitionPrimaryLabel: 'Wait' | 'Next'
   nextExerciseName: string
 }
 

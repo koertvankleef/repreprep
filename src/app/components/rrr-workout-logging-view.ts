@@ -119,7 +119,7 @@ export function buildTransitionItemViewModel(item: Extract<TimelineItem, { kind:
         ? '0%'
         : '100%',
     transitionPrimaryAction: isTransitionActiveStage(state.stage) ? 'stay-here' : 'next',
-    transitionPrimaryLabel: isTransitionActiveStage(state.stage) ? 'Stay Here' : 'Next',
+    transitionPrimaryLabel: isTransitionActiveStage(state.stage) ? 'Wait' : 'Next',
     nextExerciseName: nextExercise ? nextExercise.name : 'Workout complete',
   }
 }
@@ -151,7 +151,7 @@ export function renderWorkoutLoggingMarkup(state: WorkoutLoggingViewState, style
       <div class="stack is-dimmed">
         <section class="timeline-item timeline-item--start" data-state="${startState}">
           <h2 class="name">Ready?</h2>
-          <div class="actions start-actions"${state.stage !== 'locked' ? ' hidden aria-hidden="true"' : ''}><rrr-button data-action="go" type="button" tone="accent">GO</rrr-button></div>
+          <div class="actions start-actions"${state.stage !== 'locked' ? ' hidden aria-hidden="true"' : ''}><rrr-button data-action="go" type="button" tone="accent" rounded>GO</rrr-button></div>
           <div class="hint start-hint"${state.stage === 'locked' ? ' hidden aria-hidden="true"' : ''}>Workout flow is running. Active section is centered when possible.</div>
         </section>
 
@@ -227,15 +227,15 @@ function renderTimedSetDetail(viewModel: SetItemViewModel): string {
 function renderRepSetDetail(viewModel: SetItemViewModel): string {
   return `
     <div class="rep-row">
-      <rrr-button type="button" variant="outline" data-action="rep-minus" aria-label="Decrease reps" ${viewModel.isActiveSet ? '' : 'disabled'}>-</rrr-button>
+      <rrr-button type="button" variant="outline" rounded data-action="rep-minus" aria-label="Decrease reps" ${viewModel.isActiveSet ? '' : 'disabled'}><rrr-icon name="subtract"></rrr-icon></rrr-button>
       <div class="rep-value" aria-live="polite" aria-atomic="true" aria-label="${viewModel.repDisplay}">${viewModel.repDisplay}</div>
-      <rrr-button type="button" variant="outline" data-action="rep-plus" aria-label="Increase reps" ${viewModel.isActiveSet ? '' : 'disabled'}>+</rrr-button>
+      <rrr-button type="button" variant="outline" rounded data-action="rep-plus" aria-label="Increase reps" ${viewModel.isActiveSet ? '' : 'disabled'}><rrr-icon name="add"></rrr-icon></rrr-button>
     </div>
     <div class="hint rep-debounce-hint"${viewModel.isActiveDebounce ? '' : ' hidden aria-hidden="true"'}>Auto-confirm in <span class="debounce-countdown-value">${viewModel.debounceCountdownText}</span>...</div>
     <div class="hint rep-grace-hint"${viewModel.isActiveGrace ? '' : ' hidden aria-hidden="true"'}>Rest starts in <span class="grace-countdown-value">${viewModel.graceCountdownText}</span>...</div>
     <div class="actions">
-      <rrr-button type="button" data-action="done-set" class="rep-confirm-action" aria-label="${viewModel.confirmLabel}" ${viewModel.isActiveSet ? '' : 'disabled'}>${viewModel.confirmLabel}</rrr-button>
-      <rrr-button type="button" data-action="start-rest-now" class="rep-start-rest-now-action" ${viewModel.isActiveGrace ? '' : 'disabled'}${viewModel.isActiveGrace ? '' : ' hidden aria-hidden="true"'}>Start Rest Now</rrr-button>
+      <rrr-button type="button" data-action="done-set" rounded class="rep-confirm-action" aria-label="${viewModel.confirmLabel}" ${viewModel.isActiveSet ? '' : 'disabled'}>${viewModel.confirmLabel}</rrr-button>
+      <rrr-button type="button" data-action="start-rest-now" rounded class="rep-start-rest-now-action" ${viewModel.isActiveGrace ? '' : 'disabled'}${viewModel.isActiveGrace ? '' : ' hidden aria-hidden="true"'}>Start Rest Now</rrr-button>
     </div>
   `
 }
@@ -253,8 +253,8 @@ function renderRestTimelineItem(viewModel: RestItemViewModel): string {
       <div class="rest-detail">
         <div class="rest-detail__inner">
           <div class="actions">
-            <rrr-button type="button" variant="outline" tone="accent" data-action="${viewModel.primaryAction}" class="rest-primary-action">${viewModel.primaryLabel}</rrr-button>
-            <rrr-button type="button" variant="outline" tone="accent" data-action="skip-rest"><rrr-icon name="next"></rrr-icon></rrr-button>
+            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="${viewModel.primaryAction}" class="rest-primary-action">${viewModel.primaryLabel}</rrr-button>
+            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="skip-rest"><rrr-icon name="next"></rrr-icon></rrr-button>
           </div>
         </div>
       </div>
@@ -275,8 +275,8 @@ function renderTransitionTimelineItem(viewModel: TransitionItemViewModel): strin
       <div class="transition-detail transition-detail--actions">
         <div class="transition-detail__inner">
           <div class="actions">
-            <rrr-button type="button" variant="outline" tone="accent" data-action="${viewModel.transitionPrimaryAction}" class="transition-primary-action">${viewModel.transitionPrimaryLabel}</rrr-button>
-            <rrr-button type="button" variant="outline" tone="accent" data-action="next-now">Next Now</rrr-button>
+            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="${viewModel.transitionPrimaryAction}" class="transition-primary-action">${viewModel.transitionPrimaryLabel}</rrr-button>
+            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="next-now"><rrr-icon name="next"></rrr-icon></rrr-button>
           </div>
         </div>
       </div>
