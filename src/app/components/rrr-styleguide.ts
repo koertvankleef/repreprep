@@ -402,13 +402,13 @@ export class RrrStyleguide extends HTMLElement {
                 <rrr-button type="button" variant="ghost" tone="primary">icon after text<rrr-icon name="settings"></rrr-icon></rrr-button>
               </div>
               <div class="button-row role-row">
-                <button class="sg-button sg-button--solid sg-button--tone-info" type="button">${t('styleguide.toasts.trigger.info')}</button>
-                <button class="sg-button sg-button--solid sg-button--tone-success" type="button">${t('styleguide.toasts.trigger.success')}</button>
-                <button class="sg-button sg-button--solid sg-button--tone-warning" type="button">${t('styleguide.toasts.trigger.warning')}</button>
-                <button class="sg-button sg-button--solid sg-button--tone-danger" type="button">${t('styleguide.toasts.trigger.danger')}</button>
+                <button class="sg-button sg-button--solid sg-button--tone-info" type="button">${t('styleguide.buttons.preview.info')}</button>
+                <button class="sg-button sg-button--solid sg-button--tone-success" type="button">${t('styleguide.buttons.preview.success')}</button>
+                <button class="sg-button sg-button--solid sg-button--tone-warning" type="button">${t('styleguide.buttons.preview.warning')}</button>
+                <button class="sg-button sg-button--solid sg-button--tone-danger" type="button">${t('styleguide.buttons.preview.danger')}</button>
               </div>
               <div class="button-row">
-                <button class="sg-button sg-button--outline sg-button--tone-neutral" type="button">${t('styleguide.toasts.trigger.neutral')}</button>
+                <button class="sg-button sg-button--outline sg-button--tone-neutral" type="button">${t('styleguide.buttons.preview.neutral')}</button>
                 <button class="sg-button sg-button--ghost sg-button--tone-accent" type="button">${t('styleguide.palette.accent.title')}</button>
                 <button class="sg-button sg-button--ghost sg-button--tone-primary" type="button">${t('styleguide.palette.primary.title')}</button>
               </div>

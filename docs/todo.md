@@ -21,7 +21,8 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] Prototype marker color/state changes based on active workout segment while keeping the underlying rail visually subtle.
 - [ ] remind user via an app level warning after a certain time (days?) that the app stores in browser cache by default and that they should save the JSON as backup intermittently. Perhaps even store in the cache when they last exported so that the reminder comes up based on that.
 - [ ] [in progress] Introduce layered messaging and error reporting with clear severity semantics.
-- [ ] Add app-level banner messaging for truly global states: internal app failure, stale client warning, and local-only storage backup reminder.
+- [ ] Add app-level banner messaging for truly global states: internal app failure, stale client warning, and local-only storage backup reminder. Look at how VMware Clarity design system differentiates visually between levels of messages.
+- [ ] Add user-facing route-mismatch messaging when a stale or removed path is opened (for example an old tab to a retired route) so fallback to home is explicit.
 - [ ] Add toast-level messaging rules for non-blocking issues that may have consequences.
 - [ ] Keep inline feedback for local form or import/export validation issues and field-level corrections.
 
