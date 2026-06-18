@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import type { AppData, Workout } from '../domain/types.ts'
-import { buildWorkoutLoggingPrototypeData } from '../app/components/rrr-workout-logging-adapter.ts'
+import { buildWorkoutLoggingData } from '../app/components/rrr-workout-logging-adapter.ts'
 
 function createBaseData(): AppData {
   return {
@@ -66,7 +66,7 @@ describe('rrr-workout-logging-adapter', () => {
     const data = createBaseData()
     const workout = createWorkout()
 
-    const result = buildWorkoutLoggingPrototypeData(data, workout)
+    const result = buildWorkoutLoggingData(data, workout)
 
     expect(result.exercises).toEqual([
       {
@@ -101,7 +101,7 @@ describe('rrr-workout-logging-adapter', () => {
     const data = createBaseData()
     const workout = createWorkout()
 
-    const result = buildWorkoutLoggingPrototypeData(data, workout, {
+    const result = buildWorkoutLoggingData(data, workout, {
       defaultRestSeconds: 15,
       transitionSeconds: 8,
       restSecondsByExerciseId: { 'ex-time': 0 },
@@ -123,7 +123,7 @@ describe('rrr-workout-logging-adapter', () => {
       exercises: workout.exercises.map((entry) => ({ ...entry, restSeconds: undefined })),
     }
 
-    const result = buildWorkoutLoggingPrototypeData(data, withoutTiming, {
+    const result = buildWorkoutLoggingData(data, withoutTiming, {
       defaultRestSeconds: 14,
       transitionSeconds: 7,
       restSecondsByExerciseId: { 'ex-time': 3 },
@@ -139,7 +139,7 @@ describe('rrr-workout-logging-adapter', () => {
     const workout = createWorkout()
     workout.exercises = [{ ...workout.exercises[0]!, sets: [] }, workout.exercises[1]!]
 
-    const result = buildWorkoutLoggingPrototypeData(data, workout)
+    const result = buildWorkoutLoggingData(data, workout)
 
     expect(result.exercises).toHaveLength(1)
     expect(result.exercises[0]?.name).toBe('Plank')
@@ -152,7 +152,7 @@ describe('rrr-workout-logging-adapter', () => {
     const workout = createWorkout()
     workout.exercises[0] = { ...workout.exercises[0]!, exerciseId: 'missing-id' }
 
-    expect(() => buildWorkoutLoggingPrototypeData(data, workout)).toThrow(
+    expect(() => buildWorkoutLoggingData(data, workout)).toThrow(
       'Missing exercise definition for workout exercise id "missing-id".',
     )
   })

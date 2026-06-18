@@ -7,7 +7,7 @@ import {
   type TimelineItem,
   type TimelineState,
   type TransitionItemViewModel,
-} from './rrr-workout-logging-prototype-model.ts'
+} from './rrr-workout-logging-model.ts'
 import {
   isRestActiveOrPausedStage,
   isRestActiveStage,
@@ -19,9 +19,9 @@ import {
   isTimedReadyStage,
   isTransitionActiveOrPausedStage,
   isTransitionActiveStage,
-} from './rrr-workout-logging-prototype-workflow.ts'
+} from './rrr-workout-logging-workflow.ts'
 
-export type PrototypeViewState = {
+export type WorkoutLoggingViewState = {
   stage: ActiveStage
   activeTimelineIndex: number
   repValue: number
@@ -64,7 +64,7 @@ export function getTimelineState(stage: ActiveStage, activeTimelineIndex: number
   return 'active'
 }
 
-export function buildSetItemViewModelForState(item: Extract<TimelineItem, { kind: 'set' }>, timelineState: TimelineState, state: PrototypeViewState): SetItemViewModel {
+export function buildSetItemViewModelForState(item: Extract<TimelineItem, { kind: 'set' }>, timelineState: TimelineState, state: WorkoutLoggingViewState): SetItemViewModel {
   const exercise = getExercise(item.exerciseIndex)
   const isActive = timelineState === 'active'
   return {
@@ -88,7 +88,7 @@ export function buildSetItemViewModelForState(item: Extract<TimelineItem, { kind
   }
 }
 
-export function buildRestItemViewModel(item: Extract<TimelineItem, { kind: 'rest' }>, timelineState: TimelineState, state: PrototypeViewState): RestItemViewModel {
+export function buildRestItemViewModel(item: Extract<TimelineItem, { kind: 'rest' }>, timelineState: TimelineState, state: WorkoutLoggingViewState): RestItemViewModel {
   const isActiveRest = timelineState === 'active' && isRestActiveOrPausedStage(state.stage)
   return {
     timelineState,
@@ -105,7 +105,7 @@ export function buildRestItemViewModel(item: Extract<TimelineItem, { kind: 'rest
   }
 }
 
-export function buildTransitionItemViewModel(item: Extract<TimelineItem, { kind: 'transition' }>, timelineState: TimelineState, state: PrototypeViewState): TransitionItemViewModel {
+export function buildTransitionItemViewModel(item: Extract<TimelineItem, { kind: 'transition' }>, timelineState: TimelineState, state: WorkoutLoggingViewState): TransitionItemViewModel {
   const nextExercise = EXERCISES[item.exerciseIndex + 1]
   const isActiveTransition = timelineState === 'active' && isTransitionActiveOrPausedStage(state.stage)
   return {
@@ -124,7 +124,7 @@ export function buildTransitionItemViewModel(item: Extract<TimelineItem, { kind:
   }
 }
 
-export function renderTimelineItem(item: TimelineItem, index: number, state: PrototypeViewState): string {
+export function renderTimelineItem(item: TimelineItem, index: number, state: WorkoutLoggingViewState): string {
   const timelineState = getTimelineState(state.stage, state.activeTimelineIndex, index)
   if (item.kind === 'set') {
     return renderActivityItem(buildSetItemViewModelForState(item, timelineState, state))
@@ -137,7 +137,7 @@ export function renderTimelineItem(item: TimelineItem, index: number, state: Pro
   return renderTransitionTimelineItem(buildTransitionItemViewModel(item, timelineState, state))
 }
 
-export function renderPrototypeMarkup(state: PrototypeViewState, styles: string, timeline: TimelineItem[]): string {
+export function renderWorkoutLoggingMarkup(state: WorkoutLoggingViewState, styles: string, timeline: TimelineItem[]): string {
   const startState = state.stage === 'locked' ? 'active' : 'complete'
   return `
     <style>${styles}</style>

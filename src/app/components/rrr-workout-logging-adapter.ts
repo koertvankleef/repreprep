@@ -1,5 +1,5 @@
 import type { AppData, ExerciseDefinition, SetEntry, Workout } from '../../domain/types.ts'
-import type { Exercise, TimelineItem } from './rrr-workout-logging-prototype-model.ts'
+import type { Exercise, TimelineItem } from './rrr-workout-logging-model.ts'
 
 export interface WorkoutLoggingAdapterOptions {
   defaultRestSeconds?: number
@@ -18,7 +18,7 @@ const DEFAULT_REST_SECONDS = 20
 const DEFAULT_TRANSITION_SECONDS = 10
 const DEFAULT_PREVIOUS_PERFORMANCE = 'No previous data'
 
-export function buildWorkoutLoggingPrototypeData(
+export function buildWorkoutLoggingData(
   data: Pick<AppData, 'exercises'>,
   workout: Workout,
   options: WorkoutLoggingAdapterOptions = {},

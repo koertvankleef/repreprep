@@ -1,4 +1,4 @@
-import styles from './rrr-workout-logging-prototype.css?inline'
+import styles from './rrr-workout-logging-flow.css?inline'
 import {
   createTimelineItemDomAdapter,
   syncTimelineItemState,
@@ -6,7 +6,7 @@ import {
   type SetTimelineItemDomAdapter,
   type TimelineItemDomAdapter,
   type TransitionTimelineItemDomAdapter,
-} from './rrr-workout-logging-prototype-dom.ts'
+} from './rrr-workout-logging-dom.ts'
 import {
   EXERCISES,
   EXERCISE_TRANSITION_SECONDS,
@@ -22,27 +22,27 @@ import {
   type TimelineState,
   type TransitionItemViewModel,
   type WorkoutEvent,
-} from './rrr-workout-logging-prototype-model.ts'
-import { TimelineMotionController } from './rrr-workout-logging-prototype-motion.ts'
-import { ManagedTimer, startManagedCountdown } from './rrr-workout-logging-prototype-runtime.ts'
+} from './rrr-workout-logging-model.ts'
+import { TimelineMotionController } from './rrr-workout-logging-motion.ts'
+import { ManagedTimer, startManagedCountdown } from './rrr-workout-logging-runtime.ts'
 import {
   formatClock,
   getTimelineState,
-  renderPrototypeMarkup,
+  renderWorkoutLoggingMarkup,
   buildRestItemViewModel,
   buildSetItemViewModelForState,
   buildTransitionItemViewModel,
-  type PrototypeViewState,
-} from './rrr-workout-logging-prototype-view.ts'
+  type WorkoutLoggingViewState,
+} from './rrr-workout-logging-view.ts'
 import {
   getActivationPlan,
   getTotalSetCount,
   isRestActiveOrPausedStage,
   isSetGraceStage,
   isSetInteractionStage,
-} from './rrr-workout-logging-prototype-workflow.ts'
+} from './rrr-workout-logging-workflow.ts'
 
-export class RrrWorkoutLoggingPrototype extends HTMLElement {
+export class RrrWorkoutLoggingFlow extends HTMLElement {
   private activeTimelineIndex = 0
   private repValue = getExercise(0).suggestedReps ?? 0
   private stage: ActiveStage = 'locked'
@@ -783,7 +783,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     return this.completedSetsByExercise.reduce((sum, value) => sum + value, 0)
   }
 
-  private getViewState(): PrototypeViewState {
+  private getViewState(): WorkoutLoggingViewState {
     return {
       stage: this.stage,
       activeTimelineIndex: this.activeTimelineIndex,
@@ -807,7 +807,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     }
 
     const viewState = this.getViewState()
-    this.shadowRoot.innerHTML = renderPrototypeMarkup(viewState, styles, TIMELINE)
+    this.shadowRoot.innerHTML = renderWorkoutLoggingMarkup(viewState, styles, TIMELINE)
 
     this.cacheDomReferences()
     this.syncAnnouncementRegion()
@@ -828,4 +828,4 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
   }
 }
 
-customElements.define('rrr-workout-logging-prototype', RrrWorkoutLoggingPrototype)
+customElements.define('rrr-workout-logging-flow', RrrWorkoutLoggingFlow)

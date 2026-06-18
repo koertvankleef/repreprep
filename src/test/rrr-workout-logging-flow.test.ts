@@ -1,7 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import '../app/components/rrr-workout-logging-prototype.ts'
+import '../app/components/rrr-workout-logging-flow.ts'
 
-describe('rrr-workout-logging-prototype motion invariants', () => {
+describe('rrr-workout-logging-flow motion invariants', () => {
   beforeAll(() => {
     if (!HTMLElement.prototype.scrollIntoView) {
       Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
@@ -17,7 +17,7 @@ describe('rrr-workout-logging-prototype motion invariants', () => {
   })
 
   it('does not re-trigger motion cleanup when active item stays the same', () => {
-    const element = document.createElement('rrr-workout-logging-prototype') as HTMLElement & Record<string, unknown>
+    const element = document.createElement('rrr-workout-logging-flow') as HTMLElement & Record<string, unknown>
     document.body.appendChild(element)
 
     const component = element as unknown as {
@@ -40,7 +40,7 @@ describe('rrr-workout-logging-prototype motion invariants', () => {
   })
 
   it('sets exiting and entering once on active switch, then remains stable', () => {
-    const element = document.createElement('rrr-workout-logging-prototype') as HTMLElement & Record<string, unknown>
+    const element = document.createElement('rrr-workout-logging-flow') as HTMLElement & Record<string, unknown>
     document.body.appendChild(element)
 
     const component = element as unknown as {
@@ -78,7 +78,7 @@ describe('rrr-workout-logging-prototype motion invariants', () => {
   })
 
   it('keeps the confirm label aligned with the current rep value', () => {
-    const element = document.createElement('rrr-workout-logging-prototype') as HTMLElement & Record<string, unknown>
+    const element = document.createElement('rrr-workout-logging-flow') as HTMLElement & Record<string, unknown>
     document.body.appendChild(element)
 
     const component = element as unknown as {
@@ -104,7 +104,7 @@ describe('rrr-workout-logging-prototype motion invariants', () => {
   })
 
   it('announces the logged result without exposing countdown noise', () => {
-    const element = document.createElement('rrr-workout-logging-prototype') as HTMLElement & Record<string, unknown>
+    const element = document.createElement('rrr-workout-logging-flow') as HTMLElement & Record<string, unknown>
     document.body.appendChild(element)
 
     const component = element as unknown as {
@@ -125,7 +125,7 @@ describe('rrr-workout-logging-prototype motion invariants', () => {
   })
 
   it('renders completion as active and emits finish event for handoff', () => {
-    const element = document.createElement('rrr-workout-logging-prototype') as HTMLElement & Record<string, unknown>
+    const element = document.createElement('rrr-workout-logging-flow') as HTMLElement & Record<string, unknown>
     document.body.appendChild(element)
 
     const component = element as unknown as {

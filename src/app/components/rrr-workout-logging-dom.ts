@@ -1,7 +1,7 @@
 import type {
   TimelineItem,
   TimelineState,
-} from './rrr-workout-logging-prototype-model.ts'
+} from './rrr-workout-logging-model.ts'
 
 export type SetTimelineItemDomAdapter = {
   kind: 'set'

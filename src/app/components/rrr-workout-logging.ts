@@ -1,11 +1,11 @@
 import { storageService } from '../storage-instance.ts'
-import { buildWorkoutLoggingPrototypeData } from './rrr-workout-logging-adapter.ts'
+import { buildWorkoutLoggingData } from './rrr-workout-logging-adapter.ts'
 import { applyWorkoutLoggingEventToWorkout } from './rrr-workout-logging-event-apply.ts'
 import {
-  configureWorkoutLoggingPrototypeModel,
-  resetWorkoutLoggingPrototypeModel,
+  configureWorkoutLoggingModel,
+  resetWorkoutLoggingModel,
   type WorkoutEvent,
-} from './rrr-workout-logging-prototype-model.ts'
+} from './rrr-workout-logging-model.ts'
 
 export class RrrWorkoutLogging extends HTMLElement {
   private workoutIdValue: string | null = null
@@ -30,7 +30,7 @@ export class RrrWorkoutLogging extends HTMLElement {
     this.removeEventListener('rrr-workout-event', this.handleWorkoutEvent as EventListener)
     this.removeEventListener('rrr-workout-flow-finished', this.handleWorkoutFlowFinished as EventListener)
     this.exerciseEntryIds = []
-    resetWorkoutLoggingPrototypeModel()
+    resetWorkoutLoggingModel()
   }
 
   private readonly handleWorkoutFlowFinished = (): void => {
@@ -95,21 +95,21 @@ export class RrrWorkoutLogging extends HTMLElement {
       return
     }
 
-    const mapped = buildWorkoutLoggingPrototypeData(data, workout)
+    const mapped = buildWorkoutLoggingData(data, workout)
 
     if (mapped.exercises.length === 0) {
       this.renderMissing('This workout has no sets to log yet. Add sets first, then start logging.')
       return
     }
 
-    configureWorkoutLoggingPrototypeModel({
+    configureWorkoutLoggingModel({
       exercises: mapped.exercises,
       timeline: mapped.timeline,
     })
     this.exerciseEntryIds = mapped.exerciseEntryIds
 
     this.innerHTML = ''
-    this.append(document.createElement('rrr-workout-logging-prototype'))
+    this.append(document.createElement('rrr-workout-logging-flow'))
   }
 }
 

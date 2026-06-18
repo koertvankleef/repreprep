@@ -9,7 +9,7 @@ import './components/rrr-exercise-history.ts'
 import './components/rrr-routine-list.ts'
 import './components/rrr-routine-editor.ts'
 import './components/rrr-styleguide.ts'
-import './components/rrr-workout-logging-prototype.ts'
+import './components/rrr-workout-logging-flow.ts'
 import './components/rrr-workout-logging.ts'
 
 export function registerAppComponents(): void {

@@ -4,7 +4,7 @@ import {
   type ActivationPlan,
   type ActiveStage,
   type TimelineItem,
-} from './rrr-workout-logging-prototype-model.ts'
+} from './rrr-workout-logging-model.ts'
 
 export function isSetInteractionStage(stage: ActiveStage): boolean {
   return stage === 'set' || stage === 'set-debounce' || stage === 'set-grace'

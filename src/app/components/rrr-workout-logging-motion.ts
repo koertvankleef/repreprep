@@ -1,5 +1,5 @@
-import type { TimelineState } from './rrr-workout-logging-prototype-model.ts'
-import { ManagedTimer } from './rrr-workout-logging-prototype-runtime.ts'
+import type { TimelineState } from './rrr-workout-logging-model.ts'
+import { ManagedTimer } from './rrr-workout-logging-runtime.ts'
 
 export class TimelineMotionController {
   private static readonly DEFAULT_STATE_TRANSITION_MS = 180

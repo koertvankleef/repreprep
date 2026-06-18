@@ -52,6 +52,6 @@ Reference specification: `docs/workout-rep-logging-flow-spec.md`
 - [x] Phase 9c: persist logging events incrementally into workout set entries during active flow.
 - [x] Phase 9d: support rest and transition preferences from routine metadata instead of temporary defaults.
 - [x] Phase 9e: align active logging completion and exit path with product workout summary or editor entrypoint.
-- [ ] [in progress] Phase 10: retire prototype-only path after parity QA, keeping the prototype only as optional dev playground if still useful.
+- [x] Phase 10: retire prototype-only path after parity QA, keeping the prototype only as optional dev playground if still useful.
 - [x] Phase 10a: remove standalone prototype route and app-shell rendering path.
-- [ ] Phase 10b: rename remaining prototype-labeled modules to product names once churn risk is lower.
+- [x] Phase 10b: rename remaining prototype-labeled modules to product names once churn risk is lower.

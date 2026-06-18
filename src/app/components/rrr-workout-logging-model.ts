@@ -172,7 +172,7 @@ export function buildTimeline(exercises: Exercise[], exerciseTransitionSeconds: 
 
 export let TIMELINE = buildTimeline(EXERCISES, EXERCISE_TRANSITION_SECONDS)
 
-export function configureWorkoutLoggingPrototypeModel(input: {
+export function configureWorkoutLoggingModel(input: {
   exercises: Exercise[]
   timeline?: TimelineItem[]
   exerciseTransitionSeconds?: number
@@ -182,7 +182,7 @@ export function configureWorkoutLoggingPrototypeModel(input: {
   TIMELINE = input.timeline ? [...input.timeline] : buildTimeline(EXERCISES, EXERCISE_TRANSITION_SECONDS)
 }
 
-export function resetWorkoutLoggingPrototypeModel(): void {
+export function resetWorkoutLoggingModel(): void {
   EXERCISES = DEFAULT_EXERCISES
   EXERCISE_TRANSITION_SECONDS = DEFAULT_EXERCISE_TRANSITION_SECONDS
   TIMELINE = buildTimeline(EXERCISES, EXERCISE_TRANSITION_SECONDS)
