@@ -28,6 +28,7 @@ export type SetTimelineItemDomAdapter = {
 export type RestTimelineItemDomAdapter = {
   kind: 'rest'
   element: HTMLElement
+  actionsEl: HTMLElement | null
   countEl: HTMLElement | null
   primaryActionEl: HTMLElement | null
   progressEl: HTMLElement | null
@@ -36,6 +37,7 @@ export type RestTimelineItemDomAdapter = {
 export type TransitionTimelineItemDomAdapter = {
   kind: 'transition'
   element: HTMLElement
+  actionsEl: HTMLElement | null
   countEl: HTMLElement | null
   primaryActionEl: HTMLElement | null
   progressEl: HTMLElement | null
@@ -75,6 +77,7 @@ export function createTimelineItemDomAdapter(item: TimelineItem, element: HTMLEl
     return {
       kind: 'rest',
       element,
+      actionsEl: element.querySelector<HTMLElement>('.actions--wait-flow'),
       countEl: element.querySelector<HTMLElement>('.stage-count--rest'),
       primaryActionEl: element.querySelector<HTMLElement>('.rest-primary-action'),
       progressEl: element.querySelector<HTMLElement>('.bar--vertical > span'),
@@ -84,6 +87,7 @@ export function createTimelineItemDomAdapter(item: TimelineItem, element: HTMLEl
   return {
     kind: 'transition',
     element,
+    actionsEl: element.querySelector<HTMLElement>('.actions--wait-flow'),
     countEl: element.querySelector<HTMLElement>('.stage-count--transition'),
     primaryActionEl: element.querySelector<HTMLElement>('.transition-primary-action'),
     progressEl: element.querySelector<HTMLElement>('.bar--vertical--transition > span'),

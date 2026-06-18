@@ -90,36 +90,44 @@ export function buildSetItemViewModelForState(item: Extract<TimelineItem, { kind
 
 export function buildRestItemViewModel(item: Extract<TimelineItem, { kind: 'rest' }>, timelineState: TimelineState, state: WorkoutLoggingViewState): RestItemViewModel {
   const isActiveRest = timelineState === 'active' && isRestActiveOrPausedStage(state.stage)
+  const isRunningRest = timelineState === 'active' && isRestActiveStage(state.stage)
+  const isPausedRest = isActiveRest && !isRunningRest
   return {
     timelineState,
     durationSeconds: item.durationSeconds,
     isActiveRest,
+    showCountdown: isRunningRest,
     restDisplayTime: isActiveRest ? formatClock(state.restRemainingSeconds) : formatClock(item.durationSeconds),
-    restRemainingPercent: isActiveRest
+    restRemainingPercent: isRunningRest
       ? `${Math.max(0, Math.min(100, (state.restRemainingSeconds / item.durationSeconds) * 100))}%`
-      : timelineState === 'complete'
+      : timelineState === 'complete' || isPausedRest
         ? '0%'
         : '100%',
-    primaryAction: isRestActiveStage(state.stage) ? 'pause-rest' : 'resume-rest',
-    primaryLabel: isRestActiveStage(state.stage) ? 'Pause' : 'Resume',
+    showPrimaryAction: isRunningRest,
+    primaryAction: 'pause-rest',
+    primaryLabel: 'Wait',
   }
 }
 
 export function buildTransitionItemViewModel(item: Extract<TimelineItem, { kind: 'transition' }>, timelineState: TimelineState, state: WorkoutLoggingViewState): TransitionItemViewModel {
   const nextExercise = EXERCISES[item.exerciseIndex + 1]
   const isActiveTransition = timelineState === 'active' && isTransitionActiveOrPausedStage(state.stage)
+  const isRunningTransition = timelineState === 'active' && isTransitionActiveStage(state.stage)
+  const isPausedTransition = isActiveTransition && !isRunningTransition
   return {
     timelineState,
     durationSeconds: item.durationSeconds,
     isActiveTransition,
+    showCountdown: isRunningTransition,
     transitionDisplayTime: `${isActiveTransition ? state.nextExerciseRemainingSeconds : item.durationSeconds}`,
-    transitionRemainingPercent: isActiveTransition
+    transitionRemainingPercent: isRunningTransition
       ? `${Math.max(0, Math.min(100, (state.nextExerciseRemainingSeconds / item.durationSeconds) * 100))}%`
-      : timelineState === 'complete'
+      : timelineState === 'complete' || isPausedTransition
         ? '0%'
         : '100%',
-    transitionPrimaryAction: isTransitionActiveStage(state.stage) ? 'stay-here' : 'next',
-    transitionPrimaryLabel: isTransitionActiveStage(state.stage) ? 'Wait' : 'Next',
+    showPrimaryAction: isRunningTransition,
+    transitionPrimaryAction: 'stay-here',
+    transitionPrimaryLabel: 'Wait',
     nextExerciseName: nextExercise ? nextExercise.name : 'Workout complete',
   }
 }
@@ -248,13 +256,13 @@ function renderRestTimelineItem(viewModel: RestItemViewModel): string {
       </div>
       <div class="rest-header">
         <div class="rest-title"><rrr-icon name="water-bottle"></rrr-icon>Rest</div>
-        <span class="stage-count stage-count--rest"${viewModel.isActiveRest ? '' : ' hidden aria-hidden="true"'}>${viewModel.restDisplayTime}</span>
+        <span class="stage-count stage-count--rest${viewModel.showCountdown ? '' : ' is-countdown-hidden'}"${viewModel.showCountdown ? '' : ' aria-hidden="true"'}>${viewModel.restDisplayTime}</span>
       </div>
       <div class="rest-detail">
         <div class="rest-detail__inner">
-          <div class="actions">
-            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="${viewModel.primaryAction}" class="rest-primary-action">${viewModel.primaryLabel}</rrr-button>
-            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="skip-rest"><rrr-icon name="next"></rrr-icon></rrr-button>
+          <div class="actions actions--wait-flow${viewModel.showPrimaryAction ? '' : ' is-wait-hidden'}">
+            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="${viewModel.primaryAction}" class="rest-primary-action"${viewModel.showPrimaryAction ? '' : ' aria-hidden="true" disabled'}>${viewModel.primaryLabel}</rrr-button>
+            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="skip-rest" class="rest-next-action"><rrr-icon name="next"></rrr-icon></rrr-button>
           </div>
         </div>
       </div>
@@ -270,13 +278,13 @@ function renderTransitionTimelineItem(viewModel: TransitionItemViewModel): strin
       </div>
       <div class="rest-header">
         <div class="rest-title">Time to switch to: ${viewModel.nextExerciseName}</div>
-        <span class="stage-count stage-count--transition"${viewModel.isActiveTransition ? '' : ' hidden aria-hidden="true"'}>${viewModel.transitionDisplayTime}</span>
+        <span class="stage-count stage-count--transition${viewModel.showCountdown ? '' : ' is-countdown-hidden'}"${viewModel.showCountdown ? '' : ' aria-hidden="true"'}>${viewModel.transitionDisplayTime}</span>
       </div>
       <div class="transition-detail transition-detail--actions">
         <div class="transition-detail__inner">
-          <div class="actions">
-            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="${viewModel.transitionPrimaryAction}" class="transition-primary-action">${viewModel.transitionPrimaryLabel}</rrr-button>
-            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="next-now"><rrr-icon name="next"></rrr-icon></rrr-button>
+          <div class="actions actions--wait-flow${viewModel.showPrimaryAction ? '' : ' is-wait-hidden'}">
+            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="${viewModel.transitionPrimaryAction}" class="transition-primary-action"${viewModel.showPrimaryAction ? '' : ' aria-hidden="true" disabled'}>${viewModel.transitionPrimaryLabel}</rrr-button>
+            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="next-now" class="transition-next-action"><rrr-icon name="next"></rrr-icon></rrr-button>
           </div>
         </div>
       </div>

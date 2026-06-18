@@ -86,20 +86,24 @@ export type RestItemViewModel = {
   timelineState: TimelineState
   durationSeconds: number
   isActiveRest: boolean
+  showCountdown: boolean
   restDisplayTime: string
   restRemainingPercent: string
-  primaryAction: 'pause-rest' | 'resume-rest'
-  primaryLabel: 'Pause' | 'Resume'
+  showPrimaryAction: boolean
+  primaryAction: 'pause-rest'
+  primaryLabel: 'Wait'
 }
 
 export type TransitionItemViewModel = {
   timelineState: TimelineState
   durationSeconds: number
   isActiveTransition: boolean
+  showCountdown: boolean
   transitionDisplayTime: string
   transitionRemainingPercent: string
-  transitionPrimaryAction: 'stay-here' | 'next'
-  transitionPrimaryLabel: 'Wait' | 'Next'
+  showPrimaryAction: boolean
+  transitionPrimaryAction: 'stay-here'
+  transitionPrimaryLabel: 'Wait'
   nextExerciseName: string
 }
 

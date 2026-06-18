@@ -136,11 +136,6 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
       return
     }
 
-    if (action === 'resume-rest') {
-      this.resumeRest()
-      return
-    }
-
     if (action === 'skip-rest') {
       this.skipRest()
       return
@@ -492,16 +487,6 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
     this.patchTimelineStateInPlace()
   }
 
-  private resumeRest(): void {
-    if (this.stage !== 'rest-paused' || this.currentItem()?.kind !== 'rest') {
-      return
-    }
-
-    this.stage = 'rest'
-    this.startRestCountdown()
-    this.patchTimelineStateInPlace()
-  }
-
   private skipRest(): void {
     if (!isRestActiveOrPausedStage(this.stage) || this.currentItem()?.kind !== 'rest') {
       return
@@ -658,13 +643,20 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
 
   private patchRestItem(adapter: RestTimelineItemDomAdapter, viewModel: RestItemViewModel): void {
     if (adapter.countEl) {
-      this.setElementHidden(adapter.countEl, !viewModel.isActiveRest)
+      adapter.countEl.classList.toggle('is-countdown-hidden', !viewModel.showCountdown)
+      adapter.countEl.toggleAttribute('aria-hidden', !viewModel.showCountdown)
       adapter.countEl.textContent = viewModel.restDisplayTime
+    }
+
+    if (adapter.actionsEl) {
+      adapter.actionsEl.classList.toggle('is-wait-hidden', !viewModel.showPrimaryAction)
     }
 
     if (adapter.primaryActionEl) {
       adapter.primaryActionEl.dataset.action = viewModel.primaryAction
       adapter.primaryActionEl.textContent = viewModel.primaryLabel
+      adapter.primaryActionEl.toggleAttribute('disabled', !viewModel.showPrimaryAction)
+      adapter.primaryActionEl.toggleAttribute('aria-hidden', !viewModel.showPrimaryAction)
     }
 
     if (adapter.progressEl) {
@@ -674,7 +666,8 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
 
   private patchTransitionItem(adapter: TransitionTimelineItemDomAdapter, viewModel: TransitionItemViewModel): void {
     if (adapter.countEl) {
-      this.setElementHidden(adapter.countEl, !viewModel.isActiveTransition)
+      adapter.countEl.classList.toggle('is-countdown-hidden', !viewModel.showCountdown)
+      adapter.countEl.toggleAttribute('aria-hidden', !viewModel.showCountdown)
       adapter.countEl.textContent = viewModel.transitionDisplayTime
     }
 
@@ -682,9 +675,15 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
       adapter.progressEl.style.height = viewModel.transitionRemainingPercent
     }
 
+    if (adapter.actionsEl) {
+      adapter.actionsEl.classList.toggle('is-wait-hidden', !viewModel.showPrimaryAction)
+    }
+
     if (adapter.primaryActionEl) {
       adapter.primaryActionEl.dataset.action = viewModel.transitionPrimaryAction
       adapter.primaryActionEl.textContent = viewModel.transitionPrimaryLabel
+      adapter.primaryActionEl.toggleAttribute('disabled', !viewModel.showPrimaryAction)
+      adapter.primaryActionEl.toggleAttribute('aria-hidden', !viewModel.showPrimaryAction)
     }
   }
 

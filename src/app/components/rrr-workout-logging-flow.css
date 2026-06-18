@@ -205,6 +205,13 @@
   line-height: 1;
   font-variant-numeric: tabular-nums;
   flex: 0 0 auto;
+  transition: opacity var(--proto-transition-shorthand), transform var(--proto-transition-shorthand);
+}
+
+.stage-count.is-countdown-hidden {
+  opacity: 0;
+  transform: translateX(calc(100% + var(--rrr-spacing-s)));
+  pointer-events: none;
 }
 
 .timeline-item--transition[data-state='active'] {
@@ -326,6 +333,54 @@
 
 .actions rrr-button {
   min-height: 3rem;
+}
+
+.actions--wait-flow {
+  --wait-slide-duration: 220ms;
+  --wait-slide-ease: var(--rrr-anim-fromto-timingfunction);
+  flex-wrap: nowrap;
+}
+
+.actions--wait-flow .rest-primary-action,
+.actions--wait-flow .transition-primary-action,
+.actions--wait-flow .rest-next-action,
+.actions--wait-flow .transition-next-action {
+  transition: transform var(--wait-slide-duration) var(--wait-slide-ease), opacity var(--wait-slide-duration) var(--wait-slide-ease);
+}
+
+.actions--wait-flow .rest-primary-action,
+.actions--wait-flow .transition-primary-action {
+  overflow: hidden;
+  max-width: 14rem;
+  transition: transform var(--wait-slide-duration) var(--wait-slide-ease), opacity var(--wait-slide-duration) var(--wait-slide-ease), max-width var(--wait-slide-duration) var(--wait-slide-ease), margin-inline-end var(--wait-slide-duration) var(--wait-slide-ease);
+}
+
+.actions--wait-flow.is-wait-hidden .rest-primary-action,
+.actions--wait-flow.is-wait-hidden .transition-primary-action {
+  opacity: 0;
+  transform: translateX(calc(100% + var(--rrr-spacing-s))) scaleX(0.82);
+  max-width: 0;
+  margin-inline-end: calc(-1 * var(--rrr-spacing-s));
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-count {
+    transition: none;
+  }
+
+  .actions--wait-flow .rest-primary-action,
+  .actions--wait-flow .transition-primary-action,
+  .actions--wait-flow .rest-next-action,
+  .actions--wait-flow .transition-next-action {
+    transition: none;
+  }
+
+  .actions--wait-flow .rest-primary-action,
+  .actions--wait-flow .transition-primary-action {
+    max-width: none;
+    margin-inline-end: 0;
+  }
 }
 
 .timeline-item--complete {
