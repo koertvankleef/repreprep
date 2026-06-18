@@ -654,7 +654,9 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
 
     if (adapter.primaryActionEl) {
       adapter.primaryActionEl.dataset.action = viewModel.primaryAction
-      adapter.primaryActionEl.textContent = viewModel.primaryLabel
+      adapter.primaryActionEl.setAttribute('aria-label', viewModel.primaryLabel)
+      adapter.primaryActionEl.setAttribute('title', viewModel.primaryLabel)
+      adapter.primaryActionEl.innerHTML = '<rrr-icon name="stop"></rrr-icon>'
       adapter.primaryActionEl.toggleAttribute('disabled', !viewModel.showPrimaryAction)
       adapter.primaryActionEl.toggleAttribute('aria-hidden', !viewModel.showPrimaryAction)
     }
@@ -681,7 +683,9 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
 
     if (adapter.primaryActionEl) {
       adapter.primaryActionEl.dataset.action = viewModel.transitionPrimaryAction
-      adapter.primaryActionEl.textContent = viewModel.transitionPrimaryLabel
+      adapter.primaryActionEl.setAttribute('aria-label', viewModel.transitionPrimaryLabel)
+      adapter.primaryActionEl.setAttribute('title', viewModel.transitionPrimaryLabel)
+      adapter.primaryActionEl.innerHTML = '<rrr-icon name="stop"></rrr-icon>'
       adapter.primaryActionEl.toggleAttribute('disabled', !viewModel.showPrimaryAction)
       adapter.primaryActionEl.toggleAttribute('aria-hidden', !viewModel.showPrimaryAction)
     }

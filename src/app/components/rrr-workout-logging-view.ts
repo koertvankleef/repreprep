@@ -261,7 +261,7 @@ function renderRestTimelineItem(viewModel: RestItemViewModel): string {
       <div class="rest-detail">
         <div class="rest-detail__inner">
           <div class="actions actions--wait-flow${viewModel.showPrimaryAction ? '' : ' is-wait-hidden'}">
-            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="${viewModel.primaryAction}" class="rest-primary-action"${viewModel.showPrimaryAction ? '' : ' aria-hidden="true" disabled'}>${viewModel.primaryLabel}</rrr-button>
+            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="${viewModel.primaryAction}" class="rest-primary-action" aria-label="${viewModel.primaryLabel}" title="${viewModel.primaryLabel}"${viewModel.showPrimaryAction ? '' : ' aria-hidden="true" disabled'}><rrr-icon name="stop"></rrr-icon></rrr-button>
             <rrr-button type="button" variant="outline" rounded tone="accent" data-action="skip-rest" class="rest-next-action"><rrr-icon name="next"></rrr-icon></rrr-button>
           </div>
         </div>
@@ -283,7 +283,7 @@ function renderTransitionTimelineItem(viewModel: TransitionItemViewModel): strin
       <div class="transition-detail transition-detail--actions">
         <div class="transition-detail__inner">
           <div class="actions actions--wait-flow${viewModel.showPrimaryAction ? '' : ' is-wait-hidden'}">
-            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="${viewModel.transitionPrimaryAction}" class="transition-primary-action"${viewModel.showPrimaryAction ? '' : ' aria-hidden="true" disabled'}>${viewModel.transitionPrimaryLabel}</rrr-button>
+            <rrr-button type="button" variant="outline" rounded tone="accent" data-action="${viewModel.transitionPrimaryAction}" class="transition-primary-action" aria-label="${viewModel.transitionPrimaryLabel}" title="${viewModel.transitionPrimaryLabel}"${viewModel.showPrimaryAction ? '' : ' aria-hidden="true" disabled'}><rrr-icon name="stop"></rrr-icon></rrr-button>
             <rrr-button type="button" variant="outline" rounded tone="accent" data-action="next-now" class="transition-next-action"><rrr-icon name="next"></rrr-icon></rrr-button>
           </div>
         </div>
