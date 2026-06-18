@@ -197,17 +197,12 @@
 }
 
 .stage-count {
-  display: none;
   font-size: inherit;
   font-family: inherit;
   font-weight: var(--rrr-font-weight-normal);
   line-height: 1;
   font-variant-numeric: tabular-nums;
   flex: 0 0 auto;
-}
-
-.stage-count.is-visible {
-  display: inline-block;
 }
 
 .timeline-item--transition[data-state='active'] {
@@ -231,21 +226,10 @@
 }
 
 .timeline-item--start .actions {
-  display: none;
   justify-content: center;
 }
 
 .timeline-item--start .hint {
-  display: none;
-}
-
-.timeline-item--start .actions.is-visible,
-.timeline-item--start .hint.is-visible {
-  display: flex;
-}
-
-.timeline-item--start .hint.is-visible {
-  display: block;
 }
 
 .timeline-item--start .actions rrr-button {

@@ -7,6 +7,7 @@ This page captures current product capabilities in user-facing terms.
 - Local-first workout tracking in the browser.
 - No account required.
 - No cloud sync required for normal use.
+- Nearly never needs you to update.
 
 ## Workout Logging
 

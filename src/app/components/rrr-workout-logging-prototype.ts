@@ -109,6 +109,27 @@ function buildTimeline(): TimelineItem[] {
 
 const TIMELINE = buildTimeline()
 
+class ManagedTimer {
+  private id: number | null = null
+
+  interval(callback: () => void, ms: number): void {
+    this.clear()
+    this.id = window.setInterval(callback, ms)
+  }
+
+  timeout(callback: () => void, ms: number): void {
+    this.clear()
+    this.id = window.setTimeout(callback, ms)
+  }
+
+  clear(): void {
+    if (this.id !== null) {
+      clearInterval(this.id)
+      this.id = null
+    }
+  }
+}
+
 export class RrrWorkoutLoggingPrototype extends HTMLElement {
   private static readonly DEFAULT_STATE_TRANSITION_MS = 180
   private static readonly STATE_TRANSITION_BUFFER_MS = 60
@@ -121,12 +142,12 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
   private restRemainingSeconds = 0
   private repConfirmGraceRemainingSeconds = REP_CONFIRM_GRACE_SECONDS
   private nextExerciseRemainingSeconds = EXERCISE_TRANSITION_SECONDS
-  private restIntervalId: number | null = null
-  private repAdjustmentDebounceIntervalId: number | null = null
-  private timedSetIntervalId: number | null = null
-  private repConfirmGraceIntervalId: number | null = null
-  private exerciseCountdownIntervalId: number | null = null
-  private motionCleanupId: number | null = null
+  private readonly restTimer = new ManagedTimer()
+  private readonly debounceTimer = new ManagedTimer()
+  private readonly timedSetTimer = new ManagedTimer()
+  private readonly graceTimer = new ManagedTimer()
+  private readonly transitionTimer = new ManagedTimer()
+  private readonly motionCleanupTimer = new ManagedTimer()
   private lastConfirmedSummary: string | null = null
   private readonly completedSetsByExercise = EXERCISES.map(() => 0)
   private overallProgressVisualPercent = 0
@@ -143,7 +164,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
   disconnectedCallback(): void {
     this.shadowRoot?.removeEventListener('click', this.handleClick)
-    this.clearMotionCleanup()
+    this.motionCleanupTimer.clear()
     this.clearTimers()
   }
 
@@ -159,27 +180,17 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     const action = target.dataset.action
 
     if (action === 'go') {
-      this.startWorkout()
+      this.activateCurrentTimelineItem()
       return
     }
 
     if (action === 'rep-minus') {
-      if (this.stage !== 'set' && this.stage !== 'set-debounce' && this.stage !== 'set-grace') {
-        return
-      }
-      this.repValue = Math.max(0, this.repValue - 1)
-      this.scheduleRepAdjustmentAutoProceed()
-      this.syncActiveSetRepValue()
+      this.adjustRepValue(-1)
       return
     }
 
     if (action === 'rep-plus') {
-      if (this.stage !== 'set' && this.stage !== 'set-debounce' && this.stage !== 'set-grace') {
-        return
-      }
-      this.repValue += 1
-      this.scheduleRepAdjustmentAutoProceed()
-      this.syncActiveSetRepValue()
+      this.adjustRepValue(1)
       return
     }
 
@@ -233,8 +244,12 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     }
   }
 
-  private startWorkout(): void {
-    this.activateCurrentTimelineItem()
+  private adjustRepValue(delta: number): void {
+    if (this.stage !== 'set' && this.stage !== 'set-debounce' && this.stage !== 'set-grace') {
+      return
+    }
+    this.repValue = Math.max(0, this.repValue + delta)
+    this.scheduleRepAdjustmentAutoProceed()
   }
 
   private confirmRepResult(source: 'explicit-confirm' | 'adjusted-auto' = 'explicit-confirm'): void {
@@ -252,7 +267,8 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       return
     }
 
-    this.clearRepAdjustmentDebounceTimer()
+    this.debounceTimer.clear()
+    this.repAdjustmentDebounceRemainingSeconds = 0
     this.completedSetsByExercise[currentItem.exerciseIndex] = currentItem.setNumber
     this.lastConfirmedSummary = source === 'adjusted-auto'
       ? `${this.repValue} reps logged (auto).`
@@ -280,7 +296,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       return
     }
 
-    this.clearTimedSetTimer()
+    this.timedSetTimer.clear()
     this.timedSetElapsedSeconds = 0
     this.stage = 'timed-active'
     this.emitWorkoutEvent({
@@ -290,7 +306,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       targetDurationSeconds,
     })
 
-    this.timedSetIntervalId = window.setInterval(() => {
+    this.timedSetTimer.interval(() => {
       this.timedSetElapsedSeconds += 1
 
       if (this.timedSetElapsedSeconds >= targetDurationSeconds) {
@@ -298,7 +314,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
         return
       }
 
-      this.updateLiveStageVisuals()
+        this.patchTimelineStateInPlace()
     }, 1000)
 
     if (!this.patchTimelineStateInPlace()) {
@@ -328,7 +344,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
     const actualDurationSeconds = Math.max(0, Math.min(targetDurationSeconds, this.timedSetElapsedSeconds))
 
-    this.clearTimedSetTimer()
+    this.timedSetTimer.clear()
     this.completedSetsByExercise[currentItem.exerciseIndex] = currentItem.setNumber
     this.lastConfirmedSummary = `${actualDurationSeconds} sec logged.`
     this.emitWorkoutEvent({
@@ -354,21 +370,22 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
   }
 
   private enterRepConfirmGracePeriod(): void {
-    this.clearRepConfirmGraceTimer()
-    this.clearRepAdjustmentDebounceTimer()
-    this.clearTimedSetTimer()
+    this.graceTimer.clear()
+    this.debounceTimer.clear()
+    this.repAdjustmentDebounceRemainingSeconds = 0
+    this.timedSetTimer.clear()
     this.repConfirmGraceRemainingSeconds = REP_CONFIRM_GRACE_SECONDS
     this.stage = 'set-grace'
 
-    this.repConfirmGraceIntervalId = window.setInterval(() => {
+    this.graceTimer.interval(() => {
       this.repConfirmGraceRemainingSeconds -= 1
       if (this.repConfirmGraceRemainingSeconds <= 0) {
-        this.clearRepConfirmGraceTimer()
+        this.graceTimer.clear()
         this.moveToNextTimelineItem()
         return
       }
 
-      this.updateLiveStageVisuals()
+        this.patchTimelineStateInPlace()
     }, 1000)
 
     this.transitionToCurrentActiveItem()
@@ -381,25 +398,27 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
     const currentItem = this.currentItem()
     if (this.stage === 'set-grace' && currentItem && currentItem.kind === 'set') {
-      this.clearRepConfirmGraceTimer()
+      this.graceTimer.clear()
       this.completedSetsByExercise[currentItem.exerciseIndex] = Math.max(0, currentItem.setNumber - 1)
       this.syncOverallProgress()
       this.lastConfirmedSummary = null
     }
 
-    this.clearRepAdjustmentDebounceTimer()
+    this.debounceTimer.clear()
+    this.repAdjustmentDebounceRemainingSeconds = 0
     this.stage = 'set-debounce'
     this.repAdjustmentDebounceRemainingSeconds = REP_ADJUST_AUTO_PROCEED_SECONDS
 
-    this.repAdjustmentDebounceIntervalId = window.setInterval(() => {
+    this.debounceTimer.interval(() => {
       this.repAdjustmentDebounceRemainingSeconds -= 1
       if (this.repAdjustmentDebounceRemainingSeconds <= 0) {
-        this.clearRepAdjustmentDebounceTimer()
+        this.debounceTimer.clear()
+        this.repAdjustmentDebounceRemainingSeconds = 0
         this.confirmRepResult('adjusted-auto')
         return
       }
 
-      this.updateLiveStageVisuals()
+        this.patchTimelineStateInPlace()
     }, 1000)
 
     if (!this.patchTimelineStateInPlace()) {
@@ -417,8 +436,9 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       return
     }
 
-    this.clearRepConfirmGraceTimer()
-    this.clearRepAdjustmentDebounceTimer()
+    this.graceTimer.clear()
+    this.debounceTimer.clear()
+    this.repAdjustmentDebounceRemainingSeconds = 0
 
     this.completedSetsByExercise[currentItem.exerciseIndex] = Math.max(0, currentItem.setNumber - 1)
     this.syncOverallProgress()
@@ -440,7 +460,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       return
     }
 
-    this.clearRepConfirmGraceTimer()
+    this.graceTimer.clear()
     this.moveToNextTimelineItem()
   }
 
@@ -495,21 +515,33 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
   }
 
   private beginRest(seconds: number): void {
-    this.clearRestTimer()
+    this.restTimer.clear()
     this.restRemainingSeconds = seconds
     this.stage = 'rest'
 
-    this.restIntervalId = window.setInterval(() => {
+    this.startRestCountdown()
+    this.transitionToCurrentActiveItem()
+  }
+
+  private startRestCountdown(): void {
+    this.restTimer.interval(() => {
       this.restRemainingSeconds -= 1
       if (this.restRemainingSeconds <= 0) {
-        this.clearRestTimer()
+        this.restTimer.clear()
         this.moveToNextTimelineItem()
         return
       }
-      this.updateLiveStageVisuals()
+      this.patchTimelineStateInPlace()
     }, 1000)
+  }
 
-    this.transitionToCurrentActiveItem()
+  private clearTimers(): void {
+    this.debounceTimer.clear()
+    this.repAdjustmentDebounceRemainingSeconds = 0
+    this.timedSetTimer.clear()
+    this.graceTimer.clear()
+    this.restTimer.clear()
+    this.transitionTimer.clear()
   }
 
   private pauseRest(): void {
@@ -517,7 +549,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       return
     }
 
-    this.clearRestTimer()
+    this.restTimer.clear()
     this.stage = 'rest-paused'
     this.patchTimelineStateInPlace()
   }
@@ -528,15 +560,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     }
 
     this.stage = 'rest'
-    this.restIntervalId = window.setInterval(() => {
-      this.restRemainingSeconds -= 1
-      if (this.restRemainingSeconds <= 0) {
-        this.clearRestTimer()
-        this.moveToNextTimelineItem()
-        return
-      }
-      this.updateLiveStageVisuals()
-    }, 1000)
+    this.startRestCountdown()
     this.patchTimelineStateInPlace()
   }
 
@@ -545,23 +569,23 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       return
     }
 
-    this.clearRestTimer()
+    this.restTimer.clear()
     this.moveToNextTimelineItem()
   }
 
   private beginExerciseTransition(seconds: number): void {
-    this.clearExerciseCountdownTimer()
+    this.transitionTimer.clear()
     this.nextExerciseRemainingSeconds = seconds
     this.stage = 'transition'
 
-    this.exerciseCountdownIntervalId = window.setInterval(() => {
+    this.transitionTimer.interval(() => {
       this.nextExerciseRemainingSeconds -= 1
       if (this.nextExerciseRemainingSeconds <= 0) {
-        this.clearExerciseCountdownTimer()
+        this.transitionTimer.clear()
         this.moveToNextTimelineItem()
         return
       }
-      this.updateLiveStageVisuals()
+        this.patchTimelineStateInPlace()
     }, 1000)
 
     this.transitionToCurrentActiveItem()
@@ -572,60 +596,9 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       return
     }
 
-    this.clearExerciseCountdownTimer()
+    this.transitionTimer.clear()
     this.stage = 'transition-paused'
     this.patchTimelineStateInPlace()
-  }
-
-  private clearRestTimer(): void {
-    if (this.restIntervalId !== null) {
-      clearInterval(this.restIntervalId)
-      this.restIntervalId = null
-    }
-  }
-
-  private clearRepAdjustmentDebounceTimer(): void {
-    if (this.repAdjustmentDebounceIntervalId !== null) {
-      clearInterval(this.repAdjustmentDebounceIntervalId)
-      this.repAdjustmentDebounceIntervalId = null
-    }
-    this.repAdjustmentDebounceRemainingSeconds = 0
-  }
-
-  private clearRepConfirmGraceTimer(): void {
-    if (this.repConfirmGraceIntervalId !== null) {
-      clearInterval(this.repConfirmGraceIntervalId)
-      this.repConfirmGraceIntervalId = null
-    }
-  }
-
-  private clearTimedSetTimer(): void {
-    if (this.timedSetIntervalId !== null) {
-      clearInterval(this.timedSetIntervalId)
-      this.timedSetIntervalId = null
-    }
-  }
-
-  private clearExerciseCountdownTimer(): void {
-    if (this.exerciseCountdownIntervalId !== null) {
-      clearInterval(this.exerciseCountdownIntervalId)
-      this.exerciseCountdownIntervalId = null
-    }
-  }
-
-  private clearTimers(): void {
-    this.clearRepAdjustmentDebounceTimer()
-    this.clearTimedSetTimer()
-    this.clearRepConfirmGraceTimer()
-    this.clearRestTimer()
-    this.clearExerciseCountdownTimer()
-  }
-
-  private clearMotionCleanup(): void {
-    if (this.motionCleanupId !== null) {
-      clearTimeout(this.motionCleanupId)
-      this.motionCleanupId = null
-    }
   }
 
   private getTransitionDurationMs(variableName: '--proto-transition-duration' | '--proto-transition-duration-exit'): number {
@@ -653,9 +626,8 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       this.getTransitionDurationMs('--proto-transition-duration-exit')
     ) + RrrWorkoutLoggingPrototype.STATE_TRANSITION_BUFFER_MS
 
-    this.clearMotionCleanup()
-    this.motionCleanupId = window.setTimeout(() => {
-      this.motionCleanupId = null
+    this.motionCleanupTimer.clear()
+    this.motionCleanupTimer.timeout(() => {
       this.shadowRoot?.querySelectorAll<HTMLElement>('.timeline-item[data-motion]').forEach((element) => {
         element.removeAttribute('data-motion')
       })
@@ -784,7 +756,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
         const countEl = element.querySelector<HTMLElement>('.stage-count--rest')
         if (countEl) {
-          countEl.classList.toggle('is-visible', isActiveRest)
+          this.setElementHidden(countEl, !isActiveRest)
           countEl.textContent = isActiveRest ? this.formatClock(this.restRemainingSeconds) : this.formatClock(item.durationSeconds)
         }
 
@@ -815,7 +787,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
         const countEl = element.querySelector<HTMLElement>('.stage-count--transition')
         if (countEl) {
-          countEl.classList.toggle('is-visible', isActiveTransition)
+          this.setElementHidden(countEl, !isActiveTransition)
           countEl.textContent = `${isActiveTransition ? this.nextExerciseRemainingSeconds : item.durationSeconds}`
         }
 
@@ -842,19 +814,21 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
       }
     })
 
-    this.shadowRoot.querySelectorAll<HTMLElement>('.timeline-item[data-motion]').forEach((element) => {
-      element.removeAttribute('data-motion')
-    })
-
     const currentActive = this.shadowRoot.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
-    if (previousActive && previousActive !== currentActive) {
-      previousActive.dataset.motion = 'exiting'
-    }
-    if (currentActive) {
-      currentActive.dataset.motion = 'entering'
-    }
+    if (previousActive !== currentActive) {
+      this.shadowRoot.querySelectorAll<HTMLElement>('.timeline-item[data-motion]').forEach((element) => {
+        element.removeAttribute('data-motion')
+      })
 
-    this.scheduleMotionCleanup()
+      if (previousActive) {
+        previousActive.dataset.motion = 'exiting'
+      }
+      if (currentActive) {
+        currentActive.dataset.motion = 'entering'
+      }
+
+      this.scheduleMotionCleanup()
+    }
 
     return true
   }
@@ -874,8 +848,12 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     const startHint = startItem.querySelector<HTMLElement>('.start-hint')
     const isLocked = this.stage === 'locked'
 
-    startActions?.classList.toggle('is-visible', isLocked)
-    startHint?.classList.toggle('is-visible', !isLocked)
+    if (startActions) {
+      this.setElementHidden(startActions, !isLocked)
+    }
+    if (startHint) {
+      this.setElementHidden(startHint, isLocked)
+    }
   }
 
   private setElementHidden(element: HTMLElement, hidden: boolean): void {
@@ -886,21 +864,6 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     }
 
     element.removeAttribute('aria-hidden')
-  }
-
-  private syncActiveSetRepValue(): void {
-    const currentItem = this.currentItem()
-    if (!currentItem || currentItem.kind !== 'set') {
-      return
-    }
-
-    const activeSetValue = this.shadowRoot?.querySelector<HTMLElement>('.timeline-item--set[data-state="active"] .rep-value')
-    if (!activeSetValue) {
-      return
-    }
-
-    const exercise = getExercise(currentItem.exerciseIndex)
-    activeSetValue.textContent = exercise.name === 'Plank' ? `${this.repValue * 5} sec` : `${this.repValue} reps`
   }
 
   private syncOverallProgress(): void {
@@ -919,10 +882,6 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
   private currentItem(): TimelineItem | null {
     return TIMELINE[this.activeTimelineIndex] ?? null
-  }
-
-  private nextTimelineItem(): TimelineItem | null {
-    return TIMELINE[this.activeTimelineIndex + 1] ?? null
   }
 
   private scrollActiveIntoView(behavior: ScrollBehavior = 'smooth'): void {
@@ -967,91 +926,14 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
     return EXERCISES.reduce((sum, exercise) => sum + exercise.totalSets, 0)
   }
 
-  private updateLiveStageVisuals(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
-    if (this.stage === 'rest') {
-      const restItem = this.currentItem()
-      if (!restItem || restItem.kind !== 'rest') {
-        return
-      }
-
-      const timer = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--rest[data-state="active"] .stage-count--rest')
-      const fill = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--rest[data-state="active"] .bar--vertical > span')
-
-      if (timer) {
-        timer.textContent = this.formatClock(this.restRemainingSeconds)
-      }
-
-      if (fill) {
-        const restRemainingPercent = Math.max(0, Math.min(100, (this.restRemainingSeconds / restItem.durationSeconds) * 100))
-        fill.style.height = `${restRemainingPercent}%`
-      }
-      return
-    }
-
-    if (this.stage === 'transition') {
-      const timer = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--transition[data-state="active"] .stage-count--transition')
-      const fill = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--transition[data-state="active"] .bar--vertical--transition > span')
-
-      if (timer) {
-        timer.textContent = `${this.nextExerciseRemainingSeconds}`
-      }
-
-      if (fill) {
-        const transitionRemainingPercent = `${(this.nextExerciseRemainingSeconds / EXERCISE_TRANSITION_SECONDS) * 100}%`
-        fill.style.height = transitionRemainingPercent
-      }
-      return
-    }
-
-    if (this.stage === 'set-grace') {
-      const summary = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--set[data-state="active"] .grace-summary')
-      const countdown = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--set[data-state="active"] .grace-countdown-value')
-      if (summary && this.lastConfirmedSummary) {
-        summary.textContent = this.lastConfirmedSummary
-      }
-      if (countdown) {
-        countdown.textContent = `${this.repConfirmGraceRemainingSeconds}`
-      }
-      return
-    }
-
-    if (this.stage === 'set-debounce') {
-      const repValueEl = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--set[data-state="active"] .rep-value')
-      const debounceCountdown = this.shadowRoot.querySelector<HTMLElement>(
-        '.timeline-item--set[data-state="active"] .debounce-countdown-value',
-      )
-
-      if (repValueEl) {
-        repValueEl.textContent = `${this.repValue} reps`
-      }
-      if (debounceCountdown) {
-        debounceCountdown.textContent = `${this.repAdjustmentDebounceRemainingSeconds}`
-      }
-      return
-    }
-
-    if (this.stage === 'timed-active') {
-      const timedCount = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--set[data-state="active"] .timed-count-value')
-      if (timedCount) {
-        timedCount.textContent = this.formatClock(this.timedSetElapsedSeconds)
-      }
-    }
-  }
-
   private render(): void {
     if (!this.shadowRoot) {
       return
     }
 
-    const currentItem = this.currentItem()
     const startState = this.stage === 'locked' ? 'active' : 'complete'
     const completedSetCount = this.getCompletedSetCount()
     const totalSetCount = this.getTotalSetCount()
-    const overallProgressPercent = totalSetCount > 0 ? (completedSetCount / totalSetCount) * 100 : 0
 
     this.shadowRoot.innerHTML = `
       <style>${styles}</style>
@@ -1064,8 +946,8 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
         <div class="stack is-dimmed">
           <section class="timeline-item timeline-item--start" data-state="${startState}">
             <h2 class="name">Ready?</h2>
-            <div class="actions start-actions${this.stage === 'locked' ? ' is-visible' : ''}"><rrr-button data-action="go" type="button" tone="accent">GO</rrr-button></div>
-            <div class="hint start-hint${this.stage === 'locked' ? '' : ' is-visible'}">Workout flow is running. Active section is centered when possible.</div>
+            <div class="actions start-actions"${this.stage !== 'locked' ? ' hidden aria-hidden="true"' : ''}><rrr-button data-action="go" type="button" tone="accent">GO</rrr-button></div>
+            <div class="hint start-hint"${this.stage === 'locked' ? ' hidden aria-hidden="true"' : ''}>Workout flow is running. Active section is centered when possible.</div>
           </section>
 
           ${TIMELINE.map((item, index) => {
@@ -1163,7 +1045,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
                   </div>
                   <div class="rest-header">
                     <div class="rest-title"><rrr-icon name="water-bottle"></rrr-icon>Rest</div>
-                    <span class="stage-count stage-count--rest${isActiveRest ? ' is-visible' : ''}">${restDisplayTime}</span>
+                    <span class="stage-count stage-count--rest"${isActiveRest ? '' : ' hidden aria-hidden="true"'}>${restDisplayTime}</span>
                   </div>
                   <div class="rest-detail">
                     <div class="rest-detail__inner">
@@ -1194,7 +1076,7 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
                 </div>
                 <div class="rest-header">
                   <div class="rest-title">Time to switch to: ${nextExercise ? nextExercise.name : 'Workout complete'}</div>
-                  <span class="stage-count stage-count--transition${isActiveTransition ? ' is-visible' : ''}">${transitionDisplayTime}</span>
+                  <span class="stage-count stage-count--transition"${isActiveTransition ? '' : ' hidden aria-hidden="true"'}>${transitionDisplayTime}</span>
                 </div>
                 <div class="transition-detail transition-detail--actions">
                   <div class="transition-detail__inner">
@@ -1229,8 +1111,9 @@ export class RrrWorkoutLoggingPrototype extends HTMLElement {
 
       // Set the target on the next frame so the initial inline height is painted first.
       requestAnimationFrame(() => {
-        fill.style.height = `${overallProgressPercent}%`
-        this.overallProgressVisualPercent = overallProgressPercent
+        const percent = totalSetCount > 0 ? (completedSetCount / totalSetCount) * 100 : 0
+        fill.style.height = `${percent}%`
+        this.overallProgressVisualPercent = percent
       })
     })
   }
