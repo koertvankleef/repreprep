@@ -1,0 +1,178 @@
+export type Exercise = {
+  name: string
+  loggingType: 'reps' | 'time'
+  totalSets: number
+  restSeconds: number
+  previousPerformance: string
+  suggestedReps?: number
+  targetDurationSeconds?: number
+}
+
+export type TimelineItem =
+  | {
+      kind: 'set'
+      exerciseIndex: number
+      setNumber: number
+    }
+  | {
+      kind: 'rest'
+      exerciseIndex: number
+      setNumber: number
+      durationSeconds: number
+    }
+  | {
+      kind: 'transition'
+      exerciseIndex: number
+      durationSeconds: number
+    }
+
+export type ActiveStage =
+  | 'locked'
+  | 'set'
+  | 'set-debounce'
+  | 'timed-ready'
+  | 'timed-active'
+  | 'set-grace'
+  | 'rest'
+  | 'rest-paused'
+  | 'transition'
+  | 'transition-paused'
+  | 'workout-complete'
+
+export type WorkoutEvent =
+  | {
+      type: 'repResultConfirmed'
+      exerciseIndex: number
+      setNumber: number
+      reps: number
+    }
+  | {
+      type: 'timedSetStarted'
+      exerciseIndex: number
+      setNumber: number
+      targetDurationSeconds: number
+    }
+  | {
+      type: 'timedSetCompleted'
+      exerciseIndex: number
+      setNumber: number
+      durationSeconds: number
+      completionType: 'target-reached' | 'stopped-early'
+    }
+
+export type TimelineState = 'future' | 'active' | 'complete'
+
+export type SetItemViewModel = {
+  timelineState: TimelineState
+  exercise: Exercise
+  setNumber: number
+  stageDataAttribute: string
+  isActiveSet: boolean
+  isActiveTimedReady: boolean
+  isActiveTimed: boolean
+  isActiveTimedSet: boolean
+  isActiveDebounce: boolean
+  isActiveGrace: boolean
+  repDisplay: string
+  timedDisplay: string
+  timedTargetDisplay: string
+  graceCountdownText: string
+  debounceCountdownText: string
+  graceSummary: string
+  confirmLabel: string
+}
+
+export type RestItemViewModel = {
+  timelineState: TimelineState
+  durationSeconds: number
+  isActiveRest: boolean
+  restDisplayTime: string
+  restRemainingPercent: string
+  primaryAction: 'pause-rest' | 'resume-rest'
+  primaryLabel: 'Pause' | 'Resume'
+}
+
+export type TransitionItemViewModel = {
+  timelineState: TimelineState
+  durationSeconds: number
+  isActiveTransition: boolean
+  transitionDisplayTime: string
+  transitionRemainingPercent: string
+  transitionPrimaryAction: 'stay-here' | 'next'
+  transitionPrimaryLabel: 'Stay Here' | 'Next'
+  nextExerciseName: string
+}
+
+export type ActivationPlan =
+  | {
+      kind: 'complete'
+    }
+  | {
+      kind: 'set'
+      stage: 'set'
+      repValue: number
+      clearLastConfirmedSummary: boolean
+    }
+  | {
+      kind: 'timed-set'
+      stage: 'timed-ready'
+      timedSetElapsedSeconds: number
+      clearLastConfirmedSummary: boolean
+    }
+  | {
+      kind: 'rest'
+      stage: 'rest'
+      restRemainingSeconds: number
+    }
+  | {
+      kind: 'transition'
+      stage: 'transition'
+      nextExerciseRemainingSeconds: number
+    }
+
+export const EXERCISES: Exercise[] = [
+  { name: 'Push-ups', loggingType: 'reps', totalSets: 3, restSeconds: 20, previousPerformance: '10 reps', suggestedReps: 12 },
+  {
+    name: 'Dumbbell Row',
+    loggingType: 'reps',
+    totalSets: 3,
+    restSeconds: 20,
+    previousPerformance: '12 reps @ 14kg',
+    suggestedReps: 12,
+  },
+  { name: 'Plank', loggingType: 'time', totalSets: 1, restSeconds: 0, previousPerformance: '45 sec', targetDurationSeconds: 30 },
+]
+
+export const EXERCISE_TRANSITION_SECONDS = 10
+export const REP_CONFIRM_GRACE_SECONDS = 5
+export const REP_ADJUST_AUTO_PROCEED_SECONDS = 3
+
+export function getExercise(index: number): Exercise {
+  const exercise = EXERCISES[index]
+  if (!exercise) {
+    throw new Error(`Missing exercise at index ${index}`)
+  }
+  return exercise
+}
+
+export function buildTimeline(): TimelineItem[] {
+  const timeline: TimelineItem[] = []
+
+  EXERCISES.forEach((exercise, exerciseIndex) => {
+    for (let setNumber = 1; setNumber <= exercise.totalSets; setNumber += 1) {
+      timeline.push({ kind: 'set', exerciseIndex, setNumber })
+
+      if (setNumber < exercise.totalSets) {
+        timeline.push({ kind: 'rest', exerciseIndex, setNumber, durationSeconds: exercise.restSeconds })
+      }
+    }
+
+    if (exerciseIndex < EXERCISES.length - 1) {
+      timeline.push({ kind: 'transition', exerciseIndex, durationSeconds: EXERCISE_TRANSITION_SECONDS })
+    }
+  })
+
+  return timeline
+}
+
+export const TIMELINE = buildTimeline()

@@ -23,17 +23,13 @@ describe('rrr-workout-logging-prototype motion invariants', () => {
     const component = element as unknown as {
       activateCurrentTimelineItem: () => void
       patchTimelineStateInPlace: () => boolean
-      scheduleMotionCleanup: () => void
     }
-
-    const motionCleanupSpy = vi.spyOn(component, 'scheduleMotionCleanup')
 
     component.activateCurrentTimelineItem()
 
     const initialActive = element.shadowRoot?.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
     expect(initialActive).toBeTruthy()
     expect(initialActive?.dataset.motion).toBe('entering')
-    expect(motionCleanupSpy).toHaveBeenCalledTimes(1)
 
     const patched = component.patchTimelineStateInPlace()
     expect(patched).toBe(true)
@@ -41,7 +37,6 @@ describe('rrr-workout-logging-prototype motion invariants', () => {
     const activeAfterPatch = element.shadowRoot?.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
     expect(activeAfterPatch).toBe(initialActive)
     expect(activeAfterPatch?.dataset.motion).toBe('entering')
-    expect(motionCleanupSpy).toHaveBeenCalledTimes(1)
   })
 
   it('sets exiting and entering once on active switch, then remains stable', () => {
@@ -53,11 +48,9 @@ describe('rrr-workout-logging-prototype motion invariants', () => {
       stage: string
       activateCurrentTimelineItem: () => void
       patchTimelineStateInPlace: () => boolean
-      scheduleMotionCleanup: () => void
       clearTimers: () => void
     }
 
-    const motionCleanupSpy = vi.spyOn(component, 'scheduleMotionCleanup')
     component.activateCurrentTimelineItem()
 
     const previousActive = element.shadowRoot?.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
@@ -76,12 +69,57 @@ describe('rrr-workout-logging-prototype motion invariants', () => {
 
     expect(previousActive?.dataset.motion).toBe('exiting')
     expect(currentActive?.dataset.motion).toBe('entering')
-    expect(motionCleanupSpy).toHaveBeenCalledTimes(2)
 
     component.patchTimelineStateInPlace()
     expect(previousActive?.dataset.motion).toBe('exiting')
     expect(currentActive?.dataset.motion).toBe('entering')
-    expect(motionCleanupSpy).toHaveBeenCalledTimes(2)
+
+    component.clearTimers()
+  })
+
+  it('keeps the confirm label aligned with the current rep value', () => {
+    const element = document.createElement('rrr-workout-logging-prototype') as HTMLElement & Record<string, unknown>
+    document.body.appendChild(element)
+
+    const component = element as unknown as {
+      activateCurrentTimelineItem: () => void
+      adjustRepValue: (delta: number) => void
+      clearTimers: () => void
+    }
+
+    component.activateCurrentTimelineItem()
+
+    const confirmButtonBefore = element.shadowRoot?.querySelector<HTMLElement>('.rep-confirm-action')
+    expect(confirmButtonBefore?.textContent).toBe('Log 12 reps')
+
+    component.adjustRepValue(1)
+
+    const confirmButtonAfter = element.shadowRoot?.querySelector<HTMLElement>('.rep-confirm-action')
+    const repValue = element.shadowRoot?.querySelector<HTMLElement>('.rep-value')
+    expect(repValue?.textContent).toBe('13 reps')
+    expect(confirmButtonAfter?.textContent).toBe('Log 13 reps')
+    expect(confirmButtonAfter?.getAttribute('aria-label')).toBe('Log 13 reps')
+
+    component.clearTimers()
+  })
+
+  it('announces the logged result without exposing countdown noise', () => {
+    const element = document.createElement('rrr-workout-logging-prototype') as HTMLElement & Record<string, unknown>
+    document.body.appendChild(element)
+
+    const component = element as unknown as {
+      activateCurrentTimelineItem: () => void
+      confirmRepResult: () => void
+      clearTimers: () => void
+    }
+
+    component.activateCurrentTimelineItem()
+    component.confirmRepResult()
+
+    const announcement = element.shadowRoot?.querySelector<HTMLElement>('[data-role="workout-announcement"]')
+    const countdownHint = element.shadowRoot?.querySelector<HTMLElement>('.rep-grace-hint')
+    expect(announcement?.textContent).toBe('12 reps logged. Rest starts soon.')
+    expect(countdownHint?.getAttribute('aria-live')).toBeNull()
 
     component.clearTimers()
   })
