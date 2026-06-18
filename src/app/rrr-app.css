@@ -10,7 +10,7 @@
   --rrr-app-link-padding: var(--rrr-spacing-xs) var(--rrr-spacing-m);
   --rrr-app-link-radius: var(--rrr-radius-xl);
   --rrr-app-link-color: var(--rrr-colors-grayscale-90);
-  --rrr-app-link-transition: var(--rrr-default-transition);
+  --rrr-app-link-transition: var(--rrr-transition-default);
   --rrr-app-link-hover-background: var(--rrr-colors-activity-indigo-10);
   --rrr-app-link-hover-color: var(--rrr-colors-activity-indigo-80);
   --rrr-app-link-active-background: var(--rrr-colors-activity-indigo-60);

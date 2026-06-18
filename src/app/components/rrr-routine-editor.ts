@@ -8,8 +8,12 @@ import { todayIso } from '../../utils/date.ts'
 import styles from './rrr-routine-editor.css?inline'
 
 export class RrrRoutineEditor extends HTMLElement {
+  private static readonly defaultRestSeconds = 20
+  private static readonly defaultTransitionSeconds = 10
+
   private routineIdValue: string | null = null
   private name = ''
+  private transitionSeconds = RrrRoutineEditor.defaultTransitionSeconds
   private exercises: RoutineExercise[] = []
   private listenersBound = false
   private statusMessage = ''
@@ -45,9 +49,16 @@ export class RrrRoutineEditor extends HTMLElement {
       const version = getActiveRoutineVersion(data, this.routineIdValue)
 
       this.name = routine.name
-      this.exercises = version ? [...version.exercises] : []
+      this.transitionSeconds = Math.max(0, version?.transitionSeconds ?? RrrRoutineEditor.defaultTransitionSeconds)
+      this.exercises = version
+        ? version.exercises.map((exercise) => ({
+            ...exercise,
+            restSeconds: Math.max(0, exercise.restSeconds ?? RrrRoutineEditor.defaultRestSeconds),
+          }))
+        : []
     } else {
       this.name = ''
+      this.transitionSeconds = RrrRoutineEditor.defaultTransitionSeconds
       this.exercises = []
     }
 
@@ -149,9 +160,19 @@ export class RrrRoutineEditor extends HTMLElement {
       this.name = nameInput.value
     }
 
+    const transitionInput = this.querySelector<HTMLInputElement>('input[name="routine-transition-seconds"]')
+    const transitionValue = transitionInput?.valueAsNumber
+    this.transitionSeconds = Number.isFinite(transitionValue)
+      ? Math.max(0, Math.trunc(transitionValue ?? RrrRoutineEditor.defaultTransitionSeconds))
+      : this.transitionSeconds
+
     this.exercises = this.exercises.map((exercise) => {
+      const restInput = this.querySelector<HTMLInputElement>(
+        `input[data-exercise-id="${exercise.id}"][data-field="rest-seconds"]`,
+      )
+      const restValue = restInput?.valueAsNumber
       const sets = exercise.plannedSets.map((set, index) => {
-        if (set.kind === 'reps-weight') {
+        if (set.kind === 'reps') {
           const repsInput = this.querySelector<HTMLInputElement>(
             `input[data-exercise-id="${exercise.id}"][data-set-index="${index}"][data-field="reps"]`,
           )
@@ -160,7 +181,7 @@ export class RrrRoutineEditor extends HTMLElement {
           )
 
           return {
-            kind: 'reps-weight' as const,
+            kind: 'reps' as const,
             targetReps: repsInput?.value ? Number(repsInput.value) : null,
             targetWeightKg: weightInput?.value ? Number(weightInput.value) : null,
           }
@@ -171,12 +192,18 @@ export class RrrRoutineEditor extends HTMLElement {
         )
 
         return {
-          kind: 'duration' as const,
+          kind: 'time' as const,
           targetSeconds: secondsInput?.value ? Number(secondsInput.value) : null,
         }
       })
 
-      return { ...exercise, plannedSets: sets }
+      return {
+        ...exercise,
+        restSeconds: Number.isFinite(restValue)
+          ? Math.max(0, Math.trunc(restValue ?? RrrRoutineEditor.defaultRestSeconds))
+          : Math.max(0, exercise.restSeconds ?? RrrRoutineEditor.defaultRestSeconds),
+        plannedSets: sets,
+      }
     })
   }
 
@@ -229,18 +256,21 @@ export class RrrRoutineEditor extends HTMLElement {
     this.render()
   }
 
-  private addPlannedSet(exerciseId: string): void {
+  private addPlannedSet(routineExerciseId: string): void {
     this.readFields()
     const data = storageService.getData()
-    const exerciseDef = data.exercises.find((e) => e.id === exerciseId)
-    const kind = exerciseDef?.kind ?? 'reps-weight'
+    const routineExercise = this.exercises.find((exercise) => exercise.id === routineExerciseId)
+    const exerciseDef = routineExercise
+      ? data.exercises.find((exercise) => exercise.id === routineExercise.exerciseId)
+      : undefined
+    const kind = exerciseDef?.kind ?? 'reps'
     const newSet: PlannedSet =
-      kind === 'duration'
-        ? { kind: 'duration', targetSeconds: null }
-        : { kind: 'reps-weight', targetReps: null, targetWeightKg: null }
+      kind === 'time'
+        ? { kind: 'time', targetSeconds: null }
+        : { kind: 'reps', targetReps: null, targetWeightKg: null }
 
     this.exercises = this.exercises.map((e) =>
-      e.id === exerciseId ? { ...e, plannedSets: [...e.plannedSets, newSet] } : e,
+      e.id === routineExerciseId ? { ...e, plannedSets: [...e.plannedSets, newSet] } : e,
     )
     this.render()
   }
@@ -265,7 +295,7 @@ export class RrrRoutineEditor extends HTMLElement {
       return
     }
 
-    const saved = storageService.saveRoutine(this.routineIdValue, this.name.trim(), this.exercises)
+    const saved = storageService.saveRoutine(this.routineIdValue, this.name.trim(), this.exercises, this.transitionSeconds)
 
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
     this.routineIdValue = saved.id
@@ -290,7 +320,7 @@ export class RrrRoutineEditor extends HTMLElement {
 
     storageService.saveWorkout(workout)
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    window.location.hash = `#/workouts/${workout.id}`
+    window.location.hash = `#/workouts/${workout.id}/log`
   }
 
   private render(): void {
@@ -326,7 +356,7 @@ export class RrrRoutineEditor extends HTMLElement {
               ? `<p>${t('routineEditor.sets.empty')}</p>`
               : routineExercise.plannedSets
                   .map((set, setIndex) => {
-                    if (set.kind === 'reps-weight') {
+                    if (set.kind === 'reps') {
                       return `
                         <div class="planned-set">
                           <span>${t('routineEditor.set.label', { index: setIndex + 1 })}</span>
@@ -375,6 +405,13 @@ export class RrrRoutineEditor extends HTMLElement {
                     <rrr-button type="button" variant="ghost" tone="danger" data-action="remove-exercise" data-id="${routineExercise.id}" aria-label="${escapeHtml(t('routineEditor.action.removeExerciseAria', { name: exerciseName }))}"><rrr-icon name="delete"></rrr-icon></rrr-button>
                   </div>
                 </div>
+                <label>
+                  ${t('routineEditor.field.restSeconds')}
+                  <input type="number" min="0" step="1"
+                    data-exercise-id="${routineExercise.id}"
+                    data-field="rest-seconds"
+                    value="${Math.max(0, routineExercise.restSeconds ?? RrrRoutineEditor.defaultRestSeconds)}" />
+                </label>
                 <div class="planned-sets">${setsHtml}</div>
                 <div>
                   <rrr-button type="button" data-action="add-set" data-id="${routineExercise.id}" aria-label="${escapeHtml(t('routineEditor.action.addSetAria', { name: exerciseName }))}">${t('routineEditor.action.addSet')}</rrr-button>
@@ -394,6 +431,10 @@ export class RrrRoutineEditor extends HTMLElement {
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('routineEditor.status.default')}</p>
           <div class="row">
             <rrr-input label="${t('field.name')}" name="routine-name" placeholder="${t('routineEditor.field.name.placeholder')}"></rrr-input>
+            <label>
+              ${t('routineEditor.field.transitionSeconds')}
+              <input type="number" min="0" step="1" name="routine-transition-seconds" value="${this.transitionSeconds}" />
+            </label>
           </div>
           <div>
             <h3>${t('routineEditor.section.exercises')}</h3>

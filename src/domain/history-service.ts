@@ -6,20 +6,20 @@ export interface ExerciseHistory {
   sets: SetEntry[]
 }
 
-export interface RepsWeightPersonalRecord {
-  kind: 'reps-weight'
+export interface RepsPersonalRecord {
+  kind: 'reps'
   reps: number
   weightKg: number
   date: string
 }
 
-export interface DurationPersonalRecord {
-  kind: 'duration'
+export interface TimePersonalRecord {
+  kind: 'time'
   seconds: number
   date: string
 }
 
-export type PersonalRecord = RepsWeightPersonalRecord | DurationPersonalRecord
+export type PersonalRecord = RepsPersonalRecord | TimePersonalRecord
 
 export function getExerciseHistory(data: AppData, exerciseId: string): ExerciseHistory[] {
   return data.workouts
@@ -49,9 +49,9 @@ export function getPersonalRecord(data: AppData, exerciseId: string): PersonalRe
     return null
   }
 
-  if (firstSet.kind === 'duration') {
+  if (firstSet.kind === 'time') {
     const durationSets = sets.filter(
-      (entry): entry is { set: Extract<SetEntry, { kind: 'duration' }>; date: string } => entry.set.kind === 'duration',
+      (entry): entry is { set: Extract<SetEntry, { kind: 'time' }>; date: string } => entry.set.kind === 'time',
     )
     const record = durationSets.reduce((best, current) => {
       if (!best || current.set.seconds > best.set.seconds) {
@@ -59,23 +59,23 @@ export function getPersonalRecord(data: AppData, exerciseId: string): PersonalRe
       }
 
       return best
-    }, null as { set: Extract<SetEntry, { kind: 'duration' }>; date: string } | null)
+    }, null as { set: Extract<SetEntry, { kind: 'time' }>; date: string } | null)
 
     if (!record) {
       return null
     }
 
     return {
-      kind: 'duration',
+      kind: 'time',
       seconds: record.set.seconds,
       date: record.date,
     }
   }
 
-  const repsWeightSets = sets.filter(
-    (entry): entry is { set: Extract<SetEntry, { kind: 'reps-weight' }>; date: string } => entry.set.kind === 'reps-weight',
+  const repsSets = sets.filter(
+    (entry): entry is { set: Extract<SetEntry, { kind: 'reps' }>; date: string } => entry.set.kind === 'reps',
   )
-  const record = repsWeightSets.reduce((best, current) => {
+  const record = repsSets.reduce((best, current) => {
     const currentWeight = current.set.weightKg ?? 0
     const bestWeight = best?.set.weightKg ?? 0
 
@@ -88,14 +88,14 @@ export function getPersonalRecord(data: AppData, exerciseId: string): PersonalRe
     }
 
     return best
-  }, null as { set: Extract<SetEntry, { kind: 'reps-weight' }>; date: string } | null)
+  }, null as { set: Extract<SetEntry, { kind: 'reps' }>; date: string } | null)
 
   if (!record) {
     return null
   }
 
   return {
-    kind: 'reps-weight',
+    kind: 'reps',
     reps: record.set.reps,
     weightKg: record.set.weightKg ?? 0,
     date: record.date,

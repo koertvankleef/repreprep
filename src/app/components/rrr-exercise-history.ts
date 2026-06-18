@@ -51,7 +51,7 @@ export class RrrExerciseHistory extends HTMLElement {
         const dateLabel = this.formatHistoryDate(item.date)
         const setSummary = item.sets
           .map((set) =>
-            set.kind === 'duration'
+            set.kind === 'time'
               ? t('history.set.duration', { seconds: set.seconds })
               : t('history.set.repsWeight', { reps: set.reps, weightKg: set.weightKg ?? 0 }),
           )
@@ -80,7 +80,7 @@ export class RrrExerciseHistory extends HTMLElement {
 
     const dateLabel = this.formatHistoryDate(record.date)
 
-    if (record.kind === 'duration') {
+    if (record.kind === 'time') {
       return `<p>${t('history.record.duration', { seconds: record.seconds, date: dateLabel })}</p>`
     }
 
@@ -88,7 +88,7 @@ export class RrrExerciseHistory extends HTMLElement {
   }
 
   private formatHistoryDate(value: string): string {
-    const date = new Date(`${value}T00:00:00Z`)
+    const date = new Date(`${value}T12:00:00`)
 
     if (Number.isNaN(date.getTime())) {
       return value
@@ -99,7 +99,6 @@ export class RrrExerciseHistory extends HTMLElement {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
-      timeZone: 'UTC',
     })
   }
 

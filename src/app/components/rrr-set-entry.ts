@@ -7,7 +7,7 @@ const styles = `${shadowTypographyStyles}\n${componentStyles}`
 
 export class RrrSetEntry extends HTMLElement {
   private setValue: SetEntry | null = null
-  private exerciseKindValue: ExerciseKind = 'reps-weight'
+  private exerciseKindValue: ExerciseKind = 'reps'
 
   constructor() {
     super()
@@ -66,21 +66,21 @@ export class RrrSetEntry extends HTMLElement {
         <span class="sr-only" id="${labelId}">${t('setEntry.groupLabel')}</span>
         <div class="fields">
           ${
-            this.exerciseKindValue === 'duration'
+            this.exerciseKindValue === 'time'
               ? `
                 <label>
                   ${t('field.seconds')}
-                  <input type="number" min="0" step="1" name="seconds" value="${set.kind === 'duration' ? set.seconds : 0}" />
+                  <input type="number" min="0" step="1" name="seconds" value="${set.kind === 'time' ? set.seconds : 0}" />
                 </label>
               `
               : `
                 <label>
                   ${t('setEntry.field.reps')}
-                  <input type="number" min="0" step="1" name="reps" value="${set.kind === 'reps-weight' ? set.reps : 0}" />
+                  <input type="number" min="0" step="1" name="reps" value="${set.kind === 'reps' ? set.reps : 0}" />
                 </label>
                 <label>
                   ${t('setEntry.field.weightKg')}
-                  <input type="number" min="0" step="0.5" name="weightKg" value="${set.kind === 'reps-weight' && set.weightKg !== null ? set.weightKg : ''}" />
+                  <input type="number" min="0" step="0.5" name="weightKg" value="${set.kind === 'reps' && set.weightKg !== null ? set.weightKg : ''}" />
                 </label>
               `
           }
@@ -101,7 +101,7 @@ export class RrrSetEntry extends HTMLElement {
           return
         }
 
-        if (this.exerciseKindValue === 'duration' && this.setValue.kind === 'duration') {
+        if (this.exerciseKindValue === 'time' && this.setValue.kind === 'time') {
           const secondsInput = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="seconds"]')
           const notesInput = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="notes"]')
 
@@ -112,7 +112,7 @@ export class RrrSetEntry extends HTMLElement {
           }
         }
 
-        if (this.exerciseKindValue === 'reps-weight' && this.setValue.kind === 'reps-weight') {
+        if (this.exerciseKindValue === 'reps' && this.setValue.kind === 'reps') {
           const repsInput = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="reps"]')
           const weightInput = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="weightKg"]')
           const notesInput = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="notes"]')

@@ -11,7 +11,7 @@
   --rrr-select-border-radius: var(--rrr-radius-s);
   --rrr-select-background: var(--rrr-colors-grayscale-00);
   --rrr-select-color: var(--rrr-colors-grayscale-100);
-  --rrr-select-transition: var(--rrr-default-transition);
+  --rrr-select-transition: var(--rrr-transition-default);
   --rrr-select-hover-border-color: var(--rrr-colors-activity-indigo-30);
   --rrr-select-focus-border-color: var(--rrr-colors-activity-indigo-50);
   --rrr-select-focus-outline-width: var(--global-focus-ring-width);

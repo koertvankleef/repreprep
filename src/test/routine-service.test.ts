@@ -16,7 +16,8 @@ function makeExercise(exerciseId: string): RoutineExercise {
   return {
     id: 're-1',
     exerciseId,
-    plannedSets: [{ kind: 'reps-weight', targetReps: 10, targetWeightKg: null }],
+    restSeconds: 25,
+    plannedSets: [{ kind: 'reps', targetReps: 10, targetWeightKg: null }],
   }
 }
 
@@ -49,6 +50,8 @@ describe('routine-service', () => {
     expect(version).toBeDefined()
     expect(version?.exercises).toHaveLength(1)
     expect(version?.exercises[0]?.exerciseId).toBe(exerciseId)
+    expect(version?.transitionSeconds).toBe(10)
+    expect(version?.exercises[0]?.restSeconds).toBe(25)
     expect(version?.previousVersionId).toBeNull()
   })
 
@@ -71,6 +74,7 @@ describe('routine-service', () => {
 
     const newVersion = getActiveRoutineVersion(edited, routine?.id ?? '')
     expect(newVersion?.exercises).toHaveLength(2)
+    expect(newVersion?.transitionSeconds).toBe(10)
     expect(newVersion?.previousVersionId).toBe(originalVersionId)
   })
 
@@ -118,6 +122,7 @@ describe('routine-service', () => {
     const exercise = createRoutineExercise('exercise-123')
 
     expect(exercise.exerciseId).toBe('exercise-123')
+    expect(exercise.restSeconds).toBe(20)
     expect(exercise.plannedSets).toEqual([])
     expect(typeof exercise.id).toBe('string')
   })

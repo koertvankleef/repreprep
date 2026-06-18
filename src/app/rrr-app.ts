@@ -30,6 +30,7 @@ type BeforeInstallPromptEvent = Event & {
 type Route =
   | { name: 'workouts' }
   | { name: 'workout-edit'; workoutId: string }
+  | { name: 'workout-log'; workoutId: string }
   | { name: 'exercises' }
   | { name: 'history' }
   | { name: 'import-export' }
@@ -257,6 +258,10 @@ export class RrrApp extends HTMLElement {
   }
 
   private toRoute(match: HashRouteMatch<AppRouteMeta>): Route {
+    if (match.route.id === 'workout-log') {
+      return { name: 'workout-log', workoutId: match.params.workoutId ?? '' }
+    }
+
     if (match.route.id === 'workout-edit') {
       return { name: 'workout-edit', workoutId: match.params.workoutId ?? '' }
     }
@@ -347,6 +352,13 @@ export class RrrApp extends HTMLElement {
       const editor = document.createElement('rrr-workout-editor') as HTMLElement & { workoutId: string | null }
       editor.workoutId = route.workoutId
       view.append(editor)
+      return
+    }
+
+    if (route.name === 'workout-log') {
+      const logger = document.createElement('rrr-workout-logging') as HTMLElement & { workoutId: string | null }
+      logger.workoutId = route.workoutId
+      view.append(logger)
       return
     }
 

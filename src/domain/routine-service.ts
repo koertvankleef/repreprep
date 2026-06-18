@@ -1,6 +1,9 @@
 import type { AppData, Routine, RoutineExercise, RoutineVersion } from './types.ts'
 import { generateId } from '../utils/id.ts'
 
+const DEFAULT_REST_SECONDS = 20
+const DEFAULT_TRANSITION_SECONDS = 10
+
 export function getRoutine(data: AppData, id: string): Routine | undefined {
   return data.routines.find((r) => r.id === id)
 }
@@ -23,7 +26,7 @@ export function getActiveRoutineVersion(data: AppData, routineId: string): Routi
   return getRoutineVersion(data, routine.activeVersionId)
 }
 
-export function createRoutine(data: AppData, name: string, exercises: RoutineExercise[]): AppData {
+export function createRoutine(data: AppData, name: string, exercises: RoutineExercise[], transitionSeconds = DEFAULT_TRANSITION_SECONDS): AppData {
   const timestamp = new Date().toISOString()
   const routineId = generateId()
   const versionId = generateId()
@@ -33,6 +36,7 @@ export function createRoutine(data: AppData, name: string, exercises: RoutineExe
     routineId,
     previousVersionId: null,
     createdAt: timestamp,
+    transitionSeconds: Math.max(0, transitionSeconds),
     exercises,
   }
 
@@ -52,7 +56,7 @@ export function createRoutine(data: AppData, name: string, exercises: RoutineExe
   }
 }
 
-export function editRoutine(data: AppData, routineId: string, name: string, exercises: RoutineExercise[]): AppData {
+export function editRoutine(data: AppData, routineId: string, name: string, exercises: RoutineExercise[], transitionSeconds = DEFAULT_TRANSITION_SECONDS): AppData {
   const routine = getRoutine(data, routineId)
 
   if (!routine) {
@@ -67,6 +71,7 @@ export function editRoutine(data: AppData, routineId: string, name: string, exer
     routineId,
     previousVersionId: routine.activeVersionId,
     createdAt: timestamp,
+    transitionSeconds: Math.max(0, transitionSeconds),
     exercises,
   }
 
@@ -103,6 +108,7 @@ export function createRoutineExercise(exerciseId: string): RoutineExercise {
   return {
     id: generateId(),
     exerciseId,
+    restSeconds: DEFAULT_REST_SECONDS,
     plannedSets: [],
   }
 }

@@ -1,4 +1,4 @@
-import { createDurationSet, createRepsWeightSet } from '../../domain/workout-service.ts'
+import { createTimeSet, createRepsSet } from '../../domain/workout-service.ts'
 import { t } from '../../i18n/index.ts'
 import { shadowTypographyStyles } from '../../design-system/shadow-styles.ts'
 import type { ExerciseDefinition, SetEntry, WorkoutExerciseEntry } from '../../domain/types.ts'
@@ -108,7 +108,7 @@ export class RrrExerciseEntry extends HTMLElement {
       return
     }
 
-    const nextSet = this.exerciseValue?.kind === 'duration' ? createDurationSet(0) : createRepsWeightSet(0, null)
+    const nextSet = this.exerciseValue?.kind === 'time' ? createTimeSet(0) : createRepsSet(0, null)
 
     this.entryValue = {
       ...this.entryValue,
@@ -125,7 +125,7 @@ export class RrrExerciseEntry extends HTMLElement {
     }
 
     const exerciseName = this.exerciseValue?.name ?? t('exerciseEntry.unknownExercise')
-    const exerciseKind = this.exerciseValue?.kind ?? 'reps-weight'
+    const exerciseKind = this.exerciseValue?.kind ?? 'reps'
     const headingId = `exercise-entry-${this.entryValue.id}`
 
     this.shadowRoot.innerHTML = `
@@ -134,7 +134,7 @@ export class RrrExerciseEntry extends HTMLElement {
         <div class="header">
           <div>
             <h3 id="${headingId}">${exerciseName}</h3>
-            <p>${exerciseKind === 'duration' ? t('exerciseEntry.kind.duration') : t('exerciseEntry.kind.repsWeight')}</p>
+            <p>${exerciseKind === 'time' ? t('exerciseEntry.kind.duration') : t('exerciseEntry.kind.repsWeight')}</p>
           </div>
           <rrr-button type="button" variant="ghost" tone="danger" data-action="remove-exercise" aria-label="${escapeHtml(t('exerciseEntry.action.removeExerciseAria', { name: exerciseName }))}"><rrr-icon name="delete"></rrr-icon></rrr-button>
         </div>
@@ -178,7 +178,7 @@ export class RrrExerciseEntry extends HTMLElement {
         this.entryValue.sets.forEach((set) => {
           const setElement = document.createElement('rrr-set-entry') as HTMLElement & {
             setData: SetEntry
-            exerciseKind: 'reps-weight' | 'duration'
+            exerciseKind: 'reps' | 'time'
           }
 
           setElement.setData = set

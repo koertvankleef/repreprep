@@ -11,7 +11,7 @@
   --rrr-textarea-border-radius: var(--rrr-radius-s);
   --rrr-textarea-background: var(--rrr-colors-grayscale-00);
   --rrr-textarea-color: var(--rrr-colors-grayscale-100);
-  --rrr-textarea-transition: var(--rrr-default-transition);
+  --rrr-textarea-transition: var(--rrr-transition-default);
   --rrr-textarea-placeholder-color: var(--rrr-colors-grayscale-60);
   --rrr-textarea-hover-border-color: var(--rrr-colors-activity-indigo-30);
   --rrr-textarea-focus-border-color: var(--rrr-colors-activity-indigo-50);

@@ -52,7 +52,7 @@ button {
   background: var(--rrr-color-primary);
   color: var(--rrr-color-primary-contrast);
   box-shadow: var(--rrr-shadow-button);
-  transition: background var(--rrr-default-transition), border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition), transform var(--rrr-default-transition);
+  transition: background var(--rrr-transition-default), border-color var(--rrr-transition-default), box-shadow var(--rrr-transition-default), transform var(--rrr-transition-default);
 }
 
 button:hover {
@@ -84,7 +84,7 @@ textarea {
   border-radius: var(--rrr-radius-m);
   background: var(--rrr-colors-grayscale-00);
   color: var(--rrr-colors-grayscale-100);
-  transition: border-color var(--rrr-default-transition), box-shadow var(--rrr-default-transition), background var(--rrr-default-transition);
+  transition: border-color var(--rrr-transition-default), box-shadow var(--rrr-transition-default), background var(--rrr-transition-default);
 }
 
 input:hover,

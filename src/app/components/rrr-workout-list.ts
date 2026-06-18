@@ -49,11 +49,11 @@ export class RrrWorkoutList extends HTMLElement {
 
     storageService.saveWorkout(workout)
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    window.location.hash = `#/workouts/${workout.id}`
+    window.location.hash = `#/workouts/${workout.id}/log`
   }
 
   private formatWorkoutDate(value: string): string {
-    const date = new Date(`${value}T00:00:00Z`)
+    const date = new Date(`${value}T12:00:00`)
 
     if (Number.isNaN(date.getTime())) {
       return value
@@ -64,7 +64,6 @@ export class RrrWorkoutList extends HTMLElement {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
-      timeZone: 'UTC',
     })
   }
 

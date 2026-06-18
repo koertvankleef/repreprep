@@ -1,13 +1,16 @@
 import type {
   AppData,
-  DurationSetEntry,
+  TimeSetEntry,
   PlannedSet,
-  RepsWeightSetEntry,
+  RepsSetEntry,
   SetEntry,
   Workout,
   WorkoutExerciseEntry,
 } from './types.ts'
 import { generateId } from '../utils/id.ts'
+
+const DEFAULT_REST_SECONDS = 20
+const DEFAULT_TRANSITION_SECONDS = 10
 
 export function addWorkout(data: AppData, workout: Workout): AppData {
   return {
@@ -101,31 +104,31 @@ export function createExerciseEntry(exerciseId: string): WorkoutExerciseEntry {
   }
 }
 
-export function createRepsWeightSet(reps: number, weightKg: number | null): RepsWeightSetEntry {
+export function createRepsSet(reps: number, weightKg: number | null): RepsSetEntry {
   return {
     id: generateId(),
-    kind: 'reps-weight',
+    kind: 'reps',
     reps,
     weightKg,
     notes: '',
   }
 }
 
-export function createDurationSet(seconds: number): DurationSetEntry {
+export function createTimeSet(seconds: number): TimeSetEntry {
   return {
     id: generateId(),
-    kind: 'duration',
+    kind: 'time',
     seconds,
     notes: '',
   }
 }
 
 function createSetFromPlannedSet(plannedSet: PlannedSet): SetEntry {
-  if (plannedSet.kind === 'reps-weight') {
-    return createRepsWeightSet(plannedSet.targetReps ?? 0, plannedSet.targetWeightKg)
+  if (plannedSet.kind === 'reps') {
+    return createRepsSet(plannedSet.targetReps ?? 0, plannedSet.targetWeightKg)
   }
 
-  return createDurationSet(plannedSet.targetSeconds ?? 0)
+  return createTimeSet(plannedSet.targetSeconds ?? 0)
 }
 
 export function createWorkoutFromRoutine(data: AppData, routineId: string, date: string): Workout | null {
@@ -147,6 +150,7 @@ export function createWorkoutFromRoutine(data: AppData, routineId: string, date:
     id: generateId(),
     exerciseId: re.exerciseId,
     sets: re.plannedSets.map((ps) => createSetFromPlannedSet(ps)),
+    restSeconds: Math.max(0, re.restSeconds ?? DEFAULT_REST_SECONDS),
     notes: re.notes ?? '',
   }))
 
@@ -155,6 +159,7 @@ export function createWorkoutFromRoutine(data: AppData, routineId: string, date:
     date,
     notes: '',
     exercises,
+    transitionSeconds: Math.max(0, version.transitionSeconds ?? DEFAULT_TRANSITION_SECONDS),
     createdAt: timestamp,
     updatedAt: timestamp,
     routineId,

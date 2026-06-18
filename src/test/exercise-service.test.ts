@@ -13,7 +13,7 @@ import { addExerciseToWorkout, addWorkout, createExerciseEntry, createNewWorkout
 describe('exercise-service', () => {
   test('addExercise adds to exercises array', () => {
     const data = createDefaultData()
-    const exercise = createNewExercise('Farmer Carry', 'duration')
+    const exercise = createNewExercise('Farmer Carry', 'time')
     const updated = addExercise(data, exercise)
 
     expect(updated.exercises).toContainEqual(exercise)

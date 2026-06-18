@@ -13,6 +13,10 @@ Repreprep is a personal workout logger that runs entirely in your browser. It he
 
 No accounts, no cloud, no tracking. Your data stays in your browser.
 
+## Feature List
+
+See docs/features.md for the current user-facing feature inventory.
+
 ## Running Locally
 
 ```bash
@@ -21,6 +25,13 @@ npm run dev
 ```
 
 Then open http://localhost:5173 in your browser.
+
+## Offline Development Notes
+
+- The app now vendors its Google font assets locally under `public/fonts` and loads them via `src/design-system/fonts.css`.
+- UI typography works without internet access once dependencies are installed.
+- To work fully offline, run `npm install` before traveling so `node_modules` is already present.
+- Installed app usage offline is supported after at least one successful online load, because the service worker caches app shell assets.
 
 ## Running Tests
 
@@ -43,6 +54,12 @@ Use docs/qa-checklist.md for repeatable smoke, localization, accessibility, and 
 ## How localStorage Works
 
 All workout data is stored in your browser's localStorage under the key `repreprep:data`. Data persists between sessions on the same browser/device. Clearing browser data will erase your workouts—use the export feature regularly to back up your data.
+
+## Data Compatibility Note
+
+The workout kind model was hard-renamed from legacy values to canonical values (`reps` and `time`) without backward-compatibility or migration.
+
+If you used a build from before this change, clear local browser data for this app before using the updated build.
 
 ## Import/Export
 

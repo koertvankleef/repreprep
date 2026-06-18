@@ -4,7 +4,7 @@ import {
   addExerciseToWorkout,
   addSetToExerciseEntry,
   addWorkout,
-  createDurationSet,
+  createTimeSet,
   createExerciseEntry,
   createNewWorkout,
   deleteWorkout,
@@ -80,14 +80,14 @@ describe('workout-service', () => {
 
   test('addSetToExerciseEntry adds set', () => {
     const entry = createExerciseEntry('exercise-1')
-    const set = createDurationSet(60)
+    const set = createTimeSet(60)
     const updated = addSetToExerciseEntry(entry, set)
 
     expect(updated.sets).toEqual([set])
   })
 
   test('removeSetFromExerciseEntry removes set', () => {
-    const set = createDurationSet(60)
+    const set = createTimeSet(60)
     const entry = addSetToExerciseEntry(createExerciseEntry('exercise-1'), set)
     const updated = removeSetFromExerciseEntry(entry, set.id)
 
