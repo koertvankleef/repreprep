@@ -1,64 +1,81 @@
 import styles from './rrr-button.css?inline'
 import { defineCustomElementOnce, reflectDisabled } from './shared.ts'
 
-const buttonSheet = new CSSStyleSheet()
-buttonSheet.replaceSync(styles)
+const styledRoots = new WeakSet<Document | ShadowRoot>()
 
-const template = document.createElement('template')
-template.innerHTML = `
-  <button type="button" part="button">
-    <slot></slot>
-  </button>
-`
+function ensureButtonStyles(root: Document | ShadowRoot): void {
+  if (styledRoots.has(root)) {
+    return
+  }
+
+  const style = document.createElement('style')
+  style.setAttribute('data-rrr-button-styles', 'true')
+  style.textContent = styles
+
+  if (root instanceof ShadowRoot) {
+    root.appendChild(style)
+  } else {
+    root.head.appendChild(style)
+  }
+
+  styledRoots.add(root)
+}
 
 export class RrrButton extends HTMLElement {
   static observedAttributes = ['aria-label', 'aria-pressed', 'title', 'disabled']
 
-  private readonly button: HTMLButtonElement
-  private readonly buttonSlot: HTMLSlotElement
+  private button!: HTMLButtonElement
+  private isInitialized = false
 
   constructor() {
     super()
-
-    const shadowRoot = this.attachShadow({ mode: 'open' })
-    shadowRoot.adoptedStyleSheets = [buttonSheet]
-    shadowRoot.appendChild(template.content.cloneNode(true))
-
-    const button = shadowRoot.querySelector<HTMLButtonElement>('button')
-    const slot = shadowRoot.querySelector<HTMLSlotElement>('slot')
-
-    if (!button || !slot) {
-      throw new Error('rrr-button failed to initialize')
-    }
-
-    this.button = button
-    this.buttonSlot = slot
   }
 
   connectedCallback(): void {
+    const root = this.getRootNode()
+    if (root instanceof Document || root instanceof ShadowRoot) {
+      ensureButtonStyles(root)
+    }
+
+    if (!this.isInitialized) {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.setAttribute('part', 'button')
+      button.setAttribute('data-rrr-button-inner', 'true')
+
+      while (this.firstChild) {
+        button.appendChild(this.firstChild)
+      }
+
+      this.appendChild(button)
+      this.button = button
+      this.isInitialized = true
+
+      this.button.addEventListener('click', () => {
+        if (this.button.disabled) {
+          return
+        }
+
+        const type = this.getAttribute('type')
+        const form = this.closest('form')
+
+        if (type === 'submit') {
+          form?.requestSubmit()
+        } else if (type === 'reset') {
+          form?.reset()
+        }
+      })
+    }
+
     this.syncAll()
-    this.buttonSlot.addEventListener('slotchange', () => {
-      this.syncContentState()
-    })
     this.syncContentState()
-
-    this.button.addEventListener('click', () => {
-      if (this.button.disabled) {
-        return
-      }
-
-      const type = this.getAttribute('type')
-      const form = this.closest('form')
-
-      if (type === 'submit') {
-        form?.requestSubmit()
-      } else if (type === 'reset') {
-        form?.reset()
-      }
-    })
   }
 
   attributeChangedCallback(name: string): void {
+    if (!this.isInitialized) {
+      return
+    }
+
     if (name === 'aria-label' || name === 'aria-pressed' || name === 'title' || name === 'disabled') {
       this.syncAll()
     }
@@ -77,6 +94,10 @@ export class RrrButton extends HTMLElement {
   }
 
   private syncAll(): void {
+    if (!this.isInitialized) {
+      return
+    }
+
     const ariaLabel = this.getAttribute('aria-label')
     const ariaPressed = this.getAttribute('aria-pressed')
     const title = this.getAttribute('title')
@@ -104,8 +125,8 @@ export class RrrButton extends HTMLElement {
   }
 
   private syncContentState(): void {
-    const assignedNodes = this.buttonSlot.assignedNodes({ flatten: true })
-    const hasVisibleText = assignedNodes.some((node) => {
+    const contentNodes = Array.from(this.button.childNodes)
+    const hasVisibleText = contentNodes.some((node) => {
       if (node.nodeType === Node.TEXT_NODE) {
         return (node.textContent ?? '').trim().length > 0
       }
@@ -123,7 +144,7 @@ export class RrrButton extends HTMLElement {
       return false
     })
 
-    this.toggleAttribute('icon-only', assignedNodes.length > 0 && !hasVisibleText)
+    this.toggleAttribute('icon-only', contentNodes.length > 0 && !hasVisibleText)
   }
 }
 

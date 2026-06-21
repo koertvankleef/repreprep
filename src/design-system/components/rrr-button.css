@@ -1,4 +1,4 @@
-:host {
+rrr-button {
   display: inline-block;
   --rrr-button-radius: var(--rrr-radius-s);
   --rrr-button-padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
@@ -18,50 +18,50 @@
   --_interactive-fg: var(--rrr-button-fg);
 }
 
-:host([tone='neutral']) {
+rrr-button[tone='neutral'] {
   --_bg: var(--rrr-colors-grayscale-40);
   --_bg-hover: var(--rrr-colors-grayscale-70);
   --_fg: var(--rrr-color-text);
   --_interactive-fg: var(--_bg-hover);
 }
 
-:host([tone='accent']) {
+rrr-button[tone='accent'] {
   --_bg: var(--rrr-colors-serene-mint-60);
   --_bg-hover: var(--rrr-colors-serene-mint-70);
   --_fg: var(--rrr-color-primary-contrast);
   --_interactive-fg: var(--rrr-button-fg-accent);
 }
 
-:host([tone='info']) {
+rrr-button[tone='info'] {
   --_bg: var(--rrr-colors-context-info-60);
   --_bg-hover: var(--rrr-colors-context-info-70);
   --_fg: var(--rrr-color-primary-contrast);
   --_interactive-fg: var(--rrr-button-fg-info);
 }
 
-:host([tone='success']) {
+rrr-button[tone='success'] {
   --_bg: var(--rrr-colors-context-success-60);
   --_bg-hover: var(--rrr-colors-context-success-70);
   --_fg: var(--rrr-color-primary-contrast);
   --_interactive-fg: var(--rrr-button-fg-success);
 }
 
-:host([tone='warning']) {
+rrr-button[tone='warning'] {
   --_bg: var(--rrr-colors-context-warning-60);
   --_bg-hover: var(--rrr-colors-context-warning-70);
   --_fg: var(--rrr-color-primary-contrast);
   --_interactive-fg: var(--rrr-button-fg-warning);
 }
 
-:host([tone='danger']),
-:host([variant='danger']) {
+rrr-button[tone='danger'],
+rrr-button[variant='danger'] {
   --_bg: var(--rrr-colors-context-danger-60);
   --_bg-hover: var(--rrr-colors-context-danger-70);
   --_fg: var(--rrr-color-primary-contrast);
   --_interactive-fg: var(--rrr-button-fg-danger);
 }
 
-button {
+rrr-button > button[data-rrr-button-inner] {
   font: inherit;
   line-height: 1.25;
   border-radius: var(--rrr-button-radius);
@@ -78,58 +78,60 @@ button {
   transition: background var(--rrr-button-transition), border-color var(--rrr-button-transition), color var(--rrr-button-transition), box-shadow var(--rrr-button-transition), transform var(--rrr-button-transition);
 }
 
-:host([icon-only]) button {
+rrr-button[icon-only] > button[data-rrr-button-inner] {
   inline-size: var(--rrr-button-min-block-size);
   padding-inline: 0;
   justify-content: center;
 }
 
-:host([rounded]) button {
+rrr-button[rounded] > button[data-rrr-button-inner] {
   border-radius: 999px;
 }
 
-:host([rounded][icon-only]) button {
+rrr-button[rounded][icon-only] > button[data-rrr-button-inner] {
   border-radius: 50%;
   aspect-ratio: 1 / 1;
 }
 
-button:hover:enabled {
+rrr-button > button[data-rrr-button-inner]:hover:enabled {
   background: var(--_bg-hover);
   border-color: var(--_bg-hover);
   box-shadow: var(--rrr-button-hover-shadow);
 }
 
-button:active:enabled {
+rrr-button > button[data-rrr-button-inner]:active:enabled {
   transform: translateY(1px);
   box-shadow: var(--rrr-button-active-shadow);
 }
 
-:host([variant='outline']) button {
+rrr-button[variant='outline'] > button[data-rrr-button-inner] {
   background: transparent;
   color: var(--_interactive-fg);
   border-color: var(--_interactive-fg);
   box-shadow: none;
 }
 
-:host([variant='outline']) button:hover:enabled {
+rrr-button[variant='outline'] > button[data-rrr-button-inner]:hover:enabled {
   background: color-mix(in oklab, var(--_bg), transparent 82%);
   color: var(--_interactive-fg);
   border-color: var(--_interactive-fg);
 }
 
-:host([variant='ghost']) button {
+rrr-button[variant='ghost'] > button[data-rrr-button-inner] {
   background: transparent;
   color: var(--_interactive-fg);
   border-color: transparent;
   box-shadow: none;
 }
 
-:host([variant='ghost']) button:hover:enabled {
+rrr-button[variant='ghost'] > button[data-rrr-button-inner]:hover:enabled {
   background: color-mix(in oklab, var(--_bg), transparent 85%);
   color: var(--_interactive-fg);
+  border-color: transparent;
+  box-shadow: none;
 }
 
-button:disabled {
+rrr-button > button[data-rrr-button-inner]:disabled {
   cursor: not-allowed;
   opacity: 0.6;
   background: var(--rrr-button-disabled-background);
