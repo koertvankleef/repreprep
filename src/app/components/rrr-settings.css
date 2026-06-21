@@ -1,0 +1,97 @@
+.page {
+  display: grid;
+  gap: var(--rrr-spacing-xl);
+  max-width: 48rem;
+}
+
+.settings-header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--rrr-spacing-m);
+  align-items: center;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rrr-spacing-2xs);
+  padding: var(--rrr-spacing-2xs) var(--rrr-spacing-s);
+  border-radius: var(--rrr-radius-m);
+  text-decoration: none;
+  color: var(--rrr-colors-grayscale-80);
+  font-family: var(--rrr-font-family-heading);
+  font-size: var(--rrr-font-size-s);
+  transition: background var(--rrr-transition-default), color var(--rrr-transition-default);
+  border: var(--rrr-border-width) solid transparent;
+}
+
+.back-link:hover {
+  background: var(--rrr-colors-activity-indigo-10);
+  color: var(--rrr-colors-activity-indigo-80);
+}
+
+.back-link rrr-icon {
+  font-size: 1.1rem;
+}
+
+.settings-title {
+  margin: 0;
+  font-size: var(--rrr-font-size-xl);
+}
+
+.settings-section {
+  display: grid;
+  gap: var(--rrr-spacing-s);
+}
+
+.settings-section-title {
+  margin: 0;
+  font-family: var(--rrr-font-family-heading);
+  font-size: var(--rrr-font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rrr-colors-grayscale-60);
+}
+
+.settings-card {
+  display: grid;
+  gap: 0;
+  background: var(--rrr-colors-grayscale-00);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border-radius: var(--rrr-radius-l);
+  overflow: hidden;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rrr-spacing-m);
+  padding: var(--rrr-spacing-m);
+  border-bottom: var(--rrr-border-width) solid var(--rrr-colors-grayscale-20);
+}
+
+.control-row:last-child {
+  border-bottom: none;
+}
+
+.control-label {
+  font-size: var(--rrr-font-size-s);
+  color: var(--rrr-colors-grayscale-80);
+}
+
+.control-group {
+  display: inline-flex;
+  gap: var(--rrr-spacing-2xs);
+  padding: var(--rrr-spacing-2xs);
+  border-radius: var(--rrr-radius-s);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-40);
+  background: var(--rrr-colors-grayscale-00);
+}
+
+.control-group rrr-button[aria-pressed='true'] > button[data-rrr-button-inner] {
+  background: var(--rrr-colors-activity-indigo-60);
+  border-color: var(--rrr-colors-activity-indigo-70);
+  color: var(--rrr-color-primary-contrast);
+}

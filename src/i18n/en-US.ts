@@ -70,6 +70,12 @@ export const enUsMessages = {
   'app.theme.contrastNormal': 'Normal contrast',
   'app.theme.contrastHigh': 'High contrast',
   'app.header.options': 'More options',
+  'app.options.title': 'Options',
+  'app.options.close': 'Close',
+  'app.options.settings': 'Settings',
+  'app.settings.title': 'Settings',
+  'app.settings.back': 'Back',
+  'app.settings.display': 'Display',
 
   'styleguide.title': 'Styleguide',
   'styleguide.subtitle': 'Design-system playground for local development and component review.',

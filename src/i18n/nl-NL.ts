@@ -70,6 +70,12 @@ export const nlNlMessages = {
   'app.theme.contrastNormal': 'Normaal contrast',
   'app.theme.contrastHigh': 'Hoog contrast',
   'app.header.options': 'Meer opties',
+  'app.options.title': 'Opties',
+  'app.options.close': 'Sluiten',
+  'app.options.settings': 'Instellingen',
+  'app.settings.title': 'Instellingen',
+  'app.settings.back': 'Terug',
+  'app.settings.display': 'Weergave',
 
   'styleguide.title': 'Stijlgids',
   'styleguide.subtitle': 'Design-system speelplaats voor lokaal ontwikkelen en componentcontrole.',

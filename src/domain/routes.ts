@@ -11,9 +11,10 @@ export type AppRouteId =
   | 'routine-new'
   | 'routine-edit'
   | 'styleguide'
+  | 'settings'
 
 export type AppRouteMeta = {
-  nav: 'workouts' | 'routines' | 'exercises' | 'history' | 'import-export' | 'styleguide'
+  nav: 'workouts' | 'routines' | 'exercises' | 'history' | 'import-export' | 'styleguide' | 'settings'
 }
 
 export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
@@ -27,4 +28,5 @@ export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
   { id: 'routines', pattern: '/routines', meta: { nav: 'routines' } },
   { id: 'routine-new', pattern: '/routines/new', meta: { nav: 'routines' } },
   { id: 'routine-edit', pattern: '/routines/:routineId', meta: { nav: 'routines' } },
+  { id: 'settings', pattern: '/settings', meta: { nav: 'settings' } },
 ]

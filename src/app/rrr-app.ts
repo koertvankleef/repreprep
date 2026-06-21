@@ -38,6 +38,7 @@ type Route =
   | { name: 'routine-new' }
   | { name: 'routine-edit'; routineId: string }
   | { name: 'styleguide' }
+  | { name: 'settings' }
 
 const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
 
@@ -49,6 +50,8 @@ export class RrrApp extends HTMLElement {
   private isStandalone = window.matchMedia('(display-mode: standalone)').matches
   private stopWatchingSystemThemePreference: (() => void) | null = null
   private readonly styleguideEnabled = import.meta.env.DEV || localHosts.has(window.location.hostname)
+  private optionsPanelOpen = false
+  private settingsReturnHash = '#/workouts'
   private readonly router = createHashRouter({
     routes: appRoutes,
     notFoundRouteId: 'workouts',
@@ -115,6 +118,26 @@ export class RrrApp extends HTMLElement {
 
     if (action === 'contrast-high') {
       this.setContrastMode('high')
+    }
+
+    if (action === 'open-options') {
+      this.optionsPanelOpen = true
+      this.render()
+      return
+    }
+
+    if (action === 'close-options') {
+      this.shadowRoot?.querySelector<HTMLDialogElement>('.options-panel')?.close()
+      this.optionsPanelOpen = false
+      return
+    }
+
+    if (action === 'open-settings') {
+      this.settingsReturnHash = window.location.hash || '#/workouts'
+      this.shadowRoot?.querySelector<HTMLDialogElement>('.options-panel')?.close()
+      this.optionsPanelOpen = false
+      window.location.hash = '/settings'
+      return
     }
   }
 
@@ -294,6 +317,10 @@ export class RrrApp extends HTMLElement {
       return { name: 'styleguide' }
     }
 
+    if (match.route.id === 'settings') {
+      return { name: 'settings' }
+    }
+
     return { name: 'workouts' }
   }
 
@@ -309,6 +336,22 @@ export class RrrApp extends HTMLElement {
     }
 
     return import.meta.env.DEV || this.installAvailable
+  }
+
+  private renderOptionsPanelContent(route: Route): string {
+    const items: string[] = []
+
+    // Settings is available from every screen
+    items.push(`
+      <rrr-button type="button" variant="ghost" class="options-menu-item" data-action="open-settings">
+        <rrr-icon name="settings"></rrr-icon>
+        <span>${t('app.options.settings')}</span>
+      </rrr-button>
+    `)
+
+    void route // future: add per-route contextual items here
+
+    return items.join('')
   }
 
   private renderNavLink(routeName: Route['name'], href: string, label: string, iconName: string): string {
@@ -353,15 +396,34 @@ export class RrrApp extends HTMLElement {
             ${this.renderThemeControls()}
             ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="outline" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
           </div>
-          <rrr-button type="button" variant="ghost" class="options-trigger" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
+          <rrr-button type="button" variant="ghost" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
         </header>
         <main>
           <div id="view"></div>
         </main>
+        <dialog class="options-panel" aria-label="${t('app.options.title')}">
+          <header class="options-panel-header">
+            <span class="options-panel-title">${t('app.options.title')}</span>
+            <rrr-button type="button" variant="ghost" data-action="close-options" aria-label="${t('app.options.close')}" title="${t('app.options.close')}"><rrr-icon name="dismiss"></rrr-icon></rrr-button>
+          </header>
+          <div class="options-panel-body">
+            ${this.renderOptionsPanelContent(route)}
+          </div>
+        </dialog>
       </div>
     `
 
     const view = this.shadowRoot.querySelector<HTMLDivElement>('#view')
+
+    const panel = this.shadowRoot.querySelector<HTMLDialogElement>('.options-panel')
+    if (panel) {
+      panel.addEventListener('close', () => {
+        this.optionsPanelOpen = false
+      }, { once: true })
+      if (this.optionsPanelOpen) {
+        panel.showModal()
+      }
+    }
 
     if (!view) {
       return
@@ -415,6 +477,15 @@ export class RrrApp extends HTMLElement {
 
     if (route.name === 'styleguide') {
       view.append(document.createElement('rrr-styleguide'))
+      return
+    }
+
+    if (route.name === 'settings') {
+      const settingsEl = document.createElement('rrr-settings')
+      settingsEl.setAttribute('return-href', this.settingsReturnHash)
+      settingsEl.setAttribute('theme', this.displayPreferences.theme)
+      settingsEl.setAttribute('contrast', this.displayPreferences.contrast)
+      view.append(settingsEl)
       return
     }
 
