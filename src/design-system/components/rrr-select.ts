@@ -6,9 +6,9 @@ selectSheet.replaceSync(styles)
 
 const template = document.createElement('template')
 template.innerHTML = `
-  <label part="label" hidden></label>
+  <label part="label" for="select" hidden></label>
   <div class="select-shell" part="shell">
-    <select part="select"></select>
+    <select part="select" id="select"></select>
   </div>
   <p class="error" part="error"></p>
 `
