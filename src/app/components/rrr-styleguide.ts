@@ -333,7 +333,6 @@ export class RrrStyleguide extends HTMLElement {
       <section class="page">
         <rrr-card size="lg">
           <div class="intro">
-            <h2>${t('styleguide.title')}</h2>
             <p>${t('styleguide.subtitle')}</p>
             <p class="sample-text">${t('styleguide.localOnly')}</p>
             <p class="sample-text">${t('styleguide.localeInfo', { browserLocale: navigator.language, activeLocale: getLocale() })}</p>

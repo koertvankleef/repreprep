@@ -1,10 +1,10 @@
 rrr-exercise-history {
   --rrr-exercise-history-list-gap: var(--rrr-spacing-s);
-  --rrr-exercise-history-item-border-width: var(--rrr-border-width);
+  --rrr-exercise-history-item-border-width: var(--rrr-hairline);
   --rrr-exercise-history-item-border-color: var(--rrr-colors-grayscale-30);
   --rrr-exercise-history-item-radius: var(--rrr-radius-m);
   --rrr-exercise-history-item-padding: var(--rrr-spacing-l);
-  --rrr-exercise-history-item-background: color-mix(in oklch, var(--rrr-color-surface, var(--rrr-colors-grayscale-00)) 88%, var(--rrr-colors-activity-indigo-40));
+  --rrr-exercise-history-item-background: var(--rrr-colors-grayscale-00);
   --rrr-exercise-history-item-shadow: var(--rrr-depth-1-shadow);
 }
 

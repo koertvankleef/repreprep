@@ -189,7 +189,6 @@ export class RrrWorkoutEditor extends HTMLElement {
     }
 
     const isEditContext = this.workoutIdValue !== null && this.workout.updatedAt !== this.workout.createdAt
-    const title = isEditContext ? t('workout.title.edit') : t('workout.title.new')
     const subtitle = isEditContext ? t('workout.subtitle.edit') : t('workout.subtitle.new')
     const defaultStatus = isEditContext ? t('workout.status.default.edit') : t('workout.status.default.new')
 
@@ -198,7 +197,6 @@ export class RrrWorkoutEditor extends HTMLElement {
       <section class="page">
         <rrr-card size="lg">
           <div>
-            <h2>${title}</h2>
             <p>${subtitle}</p>
           </div>
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || defaultStatus}</p>

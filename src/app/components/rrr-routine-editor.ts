@@ -327,7 +327,6 @@ export class RrrRoutineEditor extends HTMLElement {
     const data = storageService.getData()
     const activeExercises = getActiveExercises(data)
     const isEditing = this.routineIdValue !== null
-    const title = isEditing ? t('routineEditor.title.edit') : t('routineEditor.title.new')
 
     if (isEditing && this.routineIdValue !== null && !getRoutine(data, this.routineIdValue)) {
       this.innerHTML = `
@@ -425,9 +424,6 @@ export class RrrRoutineEditor extends HTMLElement {
       <style>${styles}</style>
       <section class="page">
         <rrr-card size="lg">
-          <div>
-            <h2>${title}</h2>
-          </div>
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('routineEditor.status.default')}</p>
           <div class="row">
             <rrr-input label="${t('field.name')}" name="routine-name" placeholder="${t('routineEditor.field.name.placeholder')}"></rrr-input>

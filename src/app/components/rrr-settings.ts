@@ -26,10 +26,6 @@ export class RrrSettings extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>${componentStyles}</style>
       <div class="page">
-        <header class="settings-header">
-          <h1 class="settings-title">${t('app.settings.title')}</h1>
-        </header>
-
         <section class="settings-section">
           <h2 class="settings-section-title">${t('app.settings.navigation')}</h2>
           <div class="settings-card">

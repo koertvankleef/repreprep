@@ -109,7 +109,6 @@ export class RrrExerciseHistory extends HTMLElement {
       <style>${styles}</style>
       <section class="page">
         <rrr-card size="lg">
-          <h2>${t('history.title')}</h2>
           ${
             exercises.length === 0
               ? `<p>${t('history.empty.addExercise')}</p>`

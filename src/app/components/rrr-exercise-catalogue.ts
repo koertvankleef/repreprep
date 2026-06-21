@@ -140,7 +140,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
       <section class="page">
         <rrr-card size="lg">
           <div>
-            <h2>${t('exercise.title')}</h2>
             <p>${t('exercise.subtitle')}</p>
           </div>
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('exercise.status.default')}</p>

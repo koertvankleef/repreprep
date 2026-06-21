@@ -59,7 +59,6 @@ export class RrrImportExport extends HTMLElement {
       <style>${styles}</style>
       <section class="page">
         <rrr-card size="lg">
-          <h2>${t('importExport.title')}</h2>
           <p id="storage-description">${t('importExport.storageDescription')} <code>${this.storageKey}</code>.</p>
           <div>
             <rrr-button type="button" data-action="export">${t('importExport.action.export')}</rrr-button>

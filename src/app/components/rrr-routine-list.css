@@ -5,11 +5,13 @@ rrr-routine-list {
   --rrr-routine-list-title-color: var(--rrr-colors-activity-indigo-80);
   --rrr-routine-list-meta-color: var(--rrr-colors-grayscale-70);
   --rrr-routine-list-meta-size: var(--rrr-font-size-s);
+  position: relative;
 }
 
 .list {
   display: grid;
   gap: var(--rrr-routine-list-gap);
+  padding-bottom: calc(var(--rrr-app-bottom-nav-height) + var(--rrr-spacing-4xl) + env(safe-area-inset-bottom));
 }
 
 .card-title {
@@ -21,4 +23,21 @@ rrr-routine-list {
 .card-meta {
   color: var(--rrr-routine-list-meta-color);
   font-size: var(--rrr-routine-list-meta-size);
+}
+
+[data-action="new"] {
+  position: fixed;
+  right: max(var(--rrr-spacing-l), env(safe-area-inset-right));
+  bottom: calc(var(--rrr-app-bottom-nav-height) + var(--rrr-spacing-l) + env(safe-area-inset-bottom));
+  z-index: 35;
+}
+
+@media screen and (min-width: 48rem) {
+  .list {
+    padding-bottom: var(--rrr-spacing-4xl);
+  }
+
+  [data-action="new"] {
+    bottom: var(--rrr-spacing-2xl);
+  }
 }

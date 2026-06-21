@@ -81,7 +81,6 @@ export class RrrWorkoutList extends HTMLElement {
       <section class="page">
         <div class="header">
           <div>
-            <h2>${t('workoutList.title')}</h2>
             <p>${t('workoutList.subtitle')}</p>
           </div>
           ${

@@ -373,6 +373,62 @@ export class RrrApp extends HTMLElement {
     `
   }
 
+  private getHeaderTitle(route: Route): string {
+    if (route.name === 'workouts') {
+      return t('app.nav.today')
+    }
+
+    if (route.name === 'workout-edit') {
+      return t('app.header.workoutEdit')
+    }
+
+    if (route.name === 'workout-log') {
+      return t('app.header.workoutLog')
+    }
+
+    if (route.name === 'routines') {
+      return t('app.nav.routines')
+    }
+
+    if (route.name === 'routine-new') {
+      return t('app.header.routineNew')
+    }
+
+    if (route.name === 'routine-edit') {
+      const routineName = storageService
+        .getData()
+        .routines.find((routine) => routine.id === route.routineId)?.name
+
+      if (routineName) {
+        return t('app.header.routineEditNamed', { name: routineName })
+      }
+
+      return t('app.header.routineEdit')
+    }
+
+    if (route.name === 'exercises') {
+      return t('app.nav.exercises')
+    }
+
+    if (route.name === 'history') {
+      return t('app.nav.history')
+    }
+
+    if (route.name === 'import-export') {
+      return t('app.nav.importExport')
+    }
+
+    if (route.name === 'styleguide') {
+      return t('app.nav.styleguide')
+    }
+
+    if (route.name === 'settings') {
+      return t('app.settings.title')
+    }
+
+    return ''
+  }
+
   private render(): void {
     if (!this.shadowRoot) {
       return
@@ -397,6 +453,7 @@ export class RrrApp extends HTMLElement {
         </nav>
         <header class="app-header">
           <rrr-button type="button" variant="ghost" tone="neutral" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}" aria-hidden="${this.getBackHref() === null ? 'true' : 'false'}" ${this.getBackHref() === null ? 'tabindex="-1"' : ''}><rrr-icon name="arrow-left"></rrr-icon></rrr-button>
+          <h1 class="app-header-title">${this.getHeaderTitle(route)}</h1>
           <rrr-button type="button" variant="ghost" tone="neutral" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
         </header>
         <main>

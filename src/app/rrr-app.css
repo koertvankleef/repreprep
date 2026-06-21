@@ -135,13 +135,33 @@ nav {
   gap: var(--rrr-spacing-s);  
   padding-top: calc(0 + env(safe-area-inset-top));
   background: var(--rrr-colors-activity-indigo-60);
-  --rrr-button-min-block-size: var(--rrr-app-header-height);
-  /* --rrr-button-icon-size: 1.2rem; */
   --rrr-button-neutral-bg: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-bg-hover: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-fg: var(--rrr-color-primary-contrast);
   box-shadow: var(--rrr-app-nav-shadow);
   font-family: var(--rrr-app-link-font-family);
+}
+
+.app-header rrr-button {
+  --rrr-button-min-block-size: var(--rrr-app-header-height);
+  --rrr-button-icon-size: 1.5rem;
+}
+
+.app-header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: var(--rrr-app-link-font-family);
+  font-size: var(--rrr-font-size-l);
+  font-weight: 600;
+  color: var(--rrr-color-primary-contrast);
+  text-align: center;
+  pointer-events: none;
+  max-inline-size: calc(100% - (var(--rrr-app-header-height) * 2) - (var(--rrr-spacing-s) * 4));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-back {
@@ -160,7 +180,6 @@ nav {
 main {
   grid-area: main;
   padding: var(--rrr-app-main-padding);
-  padding-top: calc(var(--rrr-app-main-padding) + var(--rrr-app-header-height));
   padding-bottom: calc(var(--rrr-app-main-padding) + var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
   max-width: 72rem;
   width: 100%;
