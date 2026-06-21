@@ -188,6 +188,127 @@ main {
   margin: 0 auto;
 }
 
+#view {
+  position: relative;
+  display: grid;
+}
+
+#view > .route-view {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+#view.is-transitioning {
+  overflow: clip;
+}
+
+#view.is-transitioning > .route-view {
+  will-change: transform, opacity;
+}
+
+.route-view-enter-sub-forward {
+  animation: route-view-enter-sub-forward var(--rrr-transition-fromto) both;
+}
+
+.route-view-exit-sub-forward {
+  animation: route-view-exit-sub-forward var(--rrr-transition-fromto) both;
+}
+
+.route-view-enter-sub-back {
+  animation: route-view-enter-sub-back var(--rrr-transition-fromto) both;
+}
+
+.route-view-exit-sub-back {
+  animation: route-view-exit-sub-back var(--rrr-transition-fromto) both;
+}
+
+.route-view-enter-main-switch {
+  animation: route-view-enter-main-switch var(--rrr-transition-fromto) both;
+}
+
+.route-view-exit-main-switch {
+  animation: route-view-exit-main-switch var(--rrr-transition-fromto) both;
+}
+
+@keyframes route-view-enter-sub-forward {
+  from {
+    opacity: 0;
+    transform: translateX(18%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes route-view-exit-sub-forward {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-12%);
+  }
+}
+
+@keyframes route-view-enter-sub-back {
+  from {
+    opacity: 0;
+    transform: translateX(-18%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes route-view-exit-sub-back {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(12%);
+  }
+}
+
+@keyframes route-view-enter-main-switch {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes route-view-exit-main-switch {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-0.75rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #view.is-transitioning > .route-view {
+    animation: none;
+    transform: none;
+  }
+}
+
 /* ── Options panel (side drawer, mobile-first) ───────────────────────── */
 
 .options-panel {

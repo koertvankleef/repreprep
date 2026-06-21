@@ -40,10 +40,13 @@ type Route =
   | { name: 'styleguide' }
   | { name: 'settings' }
 
+type RouteTransition = 'none' | 'sub-forward' | 'sub-back' | 'main-switch'
+
 const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
 
 export class RrrApp extends HTMLElement {
   private route: Route = { name: 'workouts' }
+  private previousRoute: Route | null = null
   private displayPreferences: DisplayPreferences = loadDisplayPreferences()
   private installPromptEvent: BeforeInstallPromptEvent | null = null
   private installAvailable = false
@@ -51,6 +54,7 @@ export class RrrApp extends HTMLElement {
   private stopWatchingSystemThemePreference: (() => void) | null = null
   private readonly styleguideEnabled = import.meta.env.DEV || localHosts.has(window.location.hostname)
   private optionsPanelOpen = false
+  private shellRendered = false
   private settingsReturnHash = '#/workouts'
   private readonly router = createHashRouter({
     routes: appRoutes,
@@ -222,6 +226,7 @@ export class RrrApp extends HTMLElement {
     if (this.isStandalone) {
       this.installAvailable = false
     }
+    this.render()
     this.router.start()
   }
 
@@ -366,11 +371,246 @@ export class RrrApp extends HTMLElement {
     const ariaCurrent = linkStateClass ? ' aria-current="page"' : ''
 
     return `
-      <a class="${activeClass}" href="${href}"${ariaCurrent}>
+      <a class="${activeClass}" data-route-name="${routeName}" href="${href}"${ariaCurrent}>
         <rrr-icon name="${iconName}"></rrr-icon>
         <span>${label}</span>
       </a>
     `
+  }
+
+  private renderPrimaryNav(): string {
+    return `
+      ${this.renderNavLink('workouts', '#/workouts', t('app.nav.today'), 'calendar-date')}
+      ${this.renderNavLink('routines', '#/routines', t('app.nav.routines'), 'clipboard')}
+      ${this.renderNavLink('exercises', '#/exercises', t('app.nav.exercises'), 'compose')}
+      ${this.renderNavLink('history', '#/history', t('app.nav.history'), 'data-trending')}
+    `
+  }
+
+  private routeDepth(route: Route): number {
+    if (route.name === 'workout-edit' || route.name === 'workout-log' || route.name === 'routine-new' || route.name === 'routine-edit' || route.name === 'settings') {
+      return 1
+    }
+
+    return 0
+  }
+
+  private isMainRoute(route: Route): boolean {
+    return route.name === 'workouts' || route.name === 'routines' || route.name === 'exercises' || route.name === 'history'
+  }
+
+  private computeRouteTransition(from: Route | null, to: Route): RouteTransition {
+    if (!from || from.name === to.name) {
+      return 'none'
+    }
+
+    if (this.isMainRoute(from) && this.isMainRoute(to)) {
+      return 'main-switch'
+    }
+
+    const fromDepth = this.routeDepth(from)
+    const toDepth = this.routeDepth(to)
+
+    if (toDepth > fromDepth) {
+      return 'sub-forward'
+    }
+
+    if (toDepth < fromDepth) {
+      return 'sub-back'
+    }
+
+    return 'sub-forward'
+  }
+
+  private isSameRoute(a: Route, b: Route): boolean {
+    if (a.name !== b.name) {
+      return false
+    }
+
+    if (a.name === 'workout-edit' && b.name === 'workout-edit') {
+      return a.workoutId === b.workoutId
+    }
+
+    if (a.name === 'workout-log' && b.name === 'workout-log') {
+      return a.workoutId === b.workoutId
+    }
+
+    if (a.name === 'routine-edit' && b.name === 'routine-edit') {
+      return a.routineId === b.routineId
+    }
+
+    return true
+  }
+
+  private createRouteViewElement(route: Route): HTMLElement {
+    if (route.name === 'workouts') {
+      return document.createElement('rrr-workout-list')
+    }
+
+    if (route.name === 'workout-edit') {
+      const editor = document.createElement('rrr-workout-editor') as HTMLElement & { workoutId: string | null }
+      editor.workoutId = route.workoutId
+      return editor
+    }
+
+    if (route.name === 'workout-log') {
+      const logger = document.createElement('rrr-workout-logging') as HTMLElement & { workoutId: string | null }
+      logger.workoutId = route.workoutId
+      return logger
+    }
+
+    if (route.name === 'exercises') {
+      return document.createElement('rrr-exercise-catalogue')
+    }
+
+    if (route.name === 'history') {
+      return document.createElement('rrr-exercise-history')
+    }
+
+    if (route.name === 'routines') {
+      return document.createElement('rrr-routine-list')
+    }
+
+    if (route.name === 'routine-new') {
+      return document.createElement('rrr-routine-editor')
+    }
+
+    if (route.name === 'routine-edit') {
+      const editor = document.createElement('rrr-routine-editor') as HTMLElement & { routineId: string | null }
+      editor.routineId = route.routineId
+      return editor
+    }
+
+    if (route.name === 'styleguide') {
+      return document.createElement('rrr-styleguide')
+    }
+
+    if (route.name === 'settings') {
+      const settingsEl = document.createElement('rrr-settings')
+      settingsEl.setAttribute('theme', this.displayPreferences.theme)
+      settingsEl.setAttribute('contrast', this.displayPreferences.contrast)
+      settingsEl.setAttribute('styleguide-enabled', this.styleguideEnabled ? 'true' : 'false')
+      return settingsEl
+    }
+
+    return document.createElement('rrr-import-export')
+  }
+
+  private updateShellState(route: Route): void {
+    const headerTitle = this.shadowRoot?.querySelector<HTMLElement>('.app-header-title')
+    if (headerTitle) {
+      headerTitle.textContent = this.getHeaderTitle(route)
+    }
+
+    const backButton = this.shadowRoot?.querySelector<HTMLElement>('.header-back')
+    const backHref = this.getBackHref()
+    if (backButton) {
+      backButton.setAttribute('aria-hidden', backHref === null ? 'true' : 'false')
+      if (backHref === null) {
+        backButton.setAttribute('tabindex', '-1')
+      } else {
+        backButton.removeAttribute('tabindex')
+      }
+    }
+
+    const links = this.shadowRoot?.querySelectorAll<HTMLAnchorElement>('.primary-nav .nav-link[data-route-name]')
+    links?.forEach((link) => {
+      const routeName = link.dataset.routeName as Route['name'] | undefined
+      if (!routeName) {
+        return
+      }
+
+      const isActive = this.linkClass(routeName, route.name) !== ''
+      link.classList.toggle('active', isActive)
+      if (isActive) {
+        link.setAttribute('aria-current', 'page')
+      } else {
+        link.removeAttribute('aria-current')
+      }
+    })
+
+    const optionsBody = this.shadowRoot?.querySelector<HTMLElement>('.options-panel-body')
+    if (optionsBody) {
+      optionsBody.innerHTML = this.renderOptionsPanelContent(route)
+    }
+  }
+
+  private mountRouteView(route: Route, transition: RouteTransition): void {
+    const viewHost = this.shadowRoot?.querySelector<HTMLElement>('#view')
+    if (!viewHost) {
+      return
+    }
+
+    const currentView = viewHost.querySelector<HTMLElement>('.route-view-current')
+    const nextView = this.createRouteViewElement(route)
+    nextView.classList.add('route-view', 'route-view-current')
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!currentView || transition === 'none' || reduceMotion) {
+      viewHost.replaceChildren(nextView)
+      return
+    }
+
+    currentView.classList.remove('route-view-current')
+    currentView.classList.add(`route-view-exit-${transition}`)
+    nextView.classList.add(`route-view-enter-${transition}`)
+    viewHost.classList.add('is-transitioning')
+    viewHost.append(nextView)
+
+    const finish = (): void => {
+      currentView.remove()
+      nextView.classList.remove(`route-view-enter-${transition}`)
+      viewHost.classList.remove('is-transitioning')
+    }
+
+    nextView.addEventListener('animationend', finish, { once: true })
+  }
+
+  private renderShell(route: Route): void {
+    if (!this.shadowRoot) {
+      return
+    }
+
+    this.shadowRoot.innerHTML = `
+      <style>${styles}</style>
+      <div class="shell">
+        <nav>
+          <div class="primary-nav">
+            ${this.renderPrimaryNav()}
+          </div>
+          <div class="nav-utilities">
+            ${this.renderThemeControls()}
+            ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="outline" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
+          </div>
+        </nav>
+        <header class="app-header">
+          <rrr-button type="button" variant="ghost" tone="neutral" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}" aria-hidden="${this.getBackHref() === null ? 'true' : 'false'}" ${this.getBackHref() === null ? 'tabindex="-1"' : ''}><rrr-icon name="arrow-left"></rrr-icon></rrr-button>
+          <h1 class="app-header-title">${this.getHeaderTitle(route)}</h1>
+          <rrr-button type="button" variant="ghost" tone="neutral" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
+        </header>
+        <main>
+          <div id="view"></div>
+        </main>
+        <dialog class="options-panel" aria-label="${t('app.options.title')}">
+          <header class="options-panel-header">
+            <span class="options-panel-title">${t('app.options.title')}</span>
+            <rrr-button type="button" variant="ghost" data-action="close-options" aria-label="${t('app.options.close')}" title="${t('app.options.close')}"><rrr-icon name="dismiss"></rrr-icon></rrr-button>
+          </header>
+          <div class="options-panel-body">
+            ${this.renderOptionsPanelContent(route)}
+          </div>
+        </dialog>
+      </div>
+    `
+
+    const panel = this.shadowRoot.querySelector<HTMLDialogElement>('.options-panel')
+    if (panel) {
+      panel.addEventListener('close', () => {
+        this.optionsPanelOpen = false
+      })
+    }
+
+    this.shellRendered = true
   }
 
   private getHeaderTitle(route: Route): string {
@@ -430,124 +670,41 @@ export class RrrApp extends HTMLElement {
   }
 
   private render(): void {
+    const route = this.route
     if (!this.shadowRoot) {
       return
     }
 
-    const route = this.route
+    if (!this.shellRendered) {
+      this.renderShell(route)
+      this.mountRouteView(route, 'none')
+      this.previousRoute = route
+      return
+    }
 
-    this.shadowRoot.innerHTML = `
-      <style>${styles}</style>
-      <div class="shell">
-        <nav>
-          <div class="primary-nav">
-            ${this.renderNavLink('workouts', '#/workouts', t('app.nav.today'), 'calendar-date')}
-            ${this.renderNavLink('routines', '#/routines', t('app.nav.routines'), 'clipboard')}
-            ${this.renderNavLink('exercises', '#/exercises', t('app.nav.exercises'), 'compose')}
-            ${this.renderNavLink('history', '#/history', t('app.nav.history'), 'data-trending')}
-          </div>
-          <div class="nav-utilities">
-            ${this.renderThemeControls()}
-            ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="outline" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
-          </div>
-        </nav>
-        <header class="app-header">
-          <rrr-button type="button" variant="ghost" tone="neutral" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}" aria-hidden="${this.getBackHref() === null ? 'true' : 'false'}" ${this.getBackHref() === null ? 'tabindex="-1"' : ''}><rrr-icon name="arrow-left"></rrr-icon></rrr-button>
-          <h1 class="app-header-title">${this.getHeaderTitle(route)}</h1>
-          <rrr-button type="button" variant="ghost" tone="neutral" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
-        </header>
-        <main>
-          <div id="view"></div>
-        </main>
-        <dialog class="options-panel" aria-label="${t('app.options.title')}">
-          <header class="options-panel-header">
-            <span class="options-panel-title">${t('app.options.title')}</span>
-            <rrr-button type="button" variant="ghost" data-action="close-options" aria-label="${t('app.options.close')}" title="${t('app.options.close')}"><rrr-icon name="dismiss"></rrr-icon></rrr-button>
-          </header>
-          <div class="options-panel-body">
-            ${this.renderOptionsPanelContent(route)}
-          </div>
-        </dialog>
-      </div>
-    `
+    this.updateShellState(route)
+    const previousRoute = this.previousRoute
+    const routeChanged = !previousRoute || !this.isSameRoute(previousRoute, route)
 
-    const view = this.shadowRoot.querySelector<HTMLDivElement>('#view')
+    if (routeChanged) {
+      this.mountRouteView(route, this.computeRouteTransition(previousRoute, route))
+    }
 
-    const panel = this.shadowRoot.querySelector<HTMLDialogElement>('.options-panel')
-    if (panel) {
-      panel.addEventListener('close', () => {
-        this.optionsPanelOpen = false
-      }, { once: true })
-      if (this.optionsPanelOpen) {
-        panel.showModal()
+    if (!routeChanged && route.name === 'settings') {
+      const settingsEl = this.shadowRoot.querySelector<HTMLElement>('#view > .route-view-current > rrr-settings')
+      if (settingsEl) {
+        settingsEl.setAttribute('theme', this.displayPreferences.theme)
+        settingsEl.setAttribute('contrast', this.displayPreferences.contrast)
+        settingsEl.setAttribute('styleguide-enabled', this.styleguideEnabled ? 'true' : 'false')
       }
     }
 
-    if (!view) {
-      return
-    }
+    this.previousRoute = route
 
-    if (route.name === 'workouts') {
-      view.append(document.createElement('rrr-workout-list'))
-      return
+    const panel = this.shadowRoot.querySelector<HTMLDialogElement>('.options-panel')
+    if (panel && this.optionsPanelOpen && !panel.open) {
+      panel.showModal()
     }
-
-    if (route.name === 'workout-edit') {
-      const editor = document.createElement('rrr-workout-editor') as HTMLElement & { workoutId: string | null }
-      editor.workoutId = route.workoutId
-      view.append(editor)
-      return
-    }
-
-    if (route.name === 'workout-log') {
-      const logger = document.createElement('rrr-workout-logging') as HTMLElement & { workoutId: string | null }
-      logger.workoutId = route.workoutId
-      view.append(logger)
-      return
-    }
-
-    if (route.name === 'exercises') {
-      view.append(document.createElement('rrr-exercise-catalogue'))
-      return
-    }
-
-    if (route.name === 'history') {
-      view.append(document.createElement('rrr-exercise-history'))
-      return
-    }
-
-    if (route.name === 'routines') {
-      view.append(document.createElement('rrr-routine-list'))
-      return
-    }
-
-    if (route.name === 'routine-new') {
-      view.append(document.createElement('rrr-routine-editor'))
-      return
-    }
-
-    if (route.name === 'routine-edit') {
-      const editor = document.createElement('rrr-routine-editor') as HTMLElement & { routineId: string | null }
-      editor.routineId = route.routineId
-      view.append(editor)
-      return
-    }
-
-    if (route.name === 'styleguide') {
-      view.append(document.createElement('rrr-styleguide'))
-      return
-    }
-
-    if (route.name === 'settings') {
-      const settingsEl = document.createElement('rrr-settings')
-      settingsEl.setAttribute('theme', this.displayPreferences.theme)
-      settingsEl.setAttribute('contrast', this.displayPreferences.contrast)
-      settingsEl.setAttribute('styleguide-enabled', this.styleguideEnabled ? 'true' : 'false')
-      view.append(settingsEl)
-      return
-    }
-
-    view.append(document.createElement('rrr-import-export'))
   }
 }
 
