@@ -588,7 +588,7 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
       }
       if (adapter.confirmButton) {
         adapter.confirmButton.disabled = !viewModel.isActiveSet
-        adapter.confirmButton.textContent = viewModel.confirmLabel
+        this.setRrrButtonLabel(adapter.confirmButton, viewModel.confirmLabel)
         adapter.confirmButton.setAttribute('aria-label', viewModel.confirmLabel)
       }
       if (adapter.startRestNowButton) {
@@ -656,7 +656,6 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
       adapter.primaryActionEl.dataset.action = viewModel.primaryAction
       adapter.primaryActionEl.setAttribute('aria-label', viewModel.primaryLabel)
       adapter.primaryActionEl.setAttribute('title', viewModel.primaryLabel)
-      adapter.primaryActionEl.innerHTML = '<rrr-icon name="stop"></rrr-icon>'
       adapter.primaryActionEl.toggleAttribute('disabled', !viewModel.showPrimaryAction)
       adapter.primaryActionEl.toggleAttribute('aria-hidden', !viewModel.showPrimaryAction)
     }
@@ -685,7 +684,6 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
       adapter.primaryActionEl.dataset.action = viewModel.transitionPrimaryAction
       adapter.primaryActionEl.setAttribute('aria-label', viewModel.transitionPrimaryLabel)
       adapter.primaryActionEl.setAttribute('title', viewModel.transitionPrimaryLabel)
-      adapter.primaryActionEl.innerHTML = '<rrr-icon name="stop"></rrr-icon>'
       adapter.primaryActionEl.toggleAttribute('disabled', !viewModel.showPrimaryAction)
       adapter.primaryActionEl.toggleAttribute('aria-hidden', !viewModel.showPrimaryAction)
     }
@@ -722,6 +720,16 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
     }
 
     element.removeAttribute('aria-hidden')
+  }
+
+  private setRrrButtonLabel(buttonHost: HTMLElement, label: string): void {
+    const innerButton = buttonHost.querySelector<HTMLButtonElement>('button[data-rrr-button-inner]')
+    if (innerButton) {
+      innerButton.textContent = label
+      return
+    }
+
+    buttonHost.textContent = label
   }
 
   private announce(message: string): void {
