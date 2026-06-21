@@ -30,110 +30,6 @@
   align-items: stretch;
 }
 
-.sg-button {
-  border: var(--rrr-border-width) solid transparent;
-  border-radius: var(--rrr-radius-s);
-  padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
-  font: inherit;
-  font-weight: var(--rrr-font-weight-normal);
-  cursor: pointer;
-  transition: background var(--rrr-transition-default), color var(--rrr-transition-default), border-color var(--rrr-transition-default), box-shadow var(--rrr-transition-default);
-}
-
-.sg-button--solid {
-  color: var(--rrr-colors-grayscale-00);
-  box-shadow: var(--rrr-depth-1-shadow);
-}
-
-.sg-button--outline {
-  background: var(--rrr-colors-grayscale-00);
-  box-shadow: none;
-}
-
-.sg-button--ghost {
-  background: transparent;
-  box-shadow: none;
-}
-
-.sg-button--tone-info.sg-button--solid {
-  background: var(--rrr-colors-context-info-60);
-  border-color: var(--rrr-colors-context-info-70);
-}
-
-.sg-button--tone-info.sg-button--solid:hover {
-  background: var(--rrr-colors-context-info-70);
-  border-color: var(--rrr-colors-context-info-80);
-}
-
-.sg-button--tone-success.sg-button--solid {
-  background: var(--rrr-colors-context-success-60);
-  border-color: var(--rrr-colors-context-success-70);
-}
-
-.sg-button--tone-success.sg-button--solid:hover {
-  background: var(--rrr-colors-context-success-70);
-  border-color: var(--rrr-colors-context-success-80);
-}
-
-.sg-button--tone-warning.sg-button--solid {
-  background: var(--rrr-colors-context-warning-60);
-  border-color: var(--rrr-colors-context-warning-70);
-}
-
-.sg-button--tone-warning.sg-button--solid:hover {
-  background: var(--rrr-colors-context-warning-70);
-  border-color: var(--rrr-colors-context-warning-80);
-}
-
-.sg-button--tone-danger.sg-button--solid {
-  background: var(--rrr-colors-context-danger-60);
-  border-color: var(--rrr-colors-context-danger-70);
-}
-
-.sg-button--tone-danger.sg-button--solid:hover {
-  background: var(--rrr-colors-context-danger-70);
-  border-color: var(--rrr-colors-context-danger-80);
-}
-
-.sg-button--tone-neutral.sg-button--outline {
-  color: var(--rrr-colors-grayscale-90);
-  border-color: var(--rrr-colors-grayscale-40);
-}
-
-.sg-button--tone-neutral.sg-button--outline:hover {
-  color: var(--rrr-colors-grayscale-100);
-  border-color: var(--rrr-colors-grayscale-50);
-  background: var(--rrr-colors-grayscale-20);
-}
-
-.sg-button--tone-accent.sg-button--ghost {
-  color: var(--rrr-colors-serene-mint-80);
-  border-color: var(--rrr-colors-serene-mint-20);
-  background: var(--rrr-colors-serene-mint-10);
-}
-
-.sg-button--tone-accent.sg-button--ghost:hover {
-  color: var(--rrr-colors-serene-mint-90);
-  border-color: var(--rrr-colors-serene-mint-30);
-  background: var(--rrr-colors-serene-mint-20);
-}
-
-.sg-button--tone-primary.sg-button--ghost {
-  color: var(--rrr-colors-activity-indigo-80);
-  border-color: var(--rrr-colors-activity-indigo-20);
-  background: var(--rrr-colors-activity-indigo-10);
-}
-
-.sg-button--tone-primary.sg-button--ghost:hover {
-  color: var(--rrr-colors-activity-indigo-90);
-  border-color: var(--rrr-colors-activity-indigo-30);
-  background: var(--rrr-colors-activity-indigo-20);
-}
-
-.sg-button:hover {
-  box-shadow: var(--rrr-depth-2-shadow);
-}
-
 .role-row {
   border-bottom: var(--rrr-border-width) dashed var(--rrr-colors-grayscale-40);
   padding-bottom: var(--rrr-spacing-s);
@@ -181,10 +77,6 @@
 
 .swatch[data-swatch-dark="true"] {
   color: var(--rrr-colors-grayscale-00);
-}
-
-.swatch + .swatch {
-  border-top: var(--rrr-border-width) solid color-mix(in oklch, var(--rrr-colors-grayscale-100) 10%, transparent);
 }
 
 .swatch-meta {

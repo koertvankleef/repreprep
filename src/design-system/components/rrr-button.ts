@@ -1,25 +1,6 @@
 import styles from './rrr-button.css?inline'
 import { defineCustomElementOnce, reflectDisabled } from './shared.ts'
-
-const styledRoots = new WeakSet<Document | ShadowRoot>()
-
-function ensureButtonStyles(root: Document | ShadowRoot): void {
-  if (styledRoots.has(root)) {
-    return
-  }
-
-  const style = document.createElement('style')
-  style.setAttribute('data-rrr-button-styles', 'true')
-  style.textContent = styles
-
-  if (root instanceof ShadowRoot) {
-    root.appendChild(style)
-  } else {
-    root.head.appendChild(style)
-  }
-
-  styledRoots.add(root)
-}
+import { ensureStyleInRoot } from './style-manager.ts'
 
 export class RrrButton extends HTMLElement {
   static observedAttributes = ['aria-label', 'aria-pressed', 'title', 'disabled']
@@ -34,7 +15,7 @@ export class RrrButton extends HTMLElement {
   connectedCallback(): void {
     const root = this.getRootNode()
     if (root instanceof Document || root instanceof ShadowRoot) {
-      ensureButtonStyles(root)
+      ensureStyleInRoot(root, 'rrr-button', styles)
     }
 
     if (!this.isInitialized) {
