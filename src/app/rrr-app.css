@@ -19,7 +19,7 @@
   --rrr-app-link-font-size-mobile: 0.62rem;
   --rrr-app-link-font-size-desktop: var(--rrr-font-size-s);
   --rrr-app-bottom-nav-height: 4.75rem;
-  --rrr-app-header-height: 3rem;
+  --rrr-app-header-height: 3.25rem;
   --rrr-app-link-font-family: var(--rrr-font-family-heading);
   --rrr-app-main-padding: var(--rrr-spacing-l);
   --rrr-app-control-radius: var(--rrr-radius-s);
@@ -135,6 +135,8 @@ nav {
   gap: var(--rrr-spacing-s);  
   padding-top: calc(0 + env(safe-area-inset-top));
   background: var(--rrr-colors-activity-indigo-60);
+  --rrr-button-min-block-size: var(--rrr-app-header-height);
+  /* --rrr-button-icon-size: 1.2rem; */
   --rrr-button-neutral-bg: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-bg-hover: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-fg: var(--rrr-color-primary-contrast);

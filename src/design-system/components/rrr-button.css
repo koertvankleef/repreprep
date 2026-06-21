@@ -1,9 +1,12 @@
 rrr-button {
   display: inline-block;
   --rrr-button-radius: var(--rrr-radius-s);
-  --rrr-button-padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
+  --rrr-button-padding-block: calc(var(--rrr-spacing-s) - var(--rrr-spacing-2xs));
+  --rrr-button-padding-inline: var(--rrr-spacing-l);
+  --rrr-button-padding: var(--rrr-button-padding-block) var(--rrr-button-padding-inline);
   --rrr-button-border-width: var(--rrr-border-width);
   --rrr-button-min-block-size: var(--rrr-control-min-block-size);
+  --rrr-button-icon-size: 1.25rem;
   --rrr-button-shadow: var(--rrr-shadow-button);
   --rrr-button-transition: var(--rrr-transition-default);
   --rrr-button-hover-shadow: var(--rrr-depth-2-shadow);
@@ -76,6 +79,10 @@ rrr-button > button[data-rrr-button-inner] {
   align-items: center;
   gap: var(--rrr-spacing-s);
   transition: background var(--rrr-button-transition), border-color var(--rrr-button-transition), color var(--rrr-button-transition), box-shadow var(--rrr-button-transition), transform var(--rrr-button-transition);
+}
+
+rrr-button > button[data-rrr-button-inner] > rrr-icon {
+  font-size: var(--rrr-button-icon-size);
 }
 
 rrr-button[icon-only] > button[data-rrr-button-inner] {
