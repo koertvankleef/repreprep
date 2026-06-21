@@ -19,7 +19,7 @@
   --rrr-app-link-font-size-mobile: 0.62rem;
   --rrr-app-link-font-size-desktop: var(--rrr-font-size-s);
   --rrr-app-bottom-nav-height: 4.75rem;
-  --rrr-app-header-height: 3.25rem;
+  --rrr-app-header-height: 3rem;
   --rrr-app-link-font-family: var(--rrr-font-family-heading);
   --rrr-app-main-padding: var(--rrr-spacing-l);
   --rrr-app-control-radius: var(--rrr-radius-s);
@@ -41,6 +41,7 @@ nav {
   display: flex;
   flex-direction: column;
   gap: var(--rrr-spacing-s);
+  padding-bottom: env(safe-area-inset-bottom);
   background: var(--rrr-app-nav-background);
   box-shadow: var(--rrr-app-nav-shadow);
   align-items: stretch;
@@ -131,9 +132,12 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--rrr-spacing-s);
-  padding-top: calc(var(--rrr-spacing-xs) + env(safe-area-inset-top));
+  gap: var(--rrr-spacing-s);  
+  padding-top: calc(0 + env(safe-area-inset-top));
   background: var(--rrr-colors-activity-indigo-60);
+  --rrr-button-neutral-bg: var(--rrr-color-primary-contrast);
+  --rrr-button-neutral-bg-hover: var(--rrr-color-primary-contrast);
+  --rrr-button-neutral-fg: var(--rrr-color-primary-contrast);
   box-shadow: var(--rrr-app-nav-shadow);
   font-family: var(--rrr-app-link-font-family);
 }

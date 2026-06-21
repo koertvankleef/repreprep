@@ -396,8 +396,8 @@ export class RrrApp extends HTMLElement {
           </div>
         </nav>
         <header class="app-header">
-          <rrr-button type="button" variant="ghost" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}" aria-hidden="${this.getBackHref() === null ? 'true' : 'false'}" ${this.getBackHref() === null ? 'tabindex="-1"' : ''}><rrr-icon name="arrow-left"></rrr-icon></rrr-button>
-          <rrr-button type="button" variant="ghost" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
+          <rrr-button type="button" variant="ghost" tone="neutral" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}" aria-hidden="${this.getBackHref() === null ? 'true' : 'false'}" ${this.getBackHref() === null ? 'tabindex="-1"' : ''}><rrr-icon name="arrow-left"></rrr-icon></rrr-button>
+          <rrr-button type="button" variant="ghost" tone="neutral" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
         </header>
         <main>
           <div id="view"></div>
