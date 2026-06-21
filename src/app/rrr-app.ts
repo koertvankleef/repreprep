@@ -311,6 +311,19 @@ export class RrrApp extends HTMLElement {
     return import.meta.env.DEV || this.installAvailable
   }
 
+  private renderNavLink(routeName: Route['name'], href: string, label: string, iconName: string): string {
+    const linkStateClass = this.linkClass(routeName, this.route.name)
+    const activeClass = linkStateClass ? 'nav-link active' : 'nav-link'
+    const ariaCurrent = linkStateClass ? ' aria-current="page"' : ''
+
+    return `
+      <a class="${activeClass}" href="${href}"${ariaCurrent}>
+        <rrr-icon name="${iconName}"></rrr-icon>
+        <span>${label}</span>
+      </a>
+    `
+  }
+
   private render(): void {
     if (!this.shadowRoot) {
       return
@@ -322,15 +335,26 @@ export class RrrApp extends HTMLElement {
       <style>${styles}</style>
       <div class="shell">
         <nav>
-          <a class="${this.linkClass('workouts', route.name)}" href="#/workouts">${t('app.nav.workouts')}</a>
-          <a class="${this.linkClass('routines', route.name)}" href="#/routines">${t('app.nav.routines')}</a>
-          <a class="${this.linkClass('exercises', route.name)}" href="#/exercises">${t('app.nav.exercises')}</a>
-          <a class="${this.linkClass('history', route.name)}" href="#/history">${t('app.nav.history')}</a>
-          <a class="${this.linkClass('import-export', route.name)}" href="#/import-export">${t('app.nav.importExport')}</a>
-          ${this.styleguideEnabled ? `<a class="${this.linkClass('styleguide', route.name)}" href="#/styleguide">${t('app.nav.styleguide')}</a>` : ''}
-          ${this.renderThemeControls()}
-          ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="outline" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
+          <div class="primary-nav">
+            ${this.renderNavLink('workouts', '#/workouts', t('app.nav.today'), 'calendar-date')}
+            ${this.renderNavLink('routines', '#/routines', t('app.nav.routines'), 'clipboard')}
+            ${this.renderNavLink('exercises', '#/exercises', t('app.nav.exercises'), 'compose')}
+            ${this.renderNavLink('history', '#/history', t('app.nav.history'), 'data-trending')}
+            ${this.renderNavLink('import-export', '#/import-export', t('app.nav.importExport'), 'arrow-export-up')}
+            ${this.styleguideEnabled ? this.renderNavLink('styleguide', '#/styleguide', t('app.nav.styleguide'), 'braces') : ''}
+          </div>
+          <div class="nav-utilities">
+            ${this.renderThemeControls()}
+            ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="outline" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
+          </div>
         </nav>
+        <header class="app-header">
+          <div class="header-utilities">
+            ${this.renderThemeControls()}
+            ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="outline" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
+          </div>
+          <rrr-button type="button" variant="ghost" class="options-trigger" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
+        </header>
         <main>
           <div id="view"></div>
         </main>

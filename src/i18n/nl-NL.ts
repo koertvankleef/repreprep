@@ -52,6 +52,7 @@ export const nlNlMessages = {
     context: 'Field label for elapsed time in seconds',
   },
 
+  'app.nav.today': 'Vandaag',
   'app.nav.workouts': 'Workouts',
   'app.nav.routines': 'Routines',
   'app.nav.exercises': 'Oefeningen',
@@ -68,6 +69,7 @@ export const nlNlMessages = {
   'app.theme.auto': 'Automatische modus',
   'app.theme.contrastNormal': 'Normaal contrast',
   'app.theme.contrastHigh': 'Hoog contrast',
+  'app.header.options': 'Meer opties',
 
   'styleguide.title': 'Stijlgids',
   'styleguide.subtitle': 'Design-system speelplaats voor lokaal ontwikkelen en componentcontrole.',

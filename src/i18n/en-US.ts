@@ -52,6 +52,7 @@ export const enUsMessages = {
     context: 'Field label for elapsed time in seconds',
   },
 
+  'app.nav.today': 'Today',
   'app.nav.workouts': 'Workouts',
   'app.nav.routines': 'Routines',
   'app.nav.exercises': 'Exercises',
@@ -68,6 +69,7 @@ export const enUsMessages = {
   'app.theme.auto': 'Automatic mode',
   'app.theme.contrastNormal': 'Normal contrast',
   'app.theme.contrastHigh': 'High contrast',
+  'app.header.options': 'More options',
 
   'styleguide.title': 'Styleguide',
   'styleguide.subtitle': 'Design-system playground for local development and component review.',

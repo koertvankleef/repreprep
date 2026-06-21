@@ -1,21 +1,25 @@
 :host {
   display: block;
   min-height: 100vh;
-  --rrr-app-nav-gap: var(--rrr-spacing-s);
-  --rrr-app-nav-padding: var(--rrr-spacing-s);
+  --rrr-app-nav-gap: var(--rrr-spacing-2xs);
+  --rrr-app-nav-padding: 0 var(--rrr-spacing-s);
   --rrr-app-nav-background: var(--rrr-colors-grayscale-00);
-  --rrr-app-nav-border-width: var(--rrr-border-width);
+  --rrr-app-nav-border-width: var(--rrr-spacing-xs);
   --rrr-app-nav-border-color: var(--rrr-colors-grayscale-30);
-  --rrr-app-nav-shadow: var(--rrr-shadow-card);
-  --rrr-app-link-padding: var(--rrr-spacing-xs) var(--rrr-spacing-m);
-  --rrr-app-link-radius: var(--rrr-radius-xl);
-  --rrr-app-link-color: var(--rrr-colors-grayscale-90);
+  --rrr-app-nav-shadow: var(--rrr-depth-3-shadow);
+  --rrr-app-link-padding: var(--rrr-spacing-2xs) var(--rrr-spacing-2xs);
+  --rrr-app-link-radius: var(--rrr-radius-m);
+  --rrr-app-link-color: var(--rrr-colors-grayscale-80);
   --rrr-app-link-transition: var(--rrr-transition-default);
   --rrr-app-link-hover-background: var(--rrr-colors-activity-indigo-10);
   --rrr-app-link-hover-color: var(--rrr-colors-activity-indigo-80);
   --rrr-app-link-active-background: var(--rrr-colors-activity-indigo-60);
-  --rrr-app-link-active-color: var(--rrr-color-primary-contrast);
+  --rrr-app-link-active-color: var(--rrr-colors-activity-indigo-80);
   --rrr-app-link-active-shadow: var(--rrr-shadow-button);
+  --rrr-app-link-font-size-mobile: 0.62rem;
+  --rrr-app-link-font-size-desktop: var(--rrr-font-size-s);
+  --rrr-app-bottom-nav-height: 4.75rem;
+  --rrr-app-header-height: 3.25rem;
   --rrr-app-link-font-family: var(--rrr-font-family-heading);
   --rrr-app-main-padding: var(--rrr-spacing-l);
   --rrr-app-control-radius: var(--rrr-radius-s);
@@ -23,55 +27,84 @@
 
 .shell {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: var(--rrr-app-header-height) 1fr;
+  grid-template-areas:
+    "header"
+    "main";
   min-height: 100dvh;
 }
 
 nav {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 30;
   display: flex;
-  gap: var(--rrr-app-nav-gap);
-  padding: var(--rrr-app-nav-padding);
+  flex-direction: column;
+  gap: var(--rrr-spacing-s);
   background: var(--rrr-app-nav-background);
-  border-bottom: var(--rrr-app-nav-border-width) solid var(--rrr-app-nav-border-color);
   box-shadow: var(--rrr-app-nav-shadow);
-  flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
   font-family: var(--rrr-app-link-font-family);
+  overflow: auto;
 }
 
-nav rrr-button {
-  margin-left: 0;
-  width: auto;
+.primary-nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: var(--rrr-app-nav-gap);
+  align-items: stretch;
 }
 
-nav rrr-button[data-action="install-app"] {
-  width: 100%;
-}
-
-nav a {
+.nav-link {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 0.15rem;
+  min-block-size: calc(var(--rrr-app-bottom-nav-height) - 1.5rem);
   padding: var(--rrr-app-link-padding);
-  border-radius: var(--rrr-app-link-radius);
+  border-top: var(--rrr-spacing-xs) solid transparent;
   text-decoration: none;
   color: var(--rrr-app-link-color);
   transition: background var(--rrr-app-link-transition), color var(--rrr-app-link-transition), box-shadow var(--rrr-app-link-transition);
 }
 
-nav a:hover {
+.nav-link rrr-icon {
+  font-size: 1.15rem;
+}
+
+.nav-link span {
+  text-align: center;
+  font-size: var(--rrr-app-link-font-size-mobile);
+  line-height: 1.5;
+  max-inline-size: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-link:hover {
   background: var(--rrr-app-link-hover-background);
   color: var(--rrr-app-link-hover-color);
 }
 
-nav a.active {
-  background: var(--rrr-app-link-active-background);
+.nav-link.active {
+  border-color: var(--rrr-app-link-active-background);
   color: var(--rrr-app-link-active-color);
-  box-shadow: var(--rrr-app-link-active-shadow);
+}
+
+.nav-utilities {
+  /* on mobile nav-utilities are hidden — they live in the header instead */
+  display: none;
+}
+
+.nav-utilities > rrr-button[data-action="install-app"] {
+  width: auto;
 }
 
 .nav-controls {
   display: grid;
   grid-template-columns: repeat(2, auto);
   gap: var(--rrr-spacing-xs);
-  margin-left: auto;
 }
 
 .nav-control-group {
@@ -83,14 +116,45 @@ nav a.active {
   background: var(--rrr-colors-grayscale-00);
 }
 
-.nav-control-group rrr-button[aria-pressed="true"]::part(button) {
+.nav-control-group rrr-button[aria-pressed="true"] > button[data-rrr-button-inner] {
   background: var(--rrr-colors-activity-indigo-60);
   border-color: var(--rrr-colors-activity-indigo-70);
   color: var(--rrr-color-primary-contrast);
 }
 
+.app-header {
+  grid-area: header;
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 40;
+  block-size: var(--rrr-app-header-height);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--rrr-spacing-s);
+  padding: var(--rrr-spacing-xs) var(--rrr-spacing-s);
+  padding-top: calc(var(--rrr-spacing-xs) + env(safe-area-inset-top));
+  background: var(--rrr-app-nav-background);
+  box-shadow: var(--rrr-app-nav-shadow);
+  font-family: var(--rrr-app-link-font-family);
+}
+
+.header-utilities {
+  display: flex;
+  align-items: center;
+  gap: var(--rrr-spacing-xs);
+  margin-inline-end: auto;
+}
+
+.options-trigger {
+  flex-shrink: 0;
+}
+
 main {
+  grid-area: main;
   padding: var(--rrr-app-main-padding);
+  padding-top: calc(var(--rrr-app-main-padding) + var(--rrr-app-header-height));
+  padding-bottom: calc(var(--rrr-app-main-padding) + var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
   max-width: 72rem;
   width: 100%;
   box-sizing: border-box;
@@ -100,18 +164,87 @@ main {
 
 @media screen and (min-width: 48rem) {
   :host {
-    --rrr-app-nav-padding: var(--rrr-spacing-l);
-    --rrr-app-link-padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
+    --rrr-app-nav-padding: var(--rrr-spacing-l) var(--rrr-spacing-m);
+    --rrr-app-link-padding: var(--rrr-spacing-s) var(--rrr-spacing-m);
     --rrr-app-main-padding: var(--rrr-spacing-2xl);
+    --rrr-app-bottom-nav-height: 0px;
   }
 
-  nav rrr-button {
-    margin-left: 0;
-    width: auto;
+  .shell {
+    grid-template-columns: minmax(14rem, 18rem) 1fr;
+    grid-template-rows: var(--rrr-app-header-height) 1fr;
+    grid-template-areas:
+      "nav header"
+      "nav main";
   }
 
-  nav rrr-button[data-action="install-app"] {
-    margin-left: 0;
-    width: auto;
+  nav {
+    grid-area: nav;
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    inset: 0 auto 0 0;
+    block-size: 100dvh;
+    border-top: none;
+    box-shadow: var(--rrr-app-nav-shadow);
+  }
+
+  .primary-nav {
+    grid-template-columns: 1fr;
+    gap: var(--rrr-spacing-2xs);
+  }
+
+  .nav-link {
+    min-block-size: 2.75rem;
+    justify-items: start;
+    grid-template-columns: 1.35rem minmax(0, 1fr);
+    gap: var(--rrr-spacing-s);
+    padding: var(--rrr-app-link-padding);
+    border-right: var(--rrr-spacing-xs) solid transparent;
+    border-top: none;
+  }
+
+  .nav-link rrr-icon {
+    font-size: 1rem;
+  }
+
+  .nav-link span {
+    font-size: var(--rrr-app-link-font-size-desktop);
+    text-align: left;
+  }
+
+  .nav-utilities {
+    display: grid;
+    gap: var(--rrr-spacing-xs);
+    margin-top: auto;
+    justify-items: stretch;
+  }
+
+  .nav-utilities > rrr-button[data-action="install-app"] {
+    width: 100%;
+  }
+
+  .app-header {
+    position: static;
+    box-shadow: none;
+    border-bottom-color: transparent;
+    padding-inline-start: var(--rrr-spacing-2xl);
+  }
+
+  /* on desktop, utilities live in the sidebar — hide the duplicated header copy */
+  .header-utilities {
+    display: none;
+  }
+
+  /* contextual options live in the mobile top bar */
+  .options-trigger {
+    display: none;
+  }
+
+  main {
+    grid-area: main;
+    padding: var(--rrr-app-main-padding);
+    max-width: none;
+    margin: 0;
   }
 }
