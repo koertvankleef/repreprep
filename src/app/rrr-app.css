@@ -130,20 +130,21 @@ nav {
   block-size: var(--rrr-app-header-height);
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: var(--rrr-spacing-s);
-  padding: var(--rrr-spacing-xs) var(--rrr-spacing-s);
   padding-top: calc(var(--rrr-spacing-xs) + env(safe-area-inset-top));
-  background: var(--rrr-app-nav-background);
+  background: var(--rrr-colors-activity-indigo-60);
   box-shadow: var(--rrr-app-nav-shadow);
   font-family: var(--rrr-app-link-font-family);
 }
 
-.header-utilities {
-  display: flex;
-  align-items: center;
-  gap: var(--rrr-spacing-xs);
-  margin-inline-end: auto;
+.header-back {
+  flex-shrink: 0;
+}
+
+.header-back[aria-hidden='true'] {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .options-trigger {
@@ -214,6 +215,26 @@ main {
   flex-direction: column;
   gap: var(--rrr-spacing-2xs);
   overflow-y: auto;
+}
+
+.options-panel-section {
+  display: grid;
+  gap: var(--rrr-spacing-xs);
+  padding: var(--rrr-spacing-2xs) var(--rrr-spacing-2xs) var(--rrr-spacing-s);
+}
+
+.options-panel-section-title {
+  margin: 0;
+  font-family: var(--rrr-font-family-heading);
+  font-size: var(--rrr-font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rrr-colors-grayscale-60);
+}
+
+.options-panel .nav-controls {
+  margin: 0;
 }
 
 .options-menu-item {
@@ -305,11 +326,6 @@ main {
     box-shadow: none;
     border-bottom-color: transparent;
     padding-inline-start: var(--rrr-spacing-2xl);
-  }
-
-  /* on desktop, utilities live in the sidebar — hide the duplicated header copy */
-  .header-utilities {
-    display: none;
   }
 
   /* contextual options live in the mobile top bar */

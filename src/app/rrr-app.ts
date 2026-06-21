@@ -139,6 +139,14 @@ export class RrrApp extends HTMLElement {
       window.location.hash = '/settings'
       return
     }
+
+    if (action === 'navigate-back') {
+      const href = this.getBackHref()
+      if (href) {
+        window.location.hash = href.replace(/^#/, '')
+      }
+      return
+    }
   }
 
   private setThemeMode(theme: ThemeMode): void {
@@ -228,7 +236,6 @@ export class RrrApp extends HTMLElement {
 
   private renderThemeControls(): string {
     const theme = this.displayPreferences.theme
-    const contrast = this.displayPreferences.contrast
 
     return `
       <div class="nav-controls" aria-label="${t('app.theme.controls')}" role="group">
@@ -257,24 +264,6 @@ export class RrrApp extends HTMLElement {
             aria-label="${t('app.theme.auto')}"
             title="${t('app.theme.auto')}"
           ><rrr-icon name="arrow-sync"></rrr-icon></rrr-button></rrr-tooltip>
-        </div>
-        <div class="nav-control-group" aria-label="${t('app.theme.contrast')}" role="group">
-          <rrr-tooltip><rrr-button
-            type="button"
-            variant="ghost"
-            data-action="contrast-normal"
-            aria-pressed="${contrast === 'normal'}"
-            aria-label="${t('app.theme.contrastNormal')}"
-            title="${t('app.theme.contrastNormal')}"
-          ><rrr-icon name="circle-half-fill"></rrr-icon></rrr-button></rrr-tooltip>
-          <rrr-tooltip><rrr-button
-            type="button"
-            variant="ghost"
-            data-action="contrast-high"
-            aria-pressed="${contrast === 'high'}"
-            aria-label="${t('app.theme.contrastHigh')}"
-            title="${t('app.theme.contrastHigh')}"
-          ><rrr-icon name="shield"></rrr-icon></rrr-button></rrr-tooltip>
         </div>
       </div>
     `
@@ -330,6 +319,16 @@ export class RrrApp extends HTMLElement {
     return ''
   }
 
+  private getBackHref(): string | null {
+    const route = this.route
+    if (route.name === 'settings') return this.settingsReturnHash
+    if (route.name === 'workout-edit') return '#/workouts'
+    if (route.name === 'workout-log') return '#/workouts'
+    if (route.name === 'routine-new') return '#/routines'
+    if (route.name === 'routine-edit') return '#/routines'
+    return null
+  }
+
   private shouldShowInstallButton(): boolean {
     if (this.isStandalone) {
       return false
@@ -340,6 +339,13 @@ export class RrrApp extends HTMLElement {
 
   private renderOptionsPanelContent(route: Route): string {
     const items: string[] = []
+
+    items.push(`
+      <section class="options-panel-section">
+        <h2 class="options-panel-section-title">${t('app.settings.display')}</h2>
+        ${this.renderThemeControls()}
+      </section>
+    `)
 
     // Settings is available from every screen
     items.push(`
@@ -383,8 +389,6 @@ export class RrrApp extends HTMLElement {
             ${this.renderNavLink('routines', '#/routines', t('app.nav.routines'), 'clipboard')}
             ${this.renderNavLink('exercises', '#/exercises', t('app.nav.exercises'), 'compose')}
             ${this.renderNavLink('history', '#/history', t('app.nav.history'), 'data-trending')}
-            ${this.renderNavLink('import-export', '#/import-export', t('app.nav.importExport'), 'arrow-export-up')}
-            ${this.styleguideEnabled ? this.renderNavLink('styleguide', '#/styleguide', t('app.nav.styleguide'), 'braces') : ''}
           </div>
           <div class="nav-utilities">
             ${this.renderThemeControls()}
@@ -392,10 +396,7 @@ export class RrrApp extends HTMLElement {
           </div>
         </nav>
         <header class="app-header">
-          <div class="header-utilities">
-            ${this.renderThemeControls()}
-            ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="outline" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
-          </div>
+          <rrr-button type="button" variant="ghost" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}" aria-hidden="${this.getBackHref() === null ? 'true' : 'false'}" ${this.getBackHref() === null ? 'tabindex="-1"' : ''}><rrr-icon name="arrow-left"></rrr-icon></rrr-button>
           <rrr-button type="button" variant="ghost" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
         </header>
         <main>
@@ -482,9 +483,9 @@ export class RrrApp extends HTMLElement {
 
     if (route.name === 'settings') {
       const settingsEl = document.createElement('rrr-settings')
-      settingsEl.setAttribute('return-href', this.settingsReturnHash)
       settingsEl.setAttribute('theme', this.displayPreferences.theme)
       settingsEl.setAttribute('contrast', this.displayPreferences.contrast)
+      settingsEl.setAttribute('styleguide-enabled', this.styleguideEnabled ? 'true' : 'false')
       view.append(settingsEl)
       return
     }

@@ -1,8 +1,6 @@
 :host {
   display: block;
   --rrr-card-background: var(--rrr-colors-grayscale-00);
-  --rrr-card-border-width: var(--rrr-border-width);
-  --rrr-card-border-color: var(--rrr-colors-grayscale-30);
   --rrr-card-border-radius: var(--rrr-radius-l);
   --rrr-card-shadow: var(--rrr-shadow-card);
   --rrr-card-padding-md: var(--rrr-spacing-l);
@@ -13,7 +11,6 @@
 
 .card {
   background: var(--rrr-card-background);
-  border: var(--rrr-card-border-width) solid var(--rrr-card-border-color);
   border-radius: var(--rrr-card-border-radius);
   box-shadow: var(--rrr-card-shadow);
   display: grid;

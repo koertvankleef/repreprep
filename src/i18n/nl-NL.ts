@@ -76,6 +76,7 @@ export const nlNlMessages = {
   'app.settings.title': 'Instellingen',
   'app.settings.back': 'Terug',
   'app.settings.display': 'Weergave',
+  'app.settings.navigation': 'Navigatie',
 
   'styleguide.title': 'Stijlgids',
   'styleguide.subtitle': 'Design-system speelplaats voor lokaal ontwikkelen en componentcontrole.',

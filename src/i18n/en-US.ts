@@ -76,6 +76,7 @@ export const enUsMessages = {
   'app.settings.title': 'Settings',
   'app.settings.back': 'Back',
   'app.settings.display': 'Display',
+  'app.settings.navigation': 'Navigation',
 
   'styleguide.title': 'Styleguide',
   'styleguide.subtitle': 'Design-system playground for local development and component review.',
