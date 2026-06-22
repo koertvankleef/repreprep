@@ -138,8 +138,19 @@ nav {
   --rrr-button-neutral-bg: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-bg-hover: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-fg: var(--rrr-color-primary-contrast);
-  box-shadow: var(--rrr-app-nav-shadow);
   font-family: var(--rrr-app-link-font-family);
+  overflow: visible;
+}
+
+.app-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 4px;
+  box-shadow: var(--rrr-app-nav-shadow);
+  pointer-events: none;
 }
 
 .app-header rrr-button {
@@ -469,9 +480,12 @@ main {
 
   .app-header {
     position: static;
-    box-shadow: none;
     border-bottom-color: transparent;
     padding-inline-start: var(--rrr-spacing-2xl);
+  }
+
+  .app-header::after {
+    display: none;
   }
 
   /* contextual options live in the mobile top bar */
