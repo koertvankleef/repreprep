@@ -147,10 +147,10 @@ nav {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -4px;
-  height: 4px;
+  top: calc(8px + env(safe-area-inset-top));
   box-shadow: var(--rrr-app-nav-shadow);
   pointer-events: none;
+  height: calc(var(--rrr-app-header-height) - 8px - env(safe-area-inset-top));
 }
 
 .app-header rrr-button {

@@ -52,6 +52,14 @@ export function saveDisplayPreferences(preferences: DisplayPreferences): void {
   localStorage.setItem(storageKey, JSON.stringify(preferences))
 }
 
+export function clearDisplayPreferences(): void {
+  if (typeof localStorage === 'undefined') {
+    return
+  }
+
+  localStorage.removeItem(storageKey)
+}
+
 export function resolveTheme(mode: ThemeMode): 'light' | 'dark' {
   if (mode === 'light' || mode === 'dark') {
     return mode

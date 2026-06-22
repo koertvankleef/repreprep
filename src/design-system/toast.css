@@ -23,8 +23,9 @@
   --rrr-toast-min-width: 20rem;
   --rrr-toast-max-width: min(36rem, calc(100vw - 2rem));
   --rrr-toast-open-max-height: 14rem;
-  --rrr-toast-root-bottom: var(--rrr-spacing-l);
-  --rrr-toast-root-width: min(42rem, calc(100vw - var(--rrr-spacing-l)));
+  --rrr-toast-root-bottom: calc(env(safe-area-inset-bottom) + var(--rrr-spacing-l) + 4.75rem);
+  --rrr-toast-root-inline-padding: var(--rrr-spacing-l);
+  --rrr-toast-root-width: min(42rem, calc(100vw - (var(--rrr-toast-root-inline-padding) * 2)));
 
   position: fixed;
   bottom: var(--rrr-toast-root-bottom);
@@ -45,6 +46,22 @@
 
 @media (min-width: 40rem) {
   .rrr-toast-root {
-    bottom: var(--rrr-toast-root-bottom);
+    --rrr-toast-root-inline-padding: var(--rrr-spacing-2xl);
+  }
+}
+
+@media (min-width: 48rem) {
+  .rrr-toast-root {
+    --rrr-toast-root-bottom: var(--rrr-spacing-2xl);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: var(--rrr-toast-root-width);
+    align-items: center;
+  }
+
+  .rrr-toast-root > rrr-toast {
+    width: fit-content;
+    max-width: 100%;
   }
 }

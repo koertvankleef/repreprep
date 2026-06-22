@@ -30,6 +30,12 @@ export class WorkoutStorageService {
     this.adapter.save(this.current)
   }
 
+  resetAllData(): void {
+    this.adapter.clear()
+    this.current = createDefaultData()
+    this.adapter.save(this.current)
+  }
+
   saveWorkout(workout: Workout): void {
     this.current = getWorkout(this.current, workout.id)
       ? updateWorkout(this.current, workout)

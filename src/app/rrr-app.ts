@@ -6,6 +6,7 @@ import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router
 import { toastService } from '../foundation/toast.ts'
 import {
   applyDisplayPreferences,
+  clearDisplayPreferences,
   loadDisplayPreferences,
   saveDisplayPreferences,
   watchSystemThemePreference,
@@ -81,6 +82,22 @@ export class RrrApp extends HTMLElement {
     this.installPromptEvent = null
     this.installAvailable = false
     this.isStandalone = true
+    this.render()
+  }
+
+  private readonly handleClearDataRequest = (): void => {
+    storageService.resetAllData()
+    clearDisplayPreferences()
+    this.displayPreferences = loadDisplayPreferences()
+    applyDisplayPreferences(this.displayPreferences)
+    toastService.success(t('app.settings.resetData.success'))
+
+    if (window.location.hash !== '#/workouts') {
+      window.location.hash = '/workouts'
+      return
+    }
+
+    this.route = { name: 'workouts' }
     this.render()
   }
 
@@ -222,6 +239,7 @@ export class RrrApp extends HTMLElement {
     window.addEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.addEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.addEventListener('click', this.handleClick)
+    this.shadowRoot?.addEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
     this.isStandalone = window.matchMedia('(display-mode: standalone)').matches
     if (this.isStandalone) {
       this.installAvailable = false
@@ -236,6 +254,7 @@ export class RrrApp extends HTMLElement {
     window.removeEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.removeEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.removeEventListener('click', this.handleClick)
+    this.shadowRoot?.removeEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
     this.router.dispose()
   }
 

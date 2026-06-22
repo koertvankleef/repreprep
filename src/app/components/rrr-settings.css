@@ -92,3 +92,87 @@
   border-color: var(--rrr-colors-activity-indigo-70);
   color: var(--rrr-color-primary-contrast);
 }
+
+.danger-card {
+  gap: var(--rrr-spacing-s);
+}
+
+.danger-card-content {
+  display: grid;
+  gap: var(--rrr-spacing-xs);
+  padding: var(--rrr-spacing-m);
+}
+
+.danger-title {
+  margin: 0;
+  font-size: var(--rrr-font-size-s);
+  color: var(--rrr-colors-context-danger-70);
+}
+
+.danger-copy,
+.danger-warning {
+  margin: 0;
+  font-size: var(--rrr-font-size-s);
+  color: var(--rrr-colors-grayscale-80);
+}
+
+.danger-warning {
+  color: var(--rrr-colors-context-danger-70);
+}
+
+.danger-actions {
+  padding: 0 var(--rrr-spacing-m) var(--rrr-spacing-m);
+}
+
+.danger-actions rrr-button {
+  width: 100%;
+}
+
+.reset-confirm-panel {
+  display: grid;
+  gap: var(--rrr-spacing-s);
+  border-top: var(--rrr-border-width) solid var(--rrr-colors-grayscale-20);
+  padding: var(--rrr-spacing-m);
+  min-width: 0;
+}
+
+.reset-confirm-label {
+  font-size: var(--rrr-font-size-s);
+  color: var(--rrr-colors-grayscale-90);
+  min-width: 0;
+}
+
+.reset-confirm-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-40);
+  border-radius: var(--rrr-radius-s);
+  min-height: var(--rrr-control-min-block-size);
+  padding: 0 var(--rrr-spacing-m);
+  font: inherit;
+  color: var(--rrr-colors-grayscale-90);
+  background: var(--rrr-colors-grayscale-00);
+}
+
+.reset-confirm-input:focus-visible {
+  outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
+  outline-offset: var(--global-focus-ring-offset);
+}
+
+.reset-confirm-hint {
+  margin: 0;
+  font-size: var(--rrr-font-size-xs);
+  color: var(--rrr-colors-grayscale-70);
+}
+
+.reset-confirm-hint[data-state='ready'] {
+  color: var(--rrr-colors-context-success-70);
+}
+
+.reset-confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rrr-spacing-s);
+  justify-content: flex-end;
+}
