@@ -78,8 +78,15 @@ export class RrrRoutineEditor extends HTMLElement {
     this.listenersBound = true
 
     this.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement
-      const action = target.dataset.action
+      const actionTarget = event
+        .composedPath()
+        .find((node): node is HTMLElement => node instanceof HTMLElement && node.dataset.action !== undefined)
+
+      if (!actionTarget) {
+        return
+      }
+
+      const action = actionTarget.dataset.action
 
       if (action === 'add-exercise') {
         this.addExercise()
@@ -87,7 +94,7 @@ export class RrrRoutineEditor extends HTMLElement {
       }
 
       if (action === 'remove-exercise') {
-        const id = target.dataset.id
+        const id = actionTarget.dataset.id
 
         if (id) {
           this.removeExercise(id)
@@ -97,7 +104,7 @@ export class RrrRoutineEditor extends HTMLElement {
       }
 
       if (action === 'move-up') {
-        const id = target.dataset.id
+        const id = actionTarget.dataset.id
 
         if (id) {
           this.moveExercise(id, -1)
@@ -107,7 +114,7 @@ export class RrrRoutineEditor extends HTMLElement {
       }
 
       if (action === 'move-down') {
-        const id = target.dataset.id
+        const id = actionTarget.dataset.id
 
         if (id) {
           this.moveExercise(id, 1)
@@ -117,7 +124,7 @@ export class RrrRoutineEditor extends HTMLElement {
       }
 
       if (action === 'add-set') {
-        const id = target.dataset.id
+        const id = actionTarget.dataset.id
 
         if (id) {
           this.addPlannedSet(id)
@@ -127,8 +134,8 @@ export class RrrRoutineEditor extends HTMLElement {
       }
 
       if (action === 'remove-set') {
-        const exerciseId = target.dataset.exerciseId
-        const setIndex = target.dataset.setIndex
+        const exerciseId = actionTarget.dataset.exerciseId
+        const setIndex = actionTarget.dataset.setIndex
 
         if (exerciseId && setIndex !== undefined) {
           this.removePlannedSet(exerciseId, Number(setIndex))
