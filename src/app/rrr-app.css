@@ -19,9 +19,9 @@
   --rrr-app-link-font-size-mobile: 0.62rem;
   --rrr-app-link-font-size-desktop: var(--rrr-font-size-s);
   --rrr-app-bottom-nav-height: 4.75rem;
-  --rrr-app-header-height: 3.25rem;
+  --rrr-app-header-height: 3.5rem;
   --rrr-app-link-font-family: var(--rrr-font-family-heading);
-  --rrr-app-main-padding: var(--rrr-spacing-l);
+  --rrr-app-main-padding: var(--rrr-spacing-s);
   --rrr-app-control-radius: var(--rrr-radius-s);
 }
 
@@ -147,15 +147,10 @@ nav {
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(8px + env(safe-area-inset-top));
+  top: calc(16px + env(safe-area-inset-top));
   box-shadow: var(--rrr-app-nav-shadow);
   pointer-events: none;
-  height: calc(var(--rrr-app-header-height) - 8px - env(safe-area-inset-top));
-}
-
-.app-header rrr-button {
-  --rrr-button-min-block-size: var(--rrr-app-header-height);
-  --rrr-button-icon-size: 1.5rem;
+  height: calc(var(--rrr-app-header-height) - 16px - env(safe-area-inset-top));
 }
 
 .app-header-title {
@@ -186,6 +181,12 @@ nav {
 
 .options-trigger {
   flex-shrink: 0;
+}
+
+.card-divider {
+  border-top: var(--rrr-border-width) solid var(--rrr-colors-grayscale-20);
+  height: 1px;
+  width: 100%;
 }
 
 main {

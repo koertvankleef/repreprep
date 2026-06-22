@@ -13,6 +13,18 @@ export const shadowTypographyStyles = `
     font-family: var(--rrr-font-family-heading);
   }
 
+  h2 {
+    font-size: var(--rrr-font-size-l);
+    font-weight: 600;
+    color: var(--rrr-colors-activity-indigo-80);
+  }
+
+  h3 {
+    font-size: var(--rrr-font-size-s);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
   button,
   input,
   select,

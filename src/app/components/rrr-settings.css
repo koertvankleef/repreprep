@@ -20,12 +20,6 @@
 
 .settings-section-title {
   margin: 0;
-  font-family: var(--rrr-font-family-heading);
-  font-size: var(--rrr-font-size-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--rrr-colors-grayscale-60);
 }
 
 .settings-card {
@@ -44,12 +38,7 @@
   color: var(--rrr-colors-grayscale-80);
   gap: var(--rrr-spacing-m);
   padding: var(--rrr-spacing-m);
-  border-bottom: var(--rrr-border-width) solid var(--rrr-colors-grayscale-20);
   transition: background var(--rrr-transition-default), color var(--rrr-transition-default);
-}
-
-.settings-link:last-child {
-  border-bottom: none;
 }
 
 .settings-link:hover {
@@ -131,7 +120,6 @@
 .reset-confirm-panel {
   display: grid;
   gap: var(--rrr-spacing-s);
-  border-top: var(--rrr-border-width) solid var(--rrr-colors-grayscale-20);
   padding: var(--rrr-spacing-m);
   min-width: 0;
 }

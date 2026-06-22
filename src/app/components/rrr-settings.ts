@@ -58,21 +58,18 @@ export class RrrSettings extends HTMLElement {
   }
 
   connectedCallback(): void {
-    if (!this.shadowRoot) {
-      this.attachShadow({ mode: 'open' })
-    }
-    this.shadowRoot?.addEventListener('click', this.handleClick)
-    this.shadowRoot?.addEventListener('input', this.handleInput)
+    this.addEventListener('click', this.handleClick)
+    this.addEventListener('input', this.handleInput)
     this.render()
   }
 
   disconnectedCallback(): void {
-    this.shadowRoot?.removeEventListener('click', this.handleClick)
-    this.shadowRoot?.removeEventListener('input', this.handleInput)
+    this.removeEventListener('click', this.handleClick)
+    this.removeEventListener('input', this.handleInput)
   }
 
   attributeChangedCallback(): void {
-    if (!this.shadowRoot) return
+    if (!this.isConnected) return
     this.render()
   }
 
@@ -103,16 +100,12 @@ export class RrrSettings extends HTMLElement {
   }
 
   private syncResetConfirmationState(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
-    const confirmButton = this.shadowRoot.querySelector<HTMLButtonElement>('[data-action="confirm-reset-data"]')
+    const confirmButton = this.querySelector<HTMLButtonElement>('[data-action="confirm-reset-data"]')
     if (confirmButton) {
       confirmButton.disabled = !this.canConfirmReset()
     }
 
-    const hint = this.shadowRoot.querySelector<HTMLElement>('.reset-confirm-hint')
+    const hint = this.querySelector<HTMLElement>('.reset-confirm-hint')
     if (hint) {
       hint.textContent = this.canConfirmReset() ? t('app.settings.resetData.ready') : t('app.settings.resetData.validation')
       hint.dataset.state = this.canConfirmReset() ? 'ready' : 'pending'
@@ -120,12 +113,10 @@ export class RrrSettings extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot) return
-
     const styleguideEnabled = this.getAttribute('styleguide-enabled') === 'true'
     const contrast = this.getAttribute('contrast') ?? 'normal'
 
-    this.shadowRoot.innerHTML = `
+    this.innerHTML = `
       <style>${componentStyles}</style>
       <div class="page">
         <section class="settings-section">
@@ -136,6 +127,7 @@ export class RrrSettings extends HTMLElement {
               <span>${t('app.nav.importExport')}</span>
             </a>
             ${styleguideEnabled ? `
+              <div class="card-divider"></div>
               <a class="settings-link" href="#/styleguide">
                 <rrr-icon name="braces"></rrr-icon>
                 <span>${t('app.nav.styleguide')}</span>
@@ -183,6 +175,7 @@ export class RrrSettings extends HTMLElement {
               <rrr-button type="button" tone="danger" variant="outline" data-action="open-reset-data">${t('app.settings.resetData.open')}</rrr-button>
             </div>
             ${this.resetPanelOpen ? `
+              <div class="card-divider"></div>
               <div class="reset-confirm-panel">
                 <label class="reset-confirm-label" for="reset-date-confirm">${t('app.settings.resetData.prompt', { date: this.getTodayLocalizedDate() })}</label>
                 <input

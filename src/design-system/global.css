@@ -28,6 +28,18 @@ h6 {
   font-family: var(--rrr-font-family-heading);
 }
 
+h2 {
+  font-size: var(--rrr-font-size-l);
+  font-weight: 600;
+  color: var(--rrr-colors-activity-indigo-80);
+}
+
+h3 {
+  font-size: var(--rrr-font-size-s);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 body {
   min-height: 100vh;
   font-family: var(--rrr-font-family);
@@ -107,14 +119,6 @@ label {
 
 h1 {
   font-size: var(--rrr-font-size-2xl);
-}
-
-h2 {
-  font-size: var(--rrr-font-size-xl);
-}
-
-h3 {
-  font-size: var(--rrr-font-size-l);
 }
 
 a {
