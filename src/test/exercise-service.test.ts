@@ -19,9 +19,10 @@ describe('exercise-service', () => {
     const updated = addExercise(data, exercise)
 
     expect(updated.exercises).toContainEqual(exercise)
+    expect(exercise.createdByUser).toBe(true)
   })
 
-  test('updateExercise replaces existing exercise', () => {
+  test('updateExercise ignores predefined exercises', () => {
     const data = createDefaultData()
     const exercise = data.exercises[0]
 
@@ -32,23 +33,45 @@ describe('exercise-service', () => {
       name: 'Push-ups Plus',
     })
 
-    expect(updated.exercises[0]?.name).toBe('Push-ups Plus')
+    expect(updated.exercises[0]?.name).toBe(exercise?.name)
   })
 
-  test('archiveExercise sets archived true', () => {
+  test('updateExercise replaces user-created exercises', () => {
+    const data = createDefaultData()
+    const exercise = createNewExercise('Farmer Carry', 'time')
+    const withExercise = addExercise(data, exercise)
+    const updated = updateExercise(withExercise, {
+      ...exercise,
+      name: 'Loaded Carry',
+    })
+
+    expect(updated.exercises.find((item) => item.id === exercise.id)?.name).toBe('Loaded Carry')
+  })
+
+  test('archiveExercise ignores predefined exercises', () => {
     const data = createDefaultData()
     const exercise = data.exercises[0]
     const updated = archiveExercise(data, exercise?.id ?? '')
 
-    expect(updated.exercises[0]?.archived).toBe(true)
+    expect(updated.exercises[0]?.archived).toBe(false)
+  })
+
+  test('archiveExercise sets user-created exercises archived true', () => {
+    const data = createDefaultData()
+    const exercise = createNewExercise('Farmer Carry', 'time')
+    const withExercise = addExercise(data, exercise)
+    const updated = archiveExercise(withExercise, exercise.id)
+
+    expect(updated.exercises.find((item) => item.id === exercise.id)?.archived).toBe(true)
   })
 
   test('getActiveExercises returns only non-archived exercises', () => {
     const data = createDefaultData()
-    const firstExercise = data.exercises[0]
-    const archived = archiveExercise(data, firstExercise?.id ?? '')
+    const exercise = createNewExercise('Farmer Carry', 'time')
+    const withExercise = addExercise(data, exercise)
+    const archived = archiveExercise(withExercise, exercise.id)
 
-    expect(getActiveExercises(archived).some((exercise) => exercise.id === firstExercise?.id)).toBe(false)
+    expect(getActiveExercises(archived).some((item) => item.id === exercise.id)).toBe(false)
   })
 
   test('searchExercises matches metadata facets', () => {

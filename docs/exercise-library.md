@@ -16,3 +16,11 @@ node scripts/import-free-exercise-db.mjs .tmp/exercise-import/free-exercise-db.e
 ```
 
 The runtime exercise objects intentionally do not include source attribution fields. The generated provenance report keeps source IDs, source names, duplicate removals, and suspicious generic-name warnings separately.
+
+## Runtime Ownership
+
+Predefined library exercises are immutable in the app: users cannot rename or archive them.
+
+Persisted exercise definitions include `createdByUser` so the app can distinguish predefined library entries from user-created exercises. User-created exercises keep that flag set to `true`; generated library entries keep it set to `false`.
+
+Future custom-exercise editing and deletion should apply only to `createdByUser` exercises.

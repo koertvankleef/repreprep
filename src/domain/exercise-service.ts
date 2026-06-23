@@ -17,8 +17,17 @@ export function updateExercise(data: AppData, exercise: ExerciseDefinition): App
     return data
   }
 
+  const existingExercise = data.exercises[index]
+
+  if (!existingExercise?.createdByUser) {
+    return data
+  }
+
   const exercises = [...data.exercises]
-  exercises[index] = exercise
+  exercises[index] = {
+    ...exercise,
+    createdByUser: true,
+  }
 
   return {
     ...data,
@@ -29,7 +38,7 @@ export function updateExercise(data: AppData, exercise: ExerciseDefinition): App
 export function archiveExercise(data: AppData, id: string): AppData {
   const exercise = getExercise(data, id)
 
-  if (!exercise) {
+  if (!exercise || !exercise.createdByUser) {
     return data
   }
 
@@ -116,6 +125,7 @@ export function createNewExercise(name: string, kind: ExerciseKind): ExerciseDef
     primaryMuscles: [],
     secondaryMuscles: [],
     measurementProfiles,
+    createdByUser: true,
     kind,
     defaultUnit: getExerciseDefaultUnit(exercise),
     archived: false,

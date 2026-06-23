@@ -21,7 +21,7 @@ describe('migration', () => {
     const result = migrateRawToAppData(v1Data)
 
     expect(result).not.toBeNull()
-    expect(result?.schemaVersion).toBe(3)
+    expect(result?.schemaVersion).toBe(4)
     expect(result?.routines).toEqual([])
     expect(result?.routineVersions).toEqual([])
     expect(result?.exercises).toEqual([])
@@ -55,6 +55,7 @@ describe('migration', () => {
 
     expect(result?.exercises).toHaveLength(1)
     expect(result?.exercises[0]?.measurementProfiles).toEqual([['reps', 'weight']])
+    expect(result?.exercises[0]?.createdByUser).toBe(true)
     expect(result?.workouts).toHaveLength(1)
     expect(result?.routines).toEqual([])
   })
@@ -64,8 +65,25 @@ describe('migration', () => {
     const result = migrateRawToAppData(data)
 
     expect(result).not.toBeNull()
-    expect(result?.schemaVersion).toBe(3)
+    expect(result?.schemaVersion).toBe(4)
     expect(result?.routines).toHaveLength(data.routines.length)
+  })
+
+  test('migrateRawToAppData marks v3 catalog exercises as predefined', () => {
+    const data = createDefaultData()
+    const exercise = data.exercises.find((item) => item.id === 'pushups')
+
+    expect(exercise).toBeDefined()
+
+    const v3Data = {
+      ...data,
+      schemaVersion: 3,
+      exercises: data.exercises.map(({ createdByUser: _createdByUser, ...item }) => item),
+    }
+    const result = migrateRawToAppData(v3Data)
+
+    expect(result?.schemaVersion).toBe(4)
+    expect(result?.exercises.find((item) => item.id === 'pushups')?.createdByUser).toBe(false)
   })
 
   test('isValidAppData returns false for v1 data without routines', () => {

@@ -91,9 +91,10 @@ export function getExerciseDefaultUnit(exercise: Pick<Exercise, 'measurementProf
   return kind === 'time' ? 'seconds' : 'kg'
 }
 
-export function toExerciseDefinition(exercise: Exercise, timestamp: string): ExerciseDefinition {
+export function toExerciseDefinition(exercise: Exercise, timestamp: string, createdByUser = false): ExerciseDefinition {
   return {
     ...exercise,
+    createdByUser,
     kind: getExerciseKind(exercise),
     defaultUnit: getExerciseDefaultUnit(exercise),
     archived: false,
@@ -101,4 +102,3 @@ export function toExerciseDefinition(exercise: Exercise, timestamp: string): Exe
     updatedAt: timestamp,
   }
 }
-

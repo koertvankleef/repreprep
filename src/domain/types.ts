@@ -76,6 +76,7 @@ export interface Exercise {
 }
 
 export interface ExerciseDefinition extends Exercise {
+  createdByUser: boolean
   kind: ExerciseKind
   defaultUnit: string | null
   archived: boolean

@@ -13,6 +13,7 @@ import type {
   Workout,
   WorkoutExerciseEntry,
 } from '../domain/types.ts'
+import { exerciseCatalog } from '../exercise-library/exercises.ts'
 import {
   equipmentValues,
   exerciseCategories,
@@ -21,6 +22,8 @@ import {
   measurementTypes,
   muscleValues,
 } from '../domain/exercise-metadata.ts'
+
+const catalogExerciseIds = new Set<string>(exerciseCatalog.map((exercise) => exercise.id))
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -87,6 +90,7 @@ export function isValidExercise(obj: unknown): obj is ExerciseDefinition {
     isKnownStringArray(obj.primaryMuscles, muscleValues) &&
     isKnownStringArray(obj.secondaryMuscles, muscleValues) &&
     isValidMeasurementProfiles(obj.measurementProfiles) &&
+    typeof obj.createdByUser === 'boolean' &&
     (obj.kind === 'reps' || obj.kind === 'time') &&
     (typeof obj.defaultUnit === 'string' || obj.defaultUnit === null) &&
     typeof obj.archived === 'boolean' &&
@@ -180,11 +184,27 @@ function migrateExerciseRecord(exercise: unknown): unknown {
     primaryMuscles: [],
     secondaryMuscles: [],
     measurementProfiles,
+    createdByUser: true,
     kind: exercise.kind,
     defaultUnit: exercise.defaultUnit ?? getExerciseDefaultUnit({ measurementProfiles }),
     archived: exercise.archived,
     createdAt: exercise.createdAt,
     updatedAt: exercise.updatedAt,
+  }
+}
+
+function migrateExerciseOwnership(exercise: unknown): unknown {
+  if (!isRecord(exercise) || typeof exercise.id !== 'string') {
+    return exercise
+  }
+
+  if (typeof exercise.createdByUser === 'boolean') {
+    return exercise
+  }
+
+  return {
+    ...exercise,
+    createdByUser: !catalogExerciseIds.has(exercise.id),
   }
 }
 
@@ -206,6 +226,16 @@ export function migrateRawAppData(parsed: Record<string, unknown>): Record<strin
       schemaVersion: 3,
       exercises: Array.isArray(candidate.exercises)
         ? candidate.exercises.map((exercise) => migrateExerciseRecord(exercise))
+        : candidate.exercises,
+    }
+  }
+
+  if (candidate.schemaVersion === 3) {
+    candidate = {
+      ...candidate,
+      schemaVersion: 4,
+      exercises: Array.isArray(candidate.exercises)
+        ? candidate.exercises.map((exercise) => migrateExerciseOwnership(exercise))
         : candidate.exercises,
     }
   }
@@ -304,7 +334,7 @@ export function isValidAppData(data: unknown): data is AppData {
   }
 
   return (
-    data.schemaVersion === 3 &&
+    data.schemaVersion === 4 &&
     Array.isArray(data.exercises) &&
     data.exercises.every((exercise) => isValidExercise(exercise)) &&
     Array.isArray(data.workouts) &&

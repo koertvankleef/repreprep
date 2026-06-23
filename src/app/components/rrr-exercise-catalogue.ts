@@ -57,7 +57,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     const data = storageService.getData()
     const exercise = data.exercises.find((item) => item.id === id)
 
-    if (!exercise) {
+    if (!exercise || !exercise.createdByUser) {
       return
     }
 
@@ -85,6 +85,12 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private async archiveExercise(id: string): Promise<void> {
+    const exercise = storageService.getData().exercises.find((item) => item.id === id)
+
+    if (!exercise?.createdByUser) {
+      return
+    }
+
     const confirmed = await confirmDialog({
       title: t('exercise.dialog.archive.title'),
       message: t('exercise.dialog.archive.message'),
@@ -117,19 +123,21 @@ export class RrrExerciseCatalogue extends HTMLElement {
       .map((exercise) => {
         const used = isExerciseUsedInWorkouts(data, exercise.id)
         const kindLabel = exercise.kind === 'time' ? t('exercise.kind.duration') : t('exercise.kind.repsWeight')
+        const originLabel = exercise.createdByUser ? t('exercise.badge.custom') : t('exercise.badge.library')
 
         return `
           <article class="item">
             <div>
               <strong>${escapeHtml(exercise.name)}</strong>
               <div class="meta">
+                <span class="badge">${originLabel}</span>
                 <span class="badge">${kindLabel}</span>
                 ${used ? `<span class="badge">${t('exercise.badge.used')}</span>` : ''}
               </div>
             </div>
             <div class="actions">
-              ${showArchived ? '' : `<rrr-button type="button" variant="ghost" data-action="edit" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.editAria', { name: exercise.name }))}"><rrr-icon name="edit"></rrr-icon></rrr-button>`}
-              ${showArchived ? '' : `<rrr-button type="button" variant="ghost" tone="success" data-action="archive" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.archiveAria', { name: exercise.name }))}"><rrr-icon name="archive"></rrr-icon></rrr-button>`}
+              ${showArchived || !exercise.createdByUser ? '' : `<rrr-button type="button" variant="ghost" data-action="edit" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.editAria', { name: exercise.name }))}"><rrr-icon name="edit"></rrr-icon></rrr-button>`}
+              ${showArchived || !exercise.createdByUser ? '' : `<rrr-button type="button" variant="ghost" tone="success" data-action="archive" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.archiveAria', { name: exercise.name }))}"><rrr-icon name="archive"></rrr-icon></rrr-button>`}
             </div>
           </article>
         `

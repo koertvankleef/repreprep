@@ -186,6 +186,8 @@ export const enUsMessages = {
   'exercise.list.active': 'Active Exercises',
   'exercise.list.archived': 'Archived Exercises',
   'exercise.list.empty': 'No exercises in this section.',
+  'exercise.badge.library': 'library',
+  'exercise.badge.custom': 'custom',
   'exercise.badge.used': 'used in workouts',
   'exercise.kind.repsWeight': 'Reps',
   'exercise.kind.duration': 'Time',

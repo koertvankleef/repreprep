@@ -186,6 +186,8 @@ export const nlNlMessages = {
   'exercise.list.active': 'Actieve oefeningen',
   'exercise.list.archived': 'Gearchiveerde oefeningen',
   'exercise.list.empty': 'Geen oefeningen in deze sectie.',
+  'exercise.badge.library': 'bibliotheek',
+  'exercise.badge.custom': 'eigen',
   'exercise.badge.used': 'gebruikt in workouts',
   'exercise.kind.repsWeight': 'Herhalingen',
   'exercise.kind.duration': 'Tijd',

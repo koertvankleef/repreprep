@@ -4,7 +4,7 @@ import { buildWorkoutLoggingData } from '../app/components/rrr-workout-logging-a
 
 function createBaseData(): AppData {
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     exercises: [
       {
         id: 'ex-reps',
@@ -16,6 +16,7 @@ function createBaseData(): AppData {
         primaryMuscles: ['chest'],
         secondaryMuscles: ['shoulders', 'triceps'],
         measurementProfiles: [['reps']],
+        createdByUser: false,
         kind: 'reps',
         defaultUnit: 'kg',
         archived: false,
@@ -32,6 +33,7 @@ function createBaseData(): AppData {
         primaryMuscles: ['abs'],
         secondaryMuscles: [],
         measurementProfiles: [['time']],
+        createdByUser: false,
         kind: 'time',
         defaultUnit: 'seconds',
         archived: false,
