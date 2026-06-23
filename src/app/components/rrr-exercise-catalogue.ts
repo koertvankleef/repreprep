@@ -1,6 +1,5 @@
 import { storageService } from '../storage-instance.ts'
-import { createNewExercise, isExerciseUsedInWorkouts, searchExercises } from '../../domain/exercise-service.ts'
-import { confirmDialog, promptDialog } from '../../utils/dialog-service.ts'
+import { isExerciseUsedInWorkouts, searchExercises } from '../../domain/exercise-service.ts'
 import { t } from '../../i18n/index.ts'
 import styles from './rrr-exercise-catalogue.css?inline'
 
@@ -8,8 +7,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
   private readonly handleDataChanged = (): void => {
     this.render()
   }
-  private statusMessage = ''
-  private statusType: 'error' | 'success' | null = null
   private searchQueryValue = ''
 
   set searchQuery(value: string) {
@@ -30,96 +27,10 @@ export class RrrExerciseCatalogue extends HTMLElement {
     window.removeEventListener('rrr-data-changed', this.handleDataChanged)
   }
 
-  private setStatus(message: string, type: 'error' | 'success'): void {
-    this.statusMessage = message
-    this.statusType = type
-  }
-
-  private addExercise(): void {
-    const nameField = this.querySelector<HTMLElement>('rrr-input[name="name"]')
-    const kindField = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="kind"]')
-
-    if (!nameField || !kindField) {
-      return
-    }
-
-    const name = (nameField as HTMLInputElement).value.trim()
-    const kind = kindField.value === 'time' ? 'time' : 'reps'
-
-    if (!name) {
-      this.setStatus(t('exercise.validation.nameRequired'), 'error')
-      nameField.setAttribute('invalid', '')
-      nameField.focus()
-      return
-    }
-
-    nameField.removeAttribute('aria-invalid')
-
-    storageService.saveExercise(createNewExercise(name, kind))
-    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    this.setStatus(t('exercise.status.created', { name }), 'success')
-
-    this.render()
-  }
-
-  private async editExercise(id: string): Promise<void> {
-    const data = storageService.getData()
-    const exercise = data.exercises.find((item) => item.id === id)
-
-    if (!exercise || !exercise.createdByUser) {
-      return
-    }
-
-    const nextName = await promptDialog({
-      title: t('exercise.dialog.rename.title'),
-      message: t('exercise.dialog.rename.message', { name: exercise.name }),
-      label: t('exercise.dialog.rename.label'),
-      initialValue: exercise.name,
-      confirmLabel: t('action.save'),
-      cancelLabel: t('action.cancel'),
-      required: true,
-    })
-
-    if (!nextName) {
-      return
-    }
-
-    storageService.saveExercise({
-      ...exercise,
-      name: nextName,
-      updatedAt: new Date().toISOString(),
-    })
-    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    this.setStatus(t('exercise.status.renamed', { name: nextName }), 'success')
-  }
-
-  private async archiveExercise(id: string): Promise<void> {
-    const exercise = storageService.getData().exercises.find((item) => item.id === id)
-
-    if (!exercise?.createdByUser) {
-      return
-    }
-
-    const confirmed = await confirmDialog({
-      title: t('exercise.dialog.archive.title'),
-      message: t('exercise.dialog.archive.message'),
-      confirmLabel: t('action.archive'),
-      cancelLabel: t('action.cancel'),
-    })
-
-    if (!confirmed) {
-      return
-    }
-
-    storageService.archiveExercise(id)
-    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    this.setStatus(t('exercise.status.archived'), 'success')
-  }
-
-  private renderList(showArchived: boolean): string {
+  private renderList(): string {
     const data = storageService.getData()
     const exercises = searchExercises(
-      data.exercises.filter((exercise) => exercise.archived === showArchived),
+      data.exercises.filter((exercise) => !exercise.archived),
       this.searchQueryValue,
     )
       .sort((left, right) => left.name.localeCompare(right.name))
@@ -144,10 +55,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
                 ${used ? `<span class="badge">${t('exercise.badge.used')}</span>` : ''}
               </div>
             </div>
-            <div class="actions">
-              ${showArchived || !exercise.createdByUser ? '' : `<rrr-button type="button" variant="ghost" data-action="edit" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.editAria', { name: exercise.name }))}"><rrr-icon name="edit"></rrr-icon></rrr-button>`}
-              ${showArchived || !exercise.createdByUser ? '' : `<rrr-button type="button" variant="ghost" tone="success" data-action="archive" data-id="${exercise.id}" aria-label="${escapeHtml(t('exercise.action.archiveAria', { name: exercise.name }))}"><rrr-icon name="archive"></rrr-icon></rrr-button>`}
-            </div>
           </article>
         `
       })
@@ -156,89 +63,22 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
   private updateLists(): void {
     const activeList = this.querySelector<HTMLElement>('[data-list="active"]')
-    const archivedList = this.querySelector<HTMLElement>('[data-list="archived"]')
 
     if (activeList) {
-      activeList.innerHTML = this.renderList(false)
+      activeList.innerHTML = this.renderList()
     }
-
-    if (archivedList) {
-      archivedList.innerHTML = this.renderList(true)
-    }
-
-    this.bindListActions()
-  }
-
-  private bindListActions(): void {
-    this.querySelectorAll<HTMLElement>('rrr-button[data-action="edit"]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const id = button.dataset.id
-
-        if (id) {
-          void this.editExercise(id)
-        }
-      })
-    })
-
-    this.querySelectorAll<HTMLElement>('rrr-button[data-action="archive"]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const id = button.dataset.id
-
-        if (id) {
-          void this.archiveExercise(id)
-        }
-      })
-    })
   }
 
   private render(): void {
     this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <rrr-card size="lg">
-          <div>
-            <p>${t('exercise.subtitle')}</p>
-          </div>
-          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('exercise.status.default')}</p>
-          <div class="form">
-            <rrr-input label="${t('field.name')}" name="name" placeholder="${t('exercise.form.name.placeholder')}"></rrr-input>
-            <rrr-select label="${t('exercise.form.kind.label')}" name="kind" value="reps">
-              <option value="reps">${t('exercise.form.kind.repsWeight')}</option>
-              <option value="time">${t('exercise.form.kind.duration')}</option>
-            </rrr-select>
-            <rrr-button type="button" data-action="add">${t('exercise.form.add')}</rrr-button>
-          </div>
-        </rrr-card>
-        <rrr-card size="lg">
+        <section class="section">
           <h3>${t('exercise.list.active')}</h3>
-          <div class="list" data-list="active">${this.renderList(false)}</div>
-        </rrr-card>
-        <rrr-card size="lg">
-          <details>
-            <summary>${t('exercise.list.archived')}</summary>
-            <div class="list" data-list="archived">${this.renderList(true)}</div>
-          </details>
-        </rrr-card>
+          <div class="list" data-list="active">${this.renderList()}</div>
+        </section>
       </section>
     `
-
-    const nameField = this.querySelector<HTMLElement>('rrr-input[name="name"]')
-    const kindField = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="kind"]')
-
-    if (nameField) {
-      nameField.setAttribute('value', '')
-      nameField.removeAttribute('invalid')
-    }
-
-    if (kindField) {
-      kindField.setAttribute('value', 'reps')
-    }
-
-    this.querySelector<HTMLElement>('rrr-button[data-action="add"]')?.addEventListener('click', () => {
-      this.addExercise()
-    })
-
-    this.bindListActions()
   }
 }
 

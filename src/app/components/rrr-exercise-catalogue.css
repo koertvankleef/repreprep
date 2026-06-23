@@ -52,9 +52,3 @@ rrr-exercise-catalogue {
   color: var(--rrr-exercise-catalogue-badge-color);
   font-size: var(--rrr-exercise-catalogue-badge-size);
 }
-
-.form input,
-.form select {
-  display: block;
-  width: 100%;
-}

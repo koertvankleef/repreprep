@@ -174,7 +174,6 @@ export const enUsMessages = {
 
   'dialog.validation.required': 'This field is required.',
   'exercise.title': 'Exercises',
-  'exercise.subtitle': 'Manage your exercise catalogue.',
   'exercise.status.default': 'Create, rename, or archive exercises used across workouts and routines.',
   'exercise.search.label': 'Search exercises',
   'exercise.search.placeholder': 'Search by name, muscle, equipment, or category',

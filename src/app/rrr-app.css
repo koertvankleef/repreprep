@@ -224,23 +224,40 @@ nav {
 
 main {
   grid-area: main;
-  padding: var(--rrr-app-main-padding);
-  padding-bottom: calc(var(--rrr-app-main-padding) + var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
-  max-width: 72rem;
   width: 100%;
   box-sizing: border-box;
   min-width: 0;
-  margin: 0 auto;
+  min-height: 0;
+  display: grid;
 }
 
 #view {
   position: relative;
   display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
 }
 
 #view > .route-view {
   grid-area: 1 / 1;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
   min-width: 0;
+  min-height: 100%;
+}
+
+#view > .route-view-padded {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--rrr-app-main-padding);
+  padding-bottom: calc(var(--rrr-app-main-padding) + var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
+}
+
+#view > .route-view-full {
+  background: var(--rrr-color-background);
+  padding-bottom: calc(var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
 }
 
 #view.is-transitioning {
@@ -352,6 +369,40 @@ main {
     animation: none;
     transform: none;
   }
+}
+
+
+.section {
+  display: grid;
+  gap: var(--rrr-spacing-xs);
+}
+
+.section-title {
+  margin: 0;
+}
+
+.section-card {
+  display: grid;
+  gap: 0;
+  background: var(--rrr-colors-grayscale-00);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border-radius: var(--rrr-radius-l);
+  overflow: hidden;
+}
+
+.section-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--rrr-colors-grayscale-80);
+  gap: var(--rrr-spacing-m);
+  padding: var(--rrr-spacing-m);
+  transition: background var(--rrr-transition-default), color var(--rrr-transition-default);
+}
+
+.section-link:hover {
+  background: var(--rrr-colors-activity-indigo-10);
+  color: var(--rrr-colors-activity-indigo-80);
 }
 
 /* ── Options panel (side drawer, mobile-first) ───────────────────────── */
@@ -527,10 +578,7 @@ main {
     display: none;
   }
 
-  main {
-    grid-area: main;
-    padding: var(--rrr-app-main-padding);
+  #view > .route-view-padded {
     max-width: none;
-    margin: 0;
   }
 }

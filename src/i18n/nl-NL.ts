@@ -174,7 +174,6 @@ export const nlNlMessages = {
 
   'dialog.validation.required': 'Dit veld is verplicht.',
   'exercise.title': 'Oefeningen',
-  'exercise.subtitle': 'Beheer je oefeningencatalogus.',
   'exercise.status.default': 'Maak, hernoem of archiveer oefeningen die in workouts en routines worden gebruikt.',
   'exercise.search.label': 'Oefeningen zoeken',
   'exercise.search.placeholder': 'Zoek op naam, spiergroep, materiaal of categorie',

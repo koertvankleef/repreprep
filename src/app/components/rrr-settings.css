@@ -14,39 +14,6 @@ rrr-settings {
   font-size: var(--rrr-font-size-xl);
 }
 
-.settings-section {
-  display: grid;
-  gap: var(--rrr-spacing-xs);
-}
-
-.settings-section-title {
-  margin: 0;
-}
-
-.settings-card {
-  display: grid;
-  gap: 0;
-  background: var(--rrr-colors-grayscale-00);
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
-  border-radius: var(--rrr-radius-l);
-  overflow: hidden;
-}
-
-.settings-link {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: var(--rrr-colors-grayscale-80);
-  gap: var(--rrr-spacing-m);
-  padding: var(--rrr-spacing-m);
-  transition: background var(--rrr-transition-default), color var(--rrr-transition-default);
-}
-
-.settings-link:hover {
-  background: var(--rrr-colors-activity-indigo-10);
-  color: var(--rrr-colors-activity-indigo-80);
-}
-
 .control-row {
   display: flex;
   align-items: center;

@@ -436,6 +436,11 @@ export class RrrApp extends HTMLElement {
     return route.name === 'workouts' || route.name === 'routines' || route.name === 'exercises' || route.name === 'history'
   }
 
+  private getRouteSurface(route: Route): 'full' | 'padded' {
+    // return route.name === 'exercises' ? 'full' : 'padded'
+    return 'padded'
+  }
+
   private computeRouteTransition(from: Route | null, to: Route): RouteTransition {
     if (!from || from.name === to.name) {
       return 'none'
@@ -592,7 +597,7 @@ export class RrrApp extends HTMLElement {
 
     const currentView = viewHost.querySelector<HTMLElement>('.route-view-current')
     const nextView = this.createRouteViewElement(route)
-    nextView.classList.add('route-view', 'route-view-current')
+    nextView.classList.add('route-view', `route-view-${this.getRouteSurface(route)}`, 'route-view-current')
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (!currentView || transition === 'none' || reduceMotion) {
@@ -638,7 +643,6 @@ export class RrrApp extends HTMLElement {
         <header class="app-header">
           <rrr-button type="button" variant="ghost" tone="neutral" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}" aria-hidden="${this.getBackHref() === null ? 'true' : 'false'}" ${this.getBackHref() === null ? 'tabindex="-1"' : ''}><rrr-icon name="arrow-left"></rrr-icon></rrr-button>
           ${this.renderHeaderContent(route)}
-          <rrr-button type="button" variant="ghost" tone="neutral" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
         </header>
         <main>
           <div id="view"></div>
@@ -722,8 +726,9 @@ export class RrrApp extends HTMLElement {
   }
 
   private renderHeaderContent(route: Route): string {
+    let contentHtml = ''
     if (route.name === 'exercises') {
-      return `
+      contentHtml += `
         <rrr-input
           class="app-header-content app-header-search"
           type="search"
@@ -732,10 +737,16 @@ export class RrrApp extends HTMLElement {
           placeholder="${t('exercise.search.placeholder')}"
           value="${escapeHtml(this.exerciseSearchQuery)}"
         ></rrr-input>
+        <rrr-button type="button" variant="ghost" tone="neutral" data-action="open-filter" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="filter"></rrr-icon></rrr-button>
       `
+    } else {
+      contentHtml += `<h1 class="app-header-content app-header-title">${this.getHeaderTitle(route)}</h1>`
+    }
+    if (route.name !== 'exercises') {
+      contentHtml += `<rrr-button type="button" variant="ghost" tone="neutral" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>`
     }
 
-    return `<h1 class="app-header-content app-header-title">${this.getHeaderTitle(route)}</h1>`
+    return contentHtml
   }
 
   private render(): void {
@@ -760,7 +771,7 @@ export class RrrApp extends HTMLElement {
     }
 
     if (!routeChanged && route.name === 'settings') {
-      const settingsEl = this.shadowRoot.querySelector<HTMLElement>('#view > .route-view-current > rrr-settings')
+      const settingsEl = this.shadowRoot.querySelector<HTMLElement>('#view > rrr-settings.route-view-current')
       if (settingsEl) {
         settingsEl.setAttribute('theme', this.displayPreferences.theme)
         settingsEl.setAttribute('contrast', this.displayPreferences.contrast)
