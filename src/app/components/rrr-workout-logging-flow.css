@@ -1,4 +1,4 @@
-:host {
+rrr-workout-logging-flow {
   display: block;
   --proto-surface: var(--rrr-colors-grayscale-00);
   --proto-border: var(--rrr-colors-grayscale-40);
@@ -9,7 +9,6 @@
   --proto-transition: var(--rrr-anim-fromto-timingfunction);
   --proto-transition-shorthand: var(--proto-transition-duration) var(--proto-transition);
   --proto-stack-width: 28rem;
-}
 
 .prototype {
   display: grid;
@@ -446,4 +445,5 @@
 .hint {
   font-size: var(--rrr-font-size-xs);
   color: var(--proto-text-muted);
+}
 }

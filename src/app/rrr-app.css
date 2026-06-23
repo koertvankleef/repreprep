@@ -1,6 +1,7 @@
 :host {
   display: block;
   min-height: 100vh;
+  font-family: var(--rrr-font-family);
   --rrr-app-nav-gap: var(--rrr-spacing-2xs);
   --rrr-app-nav-padding: 0 var(--rrr-spacing-s);
   --rrr-app-nav-background: var(--rrr-colors-grayscale-00);
@@ -23,6 +24,34 @@
   --rrr-app-link-font-family: var(--rrr-font-family-heading);
   --rrr-app-main-padding: var(--rrr-spacing-s);
   --rrr-app-control-radius: var(--rrr-radius-s);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--rrr-font-family-heading);
+}
+
+h2 {
+  font-size: var(--rrr-font-size-l);
+  font-weight: 600;
+  color: var(--rrr-colors-activity-indigo-80);
+}
+
+h3 {
+  font-size: var(--rrr-font-size-s);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 .shell {

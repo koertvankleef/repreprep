@@ -7,7 +7,6 @@ rrr-set-entry {
   --rrr-set-entry-shadow: var(--rrr-depth-1-shadow);
   --rrr-set-entry-gap: var(--rrr-spacing-s);
   --rrr-set-entry-fields-gap: var(--rrr-spacing-s);
-}
 
 .set {
   border: var(--rrr-set-entry-border-width) solid var(--rrr-set-entry-border-color);
@@ -28,4 +27,5 @@ rrr-set-entry {
 .actions {
   display: flex;
   justify-content: flex-end;
+}
 }

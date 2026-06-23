@@ -1,6 +1,5 @@
 import { storageService } from './storage-instance.ts'
 import { t } from '../i18n/index.ts'
-import { shadowTypographyStyles } from '../design-system/shadow-styles.ts'
 import { appRoutes, type AppRouteMeta } from '../domain/routes.ts'
 import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
 import { toastService } from '../foundation/toast.ts'
@@ -14,9 +13,7 @@ import {
   type DisplayPreferences,
   type ThemeMode,
 } from './theme-preferences.ts'
-import appStyles from './rrr-app.css?inline'
-
-const styles = `${shadowTypographyStyles}\n${appStyles}`
+import styles from './rrr-app.css?inline'
 
 type InstallPromptChoice = {
   outcome: 'accepted' | 'dismissed'

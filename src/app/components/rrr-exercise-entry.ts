@@ -1,21 +1,13 @@
 import { createTimeSet, createRepsSet } from '../../domain/workout-service.ts'
 import { t } from '../../i18n/index.ts'
-import { shadowTypographyStyles } from '../../design-system/shadow-styles.ts'
 import type { ExerciseDefinition, SetEntry, WorkoutExerciseEntry } from '../../domain/types.ts'
 import './rrr-set-entry.ts'
-import componentStyles from './rrr-exercise-entry.css?inline'
-
-const styles = `${shadowTypographyStyles}\n${componentStyles}`
+import styles from './rrr-exercise-entry.css?inline'
 
 export class RrrExerciseEntry extends HTMLElement {
   private entryValue: WorkoutExerciseEntry | null = null
   private exerciseValue: ExerciseDefinition | null = null
   private listenersBound = false
-
-  constructor() {
-    super()
-    this.attachShadow({ mode: 'open' })
-  }
 
   set entry(value: WorkoutExerciseEntry) {
     this.entryValue = value
@@ -37,13 +29,13 @@ export class RrrExerciseEntry extends HTMLElement {
   }
 
   private bindListeners(): void {
-    if (!this.shadowRoot || this.listenersBound) {
+    if (this.listenersBound) {
       return
     }
 
     this.listenersBound = true
 
-    this.shadowRoot.addEventListener('rrr-set-changed', (event) => {
+    this.addEventListener('rrr-set-changed', (event) => {
       const customEvent = event as CustomEvent<SetEntry>
 
       if (!this.entryValue) {
@@ -58,7 +50,7 @@ export class RrrExerciseEntry extends HTMLElement {
       this.emitChanged()
     })
 
-    this.shadowRoot.addEventListener('rrr-set-removed', (event) => {
+    this.addEventListener('rrr-set-removed', (event) => {
       const customEvent = event as CustomEvent<string>
 
       if (!this.entryValue) {
@@ -120,7 +112,7 @@ export class RrrExerciseEntry extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot || !this.entryValue) {
+    if (!this.entryValue) {
       return
     }
 
@@ -128,7 +120,7 @@ export class RrrExerciseEntry extends HTMLElement {
     const exerciseKind = this.exerciseValue?.kind ?? 'reps'
     const headingId = `exercise-entry-${this.entryValue.id}`
 
-    this.shadowRoot.innerHTML = `
+    this.innerHTML = `
       <style>${styles}</style>
       <section class="entry" aria-labelledby="${headingId}">
         <div class="header">
@@ -146,7 +138,7 @@ export class RrrExerciseEntry extends HTMLElement {
       </section>
     `
 
-    this.shadowRoot.querySelector<HTMLElement & { value: string }>('rrr-textarea[name="notes"]')?.addEventListener('input', (event) => {
+    this.querySelector<HTMLElement & { value: string }>('rrr-textarea[name="notes"]')?.addEventListener('input', (event) => {
       const target = event.currentTarget as HTMLElement & { value: string }
 
       if (!this.entryValue) {
@@ -161,15 +153,15 @@ export class RrrExerciseEntry extends HTMLElement {
       this.emitChanged()
     })
 
-    this.shadowRoot.querySelector<HTMLElement>('rrr-button[data-action="add-set"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="add-set"]')?.addEventListener('click', () => {
       this.addSet()
     })
 
-    this.shadowRoot.querySelector<HTMLElement>('rrr-button[data-action="remove-exercise"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="remove-exercise"]')?.addEventListener('click', () => {
       this.emitRemoved()
     })
 
-    const container = this.shadowRoot.querySelector<HTMLDivElement>('.sets')
+    const container = this.querySelector<HTMLDivElement>('.sets')
 
     if (container) {
       if (this.entryValue.sets.length === 0) {

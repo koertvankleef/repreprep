@@ -9,7 +9,6 @@ rrr-exercise-entry {
   --rrr-exercise-entry-header-gap: var(--rrr-spacing-s);
   --rrr-exercise-entry-sets-gap: var(--rrr-spacing-s);
   --rrr-exercise-entry-footer-gap: var(--rrr-spacing-s);
-}
 
 .entry {
   border: var(--rrr-exercise-entry-border-width) solid var(--rrr-exercise-entry-border-color);
@@ -37,4 +36,5 @@ rrr-exercise-entry {
   display: flex;
   gap: var(--rrr-exercise-entry-footer-gap);
   flex-wrap: wrap;
+}
 }

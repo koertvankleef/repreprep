@@ -19,7 +19,7 @@ export class TimelineMotionController {
     }
   }
 
-  sync(root: ShadowRoot, previousActive: HTMLElement | null, currentActive: HTMLElement | null): void {
+  sync(root: ParentNode, previousActive: HTMLElement | null, currentActive: HTMLElement | null): void {
     if (previousActive === currentActive) {
       return
     }
@@ -40,7 +40,7 @@ export class TimelineMotionController {
     this.scheduleCleanup(root)
   }
 
-  private scheduleCleanup(root: ShadowRoot): void {
+  private scheduleCleanup(root: ParentNode): void {
     const cleanupDelay = Math.max(
       this.getTransitionDurationMs('--proto-transition-duration'),
       this.getTransitionDurationMs('--proto-transition-duration-exit'),

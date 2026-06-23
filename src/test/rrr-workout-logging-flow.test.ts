@@ -27,14 +27,14 @@ describe('rrr-workout-logging-flow motion invariants', () => {
 
     component.activateCurrentTimelineItem()
 
-    const initialActive = element.shadowRoot?.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
+    const initialActive = element.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
     expect(initialActive).toBeTruthy()
     expect(initialActive?.dataset.motion).toBe('entering')
 
     const patched = component.patchTimelineStateInPlace()
     expect(patched).toBe(true)
 
-    const activeAfterPatch = element.shadowRoot?.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
+    const activeAfterPatch = element.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
     expect(activeAfterPatch).toBe(initialActive)
     expect(activeAfterPatch?.dataset.motion).toBe('entering')
   })
@@ -53,7 +53,7 @@ describe('rrr-workout-logging-flow motion invariants', () => {
 
     component.activateCurrentTimelineItem()
 
-    const previousActive = element.shadowRoot?.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
+    const previousActive = element.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
     expect(previousActive).toBeTruthy()
 
     component.activeTimelineIndex = 1
@@ -62,7 +62,7 @@ describe('rrr-workout-logging-flow motion invariants', () => {
 
     expect(patchedOnSwitch).toBe(true)
 
-    const currentActive = element.shadowRoot?.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
+    const currentActive = element.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
     expect(currentActive).toBeTruthy()
     expect(currentActive).not.toBe(previousActive)
     expect(currentActive?.classList.contains('timeline-item--rest')).toBe(true)
@@ -89,13 +89,13 @@ describe('rrr-workout-logging-flow motion invariants', () => {
 
     component.activateCurrentTimelineItem()
 
-    const confirmButtonBefore = element.shadowRoot?.querySelector<HTMLElement>('.rep-confirm-action')
+    const confirmButtonBefore = element.querySelector<HTMLElement>('.rep-confirm-action')
     expect(confirmButtonBefore?.textContent).toBe('Log 12 reps')
 
     component.adjustRepValue(1)
 
-    const confirmButtonAfter = element.shadowRoot?.querySelector<HTMLElement>('.rep-confirm-action')
-    const repValue = element.shadowRoot?.querySelector<HTMLElement>('.rep-value')
+    const confirmButtonAfter = element.querySelector<HTMLElement>('.rep-confirm-action')
+    const repValue = element.querySelector<HTMLElement>('.rep-value')
     expect(repValue?.textContent).toBe('13 reps')
     expect(confirmButtonAfter?.textContent).toBe('Log 13 reps')
     expect(confirmButtonAfter?.getAttribute('aria-label')).toBe('Log 13 reps')
@@ -116,8 +116,8 @@ describe('rrr-workout-logging-flow motion invariants', () => {
     component.activateCurrentTimelineItem()
     component.confirmRepResult()
 
-    const announcement = element.shadowRoot?.querySelector<HTMLElement>('[data-role="workout-announcement"]')
-    const countdownHint = element.shadowRoot?.querySelector<HTMLElement>('.rep-grace-hint')
+    const announcement = element.querySelector<HTMLElement>('[data-role="workout-announcement"]')
+    const countdownHint = element.querySelector<HTMLElement>('.rep-grace-hint')
     expect(announcement?.textContent).toBe('12 reps logged. Rest starts soon.')
     expect(countdownHint?.getAttribute('aria-live')).toBeNull()
 
@@ -139,7 +139,7 @@ describe('rrr-workout-logging-flow motion invariants', () => {
     component.stage = 'workout-complete'
     component.render()
 
-    const completionCard = element.shadowRoot?.querySelector<HTMLElement>('.timeline-item--complete')
+    const completionCard = element.querySelector<HTMLElement>('.timeline-item--complete')
     expect(completionCard).toBeTruthy()
     expect(completionCard?.dataset.state).toBe('active')
 

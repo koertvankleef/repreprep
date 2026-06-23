@@ -1,3 +1,4 @@
+rrr-settings {
 .page {
   display: grid;
   gap: var(--rrr-spacing-xl);
@@ -15,7 +16,7 @@
 
 .settings-section {
   display: grid;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-spacing-xs);
 }
 
 .settings-section-title {
@@ -46,25 +47,12 @@
   color: var(--rrr-colors-activity-indigo-80);
 }
 
-.settings-link rrr-icon {
-  font-size: 1rem;
-}
-
-.settings-link span {
-  font-size: var(--rrr-font-size-s);
-}
-
 .control-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--rrr-spacing-m);
   padding: var(--rrr-spacing-m);
-}
-
-.control-label {
-  font-size: var(--rrr-font-size-s);
-  color: var(--rrr-colors-grayscale-80);
 }
 
 .control-group {
@@ -94,14 +82,12 @@
 
 .danger-title {
   margin: 0;
-  font-size: var(--rrr-font-size-s);
   color: var(--rrr-colors-context-danger-70);
 }
 
 .danger-copy,
 .danger-warning {
   margin: 0;
-  font-size: var(--rrr-font-size-s);
   color: var(--rrr-colors-grayscale-80);
 }
 
@@ -121,12 +107,6 @@
   display: grid;
   gap: var(--rrr-spacing-s);
   padding: var(--rrr-spacing-m);
-  min-width: 0;
-}
-
-.reset-confirm-label {
-  font-size: var(--rrr-font-size-s);
-  color: var(--rrr-colors-grayscale-90);
   min-width: 0;
 }
 
@@ -163,4 +143,5 @@
   flex-wrap: wrap;
   gap: var(--rrr-spacing-s);
   justify-content: flex-end;
+}
 }

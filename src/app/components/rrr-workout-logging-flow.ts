@@ -64,18 +64,13 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
   private timelineItemAdapters: TimelineItemDomAdapter[] = []
   private liveAnnouncement = ''
 
-  constructor() {
-    super()
-    this.attachShadow({ mode: 'open' })
-  }
-
   connectedCallback(): void {
     this.render()
-    this.shadowRoot?.addEventListener('click', this.handleClick)
+    this.addEventListener('click', this.handleClick)
   }
 
   disconnectedCallback(): void {
-    this.shadowRoot?.removeEventListener('click', this.handleClick)
+    this.removeEventListener('click', this.handleClick)
     this.motionController.dispose()
     this.clearTimers()
   }
@@ -529,11 +524,11 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
   }
 
   private patchTimelineStateInPlace(): boolean {
-    if (!this.shadowRoot || !this.startItem || this.timelineItemAdapters.length !== TIMELINE.length) {
+    if (!this.startItem || this.timelineItemAdapters.length !== TIMELINE.length) {
       return false
     }
 
-    const previousActive = this.shadowRoot.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
+    const previousActive = this.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
 
     this.startItem.dataset.state = this.stage === 'locked' ? 'active' : 'complete'
     this.syncStartSectionState(this.startItem)
@@ -558,8 +553,8 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
       }
     })
 
-    const currentActive = this.shadowRoot.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
-    this.motionController.sync(this.shadowRoot, previousActive, currentActive)
+    const currentActive = this.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
+    this.motionController.sync(this, previousActive, currentActive)
     this.syncAnnouncementRegion()
 
     return true
@@ -738,28 +733,22 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
   }
 
   private syncAnnouncementRegion(): void {
-    const announcementEl = this.shadowRoot?.querySelector<HTMLElement>('[data-role="workout-announcement"]')
+    const announcementEl = this.querySelector<HTMLElement>('[data-role="workout-announcement"]')
     if (announcementEl) {
       announcementEl.textContent = this.liveAnnouncement
     }
   }
 
   private cacheDomReferences(): void {
-    if (!this.shadowRoot) {
-      this.startItem = null
-      this.timelineItemAdapters = []
-      return
-    }
-
-    this.startItem = this.shadowRoot.querySelector<HTMLElement>('.timeline-item--start')
-    const timelineElements = Array.from(this.shadowRoot.querySelectorAll<HTMLElement>('.timeline-item:not(.timeline-item--start)'))
+    this.startItem = this.querySelector<HTMLElement>('.timeline-item--start')
+    const timelineElements = Array.from(this.querySelectorAll<HTMLElement>('.timeline-item:not(.timeline-item--start)'))
     this.timelineItemAdapters = timelineElements.length === TIMELINE.length
       ? TIMELINE.map((item, index) => createTimelineItemDomAdapter(item, timelineElements[index]!))
       : []
   }
 
   private syncOverallProgress(): void {
-    const fill = this.shadowRoot?.querySelector<HTMLElement>('.overall-progress__fill')
+    const fill = this.querySelector<HTMLElement>('.overall-progress__fill')
     if (!fill) {
       return
     }
@@ -778,14 +767,14 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
 
   private scrollActiveIntoView(behavior: ScrollBehavior = 'smooth'): void {
     requestAnimationFrame(() => {
-      const active = this.shadowRoot?.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
+      const active = this.querySelector<HTMLElement>('.timeline-item[data-state="active"]')
       active?.scrollIntoView({ behavior, block: 'center' })
     })
   }
 
   private scrollCompleteIntoView(): void {
     requestAnimationFrame(() => {
-      const complete = this.shadowRoot?.querySelector<HTMLElement>('.timeline-item--complete')
+      const complete = this.querySelector<HTMLElement>('.timeline-item--complete')
       complete?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     })
   }
@@ -813,18 +802,14 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot) {
-      return
-    }
-
     const viewState = this.getViewState()
-    this.shadowRoot.innerHTML = renderWorkoutLoggingMarkup(viewState, styles, TIMELINE)
+    this.innerHTML = renderWorkoutLoggingMarkup(viewState, styles, TIMELINE)
 
     this.cacheDomReferences()
     this.syncAnnouncementRegion()
 
     requestAnimationFrame(() => {
-      const fill = this.shadowRoot?.querySelector<HTMLElement>('.overall-progress__fill')
+      const fill = this.querySelector<HTMLElement>('.overall-progress__fill')
       if (!fill) {
         return
       }

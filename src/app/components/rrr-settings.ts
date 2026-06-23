@@ -1,8 +1,5 @@
 import { getLocale, t } from '../../i18n/index.ts'
-import { shadowTypographyStyles } from '../../design-system/shadow-styles.ts'
 import styles from './rrr-settings.css?inline'
-
-const componentStyles = `${shadowTypographyStyles}\n${styles}`
 
 export class RrrSettings extends HTMLElement {
   static observedAttributes = ['styleguide-enabled', 'contrast']
@@ -117,7 +114,7 @@ export class RrrSettings extends HTMLElement {
     const contrast = this.getAttribute('contrast') ?? 'normal'
 
     this.innerHTML = `
-      <style>${componentStyles}</style>
+      <style>${styles}</style>
       <div class="page">
         <section class="settings-section">
           <h2 class="settings-section-title">${t('app.settings.navigation')}</h2>

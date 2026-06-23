@@ -1,18 +1,10 @@
 import { t } from '../../i18n/index.ts'
 import type { ExerciseKind, SetEntry } from '../../domain/types.ts'
-import { shadowTypographyStyles } from '../../design-system/shadow-styles.ts'
-import componentStyles from './rrr-set-entry.css?inline'
-
-const styles = `${shadowTypographyStyles}\n${componentStyles}`
+import styles from './rrr-set-entry.css?inline'
 
 export class RrrSetEntry extends HTMLElement {
   private setValue: SetEntry | null = null
   private exerciseKindValue: ExerciseKind = 'reps'
-
-  constructor() {
-    super()
-    this.attachShadow({ mode: 'open' })
-  }
 
   set setData(value: SetEntry) {
     this.setValue = value
@@ -53,14 +45,14 @@ export class RrrSetEntry extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot || !this.setValue) {
+    if (!this.setValue) {
       return
     }
 
     const set = this.setValue
     const labelId = `set-label-${set.id}`
 
-    this.shadowRoot.innerHTML = `
+    this.innerHTML = `
       <style>${styles}</style>
       <div class="set" role="group" aria-labelledby="${labelId}">
         <span class="sr-only" id="${labelId}">${t('setEntry.groupLabel')}</span>
@@ -95,15 +87,15 @@ export class RrrSetEntry extends HTMLElement {
       </div>
     `
 
-    this.shadowRoot.querySelectorAll<HTMLInputElement>('input').forEach((input) => {
+    this.querySelectorAll<HTMLInputElement>('input').forEach((input) => {
       input.addEventListener('input', () => {
         if (!this.setValue) {
           return
         }
 
         if (this.exerciseKindValue === 'time' && this.setValue.kind === 'time') {
-          const secondsInput = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="seconds"]')
-          const notesInput = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="notes"]')
+          const secondsInput = this.querySelector<HTMLInputElement>('input[name="seconds"]')
+          const notesInput = this.querySelector<HTMLInputElement>('input[name="notes"]')
 
           this.setValue = {
             ...this.setValue,
@@ -113,9 +105,9 @@ export class RrrSetEntry extends HTMLElement {
         }
 
         if (this.exerciseKindValue === 'reps' && this.setValue.kind === 'reps') {
-          const repsInput = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="reps"]')
-          const weightInput = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="weightKg"]')
-          const notesInput = this.shadowRoot?.querySelector<HTMLInputElement>('input[name="notes"]')
+          const repsInput = this.querySelector<HTMLInputElement>('input[name="reps"]')
+          const weightInput = this.querySelector<HTMLInputElement>('input[name="weightKg"]')
+          const notesInput = this.querySelector<HTMLInputElement>('input[name="notes"]')
           const weightValue = weightInput?.value ?? ''
 
           this.setValue = {
@@ -130,7 +122,7 @@ export class RrrSetEntry extends HTMLElement {
       })
     })
 
-    this.shadowRoot.querySelector<HTMLElement>('rrr-button[data-action="remove"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-button[data-action="remove"]')?.addEventListener('click', () => {
       if (this.setValue) {
         this.emitRemoved(this.setValue.id)
       }
