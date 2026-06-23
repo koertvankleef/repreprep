@@ -47,7 +47,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
         return `
           <article class="item section-part">
-            <strong>${escapeHtml(exercise.name)}</strong>
+            <h4>${escapeHtml(exercise.name)}</h4>
             <div class="meta">
               <rrr-badge>${originLabel}</rrr-badge>
               <rrr-badge>${kindLabel}</rrr-badge>

@@ -124,7 +124,6 @@ export class RrrSettings extends HTMLElement {
               <span>${t('app.nav.importExport')}</span>
             </a>
             ${styleguideEnabled ? `
-              <div class="card-divider"></div>
               <a class="section-link" href="#/styleguide">
                 <rrr-icon name="braces"></rrr-icon>
                 <span>${t('app.nav.styleguide')}</span>
@@ -172,7 +171,6 @@ export class RrrSettings extends HTMLElement {
               <rrr-button type="button" tone="danger" variant="outline" data-action="open-reset-data">${t('app.settings.resetData.open')}</rrr-button>
             </div>
             ${this.resetPanelOpen ? `
-              <div class="card-divider"></div>
               <div class="reset-confirm-panel">
                 <label class="reset-confirm-label" for="reset-date-confirm">${t('app.settings.resetData.prompt', { date: this.getTodayLocalizedDate() })}</label>
                 <input

@@ -24,34 +24,14 @@
   --rrr-app-link-font-family: var(--rrr-font-family-heading);
   --rrr-app-main-padding: var(--rrr-spacing-s);
   --rrr-app-control-radius: var(--rrr-radius-s);
-}
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--rrr-font-family-heading);
-}
-
-h2 {
-  font-size: var(--rrr-font-size-l);
-  font-weight: 600;
-  color: var(--rrr-colors-activity-indigo-80);
-}
-
-h3 {
-  font-size: var(--rrr-font-size-s);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
+  /* From globals.css, unavoidable duplication */
+  min-height: 100vh;
+  font-family: var(--rrr-font-family);
+  font-size: var(--rrr-font-size-default);
+  line-height: 1.5;
+  color: var(--rrr-color-text);
+  background: var(--rrr-color-background);
 }
 
 .shell {
@@ -127,7 +107,7 @@ nav {
   display: none;
 }
 
-.nav-utilities > rrr-button[data-action="install-app"] {
+.nav-utilities>rrr-button[data-action="install-app"] {
   width: auto;
 }
 
@@ -146,7 +126,7 @@ nav {
   background: var(--rrr-colors-grayscale-00);
 }
 
-.nav-control-group rrr-button[aria-pressed="true"] > button[data-rrr-button-inner] {
+.nav-control-group rrr-button[aria-pressed="true"]>button[data-rrr-button-inner] {
   background: var(--rrr-colors-activity-indigo-60);
   border-color: var(--rrr-colors-activity-indigo-70);
   color: var(--rrr-color-primary-contrast);
@@ -172,7 +152,7 @@ nav {
   overflow: visible;
 }
 
-.app-header-inner {
+.app-header-primary {
   position: relative;
   z-index: 1;
   width: 100%;
@@ -201,10 +181,10 @@ nav {
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(16px + env(safe-area-inset-top));
-  box-shadow: var(--rrr-app-nav-shadow);
+  top: 100%;
   pointer-events: none;
-  height: calc(var(--rrr-app-header-height) - 16px - env(safe-area-inset-top));
+  height: var(--rrr-app-header-shadow-height, 0.875rem);
+  background: linear-gradient(to bottom, rgb(0 0 0 / 18%), rgb(0 0 0 / 0%));
 }
 
 .app-header-title {
@@ -239,12 +219,6 @@ nav {
   justify-self: end;
 }
 
-.card-divider {
-  border-top: var(--rrr-border-width) solid var(--rrr-colors-grayscale-20);
-  height: 1px;
-  width: 100%;
-}
-
 main {
   grid-area: main;
   width: 100%;
@@ -262,7 +236,7 @@ main {
   min-height: 100%;
 }
 
-#view > .route-view {
+#view>.route-view {
   grid-area: 1 / 1;
   display: block;
   box-sizing: border-box;
@@ -271,14 +245,14 @@ main {
   min-height: 100%;
 }
 
-#view > .route-view-padded {
+#view>.route-view-padded {
   max-width: 72rem;
   margin: 0 auto;
   padding: var(--rrr-app-main-padding);
   padding-bottom: calc(var(--rrr-app-main-padding) + var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
 }
 
-#view > .route-view-full {
+#view>.route-view-full {
   background: var(--rrr-color-background);
   padding-bottom: calc(var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
 }
@@ -287,7 +261,7 @@ main {
   overflow: clip;
 }
 
-#view.is-transitioning > .route-view {
+#view.is-transitioning>.route-view {
   will-change: transform, opacity;
 }
 
@@ -388,7 +362,7 @@ main {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #view.is-transitioning > .route-view {
+  #view.is-transitioning>.route-view {
     animation: none;
     transform: none;
   }
@@ -413,12 +387,21 @@ main {
   overflow: hidden;
 }
 
+.section-link,
 .section-part {
   display: flex;
   align-items: center;
   text-decoration: none;
   gap: var(--rrr-spacing-m);
   padding: var(--rrr-spacing-m);
+  border: var(--rrr-border-width) solid transparent;
+
+  &:not(:last-child) {
+    border-bottom-color: var(--rrr-colors-grayscale-30);
+  }
+}
+
+.section-part {
 
   &:focus-visible {
     outline: var(--rrr-focus-outline);
@@ -427,12 +410,7 @@ main {
 }
 
 .section-link {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
   color: var(--rrr-colors-grayscale-80);
-  gap: var(--rrr-spacing-m);
-  padding: var(--rrr-spacing-m);
   transition: background var(--rrr-transition-default), color var(--rrr-transition-default);
 }
 
@@ -521,7 +499,7 @@ main {
   gap: var(--rrr-spacing-s);
 }
 
-.options-menu-item > button[data-rrr-button-inner] {
+.options-menu-item>button[data-rrr-button-inner] {
   justify-content: flex-start;
   gap: var(--rrr-spacing-s);
   width: 100%;
@@ -595,7 +573,7 @@ main {
     justify-items: stretch;
   }
 
-  .nav-utilities > rrr-button[data-action="install-app"] {
+  .nav-utilities>rrr-button[data-action="install-app"] {
     width: 100%;
   }
 
@@ -622,7 +600,7 @@ main {
     display: none;
   }
 
-  #view > .route-view-padded {
+  #view>.route-view-padded {
     max-width: none;
   }
 }

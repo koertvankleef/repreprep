@@ -13,7 +13,14 @@ import {
   type DisplayPreferences,
   type ThemeMode,
 } from './theme-preferences.ts'
-import styles from './rrr-app.css?inline'
+import globalStyles from '../design-system/global.css?inline'
+import appStyles from './rrr-app.css?inline'
+
+const globalSheet = new CSSStyleSheet()
+globalSheet.replaceSync(globalStyles)
+
+const appSheet = new CSSStyleSheet()
+appSheet.replaceSync(appStyles)
 
 type InstallPromptChoice = {
   outcome: 'accepted' | 'dismissed'
@@ -73,7 +80,8 @@ export class RrrApp extends HTMLElement {
 
   constructor() {
     super()
-    this.attachShadow({ mode: 'open' })
+    const shadowRoot = this.attachShadow({ mode: 'open' })
+    shadowRoot.adoptedStyleSheets = [globalSheet, appSheet]
   }
 
   private readonly handleInstallPromptAvailable = (event: Event): void => {
@@ -528,10 +536,10 @@ export class RrrApp extends HTMLElement {
   }
 
   private updateShellState(route: Route): void {
-    const headerInner = this.shadowRoot?.querySelector<HTMLElement>('.app-header-inner')
+    const headerInner = this.shadowRoot?.querySelector<HTMLElement>('.app-header-primary')
     if (headerInner) {
       const header = this.createRouteHeader(route)
-      headerInner.className = ['app-header-inner', header.className].filter(Boolean).join(' ')
+      headerInner.className = ['app-header-primary', header.className].filter(Boolean).join(' ')
       headerInner.innerHTML = header.html
       header.bind?.(headerInner)
     }
@@ -596,7 +604,6 @@ export class RrrApp extends HTMLElement {
     }
 
     this.shadowRoot.innerHTML = `
-      <style>${styles}</style>
       <div class="shell">
         <nav>
           <div class="primary-nav">
@@ -608,7 +615,7 @@ export class RrrApp extends HTMLElement {
           </div>
         </nav>
         <header class="app-header">
-          <div class="app-header-inner"></div>
+          <div class="app-header-primary"></div>
         </header>
         <main>
           <div id="view"></div>
@@ -706,7 +713,7 @@ export class RrrApp extends HTMLElement {
       : '<span class="app-header-spacer" aria-hidden="true"></span>'
 
     return {
-      className: 'app-header-inner-standard',
+      className: 'app-header-primary-standard',
       html: `
         <div class="standard-app-header">
           ${backContent}
@@ -723,7 +730,7 @@ export class RrrApp extends HTMLElement {
       : null
 
     return {
-      className: 'app-header-inner-exercises',
+      className: 'app-header-primary-exercises',
       html: `
         <div class="exercise-app-header">
         <rrr-input

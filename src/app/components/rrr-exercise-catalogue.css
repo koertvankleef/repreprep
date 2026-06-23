@@ -17,7 +17,6 @@ rrr-exercise-catalogue {
 
 .item {
   border: var(--rrr-exercise-catalogue-item-border-width) solid var(--rrr-exercise-catalogue-item-border-color);
-  border-radius: var(--rrr-exercise-catalogue-item-radius);
   padding: var(--rrr-exercise-catalogue-item-padding);
   background: var(--rrr-exercise-catalogue-item-background);
   box-shadow: var(--rrr-exercise-catalogue-item-shadow);
