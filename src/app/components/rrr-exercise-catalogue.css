@@ -1,35 +1,43 @@
 rrr-exercise-catalogue {
   --rrr-exercise-catalogue-list-gap: var(--rrr-spacing-s);
-  --rrr-exercise-catalogue-item-border-width: var(--rrr-border-width);
-  --rrr-exercise-catalogue-item-border-color: var(--rrr-colors-grayscale-30);
-  --rrr-exercise-catalogue-item-radius: var(--rrr-radius-m);
-  --rrr-exercise-catalogue-item-padding: var(--rrr-spacing-l);
-  --rrr-exercise-catalogue-item-background: var(--rrr-colors-grayscale-00);
-  --rrr-exercise-catalogue-item-shadow: var(--rrr-depth-1-shadow);
-  --rrr-exercise-catalogue-item-gap: var(--rrr-spacing-l);
+  --rrr-exercise-catalogue-item-gap: 0;
   --rrr-exercise-catalogue-meta-gap: var(--rrr-spacing-s);
-}
+  position: relative;
 
-.list {
-  display: grid;
-  gap: var(--rrr-exercise-catalogue-list-gap);
-}
+  .list {
+    display: grid;
+    gap: var(--rrr-exercise-catalogue-list-gap);
+    padding-bottom: calc(var(--rrr-app-bottom-nav-height) + var(--rrr-spacing-4xl) + env(safe-area-inset-bottom));
+  }
 
-.item {
-  border: var(--rrr-exercise-catalogue-item-border-width) solid var(--rrr-exercise-catalogue-item-border-color);
-  padding: var(--rrr-exercise-catalogue-item-padding);
-  background: var(--rrr-exercise-catalogue-item-background);
-  box-shadow: var(--rrr-exercise-catalogue-item-shadow);
-  display: flex;
-  justify-content: space-between;
-  gap: var(--rrr-exercise-catalogue-item-gap);
-  align-items: center;
-  flex-wrap: wrap;
-}
+  .exercise-cat-item {
+    gap: var(--rrr-exercise-catalogue-item-gap);
+    flex-wrap: wrap;
+  }
 
-.meta {
-  display: flex;
-  gap: var(--rrr-exercise-catalogue-meta-gap);
-  align-items: center;
-  flex-wrap: wrap;
+  .meta {
+    display: flex;
+    gap: var(--rrr-exercise-catalogue-meta-gap);
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  [data-action='new-exercise'] {
+    position: fixed;
+    right: max(var(--rrr-spacing-l), env(safe-area-inset-right));
+    bottom: calc(var(--rrr-app-bottom-nav-height) + var(--rrr-spacing-l) + env(safe-area-inset-bottom));
+    z-index: 35;
+  }
+
+  @media screen and (min-width: 48rem) {
+    .list {
+      padding-bottom: var(--rrr-spacing-4xl);
+    }
+
+    [data-action='new-exercise'] {
+      bottom: var(--rrr-spacing-2xl);
+    }
+  }
 }

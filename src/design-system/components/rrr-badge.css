@@ -18,12 +18,12 @@ rrr-badge {
   --rrr-badge-radius: 999px;
   --rrr-badge-border-width: var(--rrr-border-width);
   --rrr-badge-font-size: var(--rrr-font-size-xs);
-  --rrr-badge-font-weight: var(--rrr-font-weight-normal);
+  --rrr-badge-font-weight: var(--rrr-font-weight-medium);
   --rrr-badge-line-height: 1.2;
 
   --_soft-bg: var(--rrr-colors-activity-indigo-10);
-  --_soft-border: var(--rrr-colors-activity-indigo-20);
-  --_soft-fg: var(--rrr-colors-activity-indigo-80);
+  --_soft-border: var(--rrr-colors-activity-indigo-10);
+  --_soft-fg: var(--rrr-colors-activity-indigo-70);
   --_solid-bg: var(--rrr-colors-activity-indigo-60);
   --_solid-fg: var(--rrr-color-primary-contrast);
 }
