@@ -54,6 +54,7 @@ export class RrrApp extends HTMLElement {
   private optionsPanelOpen = false
   private shellRendered = false
   private settingsReturnHash = '#/workouts'
+  private exerciseSearchQuery = ''
   private readonly router = createHashRouter({
     routes: appRoutes,
     notFoundRouteId: 'workouts',
@@ -167,6 +168,24 @@ export class RrrApp extends HTMLElement {
     }
   }
 
+  private readonly handleInput = (event: Event): void => {
+    const inputTarget = event
+      .composedPath()
+      .find((node): node is HTMLElement & { value: string } =>
+        node instanceof HTMLElement
+        && node.tagName.toLowerCase() === 'rrr-input'
+        && node.getAttribute('name') === 'exercise-search'
+        && 'value' in node,
+      )
+
+    if (!inputTarget) {
+      return
+    }
+
+    this.exerciseSearchQuery = inputTarget.value
+    this.applyExerciseSearchQuery()
+  }
+
   private setThemeMode(theme: ThemeMode): void {
     if (this.displayPreferences.theme === theme) {
       return
@@ -236,6 +255,7 @@ export class RrrApp extends HTMLElement {
     window.addEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.addEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.addEventListener('click', this.handleClick)
+    this.shadowRoot?.addEventListener('input', this.handleInput)
     this.shadowRoot?.addEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
     this.isStandalone = window.matchMedia('(display-mode: standalone)').matches
     if (this.isStandalone) {
@@ -251,6 +271,7 @@ export class RrrApp extends HTMLElement {
     window.removeEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.removeEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.removeEventListener('click', this.handleClick)
+    this.shadowRoot?.removeEventListener('input', this.handleInput)
     this.shadowRoot?.removeEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
     this.router.dispose()
   }
@@ -476,7 +497,9 @@ export class RrrApp extends HTMLElement {
     }
 
     if (route.name === 'exercises') {
-      return document.createElement('rrr-exercise-catalogue')
+      const catalogue = document.createElement('rrr-exercise-catalogue') as HTMLElement & { searchQuery: string }
+      catalogue.searchQuery = this.exerciseSearchQuery
+      return catalogue
     }
 
     if (route.name === 'history') {
@@ -513,9 +536,9 @@ export class RrrApp extends HTMLElement {
   }
 
   private updateShellState(route: Route): void {
-    const headerTitle = this.shadowRoot?.querySelector<HTMLElement>('.app-header-title')
-    if (headerTitle) {
-      headerTitle.textContent = this.getHeaderTitle(route)
+    const headerContent = this.shadowRoot?.querySelector<HTMLElement>('.app-header-content')
+    if (headerContent) {
+      headerContent.outerHTML = this.renderHeaderContent(route)
     }
 
     const backButton = this.shadowRoot?.querySelector<HTMLElement>('.header-back')
@@ -551,6 +574,16 @@ export class RrrApp extends HTMLElement {
     }
   }
 
+  private applyExerciseSearchQuery(): void {
+    const catalogue = this.shadowRoot?.querySelector<HTMLElement & { searchQuery?: string }>(
+      '#view > rrr-exercise-catalogue.route-view-current',
+    )
+
+    if (catalogue) {
+      catalogue.searchQuery = this.exerciseSearchQuery
+    }
+  }
+
   private mountRouteView(route: Route, transition: RouteTransition): void {
     const viewHost = this.shadowRoot?.querySelector<HTMLElement>('#view')
     if (!viewHost) {
@@ -564,6 +597,7 @@ export class RrrApp extends HTMLElement {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (!currentView || transition === 'none' || reduceMotion) {
       viewHost.replaceChildren(nextView)
+      this.applyExerciseSearchQuery()
       return
     }
 
@@ -572,11 +606,13 @@ export class RrrApp extends HTMLElement {
     nextView.classList.add(`route-view-enter-${transition}`)
     viewHost.classList.add('is-transitioning')
     viewHost.append(nextView)
+    this.applyExerciseSearchQuery()
 
     const finish = (): void => {
       currentView.remove()
       nextView.classList.remove(`route-view-enter-${transition}`)
       viewHost.classList.remove('is-transitioning')
+      this.applyExerciseSearchQuery()
     }
 
     nextView.addEventListener('animationend', finish, { once: true })
@@ -601,7 +637,7 @@ export class RrrApp extends HTMLElement {
         </nav>
         <header class="app-header">
           <rrr-button type="button" variant="ghost" tone="neutral" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}" aria-hidden="${this.getBackHref() === null ? 'true' : 'false'}" ${this.getBackHref() === null ? 'tabindex="-1"' : ''}><rrr-icon name="arrow-left"></rrr-icon></rrr-button>
-          <h1 class="app-header-title">${this.getHeaderTitle(route)}</h1>
+          ${this.renderHeaderContent(route)}
           <rrr-button type="button" variant="ghost" tone="neutral" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
         </header>
         <main>
@@ -685,6 +721,23 @@ export class RrrApp extends HTMLElement {
     return ''
   }
 
+  private renderHeaderContent(route: Route): string {
+    if (route.name === 'exercises') {
+      return `
+        <rrr-input
+          class="app-header-content app-header-search"
+          type="search"
+          name="exercise-search"
+          aria-label="${t('exercise.search.label')}"
+          placeholder="${t('exercise.search.placeholder')}"
+          value="${escapeHtml(this.exerciseSearchQuery)}"
+        ></rrr-input>
+      `
+    }
+
+    return `<h1 class="app-header-content app-header-title">${this.getHeaderTitle(route)}</h1>`
+  }
+
   private render(): void {
     const route = this.route
     if (!this.shadowRoot) {
@@ -722,6 +775,10 @@ export class RrrApp extends HTMLElement {
       panel.showModal()
     }
   }
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 customElements.define('rrr-app', RrrApp)

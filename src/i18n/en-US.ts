@@ -177,7 +177,7 @@ export const enUsMessages = {
   'exercise.subtitle': 'Manage your exercise catalogue.',
   'exercise.status.default': 'Create, rename, or archive exercises used across workouts and routines.',
   'exercise.search.label': 'Search exercises',
-  'exercise.search.placeholder': 'Name, muscle, equipment, or category',
+  'exercise.search.placeholder': 'Search by name, muscle, equipment, or category',
   'exercise.form.name.placeholder': 'Exercise name',
   'exercise.form.kind.label': 'Kind',
   'exercise.form.kind.repsWeight': 'Reps',

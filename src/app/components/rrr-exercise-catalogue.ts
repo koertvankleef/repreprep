@@ -10,7 +10,16 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
   private statusMessage = ''
   private statusType: 'error' | 'success' | null = null
-  private searchQuery = ''
+  private searchQueryValue = ''
+
+  set searchQuery(value: string) {
+    this.searchQueryValue = value
+    this.updateLists()
+  }
+
+  get searchQuery(): string {
+    return this.searchQueryValue
+  }
 
   connectedCallback(): void {
     window.addEventListener('rrr-data-changed', this.handleDataChanged)
@@ -111,7 +120,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     const data = storageService.getData()
     const exercises = searchExercises(
       data.exercises.filter((exercise) => exercise.archived === showArchived),
-      this.searchQuery,
+      this.searchQueryValue,
     )
       .sort((left, right) => left.name.localeCompare(right.name))
 
@@ -191,7 +200,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
             <p>${t('exercise.subtitle')}</p>
           </div>
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('exercise.status.default')}</p>
-          <rrr-input label="${t('exercise.search.label')}" name="search" placeholder="${t('exercise.search.placeholder')}"></rrr-input>
           <div class="form">
             <rrr-input label="${t('field.name')}" name="name" placeholder="${t('exercise.form.name.placeholder')}"></rrr-input>
             <rrr-select label="${t('exercise.form.kind.label')}" name="kind" value="reps">
@@ -216,7 +224,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
     const nameField = this.querySelector<HTMLElement>('rrr-input[name="name"]')
     const kindField = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="kind"]')
-    const searchField = this.querySelector<HTMLElement & { value: string }>('rrr-input[name="search"]')
 
     if (nameField) {
       nameField.setAttribute('value', '')
@@ -225,14 +232,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
     if (kindField) {
       kindField.setAttribute('value', 'reps')
-    }
-
-    if (searchField) {
-      searchField.setAttribute('value', this.searchQuery)
-      searchField.addEventListener('input', () => {
-        this.searchQuery = searchField.value
-        this.updateLists()
-      })
     }
 
     this.querySelector<HTMLElement>('rrr-button[data-action="add"]')?.addEventListener('click', () => {

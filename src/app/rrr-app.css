@@ -157,12 +157,12 @@ nav {
   position: fixed;
   inset: 0 0 auto;
   z-index: 40;
-  block-size: var(--rrr-app-header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--rrr-spacing-s);  
-  padding-top: calc(0 + env(safe-area-inset-top));
+  gap: var(--rrr-spacing-s);
+  padding: var(--rrr-spacing-s);
+  padding-top: calc(var(--rrr-spacing-s) + env(safe-area-inset-top));
   background: var(--rrr-colors-activity-indigo-60);
   --rrr-button-neutral-bg: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-bg-hover: var(--rrr-color-primary-contrast);
@@ -183,9 +183,6 @@ nav {
 }
 
 .app-header-title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   margin: 0;
   font-family: var(--rrr-app-link-font-family);
   font-size: var(--rrr-font-size-l);
@@ -199,17 +196,24 @@ nav {
   text-overflow: ellipsis;
 }
 
+.app-header-search {
+  width: 100%;
+  max-height: var(--rrr-control-min-block-size);
+  min-width: 0;
+  --rrr-input-gap: 0;
+}
+
 .header-back {
   flex-shrink: 0;
 }
 
 .header-back[aria-hidden='true'] {
-  visibility: hidden;
-  pointer-events: none;
+  display: none;
 }
 
 .options-trigger {
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .card-divider {
