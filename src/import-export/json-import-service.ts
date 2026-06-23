@@ -2,6 +2,8 @@ import type {
   AppData,
   TimeSetEntry,
   ExerciseDefinition,
+  ExerciseKind,
+  MeasurementProfile,
   PlannedSet,
   RepsSetEntry,
   Routine,
@@ -11,6 +13,14 @@ import type {
   Workout,
   WorkoutExerciseEntry,
 } from '../domain/types.ts'
+import {
+  equipmentValues,
+  exerciseCategories,
+  getExerciseDefaultUnit,
+  measurementProfileKey,
+  measurementTypes,
+  muscleValues,
+} from '../domain/exercise-metadata.ts'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -70,12 +80,137 @@ export function isValidExercise(obj: unknown): obj is ExerciseDefinition {
   return (
     typeof obj.id === 'string' &&
     typeof obj.name === 'string' &&
+    isStringArray(obj.aliases) &&
+    typeof obj.description === 'string' &&
+    isKnownStringArray(obj.categories, exerciseCategories) &&
+    isKnownStringArray(obj.equipment, equipmentValues) &&
+    isKnownStringArray(obj.primaryMuscles, muscleValues) &&
+    isKnownStringArray(obj.secondaryMuscles, muscleValues) &&
+    isValidMeasurementProfiles(obj.measurementProfiles) &&
     (obj.kind === 'reps' || obj.kind === 'time') &&
     (typeof obj.defaultUnit === 'string' || obj.defaultUnit === null) &&
     typeof obj.archived === 'boolean' &&
     typeof obj.createdAt === 'string' &&
     typeof obj.updatedAt === 'string'
   )
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string')
+}
+
+function isKnownStringArray<T extends string>(value: unknown, allowedValues: readonly T[]): value is T[] {
+  const allowed = new Set<string>(allowedValues)
+
+  return isStringArray(value) && value.every((item) => allowed.has(item))
+}
+
+function isValidMeasurementProfiles(value: unknown): boolean {
+  if (!Array.isArray(value) || value.length === 0) {
+    return false
+  }
+
+  const profileKeys = new Set<string>()
+  const allowed = new Set<string>(measurementTypes)
+
+  return value.every((profile) => {
+    if (!Array.isArray(profile) || profile.length === 0) {
+      return false
+    }
+
+    const types = profile.filter((item): item is typeof measurementTypes[number] => typeof item === 'string' && allowed.has(item))
+
+    if (types.length !== profile.length || new Set(types).size !== types.length) {
+      return false
+    }
+
+    const key = measurementProfileKey(types)
+
+    if (profileKeys.has(key)) {
+      return false
+    }
+
+    profileKeys.add(key)
+    return true
+  })
+}
+
+function isLegacyExercise(obj: unknown): obj is {
+  id: string
+  name: string
+  kind: ExerciseKind
+  defaultUnit: string | null
+  archived: boolean
+  createdAt: string
+  updatedAt: string
+} {
+  if (!isRecord(obj)) {
+    return false
+  }
+
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.name === 'string' &&
+    (obj.kind === 'reps' || obj.kind === 'time') &&
+    (typeof obj.defaultUnit === 'string' || obj.defaultUnit === null) &&
+    typeof obj.archived === 'boolean' &&
+    typeof obj.createdAt === 'string' &&
+    typeof obj.updatedAt === 'string'
+  )
+}
+
+function migrateExerciseRecord(exercise: unknown): unknown {
+  if (isValidExercise(exercise)) {
+    return exercise
+  }
+
+  if (!isLegacyExercise(exercise)) {
+    return exercise
+  }
+
+  const measurementProfiles: MeasurementProfile[] = exercise.kind === 'time' ? [['time']] : [['reps', 'weight']]
+
+  return {
+    id: exercise.id,
+    name: exercise.name,
+    aliases: [],
+    description: '',
+    categories: ['strength'],
+    equipment: ['other'],
+    primaryMuscles: [],
+    secondaryMuscles: [],
+    measurementProfiles,
+    kind: exercise.kind,
+    defaultUnit: exercise.defaultUnit ?? getExerciseDefaultUnit({ measurementProfiles }),
+    archived: exercise.archived,
+    createdAt: exercise.createdAt,
+    updatedAt: exercise.updatedAt,
+  }
+}
+
+export function migrateRawAppData(parsed: Record<string, unknown>): Record<string, unknown> {
+  let candidate: Record<string, unknown> = parsed
+
+  if (parsed.schemaVersion === 1) {
+    candidate = {
+      ...parsed,
+      schemaVersion: 2,
+      routines: Array.isArray(parsed.routines) ? parsed.routines : [],
+      routineVersions: Array.isArray(parsed.routineVersions) ? parsed.routineVersions : [],
+    }
+  }
+
+  if (candidate.schemaVersion === 2) {
+    candidate = {
+      ...candidate,
+      schemaVersion: 3,
+      exercises: Array.isArray(candidate.exercises)
+        ? candidate.exercises.map((exercise) => migrateExerciseRecord(exercise))
+        : candidate.exercises,
+    }
+  }
+
+  return candidate
 }
 
 export function isValidWorkout(obj: unknown): obj is Workout {
@@ -169,7 +304,7 @@ export function isValidAppData(data: unknown): data is AppData {
   }
 
   return (
-    typeof data.schemaVersion === 'number' &&
+    data.schemaVersion === 3 &&
     Array.isArray(data.exercises) &&
     data.exercises.every((exercise) => isValidExercise(exercise)) &&
     Array.isArray(data.workouts) &&
@@ -203,24 +338,11 @@ export async function importFromJson(file: File): Promise<AppData> {
     throw new Error('Imported data must include a workouts array')
   }
 
-  if (!parsed.exercises.every((exercise) => isValidExercise(exercise))) {
-    throw new Error('Imported data contains an invalid exercise record')
-  }
-
   if (!parsed.workouts.every((workout) => isValidWorkout(workout))) {
     throw new Error('Imported data contains an invalid workout record')
   }
 
-  // Migrate v1 exports by injecting empty routine collections
-  const candidate: Record<string, unknown> =
-    parsed.schemaVersion === 1
-      ? {
-          ...parsed,
-          schemaVersion: 2,
-          routines: Array.isArray(parsed.routines) ? parsed.routines : [],
-          routineVersions: Array.isArray(parsed.routineVersions) ? parsed.routineVersions : [],
-        }
-      : parsed
+  const candidate = migrateRawAppData(parsed)
 
   if (!isValidAppData(candidate)) {
     throw new Error('Imported data is not in the expected AppData format')

@@ -1,5 +1,5 @@
 import { storageService } from '../storage-instance.ts'
-import { createNewExercise, isExerciseUsedInWorkouts } from '../../domain/exercise-service.ts'
+import { createNewExercise, isExerciseUsedInWorkouts, searchExercises } from '../../domain/exercise-service.ts'
 import { confirmDialog, promptDialog } from '../../utils/dialog-service.ts'
 import { t } from '../../i18n/index.ts'
 import styles from './rrr-exercise-catalogue.css?inline'
@@ -10,6 +10,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
   private statusMessage = ''
   private statusType: 'error' | 'success' | null = null
+  private searchQuery = ''
 
   connectedCallback(): void {
     window.addEventListener('rrr-data-changed', this.handleDataChanged)
@@ -102,8 +103,10 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
   private renderList(showArchived: boolean): string {
     const data = storageService.getData()
-    const exercises = data.exercises
-      .filter((exercise) => exercise.archived === showArchived)
+    const exercises = searchExercises(
+      data.exercises.filter((exercise) => exercise.archived === showArchived),
+      this.searchQuery,
+    )
       .sort((left, right) => left.name.localeCompare(right.name))
 
     if (exercises.length === 0) {
@@ -118,7 +121,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
         return `
           <article class="item">
             <div>
-              <strong>${exercise.name}</strong>
+              <strong>${escapeHtml(exercise.name)}</strong>
               <div class="meta">
                 <span class="badge">${kindLabel}</span>
                 ${used ? `<span class="badge">${t('exercise.badge.used')}</span>` : ''}
@@ -134,53 +137,22 @@ export class RrrExerciseCatalogue extends HTMLElement {
       .join('')
   }
 
-  private render(): void {
-    this.innerHTML = `
-      <style>${styles}</style>
-      <section class="page">
-        <rrr-card size="lg">
-          <div>
-            <p>${t('exercise.subtitle')}</p>
-          </div>
-          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('exercise.status.default')}</p>
-          <div class="form">
-            <rrr-input label="${t('field.name')}" name="name" placeholder="${t('exercise.form.name.placeholder')}"></rrr-input>
-            <rrr-select label="${t('exercise.form.kind.label')}" name="kind" value="reps">
-              <option value="reps">${t('exercise.form.kind.repsWeight')}</option>
-              <option value="time">${t('exercise.form.kind.duration')}</option>
-            </rrr-select>
-            <rrr-button type="button" data-action="add">${t('exercise.form.add')}</rrr-button>
-          </div>
-        </rrr-card>
-        <rrr-card size="lg">
-          <h3>${t('exercise.list.active')}</h3>
-          <div class="list">${this.renderList(false)}</div>
-        </rrr-card>
-        <rrr-card size="lg">
-          <details>
-            <summary>${t('exercise.list.archived')}</summary>
-            <div class="list">${this.renderList(true)}</div>
-          </details>
-        </rrr-card>
-      </section>
-    `
+  private updateLists(): void {
+    const activeList = this.querySelector<HTMLElement>('[data-list="active"]')
+    const archivedList = this.querySelector<HTMLElement>('[data-list="archived"]')
 
-    const nameField = this.querySelector<HTMLElement>('rrr-input[name="name"]')
-    const kindField = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="kind"]')
-
-    if (nameField) {
-      nameField.setAttribute('value', '')
-      nameField.removeAttribute('invalid')
+    if (activeList) {
+      activeList.innerHTML = this.renderList(false)
     }
 
-    if (kindField) {
-      kindField.setAttribute('value', 'reps')
+    if (archivedList) {
+      archivedList.innerHTML = this.renderList(true)
     }
 
-    this.querySelector<HTMLElement>('rrr-button[data-action="add"]')?.addEventListener('click', () => {
-      this.addExercise()
-    })
+    this.bindListActions()
+  }
 
+  private bindListActions(): void {
     this.querySelectorAll<HTMLElement>('rrr-button[data-action="edit"]').forEach((button) => {
       button.addEventListener('click', () => {
         const id = button.dataset.id
@@ -200,6 +172,66 @@ export class RrrExerciseCatalogue extends HTMLElement {
         }
       })
     })
+  }
+
+  private render(): void {
+    this.innerHTML = `
+      <style>${styles}</style>
+      <section class="page">
+        <rrr-card size="lg">
+          <div>
+            <p>${t('exercise.subtitle')}</p>
+          </div>
+          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('exercise.status.default')}</p>
+          <rrr-input label="${t('exercise.search.label')}" name="search" placeholder="${t('exercise.search.placeholder')}"></rrr-input>
+          <div class="form">
+            <rrr-input label="${t('field.name')}" name="name" placeholder="${t('exercise.form.name.placeholder')}"></rrr-input>
+            <rrr-select label="${t('exercise.form.kind.label')}" name="kind" value="reps">
+              <option value="reps">${t('exercise.form.kind.repsWeight')}</option>
+              <option value="time">${t('exercise.form.kind.duration')}</option>
+            </rrr-select>
+            <rrr-button type="button" data-action="add">${t('exercise.form.add')}</rrr-button>
+          </div>
+        </rrr-card>
+        <rrr-card size="lg">
+          <h3>${t('exercise.list.active')}</h3>
+          <div class="list" data-list="active">${this.renderList(false)}</div>
+        </rrr-card>
+        <rrr-card size="lg">
+          <details>
+            <summary>${t('exercise.list.archived')}</summary>
+            <div class="list" data-list="archived">${this.renderList(true)}</div>
+          </details>
+        </rrr-card>
+      </section>
+    `
+
+    const nameField = this.querySelector<HTMLElement>('rrr-input[name="name"]')
+    const kindField = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="kind"]')
+    const searchField = this.querySelector<HTMLElement & { value: string }>('rrr-input[name="search"]')
+
+    if (nameField) {
+      nameField.setAttribute('value', '')
+      nameField.removeAttribute('invalid')
+    }
+
+    if (kindField) {
+      kindField.setAttribute('value', 'reps')
+    }
+
+    if (searchField) {
+      searchField.setAttribute('value', this.searchQuery)
+      searchField.addEventListener('input', () => {
+        this.searchQuery = searchField.value
+        this.updateLists()
+      })
+    }
+
+    this.querySelector<HTMLElement>('rrr-button[data-action="add"]')?.addEventListener('click', () => {
+      this.addExercise()
+    })
+
+    this.bindListActions()
   }
 }
 

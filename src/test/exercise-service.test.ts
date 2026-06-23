@@ -6,6 +6,8 @@ import {
   createNewExercise,
   getActiveExercises,
   isExerciseUsedInWorkouts,
+  mergeExerciseCatalog,
+  searchExercises,
   updateExercise,
 } from '../domain/exercise-service.ts'
 import { addExerciseToWorkout, addWorkout, createExerciseEntry, createNewWorkout } from '../domain/workout-service.ts'
@@ -47,6 +49,25 @@ describe('exercise-service', () => {
     const archived = archiveExercise(data, firstExercise?.id ?? '')
 
     expect(getActiveExercises(archived).some((exercise) => exercise.id === firstExercise?.id)).toBe(false)
+  })
+
+  test('searchExercises matches metadata facets', () => {
+    const data = createDefaultData()
+    const matches = searchExercises(getActiveExercises(data), 'dumbbell biceps weight')
+
+    expect(matches.some((exercise) => exercise.id === 'dumbbell-bicep-curl')).toBe(true)
+  })
+
+  test('mergeExerciseCatalog appends missing catalog records', () => {
+    const custom = createNewExercise('Custom Carry', 'time')
+    const data = {
+      ...createDefaultData(),
+      exercises: [custom],
+    }
+    const merged = mergeExerciseCatalog(data)
+
+    expect(merged.exercises.some((exercise) => exercise.id === custom.id)).toBe(true)
+    expect(merged.exercises.some((exercise) => exercise.id === 'pushups')).toBe(true)
   })
 
   test('isExerciseUsedInWorkouts returns true when exercise referenced in a workout', () => {

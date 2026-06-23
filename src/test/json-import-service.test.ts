@@ -30,7 +30,7 @@ describe('json-import-service', () => {
     expect(isValidAppData({ schemaVersion: 2, exercises: [], workouts: [], routines: [] })).toBe(false)
   })
 
-  test('isValidAppData returns true for valid minimal v2 AppData', () => {
-    expect(isValidAppData({ schemaVersion: 2, exercises: [], workouts: [], routines: [], routineVersions: [] })).toBe(true)
+  test('isValidAppData returns true for valid minimal current AppData', () => {
+    expect(isValidAppData({ schemaVersion: 3, exercises: [], workouts: [], routines: [], routineVersions: [] })).toBe(true)
   })
 })

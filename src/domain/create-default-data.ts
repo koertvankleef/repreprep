@@ -1,53 +1,41 @@
-import type { AppData, ExerciseDefinition, ExerciseKind, PlannedSet, Routine, RoutineExercise, RoutineVersion } from './types.ts'
+import type { AppData, ExerciseDefinition, PlannedSet, Routine, RoutineExercise, RoutineVersion } from './types.ts'
+import { exerciseCatalog } from '../exercise-library/exercises.ts'
+import { getExerciseKind, toExerciseDefinition } from './exercise-metadata.ts'
 import { generateId as generateUniqueId } from '../utils/id.ts'
 
 const DEFAULT_REST_SECONDS = 20
 const DEFAULT_TRANSITION_SECONDS = 10
 
-interface SeedExercise {
-  name: string
-  kind: ExerciseKind
-  defaultUnit: string | null
-}
-
-const seedExercises: SeedExercise[] = [
-  { name: 'Push-ups', kind: 'reps', defaultUnit: 'kg' },
-  { name: 'Overhead Press', kind: 'reps', defaultUnit: 'kg' },
-  { name: 'Dumbbell Row', kind: 'reps', defaultUnit: 'kg' },
-  { name: 'Bulgarian Split Squat', kind: 'reps', defaultUnit: 'kg' },
-  { name: 'Bicep Curl', kind: 'reps', defaultUnit: 'kg' },
-  { name: 'Romanian Deadlift', kind: 'reps', defaultUnit: 'kg' },
-  { name: 'Plank', kind: 'time', defaultUnit: 'seconds' },
+const defaultRoutineExerciseIds = [
+  'pushups',
+  'standing-military-press',
+  'one-arm-dumbbell-row',
+  'dumbbell-lunges',
+  'dumbbell-bicep-curl',
+  'romanian-deadlift',
+  'plank',
 ]
 
 export function generateId(): string {
   return generateUniqueId()
 }
 
-function createSeedExercise(seed: SeedExercise): ExerciseDefinition {
-  const timestamp = new Date().toISOString()
-
-  return {
-    id: generateId(),
-    name: seed.name,
-    kind: seed.kind,
-    defaultUnit: seed.defaultUnit,
-    archived: false,
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  }
-}
-
 export function createDefaultData(): AppData {
   const timestamp = new Date().toISOString()
-  const exercises = seedExercises.map(createSeedExercise)
+  const exercises = exerciseCatalog.map((exercise) => toExerciseDefinition(exercise, timestamp))
+  const exerciseById = new Map(exercises.map((exercise) => [exercise.id, exercise]))
 
   const routineId = generateId()
   const versionId = generateId()
 
-  const routineExercises: RoutineExercise[] = exercises.map((exercise) => {
-    const isPlank = exercise.name === 'Plank'
-    const plannedSets: PlannedSet[] = isPlank
+  const routineExercises: RoutineExercise[] = defaultRoutineExerciseIds.flatMap((exerciseId) => {
+    const exercise = exerciseById.get(exerciseId)
+
+    if (!exercise) {
+      return []
+    }
+
+    const plannedSets: PlannedSet[] = getExerciseKind(exercise) === 'time'
       ? [{ kind: 'time', targetSeconds: 30 }]
       : [
           { kind: 'reps', targetReps: 10, targetWeightKg: null },
@@ -81,7 +69,7 @@ export function createDefaultData(): AppData {
   }
 
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     exercises,
     workouts: [],
     routines: [routine],

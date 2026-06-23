@@ -1,6 +1,6 @@
 import type { AppData } from '../domain/types.ts'
 import type { StorageAdapter } from './storage-service.ts'
-import { isValidAppData } from '../import-export/json-import-service.ts'
+import { isValidAppData, migrateRawAppData } from '../import-export/json-import-service.ts'
 
 const storageKey = 'repreprep:data'
 
@@ -13,16 +13,7 @@ export function migrateRawToAppData(parsed: unknown): AppData | null {
     return null
   }
 
-  let candidate: Record<string, unknown> = parsed
-
-  if (parsed.schemaVersion === 1) {
-    candidate = {
-      ...parsed,
-      schemaVersion: 2,
-      routines: Array.isArray(parsed.routines) ? parsed.routines : [],
-      routineVersions: Array.isArray(parsed.routineVersions) ? parsed.routineVersions : [],
-    }
-  }
+  const candidate = migrateRawAppData(parsed)
 
   if (!isValidAppData(candidate)) {
     return null

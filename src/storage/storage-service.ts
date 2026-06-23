@@ -1,5 +1,11 @@
 import { createDefaultData } from '../domain/create-default-data.ts'
-import { addExercise, archiveExercise as archiveExerciseRecord, getExercise, updateExercise } from '../domain/exercise-service.ts'
+import {
+  addExercise,
+  archiveExercise as archiveExerciseRecord,
+  getExercise,
+  mergeExerciseCatalog,
+  updateExercise,
+} from '../domain/exercise-service.ts'
 import { addWorkout, deleteWorkout as removeWorkout, getWorkout, updateWorkout } from '../domain/workout-service.ts'
 import { archiveRoutine as archiveRoutineRecord, editRoutine as editRoutineRecord, getRoutine, createRoutine as createRoutineRecord } from '../domain/routine-service.ts'
 import { DomainError } from '../domain/errors.ts'
@@ -17,7 +23,7 @@ export class WorkoutStorageService {
 
   constructor(adapter: StorageAdapter) {
     this.adapter = adapter
-    this.current = adapter.load() ?? createDefaultData()
+    this.current = mergeExerciseCatalog(adapter.load() ?? createDefaultData())
     this.adapter.save(this.current)
   }
 
@@ -26,7 +32,7 @@ export class WorkoutStorageService {
   }
 
   setData(data: AppData): void {
-    this.current = data
+    this.current = mergeExerciseCatalog(data)
     this.adapter.save(this.current)
   }
 

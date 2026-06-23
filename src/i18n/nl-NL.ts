@@ -176,6 +176,8 @@ export const nlNlMessages = {
   'exercise.title': 'Oefeningen',
   'exercise.subtitle': 'Beheer je oefeningencatalogus.',
   'exercise.status.default': 'Maak, hernoem of archiveer oefeningen die in workouts en routines worden gebruikt.',
+  'exercise.search.label': 'Oefeningen zoeken',
+  'exercise.search.placeholder': 'Naam, spiergroep, materiaal of categorie',
   'exercise.form.name.placeholder': 'Naam van oefening',
   'exercise.form.kind.label': 'Type',
   'exercise.form.kind.repsWeight': 'Herhalingen',
