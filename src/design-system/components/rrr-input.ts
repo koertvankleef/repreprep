@@ -7,7 +7,11 @@ inputSheet.replaceSync(styles)
 const template = document.createElement('template')
 template.innerHTML = `
   <label part="label" hidden></label>
-  <input part="input" />
+  <div class="control" part="control">
+    <slot name="start"></slot>
+    <input part="input" />
+    <slot name="end"></slot>
+  </div>
   <p class="error" part="error"></p>
 `
 
@@ -31,6 +35,8 @@ export class RrrInput extends HTMLElement {
   private readonly input: HTMLInputElement
   private readonly label: HTMLLabelElement
   private readonly error: HTMLParagraphElement
+  private readonly startSlot: HTMLSlotElement
+  private readonly endSlot: HTMLSlotElement
 
   constructor() {
     super()
@@ -42,18 +48,30 @@ export class RrrInput extends HTMLElement {
     const input = shadowRoot.querySelector<HTMLInputElement>('input')
     const label = shadowRoot.querySelector<HTMLLabelElement>('label')
     const error = shadowRoot.querySelector<HTMLParagraphElement>('p.error')
+    const startSlot = shadowRoot.querySelector<HTMLSlotElement>('slot[name="start"]')
+    const endSlot = shadowRoot.querySelector<HTMLSlotElement>('slot[name="end"]')
 
-    if (!input || !label || !error) {
+    if (!input || !label || !error || !startSlot || !endSlot) {
       throw new Error('rrr-input failed to initialize')
     }
 
     this.input = input
     this.label = label
     this.error = error
+    this.startSlot = startSlot
+    this.endSlot = endSlot
+
+    this.startSlot.addEventListener('slotchange', () => {
+      this.syncSlotState()
+    })
+    this.endSlot.addEventListener('slotchange', () => {
+      this.syncSlotState()
+    })
   }
 
   connectedCallback(): void {
     this.syncAll()
+    this.syncSlotState()
 
     this.input.addEventListener('input', () => {
       this.setAttribute('value', this.input.value)
@@ -129,6 +147,11 @@ export class RrrInput extends HTMLElement {
 
     this.input.removeAttribute('aria-invalid')
     this.error.textContent = ''
+  }
+
+  private syncSlotState(): void {
+    this.toggleAttribute('has-start', this.startSlot.assignedElements({ flatten: true }).length > 0)
+    this.toggleAttribute('has-end', this.endSlot.assignedElements({ flatten: true }).length > 0)
   }
 }
 

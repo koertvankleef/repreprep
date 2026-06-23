@@ -19,39 +19,19 @@
   --rrr-app-link-active-shadow: var(--rrr-shadow-button);
   --rrr-app-link-font-size-mobile: 0.62rem;
   --rrr-app-link-font-size-desktop: var(--rrr-font-size-s);
-  --rrr-app-bottom-nav-height: 4.75rem;
+  --rrr-app-bottom-nav-height: 3rem;
   --rrr-app-header-height: 3.5rem;
   --rrr-app-link-font-family: var(--rrr-font-family-heading);
   --rrr-app-main-padding: var(--rrr-spacing-s);
   --rrr-app-control-radius: var(--rrr-radius-s);
-}
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--rrr-font-family-heading);
-}
-
-h2 {
-  font-size: var(--rrr-font-size-l);
-  font-weight: 600;
-  color: var(--rrr-colors-activity-indigo-80);
-}
-
-h3 {
-  font-size: var(--rrr-font-size-s);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
+  /* From globals.css, unavoidable duplication */
+  min-height: 100vh;
+  font-family: var(--rrr-font-family);
+  font-size: var(--rrr-font-size-default);
+  line-height: 1.5;
+  color: var(--rrr-color-text);
+  background: var(--rrr-color-background);
 }
 
 .shell {
@@ -127,7 +107,7 @@ nav {
   display: none;
 }
 
-.nav-utilities > rrr-button[data-action="install-app"] {
+.nav-utilities>rrr-button[data-action="install-app"] {
   width: auto;
 }
 
@@ -146,7 +126,7 @@ nav {
   background: var(--rrr-colors-grayscale-00);
 }
 
-.nav-control-group rrr-button[aria-pressed="true"] > button[data-rrr-button-inner] {
+.nav-control-group rrr-button[aria-pressed="true"]>button[data-rrr-button-inner] {
   background: var(--rrr-colors-activity-indigo-60);
   border-color: var(--rrr-colors-activity-indigo-70);
   color: var(--rrr-color-primary-contrast);
@@ -157,18 +137,43 @@ nav {
   position: fixed;
   inset: 0 0 auto;
   z-index: 40;
-  block-size: var(--rrr-app-header-height);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--rrr-spacing-s);  
-  padding-top: calc(0 + env(safe-area-inset-top));
+  display: block;
+  padding: var(--rrr-spacing-s);
+  padding-top: calc(var(--rrr-spacing-s) + env(safe-area-inset-top));
   background: var(--rrr-colors-activity-indigo-60);
   --rrr-button-neutral-bg: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-bg-hover: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-fg: var(--rrr-color-primary-contrast);
+  --rrr-input-neutral-bg: var(--rrr-color-primary-contrast);
+  --rrr-input-neutral-fg: var(--rrr-color-primary-contrast);
+  --rrr-input-outline-placeholder-color: color-mix(in oklab, var(--rrr-color-primary-contrast), transparent 28%);
+  --rrr-input-outline-focus-shadow: 0 0 0 4px color-mix(in oklab, var(--rrr-color-primary-contrast), transparent 78%);
   font-family: var(--rrr-app-link-font-family);
   overflow: visible;
+}
+
+.app-header-primary {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.standard-app-header,
+.exercise-app-header {
+  display: grid;
+  align-items: center;
+  gap: var(--rrr-spacing-s);
+  width: 100%;
+  min-width: 0;
+}
+
+.standard-app-header {
+  grid-template-columns: var(--rrr-control-min-block-size) minmax(0, 1fr) var(--rrr-control-min-block-size);
+}
+
+.exercise-app-header {
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .app-header::after {
@@ -176,16 +181,13 @@ nav {
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(16px + env(safe-area-inset-top));
-  box-shadow: var(--rrr-app-nav-shadow);
+  top: 100%;
   pointer-events: none;
-  height: calc(var(--rrr-app-header-height) - 16px - env(safe-area-inset-top));
+  height: var(--rrr-app-header-shadow-height, 0.875rem);
+  background: linear-gradient(to bottom, rgb(0 0 0 / 18%), rgb(0 0 0 / 0%));
 }
 
 .app-header-title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   margin: 0;
   font-family: var(--rrr-app-link-font-family);
   font-size: var(--rrr-font-size-l);
@@ -193,57 +195,73 @@ nav {
   color: var(--rrr-color-primary-contrast);
   text-align: center;
   pointer-events: none;
-  max-inline-size: calc(100% - (var(--rrr-app-header-height) * 2) - (var(--rrr-spacing-s) * 4));
+  min-width: 0;
+  max-inline-size: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.header-back {
-  flex-shrink: 0;
+.app-header-search {
+  width: 100%;
+  min-width: 0;
+  --rrr-input-gap: 0;
+  --rrr-input-error-min-block-size: 0;
+  font-family: var(--rrr-font-family);
 }
 
-.header-back[aria-hidden='true'] {
-  visibility: hidden;
-  pointer-events: none;
+.app-header-spacer {
+  inline-size: var(--rrr-control-min-block-size);
+  block-size: var(--rrr-control-min-block-size);
 }
 
 .options-trigger {
-  flex-shrink: 0;
-}
-
-.card-divider {
-  border-top: var(--rrr-border-width) solid var(--rrr-colors-grayscale-20);
-  height: 1px;
-  width: 100%;
+  justify-self: end;
 }
 
 main {
   grid-area: main;
-  padding: var(--rrr-app-main-padding);
-  padding-bottom: calc(var(--rrr-app-main-padding) + var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
-  max-width: 72rem;
   width: 100%;
   box-sizing: border-box;
   min-width: 0;
-  margin: 0 auto;
+  min-height: 0;
+  display: grid;
 }
 
 #view {
   position: relative;
   display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
 }
 
-#view > .route-view {
+#view>.route-view {
   grid-area: 1 / 1;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
   min-width: 0;
+  min-height: 100%;
+}
+
+#view>.route-view-padded {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--rrr-app-main-padding);
+  padding-bottom: calc(var(--rrr-app-main-padding) + var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
+}
+
+#view>.route-view-full {
+  background: var(--rrr-color-background);
+  padding-bottom: calc(var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
 }
 
 #view.is-transitioning {
   overflow: clip;
 }
 
-#view.is-transitioning > .route-view {
+#view.is-transitioning>.route-view {
   will-change: transform, opacity;
 }
 
@@ -344,10 +362,61 @@ main {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #view.is-transitioning > .route-view {
+  #view.is-transitioning>.route-view {
     animation: none;
     transform: none;
   }
+}
+
+
+.section {
+  display: grid;
+  gap: var(--rrr-spacing-xs);
+}
+
+.section-title {
+  margin: 0;
+}
+
+.section-card {
+  display: grid;
+  gap: 0;
+  background: var(--rrr-colors-grayscale-00);
+  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border-radius: var(--rrr-radius-l);
+  overflow: hidden;
+}
+
+.section-link,
+.section-part {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  gap: var(--rrr-spacing-m);
+  padding: var(--rrr-spacing-m);
+  border: var(--rrr-border-width) solid transparent;
+
+  &:not(:last-child) {
+    border-bottom-color: var(--rrr-colors-grayscale-30);
+  }
+}
+
+.section-part {
+
+  &:focus-visible {
+    outline: var(--rrr-focus-outline);
+    outline-offset: var(--rrr-focus-outline-offset);
+  }
+}
+
+.section-link {
+  color: var(--rrr-colors-grayscale-80);
+  transition: background var(--rrr-transition-default), color var(--rrr-transition-default);
+}
+
+.section-link:hover {
+  background: var(--rrr-colors-activity-indigo-10);
+  color: var(--rrr-colors-activity-indigo-80);
 }
 
 /* ── Options panel (side drawer, mobile-first) ───────────────────────── */
@@ -430,7 +499,7 @@ main {
   gap: var(--rrr-spacing-s);
 }
 
-.options-menu-item > button[data-rrr-button-inner] {
+.options-menu-item>button[data-rrr-button-inner] {
   justify-content: flex-start;
   gap: var(--rrr-spacing-s);
   width: 100%;
@@ -504,7 +573,7 @@ main {
     justify-items: stretch;
   }
 
-  .nav-utilities > rrr-button[data-action="install-app"] {
+  .nav-utilities>rrr-button[data-action="install-app"] {
     width: 100%;
   }
 
@@ -518,15 +587,20 @@ main {
     display: none;
   }
 
+  .standard-app-header {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .app-header-spacer {
+    display: none;
+  }
+
   /* contextual options live in the mobile top bar */
   .options-trigger {
     display: none;
   }
 
-  main {
-    grid-area: main;
-    padding: var(--rrr-app-main-padding);
+  #view>.route-view-padded {
     max-width: none;
-    margin: 0;
   }
 }

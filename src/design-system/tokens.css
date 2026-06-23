@@ -27,7 +27,7 @@
 
   /* Brand mapping: brand-inspired tone derived from --rrr-colors-activity-indigo-60 (#4F46E5). */
   /* Balpen Blauw remains the primary family in the imported palette. */
-  --rrr-colors-activity-indigo-10: oklch(96.60% 0.1410 275.20);
+  --rrr-colors-activity-indigo-10: oklch(98.60% 0.1610 277.20);
   --rrr-colors-activity-indigo-20: oklch(87.19% 0.1588 272.48);
   --rrr-colors-activity-indigo-30: oklch(77.78% 0.1766 269.76);
   --rrr-colors-activity-indigo-40: oklch(69.88% 0.2145 269.86);
@@ -113,6 +113,7 @@
 
   --rrr-font-weight-light: 300;
   --rrr-font-weight-normal: 400;
+  --rrr-font-weight-medium: 500;
   --rrr-font-weight-semibold: 600;
   --rrr-font-weight-bold: 700;
 
@@ -165,8 +166,6 @@
   --rrr-transition-fromto: 220ms var(--rrr-anim-fromto-timingfunction);
 
   /* Button interactive foreground for outline/ghost variants — dark mode overrides step down to 50. */
-
-  /* Button interactive foreground for outline/ghost variants — dark mode overrides step down to 50. */
   --rrr-button-fg: var(--rrr-colors-activity-indigo-70);
   --rrr-button-fg-accent: var(--rrr-colors-serene-mint-70);
   --rrr-button-fg-info: var(--rrr-colors-context-info-70);
@@ -182,6 +181,8 @@
   --rrr-color-link: var(--rrr-colors-activity-indigo-70);
   --rrr-color-link-hover: var(--rrr-colors-serene-mint-70);
   --rrr-color-scheme: light;
+
+  --rrr-color-heading: var(--rrr-colors-activity-indigo-80);
 
   --rrr-font-family: 'Exo 2', system-ui, -apple-system, sans-serif;
   --rrr-font-family-heading: 'Oxanium', system-ui, -apple-system, sans-serif;
@@ -208,15 +209,17 @@
   --rrr-button-fg-danger: var(--rrr-colors-context-danger-50);
 
   --rrr-color-primary-contrast: var(--rrr-colors-grayscale-100);
-  --rrr-color-background: var(--rrr-colors-grayscale-00);
   --rrr-color-link: var(--rrr-colors-activity-indigo-20);
   --rrr-color-link-hover: var(--rrr-colors-serene-mint-20);
   --rrr-color-scheme: dark;
+  --rrr-color-background: var(--rrr-colors-grayscale-20);
 
   --global-focus-ring-color: var(--rrr-colors-grayscale-100);
   --rrr-depth-1-shadow: 0 1px 2px #0000004f, 0 1px 1px #00000040;
   --rrr-depth-2-shadow: 0 2px 4px #00000066, 0 1px 2px #0000004d;
   --rrr-depth-3-shadow: 0 4px 10px #0000007d, 0 2px 6px #00000052;
+
+  --rrr-color-heading: var(--rrr-colors-activity-indigo-40);
 }
 
 :root[data-contrast='high'] {

@@ -116,16 +116,15 @@ export class RrrSettings extends HTMLElement {
     this.innerHTML = `
       <style>${styles}</style>
       <div class="page">
-        <section class="settings-section">
-          <h2 class="settings-section-title">${t('app.settings.navigation')}</h2>
-          <div class="settings-card">
-            <a class="settings-link" href="#/import-export">
+        <section class="section">
+          <h2 class="section-title">${t('app.settings.navigation')}</h2>
+          <div class="section-card">
+            <a class="section-link" href="#/import-export">
               <rrr-icon name="arrow-export-up"></rrr-icon>
               <span>${t('app.nav.importExport')}</span>
             </a>
             ${styleguideEnabled ? `
-              <div class="card-divider"></div>
-              <a class="settings-link" href="#/styleguide">
+              <a class="section-link" href="#/styleguide">
                 <rrr-icon name="braces"></rrr-icon>
                 <span>${t('app.nav.styleguide')}</span>
               </a>
@@ -133,9 +132,9 @@ export class RrrSettings extends HTMLElement {
           </div>
         </section>
 
-        <section class="settings-section">
-          <h2 class="settings-section-title">${t('app.settings.display')}</h2>
-          <div class="settings-card">
+        <section class="section">
+          <h2 class="section-title">${t('app.settings.display')}</h2>
+          <div class="section-card">
             <div class="control-row">
               <span class="control-label">${t('app.theme.contrast')}</span>
               <div class="control-group" role="group" aria-label="${t('app.theme.contrast')}">
@@ -160,9 +159,9 @@ export class RrrSettings extends HTMLElement {
           </div>
         </section>
 
-        <section class="settings-section">
-          <h2 class="settings-section-title">${t('app.settings.data')}</h2>
-          <div class="settings-card danger-card">
+        <section class="section">
+          <h2 class="section-title">${t('app.settings.data')}</h2>
+          <div class="section-card danger-card">
             <div class="danger-card-content">
               <h3 class="danger-title">${t('app.settings.resetData.title')}</h3>
               <p class="danger-copy">${t('app.settings.resetData.description')}</p>
@@ -172,7 +171,6 @@ export class RrrSettings extends HTMLElement {
               <rrr-button type="button" tone="danger" variant="outline" data-action="open-reset-data">${t('app.settings.resetData.open')}</rrr-button>
             </div>
             ${this.resetPanelOpen ? `
-              <div class="card-divider"></div>
               <div class="reset-confirm-panel">
                 <label class="reset-confirm-label" for="reset-date-confirm">${t('app.settings.resetData.prompt', { date: this.getTodayLocalizedDate() })}</label>
                 <input

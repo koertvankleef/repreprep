@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "exercises:import": "node scripts/import-free-exercise-db.mjs",
     "icons:check": "node scripts/check-icon-usage.mjs",
     "check:i18n": "node scripts/check-i18n-hardcoded.mjs",
     "check:architecture": "node scripts/check-architecture-boundaries.mjs"

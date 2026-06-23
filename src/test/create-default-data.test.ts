@@ -1,16 +1,18 @@
 import { describe, expect, test } from 'vitest'
 import { createDefaultData } from '../domain/create-default-data.ts'
+import { exerciseCatalog } from '../exercise-library/exercises.ts'
 
 describe('createDefaultData', () => {
   test('creates seeded app data', () => {
     const data = createDefaultData()
     const byName = new Map(data.exercises.map((exercise) => [exercise.name, exercise.kind]))
 
-    expect(data.schemaVersion).toBe(2)
-    expect(data.exercises).toHaveLength(7)
-    expect(byName.get('Push-ups')).toBe('reps')
+    expect(data.schemaVersion).toBe(4)
+    expect(data.exercises).toHaveLength(exerciseCatalog.length)
+    expect(byName.get('Pushups')).toBe('reps')
     expect(byName.get('Plank')).toBe('time')
-    expect(data.exercises.filter((exercise) => exercise.name !== 'Plank').every((exercise) => exercise.kind === 'reps')).toBe(true)
+    expect(data.exercises.every((exercise) => exercise.measurementProfiles.length > 0)).toBe(true)
+    expect(data.exercises.every((exercise) => exercise.createdByUser === false)).toBe(true)
     expect(data.workouts).toEqual([])
   })
 
@@ -22,7 +24,7 @@ describe('createDefaultData', () => {
     expect(data.routineVersions).toHaveLength(1)
   })
 
-  test('default routine version has all 7 exercises', () => {
+  test('default routine version has 7 starter exercises', () => {
     const data = createDefaultData()
     const version = data.routineVersions[0]
 

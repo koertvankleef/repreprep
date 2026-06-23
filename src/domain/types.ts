@@ -8,9 +8,75 @@ export interface AppData {
 
 export type ExerciseKind = 'reps' | 'time'
 
-export interface ExerciseDefinition {
+export type MeasurementType =
+  | 'reps'
+  | 'weight'
+  | 'time'
+  | 'distance'
+  | 'calories'
+  | 'rounds'
+
+export type MeasurementProfile = MeasurementType[]
+
+export type ExerciseCategory =
+  | 'strength'
+  | 'cardio'
+  | 'mobility'
+  | 'stretch'
+  | 'balance'
+
+export type Equipment =
+  | 'bodyweight'
+  | 'barbell'
+  | 'dumbbell'
+  | 'kettlebell'
+  | 'bench'
+  | 'machine'
+  | 'cable'
+  | 'resistance-band'
+  | 'pull-up-bar'
+  | 'dip-bars'
+  | 'medicine-ball'
+  | 'stability-ball'
+  | 'foam-roller'
+  | 'jump-rope'
+  | 'treadmill'
+  | 'exercise-bike'
+  | 'rowing-machine'
+  | 'elliptical'
+  | 'stair-machine'
+  | 'other'
+
+export type Muscle =
+  | 'chest'
+  | 'back'
+  | 'shoulders'
+  | 'biceps'
+  | 'triceps'
+  | 'forearms'
+  | 'abs'
+  | 'obliques'
+  | 'glutes'
+  | 'quadriceps'
+  | 'hamstrings'
+  | 'calves'
+  | 'hips'
+  | 'full-body'
+
+export interface Exercise {
   id: string
   name: string
+  aliases: string[]
+  description: string
+  categories: ExerciseCategory[]
+  equipment: Equipment[]
+  primaryMuscles: Muscle[]
+  secondaryMuscles: Muscle[]
+  measurementProfiles: MeasurementProfile[]
+}
+
+export interface ExerciseDefinition extends Exercise {
+  createdByUser: boolean
   kind: ExerciseKind
   defaultUnit: string | null
   archived: boolean

@@ -12,7 +12,7 @@ describe('migration', () => {
     expect(migrateRawToAppData({ exercises: [], workouts: [] })).toBeNull()
   })
 
-  test('migrateRawToAppData migrates v1 data by adding empty routines and routineVersions', () => {
+  test('migrateRawToAppData migrates v1 data to current schema with empty routines and routineVersions', () => {
     const v1Data = {
       schemaVersion: 1,
       exercises: [],
@@ -21,7 +21,7 @@ describe('migration', () => {
     const result = migrateRawToAppData(v1Data)
 
     expect(result).not.toBeNull()
-    expect(result?.schemaVersion).toBe(2)
+    expect(result?.schemaVersion).toBe(4)
     expect(result?.routines).toEqual([])
     expect(result?.routineVersions).toEqual([])
     expect(result?.exercises).toEqual([])
@@ -54,17 +54,36 @@ describe('migration', () => {
     const result = migrateRawToAppData(v1Data)
 
     expect(result?.exercises).toHaveLength(1)
+    expect(result?.exercises[0]?.measurementProfiles).toEqual([['reps', 'weight']])
+    expect(result?.exercises[0]?.createdByUser).toBe(true)
     expect(result?.workouts).toHaveLength(1)
     expect(result?.routines).toEqual([])
   })
 
-  test('migrateRawToAppData accepts valid v2 data unchanged', () => {
+  test('migrateRawToAppData accepts current data unchanged', () => {
     const data = createDefaultData()
     const result = migrateRawToAppData(data)
 
     expect(result).not.toBeNull()
-    expect(result?.schemaVersion).toBe(2)
+    expect(result?.schemaVersion).toBe(4)
     expect(result?.routines).toHaveLength(data.routines.length)
+  })
+
+  test('migrateRawToAppData marks v3 catalog exercises as predefined', () => {
+    const data = createDefaultData()
+    const exercise = data.exercises.find((item) => item.id === 'pushups')
+
+    expect(exercise).toBeDefined()
+
+    const v3Data = {
+      ...data,
+      schemaVersion: 3,
+      exercises: data.exercises.map(({ createdByUser: _createdByUser, ...item }) => item),
+    }
+    const result = migrateRawToAppData(v3Data)
+
+    expect(result?.schemaVersion).toBe(4)
+    expect(result?.exercises.find((item) => item.id === 'pushups')?.createdByUser).toBe(false)
   })
 
   test('isValidAppData returns false for v1 data without routines', () => {
@@ -76,7 +95,7 @@ describe('migration', () => {
     expect(isValidAppData(v1Data)).toBe(false)
   })
 
-  test('isValidAppData returns true for valid v2 data', () => {
+  test('isValidAppData returns true for current data', () => {
     const data = createDefaultData()
     expect(isValidAppData(data)).toBe(true)
   })

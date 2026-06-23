@@ -26,18 +26,24 @@ h4,
 h5,
 h6 {
   font-family: var(--rrr-font-family-heading);
+  color: var(--rrr-color-heading);
 }
 
 h2 {
   font-size: var(--rrr-font-size-l);
-  font-weight: 600;
-  color: var(--rrr-colors-activity-indigo-80);
+  font-weight: var(--rrr-font-weight-semibold);
 }
 
 h3 {
   font-size: var(--rrr-font-size-s);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: var(--rrr-font-weight-medium);
+}
+
+h4 {
+  font-weight: var(--rrr-font-weight-semibold);
+  font-size: var(--rrr-font-size-m);
 }
 
 body {
