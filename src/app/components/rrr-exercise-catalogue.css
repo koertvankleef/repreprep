@@ -8,13 +8,6 @@ rrr-exercise-catalogue {
   --rrr-exercise-catalogue-item-shadow: var(--rrr-depth-1-shadow);
   --rrr-exercise-catalogue-item-gap: var(--rrr-spacing-l);
   --rrr-exercise-catalogue-meta-gap: var(--rrr-spacing-s);
-  --rrr-exercise-catalogue-badge-padding: var(--rrr-spacing-xs) var(--rrr-spacing-s);
-  --rrr-exercise-catalogue-badge-radius: 999px;
-  --rrr-exercise-catalogue-badge-border-width: var(--rrr-border-width);
-  --rrr-exercise-catalogue-badge-border-color: var(--rrr-colors-activity-indigo-20);
-  --rrr-exercise-catalogue-badge-background: var(--rrr-colors-activity-indigo-10);
-  --rrr-exercise-catalogue-badge-color: var(--rrr-colors-activity-indigo-80);
-  --rrr-exercise-catalogue-badge-size: var(--rrr-font-size-s);
 }
 
 .list {
@@ -40,15 +33,4 @@ rrr-exercise-catalogue {
   gap: var(--rrr-exercise-catalogue-meta-gap);
   align-items: center;
   flex-wrap: wrap;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--rrr-exercise-catalogue-badge-padding);
-  border-radius: var(--rrr-exercise-catalogue-badge-radius);
-  border: var(--rrr-exercise-catalogue-badge-border-width) solid var(--rrr-exercise-catalogue-badge-border-color);
-  background: var(--rrr-exercise-catalogue-badge-background);
-  color: var(--rrr-exercise-catalogue-badge-color);
-  font-size: var(--rrr-exercise-catalogue-badge-size);
 }

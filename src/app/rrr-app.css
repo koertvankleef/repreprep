@@ -157,18 +157,43 @@ nav {
   position: fixed;
   inset: 0 0 auto;
   z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--rrr-spacing-s);
+  display: block;
   padding: var(--rrr-spacing-s);
   padding-top: calc(var(--rrr-spacing-s) + env(safe-area-inset-top));
   background: var(--rrr-colors-activity-indigo-60);
   --rrr-button-neutral-bg: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-bg-hover: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-fg: var(--rrr-color-primary-contrast);
+  --rrr-input-neutral-bg: var(--rrr-color-primary-contrast);
+  --rrr-input-neutral-fg: var(--rrr-color-primary-contrast);
+  --rrr-input-outline-placeholder-color: color-mix(in oklab, var(--rrr-color-primary-contrast), transparent 28%);
+  --rrr-input-outline-focus-shadow: 0 0 0 4px color-mix(in oklab, var(--rrr-color-primary-contrast), transparent 78%);
   font-family: var(--rrr-app-link-font-family);
   overflow: visible;
+}
+
+.app-header-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.standard-app-header,
+.exercise-app-header {
+  display: grid;
+  align-items: center;
+  gap: var(--rrr-spacing-s);
+  width: 100%;
+  min-width: 0;
+}
+
+.standard-app-header {
+  grid-template-columns: var(--rrr-control-min-block-size) minmax(0, 1fr) var(--rrr-control-min-block-size);
+}
+
+.exercise-app-header {
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .app-header::after {
@@ -190,7 +215,8 @@ nav {
   color: var(--rrr-color-primary-contrast);
   text-align: center;
   pointer-events: none;
-  max-inline-size: calc(100% - (var(--rrr-app-header-height) * 2) - (var(--rrr-spacing-s) * 4));
+  min-width: 0;
+  max-inline-size: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -198,22 +224,19 @@ nav {
 
 .app-header-search {
   width: 100%;
-  max-height: var(--rrr-control-min-block-size);
   min-width: 0;
   --rrr-input-gap: 0;
+  --rrr-input-error-min-block-size: 0;
+  font-family: var(--rrr-font-family);
 }
 
-.header-back {
-  flex-shrink: 0;
-}
-
-.header-back[aria-hidden='true'] {
-  display: none;
+.app-header-spacer {
+  inline-size: var(--rrr-control-min-block-size);
+  block-size: var(--rrr-control-min-block-size);
 }
 
 .options-trigger {
-  flex-shrink: 0;
-  margin-left: auto;
+  justify-self: end;
 }
 
 .card-divider {
@@ -388,6 +411,19 @@ main {
   border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
   border-radius: var(--rrr-radius-l);
   overflow: hidden;
+}
+
+.section-part {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  gap: var(--rrr-spacing-m);
+  padding: var(--rrr-spacing-m);
+
+  &:focus-visible {
+    outline: var(--rrr-focus-outline);
+    outline-offset: var(--rrr-focus-outline-offset);
+  }
 }
 
 .section-link {
@@ -570,6 +606,14 @@ main {
   }
 
   .app-header::after {
+    display: none;
+  }
+
+  .standard-app-header {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .app-header-spacer {
     display: none;
   }
 

@@ -1,3 +1,4 @@
+import { registerRrrBadge } from './rrr-badge.ts'
 import { registerRrrCard } from './rrr-card.ts'
 import { registerRrrButton } from './rrr-button.ts'
 import { registerRrrCheckbox } from './rrr-checkbox.ts'
@@ -9,6 +10,7 @@ import { registerRrrTextarea } from './rrr-textarea.ts'
 import { registerRrrTooltip } from './rrr-tooltip.ts'
 
 export function registerDesignSystemComponents(): void {
+  registerRrrBadge()
   registerRrrButton()
   registerRrrInput()
   registerRrrTextarea()

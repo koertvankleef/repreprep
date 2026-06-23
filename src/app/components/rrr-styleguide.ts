@@ -404,6 +404,34 @@ export class RrrStyleguide extends HTMLElement {
                 <rrr-button type="button" rounded tone="accent">rounded regular</rrr-button>
                 <rrr-button type="button" rounded variant="outline" tone="primary" aria-label="rounded icon only button" title="rounded icon only button"><rrr-icon name="settings"></rrr-icon></rrr-button>
               </div>
+              <div class="button-row">
+                <rrr-button type="button" size="s">size=s</rrr-button>
+                <rrr-button type="button" size="s" variant="outline" tone="neutral">small outline</rrr-button>
+                <rrr-button type="button" size="s" rounded tone="accent">small rounded</rrr-button>
+                <rrr-button type="button" size="s" rounded variant="ghost" tone="primary" aria-label="small rounded icon button" title="small rounded icon button"><rrr-icon name="settings"></rrr-icon></rrr-button>
+              </div>
+            </div>
+          </rrr-card>
+
+          <rrr-card size="lg">
+            <div class="showcase-block">
+              <h3>${t('styleguide.section.badges')}</h3>
+              <p class="sample-text">${t('styleguide.badges.description')}</p>
+              <div class="button-row role-row">
+                <rrr-badge>default</rrr-badge>
+                <rrr-badge tone="neutral">neutral</rrr-badge>
+                <rrr-badge tone="accent">accent</rrr-badge>
+                <rrr-badge tone="info">info</rrr-badge>
+                <rrr-badge tone="success">success</rrr-badge>
+                <rrr-badge tone="warning">warning</rrr-badge>
+                <rrr-badge tone="danger">danger</rrr-badge>
+              </div>
+              <div class="button-row">
+                <rrr-badge variant="outline">outline</rrr-badge>
+                <rrr-badge variant="solid">solid</rrr-badge>
+                <rrr-badge variant="solid" tone="success">solid success</rrr-badge>
+                <rrr-badge variant="outline" tone="danger">outline danger</rrr-badge>
+              </div>
             </div>
           </rrr-card>
 
@@ -414,6 +442,10 @@ export class RrrStyleguide extends HTMLElement {
                 <div class="component-column">
                   <rrr-input label="${t('field.name')}" name="sample-name" placeholder="${t('exercise.form.name.placeholder')}" value="Bench Press"></rrr-input>
                   <rrr-input label="${t('field.date')}" type="date" name="sample-date" value="2026-06-14"></rrr-input>
+                  <rrr-input label="${t('exercise.search.label')}" type="search" variant="outline" rounded placeholder="${t('exercise.search.placeholder')}" value="bench">
+                    <rrr-icon slot="start" name="search"></rrr-icon>
+                    <rrr-icon slot="end" name="dismiss-circle"></rrr-icon>
+                  </rrr-input>
                   <rrr-select label="${t('exercise.form.kind.label')}" name="sample-kind" value="reps">
                     <option value="reps">${t('exercise.form.kind.repsWeight')}</option>
                     <option value="time">${t('exercise.form.kind.duration')}</option>

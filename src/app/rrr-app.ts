@@ -40,6 +40,12 @@ type Route =
 
 type RouteTransition = 'none' | 'sub-forward' | 'sub-back' | 'main-switch'
 
+type RouteHeader = {
+  className?: string
+  html: string
+  bind?: (header: HTMLElement) => void
+}
+
 const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
 
 export class RrrApp extends HTMLElement {
@@ -55,6 +61,7 @@ export class RrrApp extends HTMLElement {
   private shellRendered = false
   private settingsReturnHash = '#/workouts'
   private exerciseSearchQuery = ''
+  private currentRouteView: HTMLElement | null = null
   private readonly router = createHashRouter({
     routes: appRoutes,
     notFoundRouteId: 'workouts',
@@ -168,24 +175,6 @@ export class RrrApp extends HTMLElement {
     }
   }
 
-  private readonly handleInput = (event: Event): void => {
-    const inputTarget = event
-      .composedPath()
-      .find((node): node is HTMLElement & { value: string } =>
-        node instanceof HTMLElement
-        && node.tagName.toLowerCase() === 'rrr-input'
-        && node.getAttribute('name') === 'exercise-search'
-        && 'value' in node,
-      )
-
-    if (!inputTarget) {
-      return
-    }
-
-    this.exerciseSearchQuery = inputTarget.value
-    this.applyExerciseSearchQuery()
-  }
-
   private setThemeMode(theme: ThemeMode): void {
     if (this.displayPreferences.theme === theme) {
       return
@@ -255,7 +244,6 @@ export class RrrApp extends HTMLElement {
     window.addEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.addEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.addEventListener('click', this.handleClick)
-    this.shadowRoot?.addEventListener('input', this.handleInput)
     this.shadowRoot?.addEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
     this.isStandalone = window.matchMedia('(display-mode: standalone)').matches
     if (this.isStandalone) {
@@ -271,7 +259,6 @@ export class RrrApp extends HTMLElement {
     window.removeEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.removeEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.removeEventListener('click', this.handleClick)
-    this.shadowRoot?.removeEventListener('input', this.handleInput)
     this.shadowRoot?.removeEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
     this.router.dispose()
   }
@@ -541,20 +528,12 @@ export class RrrApp extends HTMLElement {
   }
 
   private updateShellState(route: Route): void {
-    const headerContent = this.shadowRoot?.querySelector<HTMLElement>('.app-header-content')
-    if (headerContent) {
-      headerContent.outerHTML = this.renderHeaderContent(route)
-    }
-
-    const backButton = this.shadowRoot?.querySelector<HTMLElement>('.header-back')
-    const backHref = this.getBackHref()
-    if (backButton) {
-      backButton.setAttribute('aria-hidden', backHref === null ? 'true' : 'false')
-      if (backHref === null) {
-        backButton.setAttribute('tabindex', '-1')
-      } else {
-        backButton.removeAttribute('tabindex')
-      }
+    const headerInner = this.shadowRoot?.querySelector<HTMLElement>('.app-header-inner')
+    if (headerInner) {
+      const header = this.createRouteHeader(route)
+      headerInner.className = ['app-header-inner', header.className].filter(Boolean).join(' ')
+      headerInner.innerHTML = header.html
+      header.bind?.(headerInner)
     }
 
     const links = this.shadowRoot?.querySelectorAll<HTMLAnchorElement>('.primary-nav .nav-link[data-route-name]')
@@ -579,16 +558,6 @@ export class RrrApp extends HTMLElement {
     }
   }
 
-  private applyExerciseSearchQuery(): void {
-    const catalogue = this.shadowRoot?.querySelector<HTMLElement & { searchQuery?: string }>(
-      '#view > rrr-exercise-catalogue.route-view-current',
-    )
-
-    if (catalogue) {
-      catalogue.searchQuery = this.exerciseSearchQuery
-    }
-  }
-
   private mountRouteView(route: Route, transition: RouteTransition): void {
     const viewHost = this.shadowRoot?.querySelector<HTMLElement>('#view')
     if (!viewHost) {
@@ -598,11 +567,11 @@ export class RrrApp extends HTMLElement {
     const currentView = viewHost.querySelector<HTMLElement>('.route-view-current')
     const nextView = this.createRouteViewElement(route)
     nextView.classList.add('route-view', `route-view-${this.getRouteSurface(route)}`, 'route-view-current')
+    this.currentRouteView = nextView
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (!currentView || transition === 'none' || reduceMotion) {
       viewHost.replaceChildren(nextView)
-      this.applyExerciseSearchQuery()
       return
     }
 
@@ -611,13 +580,11 @@ export class RrrApp extends HTMLElement {
     nextView.classList.add(`route-view-enter-${transition}`)
     viewHost.classList.add('is-transitioning')
     viewHost.append(nextView)
-    this.applyExerciseSearchQuery()
 
     const finish = (): void => {
       currentView.remove()
       nextView.classList.remove(`route-view-enter-${transition}`)
       viewHost.classList.remove('is-transitioning')
-      this.applyExerciseSearchQuery()
     }
 
     nextView.addEventListener('animationend', finish, { once: true })
@@ -641,8 +608,7 @@ export class RrrApp extends HTMLElement {
           </div>
         </nav>
         <header class="app-header">
-          <rrr-button type="button" variant="ghost" tone="neutral" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}" aria-hidden="${this.getBackHref() === null ? 'true' : 'false'}" ${this.getBackHref() === null ? 'tabindex="-1"' : ''}><rrr-icon name="arrow-left"></rrr-icon></rrr-button>
-          ${this.renderHeaderContent(route)}
+          <div class="app-header-inner"></div>
         </header>
         <main>
           <div id="view"></div>
@@ -725,28 +691,69 @@ export class RrrApp extends HTMLElement {
     return ''
   }
 
-  private renderHeaderContent(route: Route): string {
-    let contentHtml = ''
+  private createRouteHeader(route: Route): RouteHeader {
     if (route.name === 'exercises') {
-      contentHtml += `
+      return this.createExerciseCatalogueHeader()
+    }
+
+    return this.createStandardHeader(route)
+  }
+
+  private createStandardHeader(route: Route): RouteHeader {
+    const backHref = this.getBackHref()
+    const backContent = backHref
+      ? `<rrr-button type="button" variant="ghost" tone="neutral" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}"><rrr-icon name="arrow-left"></rrr-icon></rrr-button>`
+      : '<span class="app-header-spacer" aria-hidden="true"></span>'
+
+    return {
+      className: 'app-header-inner-standard',
+      html: `
+        <div class="standard-app-header">
+          ${backContent}
+          <h1 class="app-header-title">${escapeHtml(this.getHeaderTitle(route))}</h1>
+          <rrr-button type="button" variant="ghost" tone="neutral" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
+        </div>
+      `,
+    }
+  }
+
+  private createExerciseCatalogueHeader(): RouteHeader {
+    const catalogue = this.currentRouteView?.tagName.toLowerCase() === 'rrr-exercise-catalogue'
+      ? this.currentRouteView as HTMLElement & { searchQuery: string }
+      : null
+
+    return {
+      className: 'app-header-inner-exercises',
+      html: `
+        <div class="exercise-app-header">
         <rrr-input
-          class="app-header-content app-header-search"
+          class="app-header-search"
+          variant="outline"
+          tone="neutral"
+          rounded
           type="search"
           name="exercise-search"
           aria-label="${t('exercise.search.label')}"
           placeholder="${t('exercise.search.placeholder')}"
           value="${escapeHtml(this.exerciseSearchQuery)}"
-        ></rrr-input>
-        <rrr-button type="button" variant="ghost" tone="neutral" data-action="open-filter" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="filter"></rrr-icon></rrr-button>
-      `
-    } else {
-      contentHtml += `<h1 class="app-header-content app-header-title">${this.getHeaderTitle(route)}</h1>`
-    }
-    if (route.name !== 'exercises') {
-      contentHtml += `<rrr-button type="button" variant="ghost" tone="neutral" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>`
-    }
+        >
+          <rrr-icon slot="start" name="search"></rrr-icon>
+        </rrr-input>
+        <rrr-button type="button" variant="ghost" tone="neutral" rounded data-action="open-filter" aria-label="${t('exercise.filter.open')}" title="${t('exercise.filter.open')}"><rrr-icon name="filter"></rrr-icon></rrr-button>
+        </div>
+      `,
+      bind: (header) => {
+        const searchInput = header.querySelector<HTMLElement & { value: string }>('rrr-input[name="exercise-search"]')
 
-    return contentHtml
+        searchInput?.addEventListener('input', () => {
+          this.exerciseSearchQuery = searchInput.value
+
+          if (catalogue) {
+            catalogue.searchQuery = this.exerciseSearchQuery
+          }
+        })
+      },
+    }
   }
 
   private render(): void {
@@ -758,11 +765,11 @@ export class RrrApp extends HTMLElement {
     if (!this.shellRendered) {
       this.renderShell(route)
       this.mountRouteView(route, 'none')
+      this.updateShellState(route)
       this.previousRoute = route
       return
     }
 
-    this.updateShellState(route)
     const previousRoute = this.previousRoute
     const routeChanged = !previousRoute || !this.isSameRoute(previousRoute, route)
 
@@ -779,6 +786,7 @@ export class RrrApp extends HTMLElement {
       }
     }
 
+    this.updateShellState(route)
     this.previousRoute = route
 
     const panel = this.shadowRoot.querySelector<HTMLDialogElement>('.options-panel')

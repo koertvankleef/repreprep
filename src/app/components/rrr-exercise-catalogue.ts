@@ -46,14 +46,12 @@ export class RrrExerciseCatalogue extends HTMLElement {
         const originLabel = exercise.createdByUser ? t('exercise.badge.custom') : t('exercise.badge.library')
 
         return `
-          <article class="item">
-            <div>
-              <strong>${escapeHtml(exercise.name)}</strong>
-              <div class="meta">
-                <span class="badge">${originLabel}</span>
-                <span class="badge">${kindLabel}</span>
-                ${used ? `<span class="badge">${t('exercise.badge.used')}</span>` : ''}
-              </div>
+          <article class="item section-part">
+            <strong>${escapeHtml(exercise.name)}</strong>
+            <div class="meta">
+              <rrr-badge>${originLabel}</rrr-badge>
+              <rrr-badge>${kindLabel}</rrr-badge>
+              ${used ? `<rrr-badge>${t('exercise.badge.used')}</rrr-badge>` : ''}
             </div>
           </article>
         `
@@ -74,8 +72,8 @@ export class RrrExerciseCatalogue extends HTMLElement {
       <style>${styles}</style>
       <section class="page">
         <section class="section">
-          <h3>${t('exercise.list.active')}</h3>
-          <div class="list" data-list="active">${this.renderList()}</div>
+          <h2 class="section-title">Actief</h2>
+          <div class="list section-card" data-list="active">${this.renderList()}</div>
         </section>
       </section>
     `

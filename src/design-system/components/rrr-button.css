@@ -6,6 +6,8 @@ rrr-button {
   --rrr-button-padding: var(--rrr-button-padding-block) var(--rrr-button-padding-inline);
   --rrr-button-border-width: var(--rrr-border-width);
   --rrr-button-min-block-size: var(--rrr-control-min-block-size);
+  --rrr-button-font-size: inherit;
+  --rrr-button-gap: var(--rrr-spacing-s);
   --rrr-button-icon-size: 1.25rem;
   --rrr-button-shadow: var(--rrr-shadow-button);
   --rrr-button-transition: var(--rrr-transition-default);
@@ -19,6 +21,15 @@ rrr-button {
   --_bg-hover: var(--rrr-colors-activity-indigo-70);
   --_fg: var(--rrr-color-primary-contrast);
   --_interactive-fg: var(--rrr-button-fg);
+}
+
+rrr-button[size='s'] {
+  --rrr-button-min-block-size: 2rem;
+  --rrr-button-padding-block: var(--rrr-spacing-xs);
+  --rrr-button-padding-inline: var(--rrr-spacing-m);
+  --rrr-button-font-size: var(--rrr-font-size-s);
+  --rrr-button-gap: var(--rrr-spacing-xs);
+  --rrr-button-icon-size: 1rem;
 }
 
 rrr-button[tone='neutral'] {
@@ -66,6 +77,7 @@ rrr-button[variant='danger'] {
 
 rrr-button > button[data-rrr-button-inner] {
   font: inherit;
+  font-size: var(--rrr-button-font-size);
   line-height: 1.25;
   border-radius: var(--rrr-button-radius);
   border: var(--rrr-button-border-width) solid var(--_bg);
@@ -77,7 +89,7 @@ rrr-button > button[data-rrr-button-inner] {
   box-shadow: var(--rrr-button-shadow);
   display: inline-flex;
   align-items: center;
-  gap: var(--rrr-spacing-s);
+  gap: var(--rrr-button-gap);
   transition: background var(--rrr-button-transition), border-color var(--rrr-button-transition), color var(--rrr-button-transition), box-shadow var(--rrr-button-transition), transform var(--rrr-button-transition);
 }
 
