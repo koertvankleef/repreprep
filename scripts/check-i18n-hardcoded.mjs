@@ -5,6 +5,7 @@ const filesToCheck = [
   'src/app/rrr-app.ts',
   'src/design-system/components/rrr-dialog-host.ts',
   'src/app/components/rrr-exercise-catalogue.ts',
+  'src/app/components/rrr-exercise-detail.ts',
   'src/app/components/rrr-exercise-entry.ts',
   'src/app/components/rrr-exercise-history.ts',
   'src/app/components/rrr-import-export.ts',

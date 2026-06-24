@@ -515,6 +515,12 @@ main {
   }
 }
 
+:host[data-theme='dark'] {
+  .section-card {
+    background: var(--rrr-colors-grayscale-20);
+  }
+}
+
 @media screen and (min-width: 48rem) {
   :host {
     --rrr-app-nav-padding: var(--rrr-spacing-l) var(--rrr-spacing-m);

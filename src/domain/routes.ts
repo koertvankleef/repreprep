@@ -5,6 +5,7 @@ export type AppRouteId =
   | 'workout-edit'
   | 'workout-log'
   | 'exercises'
+  | 'exercise-detail'
   | 'history'
   | 'import-export'
   | 'routines'
@@ -22,6 +23,7 @@ export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
   { id: 'workout-edit', pattern: '/workouts/:workoutId', meta: { nav: 'workouts' } },
   { id: 'workout-log', pattern: '/workouts/:workoutId/log', meta: { nav: 'workouts' } },
   { id: 'exercises', pattern: '/exercises', meta: { nav: 'exercises' } },
+  { id: 'exercise-detail', pattern: '/exercises/:exerciseId', meta: { nav: 'exercises' } },
   { id: 'history', pattern: '/history', meta: { nav: 'history' } },
   { id: 'import-export', pattern: '/import-export', meta: { nav: 'import-export' } },
   { id: 'styleguide', pattern: '/styleguide', meta: { nav: 'styleguide' } },

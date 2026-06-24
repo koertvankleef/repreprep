@@ -60,16 +60,17 @@ export class RrrExerciseCatalogue extends HTMLElement {
   private renderExerciseItem(exercise: ExerciseDefinition, data: AppData): string {
     const used = isExerciseUsedInWorkouts(data, exercise.id)
     const kindLabel = exercise.kind === 'time' ? t('exercise.kind.duration') : t('exercise.kind.repsWeight')
+    const href = `#/exercises/${encodeURIComponent(exercise.id)}`
 
     return `
-      <article class="exercise-cat-item section-part">
+      <a class="exercise-cat-item section-link" href="${href}">
         <h4>${escapeHtml(exercise.name)}</h4>
         <div class="meta">
           ${exercise.createdByUser ? `<rrr-badge tone="accent">${t('exercise.badge.custom')}</rrr-badge>` : ''}
           <rrr-badge>${kindLabel}</rrr-badge>
           ${used ? `<rrr-badge>${t('exercise.badge.used')}</rrr-badge>` : ''}
         </div>
-      </article>
+      </a>
     `
   }
 

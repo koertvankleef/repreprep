@@ -37,6 +37,7 @@ type Route =
   | { name: 'workout-edit'; workoutId: string }
   | { name: 'workout-log'; workoutId: string }
   | { name: 'exercises' }
+  | { name: 'exercise-detail'; exerciseId: string }
   | { name: 'history' }
   | { name: 'import-export' }
   | { name: 'routines' }
@@ -68,6 +69,7 @@ export class RrrApp extends HTMLElement {
   private shellRendered = false
   private settingsReturnHash = '#/workouts'
   private exerciseSearchQuery = ''
+  private exerciseCatalogueScrollY = 0
   private currentRouteView: HTMLElement | null = null
   private readonly router = createHashRouter({
     routes: appRoutes,
@@ -331,6 +333,10 @@ export class RrrApp extends HTMLElement {
       return { name: 'exercises' }
     }
 
+    if (match.route.id === 'exercise-detail') {
+      return { name: 'exercise-detail', exerciseId: match.params.exerciseId ?? '' }
+    }
+
     if (match.route.id === 'history') {
       return { name: 'history' }
     }
@@ -353,6 +359,7 @@ export class RrrApp extends HTMLElement {
   private linkClass(routeName: Route['name'], current: Route['name']): string {
     if (routeName === current) return 'active'
     if (routeName === 'routines' && (current === 'routine-new' || current === 'routine-edit')) return 'active'
+    if (routeName === 'exercises' && current === 'exercise-detail') return 'active'
     return ''
   }
 
@@ -363,6 +370,7 @@ export class RrrApp extends HTMLElement {
     if (route.name === 'workout-log') return '#/workouts'
     if (route.name === 'routine-new') return '#/routines'
     if (route.name === 'routine-edit') return '#/routines'
+    if (route.name === 'exercise-detail') return '#/exercises'
     return null
   }
 
@@ -420,7 +428,14 @@ export class RrrApp extends HTMLElement {
   }
 
   private routeDepth(route: Route): number {
-    if (route.name === 'workout-edit' || route.name === 'workout-log' || route.name === 'routine-new' || route.name === 'routine-edit' || route.name === 'settings') {
+    if (
+      route.name === 'workout-edit'
+      || route.name === 'workout-log'
+      || route.name === 'routine-new'
+      || route.name === 'routine-edit'
+      || route.name === 'exercise-detail'
+      || route.name === 'settings'
+    ) {
       return 1
     }
 
@@ -476,7 +491,25 @@ export class RrrApp extends HTMLElement {
       return a.routineId === b.routineId
     }
 
+    if (a.name === 'exercise-detail' && b.name === 'exercise-detail') {
+      return a.exerciseId === b.exerciseId
+    }
+
     return true
+  }
+
+  private captureRouteState(route: Route | null): void {
+    if (route?.name === 'exercises') {
+      this.exerciseCatalogueScrollY = window.scrollY
+    }
+  }
+
+  private restoreRouteScrollPosition(route: Route): void {
+    const top = route.name === 'exercises' ? this.exerciseCatalogueScrollY : 0
+
+    requestAnimationFrame(() => {
+      window.scrollTo(0, top)
+    })
   }
 
   private createRouteViewElement(route: Route): HTMLElement {
@@ -500,6 +533,12 @@ export class RrrApp extends HTMLElement {
       const catalogue = document.createElement('rrr-exercise-catalogue') as HTMLElement & { searchQuery: string }
       catalogue.searchQuery = this.exerciseSearchQuery
       return catalogue
+    }
+
+    if (route.name === 'exercise-detail') {
+      const detail = document.createElement('rrr-exercise-detail') as HTMLElement & { exerciseId: string | null }
+      detail.exerciseId = route.exerciseId
+      return detail
     }
 
     if (route.name === 'history') {
@@ -679,6 +718,14 @@ export class RrrApp extends HTMLElement {
       return t('app.nav.exercises')
     }
 
+    if (route.name === 'exercise-detail') {
+      const exerciseName = storageService
+        .getData()
+        .exercises.find((exercise) => exercise.id === route.exerciseId)?.name
+
+      return exerciseName ?? t('exercise.detail.notFoundTitle')
+    }
+
     if (route.name === 'history') {
       return t('app.nav.history')
     }
@@ -781,7 +828,9 @@ export class RrrApp extends HTMLElement {
     const routeChanged = !previousRoute || !this.isSameRoute(previousRoute, route)
 
     if (routeChanged) {
+      this.captureRouteState(previousRoute)
       this.mountRouteView(route, this.computeRouteTransition(previousRoute, route))
+      this.restoreRouteScrollPosition(route)
     }
 
     if (!routeChanged && route.name === 'settings') {

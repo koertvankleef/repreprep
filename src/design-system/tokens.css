@@ -212,14 +212,14 @@
   --rrr-color-link: var(--rrr-colors-activity-indigo-20);
   --rrr-color-link-hover: var(--rrr-colors-serene-mint-20);
   --rrr-color-scheme: dark;
-  --rrr-color-background: var(--rrr-colors-grayscale-20);
+  --rrr-color-background: var(--rrr-colors-grayscale-30);
 
   --global-focus-ring-color: var(--rrr-colors-grayscale-100);
   --rrr-depth-1-shadow: 0 1px 2px #0000004f, 0 1px 1px #00000040;
   --rrr-depth-2-shadow: 0 2px 4px #00000066, 0 1px 2px #0000004d;
   --rrr-depth-3-shadow: 0 4px 10px #0000007d, 0 2px 6px #00000052;
 
-  --rrr-color-heading: var(--rrr-colors-activity-indigo-40);
+  --rrr-color-heading: var(--rrr-colors-activity-indigo-30);
 }
 
 :root[data-contrast='high'] {
