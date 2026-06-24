@@ -9,6 +9,7 @@ rrr-button {
   --rrr-button-font-size: inherit;
   --rrr-button-gap: var(--rrr-spacing-s);
   --rrr-button-icon-size: 1.25rem;
+  --rrr-button-white-space: nowrap;
   --rrr-button-shadow: var(--rrr-shadow-button);
   --rrr-button-transition: var(--rrr-transition-default);
   --rrr-button-hover-shadow: var(--rrr-depth-2-shadow);
@@ -90,6 +91,7 @@ rrr-button > button[data-rrr-button-inner] {
   display: inline-flex;
   align-items: center;
   gap: var(--rrr-button-gap);
+  white-space: var(--rrr-button-white-space);
   transition: background var(--rrr-button-transition), border-color var(--rrr-button-transition), color var(--rrr-button-transition), box-shadow var(--rrr-button-transition), transform var(--rrr-button-transition);
 }
 

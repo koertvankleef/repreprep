@@ -1,7 +1,12 @@
-import type { AppData, ExerciseDefinition, ExerciseKind, MeasurementProfile } from './types.ts'
+import type { AppData, Equipment, ExerciseCategory, ExerciseDefinition, ExerciseKind, MeasurementProfile } from './types.ts'
 import { exerciseCatalog } from '../exercise-library/exercises.ts'
 import { getExerciseDefaultUnit, toExerciseDefinition } from './exercise-metadata.ts'
 import { generateId } from '../utils/id.ts'
+
+export type ExerciseFilters = {
+  categories: ExerciseCategory[]
+  equipment: Equipment[]
+}
 
 export function addExercise(data: AppData, exercise: ExerciseDefinition): AppData {
   return {
@@ -105,6 +110,20 @@ export function searchExercises(exercises: ExerciseDefinition[], query: string):
       .toLowerCase()
 
     return tokens.every((token) => searchableText.includes(token))
+  })
+}
+
+export function filterExercises(exercises: ExerciseDefinition[], filters: ExerciseFilters): ExerciseDefinition[] {
+  const selectedCategories = new Set(filters.categories)
+  const selectedEquipment = new Set(filters.equipment)
+
+  return exercises.filter((exercise) => {
+    const matchesCategory = selectedCategories.size === 0
+      || exercise.categories.some((category) => selectedCategories.has(category))
+    const matchesEquipment = selectedEquipment.size === 0
+      || exercise.equipment.some((equipment) => selectedEquipment.has(equipment))
+
+    return matchesCategory && matchesEquipment
   })
 }
 

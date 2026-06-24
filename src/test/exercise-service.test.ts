@@ -4,6 +4,7 @@ import {
   addExercise,
   archiveExercise,
   createNewExercise,
+  filterExercises,
   getActiveExercises,
   isExerciseUsedInWorkouts,
   mergeExerciseCatalog,
@@ -79,6 +80,29 @@ describe('exercise-service', () => {
     const matches = searchExercises(getActiveExercises(data), 'dumbbell biceps weight')
 
     expect(matches.some((exercise) => exercise.id === 'dumbbell-bicep-curl')).toBe(true)
+  })
+
+  test('filterExercises matches category and equipment facets', () => {
+    const data = createDefaultData()
+    const matches = filterExercises(getActiveExercises(data), {
+      categories: ['strength'],
+      equipment: ['dumbbell'],
+    })
+
+    expect(matches.length).toBeGreaterThan(0)
+    expect(matches.every((exercise) => exercise.categories.includes('strength'))).toBe(true)
+    expect(matches.every((exercise) => exercise.equipment.includes('dumbbell'))).toBe(true)
+  })
+
+  test('filterExercises treats selected values within the same facet as OR', () => {
+    const data = createDefaultData()
+    const matches = filterExercises(getActiveExercises(data), {
+      categories: ['strength', 'cardio'],
+      equipment: [],
+    })
+
+    expect(matches.length).toBeGreaterThan(0)
+    expect(matches.every((exercise) => exercise.categories.includes('strength') || exercise.categories.includes('cardio'))).toBe(true)
   })
 
   test('mergeExerciseCatalog appends missing catalog records', () => {

@@ -1,5 +1,5 @@
 import { storageService } from '../storage-instance.ts'
-import { isExerciseUsedInWorkouts, searchExercises } from '../../domain/exercise-service.ts'
+import { filterExercises, isExerciseUsedInWorkouts, searchExercises, type ExerciseFilters } from '../../domain/exercise-service.ts'
 import type { AppData, ExerciseDefinition } from '../../domain/types.ts'
 import { t } from '../../i18n/index.ts'
 import styles from './rrr-exercise-catalogue.css?inline'
@@ -14,14 +14,34 @@ export class RrrExerciseCatalogue extends HTMLElement {
     this.render()
   }
   private searchQueryValue = ''
+  private filtersValue: ExerciseFilters = { categories: [], equipment: [] }
 
   set searchQuery(value: string) {
-    this.searchQueryValue = value
-    this.updateLists()
+    this.setSearchAndFilters(value, this.filtersValue)
   }
 
   get searchQuery(): string {
     return this.searchQueryValue
+  }
+
+  set filters(value: ExerciseFilters) {
+    this.setSearchAndFilters(this.searchQueryValue, value)
+  }
+
+  get filters(): ExerciseFilters {
+    return {
+      categories: [...this.filtersValue.categories],
+      equipment: [...this.filtersValue.equipment],
+    }
+  }
+
+  setSearchAndFilters(searchQuery: string, filters: ExerciseFilters): void {
+    this.searchQueryValue = searchQuery
+    this.filtersValue = {
+      categories: [...filters.categories],
+      equipment: [...filters.equipment],
+    }
+    this.render()
   }
 
   connectedCallback(): void {
@@ -35,9 +55,12 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
   private renderList(): string {
     const data = storageService.getData()
-    const exercises = searchExercises(
-      data.exercises.filter((exercise) => !exercise.archived),
-      this.searchQueryValue,
+    const exercises = filterExercises(
+      searchExercises(
+        data.exercises.filter((exercise) => !exercise.archived),
+        this.searchQueryValue,
+      ),
+      this.filtersValue,
     )
       .sort(compareExerciseNames)
 
@@ -72,14 +95,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
         </div>
       </a>
     `
-  }
-
-  private updateLists(): void {
-    const activeList = this.querySelector<HTMLElement>('[data-list="active"]')
-
-    if (activeList) {
-      activeList.innerHTML = this.renderList()
-    }
   }
 
   private render(): void {

@@ -138,9 +138,14 @@ nav {
   inset: 0 0 auto;
   z-index: 40;
   display: block;
-  padding: var(--rrr-spacing-s);
-  padding-top: calc(var(--rrr-spacing-s) + env(safe-area-inset-top));
-  background: var(--rrr-colors-activity-indigo-60);
+  --rrr-app-header-primary-background: var(--rrr-colors-activity-indigo-60);
+  --rrr-app-header-secondary-background: oklch(from var(--rrr-colors-activity-indigo-20) l c h / 0.3);
+  --rrr-app-header-secondary-edge-border: var(--rrr-colors-activity-indigo-50);
+  font-family: var(--rrr-app-link-font-family);
+  overflow: visible;
+}
+
+.app-header-primary {
   --rrr-button-neutral-bg: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-bg-hover: var(--rrr-color-primary-contrast);
   --rrr-button-neutral-fg: var(--rrr-color-primary-contrast);
@@ -148,15 +153,34 @@ nav {
   --rrr-input-neutral-fg: var(--rrr-color-primary-contrast);
   --rrr-input-outline-placeholder-color: color-mix(in oklab, var(--rrr-color-primary-contrast), transparent 28%);
   --rrr-input-outline-focus-shadow: 0 0 0 4px color-mix(in oklab, var(--rrr-color-primary-contrast), transparent 78%);
-  font-family: var(--rrr-app-link-font-family);
-  overflow: visible;
-}
-
-.app-header-primary {
   position: relative;
   z-index: 1;
   width: 100%;
   min-width: 0;
+  background: var(--rrr-app-header-primary-background);
+}
+
+.app-header-primary,
+.app-header-secondary {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.app-header-primary {
+  padding: var(--rrr-spacing-s);
+  padding-top: calc(var(--rrr-spacing-s) + env(safe-area-inset-top));
+}
+
+.app-header-secondary {
+  position: relative;
+  z-index: 1;
+  background: var(--rrr-app-header-secondary-background);
+  backdrop-filter: blur(12px);
+}
+
+.app-header-secondary[hidden] {
+  display: none;
 }
 
 .standard-app-header,
@@ -174,6 +198,232 @@ nav {
 
 .exercise-app-header {
   grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.exercise-filter-trigger {
+  position: relative;
+}
+
+.exercise-filter-trigger[aria-pressed="true"]>button[data-rrr-button-inner] {
+  background: color-mix(in oklab, var(--rrr-color-primary-contrast), transparent 82%);
+}
+
+.exercise-filter-trigger[data-has-active-filters="true"]::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 0.2rem;
+  inset-inline-end: 0.2rem;
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 999px;
+  background: var(--rrr-color-primary-contrast);
+  box-shadow: 0 0 0 2px var(--rrr-app-header-primary-background);
+  pointer-events: none;
+}
+
+.exercise-filter-rows {
+  display: grid;
+}
+
+.exercise-filter-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--rrr-spacing-m);
+  min-block-size: var(--rrr-app-header-primary-min-block-size, var(--rrr-app-header-height));
+  padding: var(--rrr-spacing-s);
+}
+
+.exercise-filter-group-label {
+  color: var(--rrr-button-fg);
+  font-family: var(--rrr-font-family-heading);
+  font-size: var(--rrr-font-size-xs);
+  font-weight: var(--rrr-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.exercise-filter-shell {
+  position: relative;
+  min-width: 0;
+  --_rail-edge-size: 1.5rem;
+  --_rail-edge-depth: 0.625rem;
+  --_rail-edge-border-size: 0.2rem;
+}
+
+.exercise-filter-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: var(--_rail-edge-size);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--rrr-transition-default);
+}
+
+.exercise-filter-edge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.exercise-filter-edge::after {
+  background: var(--rrr-app-header-secondary-edge-border);
+}
+
+.exercise-filter-edge-left {
+  left: 0;
+}
+
+.exercise-filter-edge-left::after {
+  clip-path: polygon(
+    100% 0,
+    58% 10%,
+    100% 20%,
+    58% 30%,
+    100% 40%,
+    58% 50%,
+    100% 60%,
+    58% 70%,
+    100% 80%,
+    58% 90%,
+    100% 100%,
+    calc(100% - var(--_rail-edge-border-size)) 100%,
+    calc(58% - var(--_rail-edge-border-size)) 90%,
+    calc(100% - var(--_rail-edge-border-size)) 80%,
+    calc(58% - var(--_rail-edge-border-size)) 70%,
+    calc(100% - var(--_rail-edge-border-size)) 60%,
+    calc(58% - var(--_rail-edge-border-size)) 50%,
+    calc(100% - var(--_rail-edge-border-size)) 40%,
+    calc(58% - var(--_rail-edge-border-size)) 30%,
+    calc(100% - var(--_rail-edge-border-size)) 20%,
+    calc(58% - var(--_rail-edge-border-size)) 10%,
+    calc(100% - var(--_rail-edge-border-size)) 0
+  );
+}
+
+.exercise-filter-edge-right {
+  right: 0;
+}
+
+.exercise-filter-edge-right::after {
+  clip-path: polygon(
+    0 0,
+    42% 10%,
+    0 20%,
+    42% 30%,
+    0 40%,
+    42% 50%,
+    0 60%,
+    42% 70%,
+    0 80%,
+    42% 90%,
+    0 100%,
+    var(--_rail-edge-border-size) 100%,
+    calc(42% + var(--_rail-edge-border-size)) 90%,
+    var(--_rail-edge-border-size) 80%,
+    calc(42% + var(--_rail-edge-border-size)) 70%,
+    var(--_rail-edge-border-size) 60%,
+    calc(42% + var(--_rail-edge-border-size)) 50%,
+    var(--_rail-edge-border-size) 40%,
+    calc(42% + var(--_rail-edge-border-size)) 30%,
+    var(--_rail-edge-border-size) 20%,
+    calc(42% + var(--_rail-edge-border-size)) 10%,
+    var(--_rail-edge-border-size) 0
+  );
+}
+
+.exercise-filter-shell[data-overflow-left="true"] .exercise-filter-edge-left,
+.exercise-filter-shell[data-overflow-right="true"] .exercise-filter-edge-right {
+  opacity: 1;
+}
+
+.exercise-filter-rail {
+  display: flex;
+  align-items: center;
+  gap: var(--rrr-spacing-xs);
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  scroll-padding-inline: var(--_rail-edge-size);
+}
+
+.exercise-filter-shell[data-overflow-left="true"][data-overflow-right="false"] .exercise-filter-rail {
+  clip-path: polygon(
+    var(--_rail-edge-size) 0,
+    100% 0,
+    100% 100%,
+    var(--_rail-edge-size) 100%,
+    calc(var(--_rail-edge-size) - var(--_rail-edge-depth)) 90%,
+    var(--_rail-edge-size) 80%,
+    calc(var(--_rail-edge-size) - var(--_rail-edge-depth)) 70%,
+    var(--_rail-edge-size) 60%,
+    calc(var(--_rail-edge-size) - var(--_rail-edge-depth)) 50%,
+    var(--_rail-edge-size) 40%,
+    calc(var(--_rail-edge-size) - var(--_rail-edge-depth)) 30%,
+    var(--_rail-edge-size) 20%,
+    calc(var(--_rail-edge-size) - var(--_rail-edge-depth)) 10%
+  );
+}
+
+.exercise-filter-shell[data-overflow-left="false"][data-overflow-right="true"] .exercise-filter-rail {
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--_rail-edge-size)) 0,
+    calc(100% - var(--_rail-edge-size) + var(--_rail-edge-depth)) 10%,
+    calc(100% - var(--_rail-edge-size)) 20%,
+    calc(100% - var(--_rail-edge-size) + var(--_rail-edge-depth)) 30%,
+    calc(100% - var(--_rail-edge-size)) 40%,
+    calc(100% - var(--_rail-edge-size) + var(--_rail-edge-depth)) 50%,
+    calc(100% - var(--_rail-edge-size)) 60%,
+    calc(100% - var(--_rail-edge-size) + var(--_rail-edge-depth)) 70%,
+    calc(100% - var(--_rail-edge-size)) 80%,
+    calc(100% - var(--_rail-edge-size) + var(--_rail-edge-depth)) 90%,
+    calc(100% - var(--_rail-edge-size)) 100%,
+    0 100%
+  );
+}
+
+.exercise-filter-shell[data-overflow-left="true"][data-overflow-right="true"] .exercise-filter-rail {
+  clip-path: polygon(
+    var(--_rail-edge-size) 0,
+    calc(100% - var(--_rail-edge-size)) 0,
+    calc(100% - var(--_rail-edge-size) + var(--_rail-edge-depth)) 10%,
+    calc(100% - var(--_rail-edge-size)) 20%,
+    calc(100% - var(--_rail-edge-size) + var(--_rail-edge-depth)) 30%,
+    calc(100% - var(--_rail-edge-size)) 40%,
+    calc(100% - var(--_rail-edge-size) + var(--_rail-edge-depth)) 50%,
+    calc(100% - var(--_rail-edge-size)) 60%,
+    calc(100% - var(--_rail-edge-size) + var(--_rail-edge-depth)) 70%,
+    calc(100% - var(--_rail-edge-size)) 80%,
+    calc(100% - var(--_rail-edge-size) + var(--_rail-edge-depth)) 90%,
+    calc(100% - var(--_rail-edge-size)) 100%,
+    var(--_rail-edge-size) 100%,
+    calc(var(--_rail-edge-size) - var(--_rail-edge-depth)) 90%,
+    var(--_rail-edge-size) 80%,
+    calc(var(--_rail-edge-size) - var(--_rail-edge-depth)) 70%,
+    var(--_rail-edge-size) 60%,
+    calc(var(--_rail-edge-size) - var(--_rail-edge-depth)) 50%,
+    var(--_rail-edge-size) 40%,
+    calc(var(--_rail-edge-size) - var(--_rail-edge-depth)) 30%,
+    var(--_rail-edge-size) 20%,
+    calc(var(--_rail-edge-size) - var(--_rail-edge-depth)) 10%
+  );
+}
+
+.exercise-filter-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.exercise-filter-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-block-size: var(--rrr-app-header-primary-min-block-size, var(--rrr-app-header-height));
+  padding: var(--rrr-spacing-s);
 }
 
 .app-header::after {
@@ -530,6 +780,14 @@ main {
   .app-header {
     position: static;
     border-bottom-color: transparent;
+  }
+
+  .app-header-primary {
+    padding-inline-start: var(--rrr-spacing-2xl);
+  }
+
+  .exercise-filter-row,
+  .exercise-filter-actions {
     padding-inline-start: var(--rrr-spacing-2xl);
   }
 

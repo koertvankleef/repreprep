@@ -1,5 +1,8 @@
 import { storageService } from './storage-instance.ts'
 import { t } from '../i18n/index.ts'
+import { equipmentValues, exerciseCategories } from '../domain/exercise-metadata.ts'
+import type { Equipment, ExerciseCategory } from '../domain/types.ts'
+import type { ExerciseFilters } from '../domain/exercise-service.ts'
 import { appRoutes, type AppRouteMeta } from '../domain/routes.ts'
 import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
 import { toastService } from '../foundation/toast.ts'
@@ -51,7 +54,15 @@ type RouteTransition = 'none' | 'sub-forward' | 'sub-back' | 'main-switch'
 type RouteHeader = {
   className?: string
   html: string
+  secondaryClassName?: string
+  secondaryHtml?: string
   bind?: (header: HTMLElement) => void
+}
+
+type ExerciseCatalogueElement = HTMLElement & {
+  searchQuery: string
+  filters: ExerciseFilters
+  setSearchAndFilters?: (searchQuery: string, filters: ExerciseFilters) => void
 }
 
 const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
@@ -69,6 +80,11 @@ export class RrrApp extends HTMLElement {
   private shellRendered = false
   private settingsReturnHash = '#/workouts'
   private exerciseSearchQuery = ''
+  private exerciseFiltersOpen = false
+  private exerciseFilters: ExerciseFilters = { categories: [], equipment: [] }
+  private exerciseSearchDebounceId: number | null = null
+  private exerciseFilterRailController: AbortController | null = null
+  private exerciseFilterRailResizeObserver: ResizeObserver | null = null
   private exerciseCatalogueScrollY = 0
   private currentRouteView: HTMLElement | null = null
   private readonly router = createHashRouter({
@@ -176,6 +192,25 @@ export class RrrApp extends HTMLElement {
       return
     }
 
+    if (action === 'toggle-exercise-filters') {
+      this.exerciseFiltersOpen = !this.exerciseFiltersOpen
+      this.render()
+      return
+    }
+
+    if (action === 'toggle-exercise-filter') {
+      this.toggleExerciseFilter(actionTarget)
+      return
+    }
+
+    if (action === 'clear-exercise-filters') {
+      this.exerciseFilters = { categories: [], equipment: [] }
+      this.exerciseFiltersOpen = false
+      this.syncExerciseCatalogueState()
+      this.render()
+      return
+    }
+
     if (action === 'navigate-back') {
       const href = this.getBackHref()
       if (href) {
@@ -197,6 +232,34 @@ export class RrrApp extends HTMLElement {
 
     this.applyAndPersistDisplayPreferences()
     this.render()
+  }
+
+  private toggleExerciseFilter(target: HTMLElement): void {
+    const filterType = target.dataset.filterType
+    const value = target.dataset.filterValue
+
+    if (!value) {
+      return
+    }
+
+    if (filterType === 'category') {
+      this.exerciseFilters = {
+        ...this.exerciseFilters,
+        categories: toggleArrayValue(this.exerciseFilters.categories, value as ExerciseCategory),
+      }
+      this.syncExerciseCatalogueState()
+      this.render()
+      return
+    }
+
+    if (filterType === 'equipment') {
+      this.exerciseFilters = {
+        ...this.exerciseFilters,
+        equipment: toggleArrayValue(this.exerciseFilters.equipment, value as Equipment),
+      }
+      this.syncExerciseCatalogueState()
+      this.render()
+    }
   }
 
   private setContrastMode(contrast: ContrastMode): void {
@@ -264,6 +327,11 @@ export class RrrApp extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    if (this.exerciseSearchDebounceId !== null) {
+      window.clearTimeout(this.exerciseSearchDebounceId)
+      this.exerciseSearchDebounceId = null
+    }
+    this.clearExerciseFilterRailBinding()
     this.stopWatchingSystemThemePreference?.()
     this.stopWatchingSystemThemePreference = null
     window.removeEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
@@ -512,6 +580,93 @@ export class RrrApp extends HTMLElement {
     })
   }
 
+  private cloneExerciseFilters(): ExerciseFilters {
+    return {
+      categories: [...this.exerciseFilters.categories],
+      equipment: [...this.exerciseFilters.equipment],
+    }
+  }
+
+  private getExerciseCatalogueView(): ExerciseCatalogueElement | null {
+    const mountedCatalogue = this.shadowRoot?.querySelector<ExerciseCatalogueElement>(
+      '#view > rrr-exercise-catalogue.route-view-current',
+    )
+
+    if (mountedCatalogue) {
+      return mountedCatalogue
+    }
+
+    return this.currentRouteView?.tagName.toLowerCase() === 'rrr-exercise-catalogue'
+      ? this.currentRouteView as ExerciseCatalogueElement
+      : null
+  }
+
+  private syncExerciseCatalogueState(): void {
+    const catalogue = this.getExerciseCatalogueView()
+
+    if (!catalogue) {
+      return
+    }
+
+    const filters = this.cloneExerciseFilters()
+
+    if (catalogue.setSearchAndFilters) {
+      catalogue.setSearchAndFilters(this.exerciseSearchQuery, filters)
+      return
+    }
+
+    catalogue.searchQuery = this.exerciseSearchQuery
+    catalogue.filters = filters
+  }
+
+  private syncHeaderHeight(): void {
+    const header = this.shadowRoot?.querySelector<HTMLElement>('.app-header')
+    const primaryHeader = this.shadowRoot?.querySelector<HTMLElement>('.app-header-primary')
+    if (!header) {
+      return
+    }
+
+    requestAnimationFrame(() => {
+      const height = header.getBoundingClientRect().height
+      const primaryHeight = primaryHeader?.getBoundingClientRect().height ?? 0
+
+      if (height > 0) {
+        this.style.setProperty('--rrr-app-header-height', `${height}px`)
+      }
+
+      if (primaryHeight > 0) {
+        this.style.setProperty('--rrr-app-header-primary-min-block-size', `${primaryHeight}px`)
+      }
+    })
+  }
+
+  private queueExerciseCatalogueSync(): void {
+    if (this.exerciseSearchDebounceId !== null) {
+      window.clearTimeout(this.exerciseSearchDebounceId)
+    }
+
+    this.exerciseSearchDebounceId = window.setTimeout(() => {
+      this.exerciseSearchDebounceId = null
+      this.syncExerciseCatalogueState()
+    }, 150)
+  }
+
+  private flushExerciseCatalogueSync(): void {
+    if (this.exerciseSearchDebounceId !== null) {
+      window.clearTimeout(this.exerciseSearchDebounceId)
+      this.exerciseSearchDebounceId = null
+    }
+
+    this.syncExerciseCatalogueState()
+  }
+
+  private clearExerciseFilterRailBinding(): void {
+    this.exerciseFilterRailController?.abort()
+    this.exerciseFilterRailController = null
+    this.exerciseFilterRailResizeObserver?.disconnect()
+    this.exerciseFilterRailResizeObserver = null
+  }
+
   private createRouteViewElement(route: Route): HTMLElement {
     if (route.name === 'workouts') {
       return document.createElement('rrr-workout-list')
@@ -530,8 +685,15 @@ export class RrrApp extends HTMLElement {
     }
 
     if (route.name === 'exercises') {
-      const catalogue = document.createElement('rrr-exercise-catalogue') as HTMLElement & { searchQuery: string }
-      catalogue.searchQuery = this.exerciseSearchQuery
+      const catalogue = document.createElement('rrr-exercise-catalogue') as ExerciseCatalogueElement
+      const filters = this.cloneExerciseFilters()
+
+      if (catalogue.setSearchAndFilters) {
+        catalogue.setSearchAndFilters(this.exerciseSearchQuery, filters)
+      } else {
+        catalogue.searchQuery = this.exerciseSearchQuery
+        catalogue.filters = filters
+      }
       return catalogue
     }
 
@@ -575,12 +737,24 @@ export class RrrApp extends HTMLElement {
   }
 
   private updateShellState(route: Route): void {
+    const appHeader = this.shadowRoot?.querySelector<HTMLElement>('.app-header')
+    const header = this.createRouteHeader(route)
+    this.clearExerciseFilterRailBinding()
     const headerInner = this.shadowRoot?.querySelector<HTMLElement>('.app-header-primary')
     if (headerInner) {
-      const header = this.createRouteHeader(route)
       headerInner.className = ['app-header-primary', header.className].filter(Boolean).join(' ')
       headerInner.innerHTML = header.html
-      header.bind?.(headerInner)
+    }
+
+    const secondaryHeader = this.shadowRoot?.querySelector<HTMLElement>('.app-header-secondary')
+    if (secondaryHeader) {
+      secondaryHeader.className = ['app-header-secondary', header.secondaryClassName].filter(Boolean).join(' ')
+      secondaryHeader.hidden = !header.secondaryHtml
+      secondaryHeader.innerHTML = header.secondaryHtml ?? ''
+    }
+
+    if (appHeader) {
+      header.bind?.(appHeader)
     }
 
     const links = this.shadowRoot?.querySelectorAll<HTMLAnchorElement>('.primary-nav .nav-link[data-route-name]')
@@ -603,6 +777,8 @@ export class RrrApp extends HTMLElement {
     if (optionsBody) {
       optionsBody.innerHTML = this.renderOptionsPanelContent(route)
     }
+
+    this.syncHeaderHeight()
   }
 
   private mountRouteView(route: Route, transition: RouteTransition): void {
@@ -655,6 +831,7 @@ export class RrrApp extends HTMLElement {
         </nav>
         <header class="app-header">
           <div class="app-header-primary"></div>
+          <div class="app-header-secondary" hidden></div>
         </header>
         <main>
           <div id="view"></div>
@@ -772,12 +949,16 @@ export class RrrApp extends HTMLElement {
   }
 
   private createExerciseCatalogueHeader(): RouteHeader {
-    const catalogue = this.currentRouteView?.tagName.toLowerCase() === 'rrr-exercise-catalogue'
-      ? this.currentRouteView as HTMLElement & { searchQuery: string }
-      : null
+    const hasActiveFilters = this.getActiveExerciseFilterCount() > 0
+    const filterLabel = hasActiveFilters
+      ? t('exercise.filter.openActive')
+      : t('exercise.filter.open')
+    const escapedFilterLabel = escapeHtml(filterLabel)
 
     return {
       className: 'app-header-primary-exercises',
+      secondaryClassName: 'app-header-secondary-exercises',
+      secondaryHtml: this.exerciseFiltersOpen ? this.renderExerciseFilterRail() : '',
       html: `
         <div class="exercise-app-header">
         <rrr-input
@@ -793,21 +974,143 @@ export class RrrApp extends HTMLElement {
         >
           <rrr-icon slot="start" name="search"></rrr-icon>
         </rrr-input>
-        <rrr-button type="button" variant="ghost" tone="neutral" rounded data-action="open-filter" aria-label="${t('exercise.filter.open')}" title="${t('exercise.filter.open')}"><rrr-icon name="filter"></rrr-icon></rrr-button>
+        <rrr-button
+          type="button"
+          variant="ghost"
+          tone="neutral"
+          rounded
+          class="exercise-filter-trigger"
+          data-action="toggle-exercise-filters"
+          data-has-active-filters="${hasActiveFilters}"
+          aria-pressed="${this.exerciseFiltersOpen}"
+          aria-label="${escapedFilterLabel}"
+          title="${escapedFilterLabel}"
+        ><rrr-icon name="filter"></rrr-icon></rrr-button>
         </div>
       `,
       bind: (header) => {
         const searchInput = header.querySelector<HTMLElement & { value: string }>('rrr-input[name="exercise-search"]')
 
-        searchInput?.addEventListener('input', () => {
-          this.exerciseSearchQuery = searchInput.value
-
-          if (catalogue) {
-            catalogue.searchQuery = this.exerciseSearchQuery
+        if (searchInput) {
+          const syncSearchInput = (): void => {
+            this.exerciseSearchQuery = searchInput.value
+            this.queueExerciseCatalogueSync()
           }
-        })
+
+          searchInput.addEventListener('input', syncSearchInput)
+          searchInput.addEventListener('change', syncSearchInput)
+          searchInput.addEventListener('keydown', (event) => {
+            if (event instanceof KeyboardEvent && event.key === 'Enter') {
+              this.exerciseSearchQuery = searchInput.value
+              this.flushExerciseCatalogueSync()
+            }
+          })
+        }
+
+        this.bindExerciseFilterRail(header)
       },
     }
+  }
+
+  private renderExerciseFilterRail(): string {
+    const hasActiveFilters = this.getActiveExerciseFilterCount() > 0
+
+    return `
+      <div class="exercise-filter-rows" aria-label="${t('exercise.filter.railLabel')}">
+        ${this.renderExerciseFilterGroup(
+          t('exercise.filter.category'),
+          exerciseCategories,
+          this.exerciseFilters.categories,
+          'category',
+          getExerciseCategoryLabel,
+        )}
+        ${this.renderExerciseFilterGroup(
+          t('exercise.filter.equipment'),
+          equipmentValues,
+          this.exerciseFilters.equipment,
+          'equipment',
+          getEquipmentLabel,
+        )}
+        ${hasActiveFilters ? `
+          <div class="exercise-filter-actions">
+            <rrr-button type="button" size="s" rounded variant="ghost" data-action="clear-exercise-filters">
+              ${t('exercise.filter.clear')}
+            </rrr-button>
+          </div>
+        ` : ''}
+      </div>
+    `
+  }
+
+  private renderExerciseFilterGroup<T extends string>(
+    label: string,
+    values: readonly T[],
+    selectedValues: readonly T[],
+    filterType: 'category' | 'equipment',
+    labelForValue: (value: T) => string,
+  ): string {
+    const selected = new Set(selectedValues)
+
+    return `
+      <div class="exercise-filter-row" role="group" aria-label="${escapeHtml(label)}">
+        <span class="exercise-filter-group-label">${escapeHtml(label)}</span>
+        <div class="exercise-filter-shell" data-overflow-left="false" data-overflow-right="false">
+          <span class="exercise-filter-edge exercise-filter-edge-left" aria-hidden="true"></span>
+          <div class="exercise-filter-rail" data-filter-rail>
+            ${values.map((value) => {
+              const active = selected.has(value)
+              const buttonLabel = labelForValue(value)
+
+              return `
+                <rrr-button
+                  type="button"
+                  size="s"
+                  rounded
+                  ${active ? '' : 'variant="outline"'}
+                  data-action="toggle-exercise-filter"
+                  data-filter-type="${filterType}"
+                  data-filter-value="${escapeHtml(value)}"
+                  aria-pressed="${active}"
+                >${escapeHtml(buttonLabel)}</rrr-button>
+              `
+            }).join('')}
+          </div>
+          <span class="exercise-filter-edge exercise-filter-edge-right" aria-hidden="true"></span>
+        </div>
+      </div>
+    `
+  }
+
+  private bindExerciseFilterRail(header: HTMLElement): void {
+    this.clearExerciseFilterRailBinding()
+
+    const rails = [...header.querySelectorAll<HTMLElement>('[data-filter-rail]')]
+
+    if (rails.length === 0) {
+      return
+    }
+
+    const controller = new AbortController()
+    this.exerciseFilterRailController = controller
+    this.exerciseFilterRailResizeObserver = new ResizeObserver((entries) => {
+      entries.forEach((entry) => {
+        updateFilterRailOverflow(entry.target as HTMLElement)
+      })
+    })
+
+    rails.forEach((rail) => {
+      const updateOverflow = (): void => {
+        updateFilterRailOverflow(rail)
+      }
+
+      rail.addEventListener('scroll', updateOverflow, { passive: true, signal: controller.signal })
+      this.exerciseFilterRailResizeObserver?.observe(rail)
+      requestAnimationFrame(updateOverflow)
+    })
+  }
+
+  private getActiveExerciseFilterCount(): number {
+    return this.exerciseFilters.categories.length + this.exerciseFilters.equipment.length
   }
 
   private render(): void {
@@ -843,6 +1146,11 @@ export class RrrApp extends HTMLElement {
     }
 
     this.updateShellState(route)
+
+    if (!routeChanged && route.name === 'exercises') {
+      this.syncExerciseCatalogueState()
+    }
+
     this.previousRoute = route
 
     const panel = this.shadowRoot.querySelector<HTMLDialogElement>('.options-panel')
@@ -854,6 +1162,32 @@ export class RrrApp extends HTMLElement {
 
 function escapeHtml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
+function getExerciseCategoryLabel(category: ExerciseCategory): string {
+  return t(`exercise.category.${category}`)
+}
+
+function getEquipmentLabel(equipment: Equipment): string {
+  return t(`exercise.equipment.${equipment}`)
+}
+
+function toggleArrayValue<T>(values: readonly T[], value: T): T[] {
+  return values.includes(value)
+    ? values.filter((item) => item !== value)
+    : [...values, value]
+}
+
+function updateFilterRailOverflow(rail: HTMLElement): void {
+  const shell = rail.closest<HTMLElement>('.exercise-filter-shell')
+
+  if (!shell) {
+    return
+  }
+
+  const maxScrollLeft = rail.scrollWidth - rail.clientWidth
+  shell.dataset.overflowLeft = String(rail.scrollLeft > 1)
+  shell.dataset.overflowRight = String(rail.scrollLeft < maxScrollLeft - 1)
 }
 
 customElements.define('rrr-app', RrrApp)
