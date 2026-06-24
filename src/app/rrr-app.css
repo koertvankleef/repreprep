@@ -369,56 +369,6 @@ main {
 }
 
 
-.section {
-  display: grid;
-  gap: var(--rrr-spacing-xs);
-}
-
-.section-title {
-  margin: 0;
-}
-
-.section-card {
-  display: grid;
-  gap: 0;
-  background: var(--rrr-colors-grayscale-00);
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
-  border-radius: var(--rrr-radius-l);
-  overflow: hidden;
-}
-
-.section-link,
-.section-part {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  gap: var(--rrr-spacing-m);
-  padding: var(--rrr-spacing-m);
-  border: var(--rrr-border-width) solid transparent;
-
-  &:not(:last-child) {
-    border-bottom-color: var(--rrr-colors-grayscale-30);
-  }
-}
-
-.section-part {
-
-  &:focus-visible {
-    outline: var(--rrr-focus-outline);
-    outline-offset: var(--rrr-focus-outline-offset);
-  }
-}
-
-.section-link {
-  color: var(--rrr-colors-grayscale-80);
-  transition: background var(--rrr-transition-default), color var(--rrr-transition-default);
-}
-
-.section-link:hover {
-  background: var(--rrr-colors-activity-indigo-10);
-  color: var(--rrr-colors-activity-indigo-80);
-}
-
 /* ── Options panel (side drawer, mobile-first) ───────────────────────── */
 
 .options-panel {
@@ -512,12 +462,6 @@ main {
 
   to {
     transform: translateX(0);
-  }
-}
-
-:host[data-theme='dark'] {
-  .section-card {
-    background: var(--rrr-colors-grayscale-20);
   }
 }
 

@@ -47,9 +47,9 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
     return groupExercisesByInitial(exercises)
       .map((section) => `
-        <section class="section">
-          <h2 class="section-title">${escapeHtml(section.title)}</h2>
-          <div class="section-card">
+        <section class="rrr-section">
+          <h2 class="rrr-section-title">${escapeHtml(section.title)}</h2>
+          <div class="rrr-section-card">
             ${section.exercises.map((exercise) => this.renderExerciseItem(exercise, data)).join('')}
           </div>
         </section>
@@ -63,7 +63,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     const href = `#/exercises/${encodeURIComponent(exercise.id)}`
 
     return `
-      <a class="exercise-cat-item section-link" href="${href}">
+      <a class="exercise-cat-item rrr-section-link" href="${href}">
         <h4>${escapeHtml(exercise.name)}</h4>
         <div class="meta">
           ${exercise.createdByUser ? `<rrr-badge tone="accent">${t('exercise.badge.custom')}</rrr-badge>` : ''}

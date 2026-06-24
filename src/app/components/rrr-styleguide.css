@@ -177,13 +177,11 @@
   background: var(--rrr-colors-activity-indigo-40);
 }
 
-.scale-preview.spacing {
-  min-inline-size: 0.25rem;
-}
-
 .scale-preview.radius {
-  inline-size: 2.5rem;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
   border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border-radius: var(--scale-preview-radius, .125rem);
   background: var(--rrr-colors-grayscale-10);
 }
 

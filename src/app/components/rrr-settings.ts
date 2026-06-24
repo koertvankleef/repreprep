@@ -116,15 +116,15 @@ export class RrrSettings extends HTMLElement {
     this.innerHTML = `
       <style>${styles}</style>
       <div class="page">
-        <section class="section">
-          <h2 class="section-title">${t('app.settings.navigation')}</h2>
-          <div class="section-card">
-            <a class="section-link" href="#/import-export">
+        <section class="rrr-section">
+          <h2 class="rrr-section-title">${t('app.settings.navigation')}</h2>
+          <div class="rrr-section-card">
+            <a class="rrr-section-link" href="#/import-export">
               <rrr-icon name="arrow-export-up"></rrr-icon>
               <span>${t('app.nav.importExport')}</span>
             </a>
             ${styleguideEnabled ? `
-              <a class="section-link" href="#/styleguide">
+              <a class="rrr-section-link" href="#/styleguide">
                 <rrr-icon name="braces"></rrr-icon>
                 <span>${t('app.nav.styleguide')}</span>
               </a>
@@ -132,9 +132,9 @@ export class RrrSettings extends HTMLElement {
           </div>
         </section>
 
-        <section class="section">
-          <h2 class="section-title">${t('app.settings.display')}</h2>
-          <div class="section-card">
+        <section class="rrr-section">
+          <h2 class="rrr-section-title">${t('app.settings.display')}</h2>
+          <div class="rrr-section-card">
             <div class="control-row">
               <span class="control-label">${t('app.theme.contrast')}</span>
               <div class="control-group" role="group" aria-label="${t('app.theme.contrast')}">
@@ -159,9 +159,9 @@ export class RrrSettings extends HTMLElement {
           </div>
         </section>
 
-        <section class="section">
-          <h2 class="section-title">${t('app.settings.data')}</h2>
-          <div class="section-card danger-card">
+        <section class="rrr-section">
+          <h2 class="rrr-section-title">${t('app.settings.data')}</h2>
+          <div class="rrr-section-card danger-card">
             <div class="danger-card-content">
               <h3 class="danger-title">${t('app.settings.resetData.title')}</h3>
               <p class="danger-copy">${t('app.settings.resetData.description')}</p>

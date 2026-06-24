@@ -305,7 +305,7 @@ export class RrrStyleguide extends HTMLElement {
     return TOKEN_SCALES.map((scale) => {
       const items = scale.tokens.map((token) => {
         const scaleVisual = scale.titleKey === 'styleguide.scale.radius'
-          ? `<span class="scale-preview radius" style="border-radius: var(${token});"></span>`
+          ? `<span class="scale-preview radius" style="--scale-preview-radius: var(${token});"></span>`
           : scale.titleKey === 'styleguide.scale.elevation'
             ? `<span class="scale-preview elevation" style="box-shadow: var(${token});"></span>`
             : `<span class="scale-preview spacing" style="inline-size: var(${token});"></span>`

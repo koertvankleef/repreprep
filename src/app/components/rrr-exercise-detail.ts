@@ -57,10 +57,10 @@ export class RrrExerciseDetail extends HTMLElement {
   private renderNotFound(): string {
     return `
       <section class="page detail-page">
-        <section class="section">
-          <h2 class="section-title">${t('exercise.detail.notFoundTitle')}</h2>
-          <div class="section-card">
-            <p class="section-part">${t('exercise.detail.notFound')}</p>
+        <section class="rrr-section">
+          <h2 class="rrr-section-title">${t('exercise.detail.notFoundTitle')}</h2>
+          <div class="rrr-section-card">
+            <p class="rrr-section-row">${t('exercise.detail.notFound')}</p>
           </div>
         </section>
       </section>
@@ -103,9 +103,9 @@ export class RrrExerciseDetail extends HTMLElement {
 
   private renderDetailSection(title: string, rows: DetailRow[]): string {
     return `
-      <section class="section">
-        <h2 class="section-title">${escapeHtml(title)}</h2>
-        <dl class="section-card detail-list">
+      <section class="rrr-section">
+        <h2 class="rrr-section-title">${escapeHtml(title)}</h2>
+        <dl class="rrr-section-card detail-list">
           ${rows.map((row) => this.renderDetailRow(row)).join('')}
         </dl>
       </section>
@@ -114,7 +114,7 @@ export class RrrExerciseDetail extends HTMLElement {
 
   private renderDetailRow(row: DetailRow): string {
     return `
-      <div class="detail-row section-part">
+      <div class="rrr-detail-row rrr-section-row">
         <dt>${escapeHtml(row.label)}</dt>
         <dd>${row.value}</dd>
       </div>
