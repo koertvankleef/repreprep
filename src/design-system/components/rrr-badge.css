@@ -21,59 +21,37 @@ rrr-badge {
   --rrr-badge-font-weight: var(--rrr-font-weight-medium);
   --rrr-badge-line-height: 1.2;
 
-  --_soft-bg: var(--rrr-colors-activity-indigo-10);
-  --_soft-border: var(--rrr-colors-activity-indigo-10);
-  --_soft-fg: var(--rrr-colors-activity-indigo-70);
-  --_solid-bg: var(--rrr-colors-activity-indigo-60);
+  --_tone: var(--rrr-colors-activity-indigo-60);
+  --_soft-bg: color-mix(in oklab, var(--rrr-surface-raised) 86%, var(--_tone) 14%);
+  --_soft-border: color-mix(in oklab, var(--rrr-surface-raised) 58%, var(--_tone) 42%);
+  --_soft-fg: color-mix(in oklab, var(--_tone) 64%, var(--rrr-color-text) 36%);
+  --_solid-bg: var(--_tone);
   --_solid-fg: var(--rrr-color-primary-contrast);
 }
 
 rrr-badge[tone='neutral'] {
-  --_soft-bg: var(--rrr-colors-grayscale-10);
-  --_soft-border: var(--rrr-colors-grayscale-30);
-  --_soft-fg: var(--rrr-colors-grayscale-80);
-  --_solid-bg: var(--rrr-colors-grayscale-80);
-  --_solid-fg: var(--rrr-colors-grayscale-00);
+  --_tone: var(--rrr-color-text);
+  --_solid-fg: var(--rrr-color-background);
 }
 
 rrr-badge[tone='accent'] {
-  --_soft-bg: var(--rrr-colors-serene-mint-10);
-  --_soft-border: var(--rrr-colors-serene-mint-20);
-  --_soft-fg: var(--rrr-colors-serene-mint-80);
-  --_solid-bg: var(--rrr-colors-serene-mint-60);
-  --_solid-fg: var(--rrr-color-primary-contrast);
+  --_tone: var(--rrr-colors-serene-mint-60);
 }
 
 rrr-badge[tone='info'] {
-  --_soft-bg: var(--rrr-colors-context-info-10);
-  --_soft-border: var(--rrr-colors-context-info-20);
-  --_soft-fg: var(--rrr-colors-context-info-80);
-  --_solid-bg: var(--rrr-colors-context-info-60);
-  --_solid-fg: var(--rrr-color-primary-contrast);
+  --_tone: var(--rrr-colors-context-info-60);
 }
 
 rrr-badge[tone='success'] {
-  --_soft-bg: var(--rrr-colors-context-success-10);
-  --_soft-border: var(--rrr-colors-context-success-20);
-  --_soft-fg: var(--rrr-colors-context-success-80);
-  --_solid-bg: var(--rrr-colors-context-success-60);
-  --_solid-fg: var(--rrr-color-primary-contrast);
+  --_tone: var(--rrr-colors-context-success-60);
 }
 
 rrr-badge[tone='warning'] {
-  --_soft-bg: var(--rrr-colors-context-warning-10);
-  --_soft-border: var(--rrr-colors-context-warning-20);
-  --_soft-fg: var(--rrr-colors-context-warning-80);
-  --_solid-bg: var(--rrr-colors-context-warning-60);
-  --_solid-fg: var(--rrr-color-primary-contrast);
+  --_tone: var(--rrr-colors-context-warning-60);
 }
 
 rrr-badge[tone='danger'] {
-  --_soft-bg: var(--rrr-colors-context-danger-10);
-  --_soft-border: var(--rrr-colors-context-danger-20);
-  --_soft-fg: var(--rrr-colors-context-danger-80);
-  --_solid-bg: var(--rrr-colors-context-danger-60);
-  --_solid-fg: var(--rrr-color-primary-contrast);
+  --_tone: var(--rrr-colors-context-danger-60);
 }
 
 rrr-badge[variant='outline'] {

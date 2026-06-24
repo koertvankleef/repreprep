@@ -210,6 +210,10 @@ a:hover {
   gap: var(--rrr-spacing-m);
   padding: var(--rrr-spacing-m);
   border: var(--rrr-border-width) solid transparent;
+
+  &:focus-visible {
+    outline-offset: calc(var(--global-focus-ring-offset) * -2)
+  }
 }
 
 .rrr-section-link:not(:last-child),
@@ -221,11 +225,13 @@ a:hover {
   color: var(--rrr-color-text);
   text-decoration: none;
   transition: background var(--rrr-transition-default), color var(--rrr-transition-default);
+  --_rrr-section-link-hover-background: color-mix(in oklab, var(--rrr-color-primary), transparent 85%);
+  --_rrr-section-link-hover-color: var(--rrr-button-fg);
 }
 
 .rrr-section-link:hover {
-  background: var(--rrr-colors-activity-indigo-10);
-  color: var(--rrr-colors-activity-indigo-80);
+  background: var(--_rrr-section-link-hover-background);
+  color: var(--_rrr-section-link-hover-color);
 }
 
 .rrr-section-row:focus-visible {

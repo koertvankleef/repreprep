@@ -1,6 +1,7 @@
 .intro {
   display: grid;
   gap: var(--rrr-spacing-s);
+  padding: var(--rrr-spacing-xl);
 }
 
 .stack {
@@ -17,6 +18,7 @@
 .showcase-block {
   display: grid;
   gap: var(--rrr-spacing-s);
+  padding: var(--rrr-spacing-xl);
 }
 
 .button-row {
@@ -31,7 +33,7 @@
 }
 
 .role-row {
-  border-bottom: var(--rrr-border-width) dashed var(--rrr-colors-grayscale-40);
+  border-bottom: var(--rrr-border-width) dashed var(--rrr-border-subtle);
   padding-bottom: var(--rrr-spacing-s);
 }
 
@@ -52,14 +54,14 @@
 
 .swatch-description {
   margin: 0;
-  color: var(--rrr-colors-grayscale-70);
+  color: var(--rrr-text-muted);
 }
 
 .swatch-grid {
   list-style: none;
   margin: 0;
   padding: 0;
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border: var(--rrr-border-width) solid var(--rrr-border-subtle);
   border-radius: var(--rrr-radius-s);
   overflow: hidden;
 }
@@ -114,7 +116,7 @@
 }
 
 .sample-text {
-  color: var(--rrr-colors-grayscale-70);
+  color: var(--rrr-text-muted);
 }
 
 .component-column {
@@ -134,10 +136,10 @@
   align-items: center;
   gap: var(--rrr-spacing-s);
   padding: var(--rrr-spacing-s) var(--rrr-spacing-m);
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border: var(--rrr-border-width) solid var(--rrr-border-subtle);
   border-radius: var(--rrr-radius-s);
-  background: var(--rrr-colors-grayscale-00);
-  color: var(--rrr-colors-grayscale-90);
+  background: var(--rrr-surface-raised);
+  color: var(--rrr-color-text);
 }
 
 .icon-item rrr-icon {
@@ -180,15 +182,15 @@
 .scale-preview.radius {
   inline-size: 3.5rem;
   block-size: 3.5rem;
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-30);
+  border: var(--rrr-border-width) solid var(--rrr-border-subtle);
   border-radius: var(--scale-preview-radius, .125rem);
-  background: var(--rrr-colors-grayscale-10);
+  background: var(--rrr-surface-base);
 }
 
 .scale-preview.elevation {
   inline-size: 2.5rem;
   border-radius: var(--rrr-radius-s);
-  background: var(--rrr-colors-grayscale-00);
+  background: var(--rrr-surface-raised);
 }
 
 @media screen and (min-width: 62rem) {
