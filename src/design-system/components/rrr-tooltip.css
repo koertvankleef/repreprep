@@ -13,6 +13,7 @@
   position: fixed;
   z-index: 9999;
   pointer-events: none;
+  user-select: none;
 
   background: var(--rrr-colors-grayscale-90);
   color: var(--rrr-colors-grayscale-00);

@@ -2,6 +2,7 @@
   display: inline-flex;
   inline-size: 1.2em;
   block-size: 1.2em;
+  user-select: none;
   color: inherit;
   vertical-align: -0.125em;
 }

@@ -1,5 +1,6 @@
 rrr-button {
   display: inline-block;
+  user-select: none;
   --rrr-button-radius: var(--rrr-radius-s);
   --rrr-button-padding-block: calc(var(--rrr-spacing-s) - var(--rrr-spacing-2xs));
   --rrr-button-padding-inline: var(--rrr-spacing-l);
@@ -80,6 +81,7 @@ rrr-button > button[data-rrr-button-inner] {
   font: inherit;
   font-size: var(--rrr-button-font-size);
   line-height: 1.25;
+  user-select: none;
   border-radius: var(--rrr-button-radius);
   border: var(--rrr-button-border-width) solid var(--_bg);
   min-block-size: var(--rrr-button-min-block-size);

@@ -1,6 +1,7 @@
 rrr-badge {
   display: inline-flex;
   align-items: center;
+  user-select: none;
   max-inline-size: 100%;
   box-sizing: border-box;
   min-block-size: var(--rrr-badge-min-block-size);
