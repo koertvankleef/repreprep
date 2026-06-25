@@ -8,6 +8,8 @@ rrr-exercise-catalogue {
   --rrr-exercise-browser-focused-border: var(--rrr-colors-activity-indigo-50);
   --rrr-exercise-browser-focused-shadow: var(--rrr-depth-3-shadow);
   --rrr-exercise-browser-marker-width: 1.9rem;
+  --rrr-exercise-browser-compact-height: 5.25rem;
+  --rrr-exercise-browser-focused-height: min(20rem, 38dvh);
   position: relative;
   display: block;
   box-sizing: border-box;
@@ -48,24 +50,28 @@ rrr-exercise-catalogue {
   }
 
   .exercise-browser-track {
-    display: grid;
-    gap: var(--rrr-spacing-xs);
-    align-content: center;
-    min-block-size: 100%;
+    position: relative;
+    block-size: 100%;
+    min-block-size: 0;
     perspective: 60rem;
   }
 
   .exercise-browser-item {
     --_scale: calc(0.9 + var(--near-amount) * 0.1);
-    --_opacity: calc(0.5 + var(--near-amount) * 0.5);
+    --_opacity: calc(0.42 + var(--near-amount) * 0.58);
     --_side-inset: calc((1 - var(--near-amount)) * 1.4rem);
-    --_padding-block: calc(var(--rrr-spacing-xs) + var(--near-amount) * 0.35rem);
+    --_padding-block: var(--rrr-spacing-xs);
+    position: absolute;
+    z-index: var(--item-z-index);
+    inset-block-start: 50%;
+    inset-inline: 0;
     box-sizing: border-box;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: var(--rrr-spacing-xs);
     align-items: center;
     inline-size: calc(100% - var(--_side-inset));
+    block-size: var(--rrr-exercise-browser-compact-height);
     min-inline-size: 0;
     margin-inline: auto;
     padding: var(--_padding-block) var(--rrr-spacing-s);
@@ -77,8 +83,17 @@ rrr-exercise-catalogue {
     text-align: start;
     text-decoration: none;
     opacity: var(--_opacity);
-    transform: scale(var(--_scale)) translateY(calc(var(--distance) * -0.05rem));
+    pointer-events: auto;
+    overflow: hidden;
+    transform: translateY(calc(-50% + var(--slot-distance))) scale(var(--_scale));
     transform-origin: center;
+  }
+
+  .exercise-browser-item[data-interactive='false'] {
+    pointer-events: none;
+  }
+
+  .exercise-browser-item {
     will-change: transform, opacity;
   }
 
@@ -91,16 +106,44 @@ rrr-exercise-catalogue {
     box-shadow: 0 0 0 4px color-mix(in oklab, var(--rrr-color-primary), transparent 72%);
   }
 
-  .exercise-browser-item-focused {
+  .exercise-browser-item[data-focused='true'] {
     --_scale: calc(0.96 + var(--focus-amount) * 0.04);
     --_opacity: 1;
     --_side-inset: 0rem;
     --_padding-block: var(--rrr-spacing-l);
+    block-size: var(--rrr-exercise-browser-focused-height);
     grid-template-columns: minmax(0, 1fr);
     gap: var(--rrr-spacing-m);
+    z-index: 10;
     border-color: var(--rrr-exercise-browser-focused-border);
     background: var(--rrr-exercise-browser-focused-bg);
     box-shadow: var(--rrr-exercise-browser-focused-shadow);
+  }
+
+  .exercise-browser-preview {
+    display: grid;
+    gap: var(--rrr-spacing-s);
+    max-block-size: 20rem;
+    opacity: 1;
+    overflow: hidden;
+  }
+
+  .exercise-browser-used-badge {
+    opacity: 1;
+  }
+
+  .exercise-browser-item[data-focused='false'] .exercise-browser-preview {
+    max-block-size: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .exercise-browser-item[data-focused='false'] .exercise-browser-used-badge {
+    opacity: 0;
+  }
+
+  .exercise-browser-item[data-focused='true'] .exercise-browser-marker {
+    visibility: hidden;
   }
 
   .exercise-browser-marker {
@@ -129,6 +172,7 @@ rrr-exercise-catalogue {
   .exercise-browser-main {
     display: grid;
     gap: 0.12rem;
+    min-block-size: 0;
   }
 
   .exercise-browser-heading {
@@ -149,7 +193,7 @@ rrr-exercise-catalogue {
     line-height: 1.2;
   }
 
-  .exercise-browser-item-focused .exercise-browser-name {
+  .exercise-browser-item[data-focused='true'] .exercise-browser-name {
     font-size: var(--rrr-font-size-l);
   }
 
@@ -171,8 +215,7 @@ rrr-exercise-catalogue {
   }
 
   .exercise-browser-preview {
-    display: grid;
-    gap: var(--rrr-spacing-s);
+    min-block-size: 0;
   }
 
   .exercise-browser-description {
@@ -180,6 +223,10 @@ rrr-exercise-catalogue {
     color: var(--rrr-colors-grayscale-80);
     font-size: var(--rrr-font-size-default);
     white-space: normal;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
   }
 
   .exercise-browser-detail-line {
@@ -224,6 +271,7 @@ rrr-exercise-catalogue {
     font-family: var(--rrr-font-family-heading);
     font-size: var(--rrr-font-size-s);
     font-weight: var(--rrr-font-weight-semibold);
+    pointer-events: auto;
   }
 
   .exercise-browser-empty {

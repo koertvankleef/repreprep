@@ -5,11 +5,13 @@ import { FocusedSequenceController, type FocusSequenceState } from '../focused-s
 import { storageService } from '../storage-instance.ts'
 import styles from './rrr-exercise-catalogue.css?inline'
 
-const VISIBLE_RADIUS = 6
+const VISIBLE_RADIUS = 4
 const WHEEL_ITEM_SIZE = 260
 const MAX_WHEEL_DELTA_ITEMS = 1.15
 const TOUCH_ITEM_SIZE = 155
 const BOUNDARY_RELEASE_OFFSET = 0.42
+const FOCUS_SLOT_STEP_REM = 13.75
+const COMPACT_SLOT_STEP_REM = 6.8
 
 export class RrrExerciseCatalogue extends HTMLElement {
   private readonly focusSequence = new FocusedSequenceController<ExerciseDefinition>(() => this.prefersReducedMotion())
@@ -41,15 +43,27 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private readonly handleClick = (event: MouseEvent): void => {
-    const focusButton = (event.target as Element | null)?.closest<HTMLButtonElement>('[data-action="focus-exercise"]')
+    const openButton = (event.target as Element | null)?.closest('[data-action="open-exercise"]')
 
-    if (!focusButton) {
+    if (openButton) {
+      this.openFocusedExercise()
       return
     }
 
-    const index = Number(focusButton.dataset.index)
+    const itemButton = (event.target as Element | null)?.closest<HTMLButtonElement>('[data-action="focus-exercise"]')
+
+    if (!itemButton) {
+      return
+    }
+
+    const index = Number(itemButton.dataset.index)
 
     if (!Number.isInteger(index)) {
+      return
+    }
+
+    if (index === this.sequenceState.focusedIndex) {
+      this.openFocusedExercise()
       return
     }
 
@@ -285,12 +299,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
         aria-activedescendant="exercise-browser-item-${escapeHtml(state.items[state.focusedIndex]?.id ?? '')}"
       >
         <div class="exercise-browser-track" style="--visual-position: ${formatCssNumber(state.visualPosition)};">
-          ${visibleItems.map((exercise, offset) => this.renderExerciseItem(
-            exercise,
-            data,
-            startIndex + offset,
-            state,
-          )).join('')}
+          ${visibleItems.map((exercise, offset) => this.renderExerciseItem(exercise, data, startIndex + offset)).join('')}
         </div>
       </div>
     `
@@ -300,73 +309,47 @@ export class RrrExerciseCatalogue extends HTMLElement {
     exercise: ExerciseDefinition,
     data: AppData,
     index: number,
-    state: FocusSequenceState<ExerciseDefinition>,
   ): string {
     const used = isExerciseUsedInRoutines(data, exercise.id)
-    const href = `#/exercises/${encodeURIComponent(exercise.id)}`
-    const distance = index - state.visualPosition
-    const absoluteDistance = Math.abs(distance)
-    const focusAmount = Math.max(0, 1 - absoluteDistance)
-    const nearAmount = Math.max(0, 1 - absoluteDistance / 3)
-    const isFocused = index === state.focusedIndex
     const sectionTitle = getExerciseSectionTitle(exercise.name)
-    const previousTitle = index > 0 ? getExerciseSectionTitle(state.items[index - 1]?.name ?? '') : null
-    const marker = !isFocused && sectionTitle !== previousTitle
+    const previousTitle = index > 0 ? getExerciseSectionTitle(this.sequenceState.items[index - 1]?.name ?? '') : null
+    const marker = sectionTitle !== previousTitle
       ? `<span class="exercise-browser-marker" aria-hidden="true">${escapeHtml(sectionTitle)}</span>`
       : ''
-    const itemStyle = [
-      `--distance: ${formatCssNumber(distance)}`,
-      `--abs-distance: ${formatCssNumber(absoluteDistance)}`,
-      `--focus-amount: ${formatCssNumber(focusAmount)}`,
-      `--near-amount: ${formatCssNumber(nearAmount)}`,
-    ].join('; ')
-
-    if (isFocused) {
-      return `
-        <a
-          id="exercise-browser-item-${escapeHtml(exercise.id)}"
-          class="exercise-browser-item exercise-browser-item-focused"
-          style="${itemStyle}"
-          href="${href}"
-          role="option"
-          aria-selected="true"
-          aria-current="true"
-          data-index="${index}"
-        >
-          ${this.renderExerciseContent(exercise, used, true)}
-        </a>
-      `
-    }
 
     return `
       <button
         id="exercise-browser-item-${escapeHtml(exercise.id)}"
-        class="exercise-browser-item exercise-browser-item-compact"
-        style="${itemStyle}"
+        class="exercise-browser-item"
+        style="${this.getItemStyle(index, this.sequenceState)}"
         type="button"
         role="option"
-        aria-selected="false"
+        aria-selected="${index === this.sequenceState.focusedIndex ? 'true' : 'false'}"
+        aria-current="${index === this.sequenceState.focusedIndex ? 'true' : 'false'}"
         data-action="focus-exercise"
+        data-exercise-id="${escapeHtml(exercise.id)}"
+        data-focused="${index === this.sequenceState.focusedIndex ? 'true' : 'false'}"
+        data-interactive="${this.isItemInteractive(index, this.sequenceState) ? 'true' : 'false'}"
         data-index="${index}"
       >
         ${marker}
-        ${this.renderExerciseContent(exercise, used, false)}
+        ${this.renderExerciseContent(exercise, used)}
       </button>
     `
   }
 
-  private renderExerciseContent(exercise: ExerciseDefinition, used: boolean, isFocused: boolean): string {
+  private renderExerciseContent(exercise: ExerciseDefinition, used: boolean): string {
     return `
       <span class="exercise-browser-main">
         <span class="exercise-browser-heading">
           <span class="exercise-browser-name">${escapeHtml(exercise.name)}</span>
           ${exercise.createdByUser ? `<rrr-badge tone="accent">${t('exercise.badge.custom')}</rrr-badge>` : ''}
-          ${used && isFocused ? `<rrr-badge>${t('exercise.badge.used')}</rrr-badge>` : ''}
+          ${used ? `<rrr-badge class="exercise-browser-used-badge">${t('exercise.badge.used')}</rrr-badge>` : ''}
         </span>
         <span class="exercise-browser-meta">${escapeHtml(this.renderExerciseMeta(exercise))}</span>
         <span class="exercise-browser-cue">${escapeHtml(getMovementCue(exercise.description))}</span>
       </span>
-      ${isFocused ? this.renderFocusedDetails(exercise) : ''}
+      ${this.renderFocusedDetails(exercise)}
     `
   }
 
@@ -383,7 +366,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
         <span class="exercise-browser-profile-list">
           ${exercise.measurementProfiles.map((profile) => this.renderMeasurementProfile(profile)).join('')}
         </span>
-        <span class="exercise-browser-open">${t('exercise.browser.openDetails')}</span>
+        <span class="exercise-browser-open" data-action="open-exercise">${t('exercise.browser.openDetails')}</span>
       </span>
     `
   }
@@ -424,6 +407,28 @@ export class RrrExerciseCatalogue extends HTMLElement {
     if (shouldRestoreBrowserFocus) {
       this.querySelector<HTMLElement>('[data-exercise-browser]')?.focus({ preventScroll: true })
     }
+  }
+
+  private getItemStyle(index: number, state: FocusSequenceState<ExerciseDefinition>): string {
+    const distance = index - state.visualPosition
+    const absoluteDistance = Math.abs(distance)
+    const focusAmount = Math.max(0, 1 - absoluteDistance)
+    const nearAmount = Math.max(0, 1 - absoluteDistance / 3)
+    const slotDistance = getSlotDistanceRem(distance)
+    const zIndex = Math.max(1, 20 - Math.round(absoluteDistance * 3))
+
+    return [
+      `--distance: ${formatCssNumber(distance)}`,
+      `--abs-distance: ${formatCssNumber(absoluteDistance)}`,
+      `--focus-amount: ${formatCssNumber(focusAmount)}`,
+      `--near-amount: ${formatCssNumber(nearAmount)}`,
+      `--slot-distance: ${formatCssNumber(slotDistance)}rem`,
+      `--item-z-index: ${zIndex}`,
+    ].join('; ')
+  }
+
+  private isItemInteractive(index: number, state: FocusSequenceState<ExerciseDefinition>): boolean {
+    return Math.abs(index - state.visualPosition) <= 2.35
   }
 
   private scheduleSnap(reason: 'gesture' | 'wheel'): void {
@@ -575,6 +580,17 @@ function normalizeWheelDelta(event: WheelEvent): number {
 
 function formatCssNumber(value: number): string {
   return value.toFixed(4)
+}
+
+function getSlotDistanceRem(distance: number): number {
+  const absoluteDistance = Math.abs(distance)
+  const direction = Math.sign(distance)
+
+  if (absoluteDistance <= 1) {
+    return distance * FOCUS_SLOT_STEP_REM
+  }
+
+  return direction * (FOCUS_SLOT_STEP_REM + (absoluteDistance - 1) * COMPACT_SLOT_STEP_REM)
 }
 
 function clamp(value: number, min: number, max: number): number {
