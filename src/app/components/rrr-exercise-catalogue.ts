@@ -1,5 +1,5 @@
 import { storageService } from '../storage-instance.ts'
-import { filterExercises, isExerciseUsedInWorkouts, searchExercises, type ExerciseFilters } from '../../domain/exercise-service.ts'
+import { filterExercises, isExerciseUsedInRoutines, searchExercises, type ExerciseFilters } from '../../domain/exercise-service.ts'
 import type { AppData, ExerciseDefinition } from '../../domain/types.ts'
 import { t } from '../../i18n/index.ts'
 import styles from './rrr-exercise-catalogue.css?inline'
@@ -81,7 +81,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private renderExerciseItem(exercise: ExerciseDefinition, data: AppData): string {
-    const used = isExerciseUsedInWorkouts(data, exercise.id)
+    const used = isExerciseUsedInRoutines(data, exercise.id)
     const kindLabel = exercise.kind === 'time' ? t('exercise.kind.duration') : t('exercise.kind.repsWeight')
     const href = `#/exercises/${encodeURIComponent(exercise.id)}`
 
