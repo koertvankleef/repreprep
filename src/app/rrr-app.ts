@@ -568,7 +568,7 @@ export class RrrApp extends HTMLElement {
 
   private captureRouteState(route: Route | null): void {
     if (route?.name === 'exercises') {
-      this.exerciseCatalogueScrollY = window.scrollY
+      this.exerciseCatalogueScrollY = 0
     }
   }
 

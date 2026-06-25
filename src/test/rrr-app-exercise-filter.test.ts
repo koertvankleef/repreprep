@@ -92,22 +92,26 @@ describe('rrr-app exercise filters', () => {
     const catalogue = app.shadowRoot?.querySelector<HTMLElement>('rrr-exercise-catalogue')
     expect(catalogue).toBeTruthy()
 
-    const initialItems = catalogue?.querySelectorAll('.exercise-cat-item') ?? []
-    expect(initialItems.length).toBe(storageService.getData().exercises.length)
+    const initialBrowser = catalogue?.querySelector<HTMLElement>('[data-result-count]')
+    const initialCount = Number(initialBrowser?.dataset.resultCount)
+    expect(initialCount).toBe(storageService.getData().exercises.length)
 
     app.shadowRoot?.querySelector<HTMLElement>('rrr-button[data-action="toggle-exercise-filters"]')?.click()
     app.shadowRoot
       ?.querySelector<HTMLElement>('rrr-button[data-action="toggle-exercise-filter"][data-filter-value="cardio"]')
       ?.click()
 
-    const filteredItems = catalogue?.querySelectorAll('.exercise-cat-item') ?? []
     const expectedMatches = filterExercises(storageService.getData().exercises, {
       categories: ['cardio'],
       equipment: [],
     })
+    const filteredBrowser = catalogue?.querySelector<HTMLElement>('[data-result-count]')
+    const filteredCount = Number(filteredBrowser?.dataset.resultCount)
+    const visibleItems = catalogue?.querySelectorAll('[role="option"]') ?? []
 
-    expect(filteredItems.length).toBe(expectedMatches.length)
-    expect(filteredItems.length).toBeLessThan(initialItems.length)
+    expect(filteredCount).toBe(expectedMatches.length)
+    expect(filteredCount).toBeLessThan(initialCount)
+    expect(visibleItems.length).toBeGreaterThan(0)
   }, 10_000)
 
   it('updates the mounted exercise list when confirming a search term', async () => {
@@ -118,17 +122,19 @@ describe('rrr-app exercise filters', () => {
     const catalogue = app.shadowRoot?.querySelector<HTMLElement>('rrr-exercise-catalogue')
     expect(catalogue).toBeTruthy()
 
-    const initialItems = catalogue?.querySelectorAll('.exercise-cat-item') ?? []
+    const initialBrowser = catalogue?.querySelector<HTMLElement>('[data-result-count]')
+    const initialCount = Number(initialBrowser?.dataset.resultCount)
     const searchInput = app.shadowRoot?.querySelector('rrr-input[name="exercise-search"]') ?? null
     const nativeInput = getNativeInput(searchInput)
     nativeInput.value = 'cardio'
     nativeInput.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
     nativeInput.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'Enter' }))
 
-    const filteredItems = catalogue?.querySelectorAll('.exercise-cat-item') ?? []
     const expectedMatches = searchExercises(storageService.getData().exercises, 'cardio')
+    const filteredBrowser = catalogue?.querySelector<HTMLElement>('[data-result-count]')
+    const filteredCount = Number(filteredBrowser?.dataset.resultCount)
 
-    expect(filteredItems.length).toBe(expectedMatches.length)
-    expect(filteredItems.length).toBeLessThan(initialItems.length)
+    expect(filteredCount).toBe(expectedMatches.length)
+    expect(filteredCount).toBeLessThan(initialCount)
   }, 10_000)
 })
