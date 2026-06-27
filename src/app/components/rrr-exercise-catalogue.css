@@ -1,6 +1,6 @@
 rrr-exercise-catalogue {
   --rrr-exercise-catalogue-list-gap: var(--rrr-spacing-s);
-  --rrr-exercise-browser-max-width: 44rem;
+  --rrr-exercise-browser-max-width: 48rem;
   --rrr-exercise-browser-item-radius: var(--rrr-radius-s);
   --rrr-exercise-browser-item-border: var(--rrr-border-width) solid var(--rrr-border-subtle);
   --rrr-exercise-browser-compact-bg: var(--rrr-surface-raised);
@@ -18,6 +18,8 @@ rrr-exercise-catalogue {
 
   .page {
     box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: var(--rrr-exercise-browser-max-width);
     block-size: 100%;
     min-block-size: 0;
     overflow: hidden;
@@ -68,7 +70,7 @@ rrr-exercise-catalogue {
     display: grid;
     align-items: center;
     justify-self: center;
-    inline-size: min(100%, var(--rrr-exercise-browser-max-width));
+    inline-size: 100%;
     block-size: 100%;
     min-block-size: 0;
     padding: var(--rrr-spacing-s) 0;
@@ -85,9 +87,7 @@ rrr-exercise-catalogue {
   }
 
   .exercise-browser-item {
-    --_scale: calc(0.9 + var(--near-amount) * 0.1);
     --_opacity: calc(0.42 + var(--near-amount) * 0.58);
-    --_side-inset: calc((1 - var(--near-amount)) * 1.4rem);
     position: absolute;
     z-index: var(--item-z-index);
     inset-block-start: var(--focus-anchor);
@@ -97,7 +97,7 @@ rrr-exercise-catalogue {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--rrr-spacing-xs);
     align-items: center;
-    inline-size: calc(100% - var(--_side-inset));
+    inline-size: 100%;
     block-size: var(--item-height);
     min-inline-size: 0;
     margin-inline: auto;
@@ -112,7 +112,7 @@ rrr-exercise-catalogue {
     opacity: var(--_opacity);
     pointer-events: auto;
     overflow: hidden;
-    transform: translateY(calc(-50% + var(--slot-distance))) scale(var(--_scale));
+    transform: translateY(calc(-50% + var(--slot-distance)));
     transform-origin: center;
   }
 
@@ -134,9 +134,7 @@ rrr-exercise-catalogue {
   }
 
   .exercise-browser-item[data-focused='true'] {
-    --_scale: calc(0.96 + var(--focus-amount) * 0.04);
     --_opacity: 1;
-    --_side-inset: 0rem;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--rrr-spacing-m);
     z-index: 10;
