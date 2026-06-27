@@ -11,7 +11,8 @@ rrr-exercise-catalogue {
   position: relative;
   display: block;
   box-sizing: border-box;
-  block-size: 100%;
+  block-size: calc(100dvh - var(--rrr-app-header-height) - var(--rrr-app-bottom-nav-height));
+  max-block-size: calc(100dvh - var(--rrr-app-header-height) - var(--rrr-app-bottom-nav-height));
   min-block-size: 0;
   overflow: hidden;
 
@@ -23,10 +24,44 @@ rrr-exercise-catalogue {
   }
 
   .list {
-    display: grid;
-    align-items: center;
+    display: block;
     block-size: 100%;
     min-block-size: 0;
+  }
+
+  .exercise-browser-scroll {
+    position: relative;
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
+    scrollbar-gutter: stable;
+    scrollbar-width: auto;
+    scrollbar-color: var(--rrr-colors-grayscale-50) transparent;
+    overflow-anchor: none;
+    outline: none;
+  }
+
+  .exercise-browser-scroll:focus-visible {
+    box-shadow: inset 0 0 0 4px color-mix(in oklab, var(--rrr-color-primary), transparent 72%);
+  }
+
+  .exercise-browser-presentation {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+    block-size: 100%;
+    min-block-size: 0;
+    overflow: hidden;
+    overflow-anchor: none;
+  }
+
+  .exercise-browser-scroll-spacer {
+    inline-size: 1px;
+    pointer-events: none;
+    overflow-anchor: none;
   }
 
   .exercise-browser {
@@ -40,11 +75,6 @@ rrr-exercise-catalogue {
     overflow: hidden;
     outline: none;
     touch-action: pan-y;
-  }
-
-  .exercise-browser:focus-visible {
-    border-radius: var(--rrr-exercise-browser-item-radius);
-    box-shadow: 0 0 0 4px color-mix(in oklab, var(--rrr-color-primary), transparent 72%);
   }
 
   .exercise-browser-track {

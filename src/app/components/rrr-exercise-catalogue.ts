@@ -6,10 +6,7 @@ import { storageService } from '../storage-instance.ts'
 import styles from './rrr-exercise-catalogue.css?inline'
 
 const VISIBLE_RADIUS = 4
-const WHEEL_ITEM_SIZE = 260
-const MAX_WHEEL_DELTA_ITEMS = 1.15
-const TOUCH_ITEM_SIZE = 155
-const BOUNDARY_RELEASE_OFFSET = 0.42
+const SCROLL_PIXELS_PER_ITEM = 120
 const FOCUS_SLOT_STEP_REM = 13.75
 const COMPACT_SLOT_STEP_REM = 6.8
 const COMPACT_ITEM_HEIGHT_REM = 5.25
@@ -23,9 +20,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
   private focusedExerciseId: string | null = null
   private sequenceState = this.focusSequence.state
   private isRendering = false
-  private wheelSnapTimeout = 0
-  private touchLastY: number | null = null
-  private touchMoved = false
   private unsubscribeState: (() => void) | null = null
   private unsubscribeFocus: (() => void) | null = null
 
@@ -70,14 +64,11 @@ export class RrrExerciseCatalogue extends HTMLElement {
       return
     }
 
-    this.focusSequence.setFocusedIndex(index, {
-      animate: true,
-      reason: 'programmatic',
-    })
+    this.scrollToIndex(index)
   }
 
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
-    const browser = (event.target as Element | null)?.closest('[data-exercise-browser]')
+    const browser = (event.target as Element | null)?.closest('[data-exercise-scroll]')
 
     if (!browser || this.sequenceState.items.length === 0) {
       return
@@ -85,25 +76,25 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
     if (event.key === 'ArrowDown') {
       event.preventDefault()
-      this.focusSequence.focusNext({ animate: true, reason: 'keyboard' })
+      this.scrollToIndex(this.sequenceState.focusedIndex + 1)
       return
     }
 
     if (event.key === 'ArrowUp') {
       event.preventDefault()
-      this.focusSequence.focusPrevious({ animate: true, reason: 'keyboard' })
+      this.scrollToIndex(this.sequenceState.focusedIndex - 1)
       return
     }
 
     if (event.key === 'Home') {
       event.preventDefault()
-      this.focusSequence.setFocusedIndex(0, { animate: true, reason: 'keyboard' })
+      this.scrollToIndex(0)
       return
     }
 
     if (event.key === 'End') {
       event.preventDefault()
-      this.focusSequence.setFocusedIndex(this.sequenceState.items.length - 1, { animate: true, reason: 'keyboard' })
+      this.scrollToIndex(this.sequenceState.items.length - 1)
       return
     }
 
@@ -113,75 +104,14 @@ export class RrrExerciseCatalogue extends HTMLElement {
     }
   }
 
-  private readonly handleWheel = (event: WheelEvent): void => {
-    const browser = (event.target as Element | null)?.closest('[data-exercise-browser]')
+  private readonly handleScroll = (event: Event): void => {
+    const scrollProxy = event.target
 
-    if (!browser || this.sequenceState.items.length < 2) {
+    if (!(scrollProxy instanceof HTMLElement) || !scrollProxy.matches('[data-exercise-scroll]')) {
       return
     }
 
-    const deltaItems = clamp(
-      normalizeWheelDelta(event) / WHEEL_ITEM_SIZE,
-      -MAX_WHEEL_DELTA_ITEMS,
-      MAX_WHEEL_DELTA_ITEMS,
-    )
-
-    if (Math.abs(deltaItems) < 0.01) {
-      return
-    }
-
-    if (this.focusSequence.boundaryOverflow(deltaItems) > BOUNDARY_RELEASE_OFFSET) {
-      this.scheduleSnap('wheel')
-      return
-    }
-
-    event.preventDefault()
-    this.focusSequence.applyGestureDelta(deltaItems, 'wheel')
-  }
-
-  private readonly handleTouchStart = (event: TouchEvent): void => {
-    const browser = (event.target as Element | null)?.closest('[data-exercise-browser]')
-    const touch = event.touches.item(0)
-
-    if (!browser || !touch || this.sequenceState.items.length < 2) {
-      return
-    }
-
-    this.touchLastY = touch.clientY
-    this.touchMoved = false
-  }
-
-  private readonly handleTouchMove = (event: TouchEvent): void => {
-    if (this.touchLastY === null) {
-      return
-    }
-
-    const browser = (event.target as Element | null)?.closest('[data-exercise-browser]')
-    const touch = event.touches.item(0)
-
-    if (!browser || !touch) {
-      return
-    }
-
-    const deltaItems = (this.touchLastY - touch.clientY) / TOUCH_ITEM_SIZE
-    this.touchLastY = touch.clientY
-
-    if (Math.abs(deltaItems) < 0.005) {
-      return
-    }
-
-    if (this.focusSequence.boundaryOverflow(deltaItems) > BOUNDARY_RELEASE_OFFSET) {
-      this.endTouchGesture()
-      return
-    }
-
-    event.preventDefault()
-    this.touchMoved = true
-    this.focusSequence.applyGestureDelta(deltaItems, 'gesture')
-  }
-
-  private readonly handleTouchEnd = (): void => {
-    this.endTouchGesture()
+    this.focusSequence.setVisualPosition(scrollProxy.scrollTop / SCROLL_PIXELS_PER_ITEM, 'scroll')
   }
 
   set searchQuery(value: string) {
@@ -216,16 +146,13 @@ export class RrrExerciseCatalogue extends HTMLElement {
     window.addEventListener('rrr-data-changed', this.handleDataChanged)
     this.addEventListener('click', this.handleClick)
     this.addEventListener('keydown', this.handleKeyDown)
-    this.addEventListener('wheel', this.handleWheel, { passive: false })
-    this.addEventListener('touchstart', this.handleTouchStart, { passive: true })
-    this.addEventListener('touchmove', this.handleTouchMove, { passive: false })
-    this.addEventListener('touchend', this.handleTouchEnd)
-    this.addEventListener('touchcancel', this.handleTouchEnd)
+    this.addEventListener('scroll', this.handleScroll, true)
     this.unsubscribeState = this.focusSequence.onStateChange(this.handleSequenceStateChanged)
     this.unsubscribeFocus = this.focusSequence.onFocusChange(this.handleSequenceFocusChanged)
     this.render()
     requestAnimationFrame(() => {
       window.scrollTo(0, 0)
+      this.syncScrollProxyToState()
     })
   }
 
@@ -233,12 +160,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     window.removeEventListener('rrr-data-changed', this.handleDataChanged)
     this.removeEventListener('click', this.handleClick)
     this.removeEventListener('keydown', this.handleKeyDown)
-    this.removeEventListener('wheel', this.handleWheel)
-    this.removeEventListener('touchstart', this.handleTouchStart)
-    this.removeEventListener('touchmove', this.handleTouchMove)
-    this.removeEventListener('touchend', this.handleTouchEnd)
-    this.removeEventListener('touchcancel', this.handleTouchEnd)
-    window.clearTimeout(this.wheelSnapTimeout)
+    this.removeEventListener('scroll', this.handleScroll, true)
     this.unsubscribeState?.()
     this.unsubscribeFocus?.()
     this.unsubscribeState = null
@@ -286,6 +208,27 @@ export class RrrExerciseCatalogue extends HTMLElement {
       `
     }
 
+    const scrollRange = (state.items.length - 1) * SCROLL_PIXELS_PER_ITEM
+
+    return `
+      <div
+        class="exercise-browser-scroll"
+        data-exercise-scroll
+        data-result-count="${state.items.length}"
+        role="listbox"
+        tabindex="0"
+        aria-label="${escapeHtml(t('exercise.browser.label'))}"
+        aria-activedescendant="exercise-browser-item-${escapeHtml(state.items[state.focusedIndex]?.id ?? '')}"
+      >
+        <div class="exercise-browser-presentation" data-browser-presentation>
+          ${this.renderBrowserPresentation(data, state)}
+        </div>
+        <div class="exercise-browser-scroll-spacer" style="block-size: ${scrollRange}px;" aria-hidden="true"></div>
+      </div>
+    `
+  }
+
+  private renderBrowserPresentation(data: AppData, state: FocusSequenceState<ExerciseDefinition>): string {
     const startIndex = Math.max(0, Math.floor(state.visualPosition) - VISIBLE_RADIUS)
     const endIndex = Math.min(state.items.length - 1, Math.ceil(state.visualPosition) + VISIBLE_RADIUS)
     const visibleItems = state.items.slice(startIndex, endIndex + 1)
@@ -294,11 +237,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
       <div
         class="exercise-browser"
         data-exercise-browser
-        data-result-count="${state.items.length}"
-        role="listbox"
-        tabindex="0"
-        aria-label="${escapeHtml(t('exercise.browser.label'))}"
-        aria-activedescendant="exercise-browser-item-${escapeHtml(state.items[state.focusedIndex]?.id ?? '')}"
       >
         <div
           class="exercise-browser-track"
@@ -442,11 +380,23 @@ export class RrrExerciseCatalogue extends HTMLElement {
     const activeElement = root.activeElement
     const shouldRestoreBrowserFocus = activeElement instanceof Element
       && Boolean(activeElement.closest('[data-exercise-browser], [data-action="focus-exercise"]'))
+    const scrollProxy = list.querySelector<HTMLElement>('[data-exercise-scroll]')
+    const presentation = list.querySelector<HTMLElement>('[data-browser-presentation]')
 
-    list.innerHTML = this.renderList()
+    if (!scrollProxy || !presentation) {
+      list.innerHTML = this.renderList()
+      this.syncScrollProxyToState()
+      return
+    }
+
+    scrollProxy.setAttribute(
+      'aria-activedescendant',
+      `exercise-browser-item-${this.sequenceState.items[this.sequenceState.focusedIndex]?.id ?? ''}`,
+    )
+    presentation.innerHTML = this.renderBrowserPresentation(storageService.getData(), this.sequenceState)
 
     if (shouldRestoreBrowserFocus) {
-      this.querySelector<HTMLElement>('[data-exercise-browser]')?.focus({ preventScroll: true })
+      scrollProxy.focus({ preventScroll: true })
     }
   }
 
@@ -496,20 +446,28 @@ export class RrrExerciseCatalogue extends HTMLElement {
     return Math.abs(index - state.visualPosition) <= 2.35
   }
 
-  private scheduleSnap(reason: 'gesture' | 'wheel'): void {
-    window.clearTimeout(this.wheelSnapTimeout)
-    this.wheelSnapTimeout = window.setTimeout(() => {
-      this.focusSequence.snapToFocused({ animate: true, reason })
-    }, reason === 'wheel' ? 130 : 0)
-  }
+  private scrollToIndex(index: number): void {
+    const scrollProxy = this.querySelector<HTMLElement>('[data-exercise-scroll]')
 
-  private endTouchGesture(): void {
-    if (this.touchLastY !== null || this.touchMoved) {
-      this.focusSequence.snapToFocused({ animate: true, reason: 'gesture' })
+    if (!scrollProxy || this.sequenceState.items.length === 0) {
+      return
     }
 
-    this.touchLastY = null
-    this.touchMoved = false
+    const clampedIndex = clamp(index, 0, this.sequenceState.items.length - 1)
+    const top = clampedIndex * SCROLL_PIXELS_PER_ITEM
+    const behavior: ScrollBehavior = this.prefersReducedMotion() ? 'auto' : 'smooth'
+
+    scrollProxy.scrollTo({ top, behavior })
+  }
+
+  private syncScrollProxyToState(): void {
+    const scrollProxy = this.querySelector<HTMLElement>('[data-exercise-scroll]')
+
+    if (!scrollProxy) {
+      return
+    }
+
+    scrollProxy.scrollTop = this.sequenceState.visualPosition * SCROLL_PIXELS_PER_ITEM
   }
 
   private openFocusedExercise(): void {
@@ -551,6 +509,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     `
 
     this.isRendering = false
+    this.syncScrollProxyToState()
   }
 }
 
@@ -619,18 +578,6 @@ function getMuscleLabel(muscle: Muscle): string {
 
 function getMeasurementTypeLabel(type: MeasurementType): string {
   return t(`exercise.measurement.${type}`)
-}
-
-function normalizeWheelDelta(event: WheelEvent): number {
-  if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
-    return event.deltaY * 16
-  }
-
-  if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
-    return event.deltaY * window.innerHeight
-  }
-
-  return event.deltaY
 }
 
 function formatCssNumber(value: number): string {

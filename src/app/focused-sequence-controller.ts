@@ -1,6 +1,7 @@
 export type FocusChangeReason =
   | 'gesture'
   | 'wheel'
+  | 'scroll'
   | 'keyboard'
   | 'programmatic'
   | 'filter'
@@ -116,6 +117,40 @@ export class FocusedSequenceController<TItem> {
 
   focusPrevious(options: FocusSequenceOptions = {}): void {
     this.setFocusedIndex(this.focusedIndexValue - 1, options)
+  }
+
+  setVisualPosition(position: number, reason: FocusChangeReason = 'scroll'): void {
+    if (this.itemsValue.length === 0) {
+      return
+    }
+
+    this.cancelAnimation()
+    this.visualPositionValue = Math.min(Math.max(0, position), this.itemsValue.length - 1)
+    const previousFocusedIndex = this.focusedIndexValue
+
+    while (
+      this.visualPositionValue - this.focusedIndexValue >= FOCUS_THRESHOLD
+      && this.focusedIndexValue < this.itemsValue.length - 1
+    ) {
+      this.focusedIndexValue += 1
+    }
+
+    while (
+      this.visualPositionValue - this.focusedIndexValue <= -FOCUS_THRESHOLD
+      && this.focusedIndexValue > 0
+    ) {
+      this.focusedIndexValue -= 1
+    }
+
+    this.targetIndexValue = this.focusedIndexValue
+    this.gestureOffset = this.visualPositionValue - this.focusedIndexValue
+    this.isTransitioningValue = false
+
+    if (this.focusedIndexValue !== previousFocusedIndex) {
+      this.emitFocus(reason)
+    }
+
+    this.emitState()
   }
 
   applyGestureDelta(deltaItems: number, reason: FocusChangeReason): boolean {
