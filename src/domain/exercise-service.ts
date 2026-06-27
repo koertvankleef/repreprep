@@ -81,8 +81,14 @@ export function mergeExerciseCatalog(data: AppData): AppData {
   }
 }
 
-export function isExerciseUsedInWorkouts(data: AppData, id: string): boolean {
-  return data.workouts.some((workout) => workout.exercises.some((entry) => entry.exerciseId === id))
+export function isExerciseUsedInRoutines(data: AppData, id: string): boolean {
+  return data.routines
+    .filter((routine) => !routine.archived)
+    .some((routine) => {
+      const activeVersion = data.routineVersions.find((version) => version.id === routine.activeVersionId)
+
+      return activeVersion?.exercises.some((entry) => entry.exerciseId === id) ?? false
+    })
 }
 
 export function searchExercises(exercises: ExerciseDefinition[], query: string): ExerciseDefinition[] {

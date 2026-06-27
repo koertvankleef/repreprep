@@ -507,6 +507,10 @@ main {
   padding-bottom: calc(var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
 }
 
+#view>rrr-exercise-catalogue.route-view-full {
+  padding-bottom: 0;
+}
+
 #view.is-transitioning {
   overflow: clip;
 }

@@ -27,4 +27,5 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] Add toast-level messaging rules for non-blocking issues that may have consequences.
 - [ ] Keep inline feedback for local form or import/export validation issues and field-level corrections.
 - [ ] In places with item lists like the History page: use swipe right/left actions for things like delete (with an undo toast with grace period!). This also requires that we hint at this functionality the first time the user sees an item in this list (by letting the swipe movement show for a second as a 'peek')
+- [ ] Move the intended section-heading typography onto `.rrr-section-title` in the design system so its appearance does not depend on the semantic heading level used.
 

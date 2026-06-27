@@ -6,12 +6,11 @@ import {
   createNewExercise,
   filterExercises,
   getActiveExercises,
-  isExerciseUsedInWorkouts,
+  isExerciseUsedInRoutines,
   mergeExerciseCatalog,
   searchExercises,
   updateExercise,
 } from '../domain/exercise-service.ts'
-import { addExerciseToWorkout, addWorkout, createExerciseEntry, createNewWorkout } from '../domain/workout-service.ts'
 
 describe('exercise-service', () => {
   test('addExercise adds to exercises array', () => {
@@ -117,19 +116,17 @@ describe('exercise-service', () => {
     expect(merged.exercises.some((exercise) => exercise.id === 'pushups')).toBe(true)
   })
 
-  test('isExerciseUsedInWorkouts returns true when exercise referenced in a workout', () => {
+  test('isExerciseUsedInRoutines returns true when exercise referenced in an active routine', () => {
     const data = createDefaultData()
-    const exercise = data.exercises[0]
-    const workout = addExerciseToWorkout(createNewWorkout('2026-06-13'), createExerciseEntry(exercise?.id ?? ''))
-    const updated = addWorkout(data, workout)
+    const exercise = data.exercises.find((item) => item.id === 'pushups')
 
-    expect(isExerciseUsedInWorkouts(updated, exercise?.id ?? '')).toBe(true)
+    expect(isExerciseUsedInRoutines(data, exercise?.id ?? '')).toBe(true)
   })
 
-  test('isExerciseUsedInWorkouts returns false when not used', () => {
+  test('isExerciseUsedInRoutines returns false when not used in an active routine', () => {
     const data = createDefaultData()
     const exercise = data.exercises[0]
 
-    expect(isExerciseUsedInWorkouts(data, exercise?.id ?? '')).toBe(false)
+    expect(isExerciseUsedInRoutines(data, exercise?.id ?? '')).toBe(false)
   })
 })

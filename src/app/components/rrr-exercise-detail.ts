@@ -1,4 +1,4 @@
-import { getExercise, isExerciseUsedInWorkouts } from '../../domain/exercise-service.ts'
+import { getExercise, isExerciseUsedInRoutines } from '../../domain/exercise-service.ts'
 import type {
   Equipment,
   ExerciseCategory,
@@ -50,7 +50,7 @@ export class RrrExerciseDetail extends HTMLElement {
 
     this.innerHTML = `
       <style>${styles}</style>
-      ${exercise ? this.renderExercise(exercise, isExerciseUsedInWorkouts(data, exercise.id)) : this.renderNotFound()}
+      ${exercise ? this.renderExercise(exercise, isExerciseUsedInRoutines(data, exercise.id)) : this.renderNotFound()}
     `
   }
 
@@ -67,7 +67,7 @@ export class RrrExerciseDetail extends HTMLElement {
     `
   }
 
-  private renderExercise(exercise: ExerciseDefinition, usedInWorkouts: boolean): string {
+  private renderExercise(exercise: ExerciseDefinition, usedInRoutines: boolean): string {
     const overviewRows: DetailRow[] = [
       { label: t('exercise.detail.description'), value: this.renderText(exercise.description) },
       { label: t('exercise.detail.aliases'), value: this.renderBadgeList(exercise.aliases, (alias) => alias) },
@@ -75,7 +75,7 @@ export class RrrExerciseDetail extends HTMLElement {
       { label: t('exercise.detail.type'), value: this.renderBadge(this.getKindLabel(exercise)) },
       { label: t('exercise.detail.defaultUnit'), value: this.renderText(this.getDefaultUnitLabel(exercise.defaultUnit)) },
       { label: t('exercise.detail.status'), value: this.renderBadge(exercise.archived ? t('exercise.detail.archived') : t('exercise.detail.active')) },
-      { label: t('exercise.detail.usedInWorkouts'), value: this.renderText(usedInWorkouts ? t('exercise.detail.yes') : t('exercise.detail.no')) },
+      { label: t('exercise.detail.usedInRoutines'), value: this.renderText(usedInRoutines ? t('exercise.detail.yes') : t('exercise.detail.no')) },
     ]
 
     const classificationRows: DetailRow[] = [

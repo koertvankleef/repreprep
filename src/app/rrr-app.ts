@@ -62,6 +62,7 @@ type RouteHeader = {
 type ExerciseCatalogueElement = HTMLElement & {
   searchQuery: string
   filters: ExerciseFilters
+  focusedExerciseId: string | null
   setSearchAndFilters?: (searchQuery: string, filters: ExerciseFilters) => void
 }
 
@@ -82,16 +83,20 @@ export class RrrApp extends HTMLElement {
   private exerciseSearchQuery = ''
   private exerciseFiltersOpen = false
   private exerciseFilters: ExerciseFilters = { categories: [], equipment: [] }
+  private exerciseCatalogueFocusedId: string | null = null
   private exerciseSearchDebounceId: number | null = null
   private exerciseFilterRailController: AbortController | null = null
   private exerciseFilterRailResizeObserver: ResizeObserver | null = null
-  private exerciseCatalogueScrollY = 0
   private currentRouteView: HTMLElement | null = null
   private readonly router = createHashRouter({
     routes: appRoutes,
     notFoundRouteId: 'workouts',
     onRouteChange: (match) => {
-      this.route = this.toRoute(match)
+      const route = this.toRoute(match)
+      if (route.name === 'exercise-detail') {
+        this.exerciseCatalogueFocusedId = route.exerciseId
+      }
+      this.route = route
       this.render()
     },
   })
@@ -515,8 +520,7 @@ export class RrrApp extends HTMLElement {
   }
 
   private getRouteSurface(route: Route): 'full' | 'padded' {
-    // return route.name === 'exercises' ? 'full' : 'padded'
-    return 'padded'
+    return route.name === 'exercises' ? 'full' : 'padded'
   }
 
   private computeRouteTransition(from: Route | null, to: Route): RouteTransition {
@@ -566,17 +570,9 @@ export class RrrApp extends HTMLElement {
     return true
   }
 
-  private captureRouteState(route: Route | null): void {
-    if (route?.name === 'exercises') {
-      this.exerciseCatalogueScrollY = window.scrollY
-    }
-  }
-
-  private restoreRouteScrollPosition(route: Route): void {
-    const top = route.name === 'exercises' ? this.exerciseCatalogueScrollY : 0
-
+  private restoreRouteScrollPosition(): void {
     requestAnimationFrame(() => {
-      window.scrollTo(0, top)
+      window.scrollTo(0, 0)
     })
   }
 
@@ -687,6 +683,7 @@ export class RrrApp extends HTMLElement {
     if (route.name === 'exercises') {
       const catalogue = document.createElement('rrr-exercise-catalogue') as ExerciseCatalogueElement
       const filters = this.cloneExerciseFilters()
+      catalogue.focusedExerciseId = this.exerciseCatalogueFocusedId
 
       if (catalogue.setSearchAndFilters) {
         catalogue.setSearchAndFilters(this.exerciseSearchQuery, filters)
@@ -1131,9 +1128,8 @@ export class RrrApp extends HTMLElement {
     const routeChanged = !previousRoute || !this.isSameRoute(previousRoute, route)
 
     if (routeChanged) {
-      this.captureRouteState(previousRoute)
       this.mountRouteView(route, this.computeRouteTransition(previousRoute, route))
-      this.restoreRouteScrollPosition(route)
+      this.restoreRouteScrollPosition()
     }
 
     if (!routeChanged && route.name === 'settings') {
