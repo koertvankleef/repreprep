@@ -514,8 +514,7 @@ export class RrrApp extends HTMLElement {
   }
 
   private getRouteSurface(route: Route): 'full' | 'padded' {
-    // return route.name === 'exercises' ? 'full' : 'padded'
-    return 'padded'
+    return route.name === 'exercises' ? 'full' : 'padded'
   }
 
   private computeRouteTransition(from: Route | null, to: Route): RouteTransition {

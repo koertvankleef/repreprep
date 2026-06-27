@@ -475,7 +475,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
     const zIndex = Math.max(1, 20 - Math.round(absoluteDistance * 3))
     const itemHeight = getItemHeightRem(index, state.visualPosition)
     const previewMaxHeight = 10 * focusAmount
-    const paddingBlock = 0.55 + 0.7 * focusAmount
 
     return [
       `--focus-amount: ${formatCssNumber(focusAmount)}`,
@@ -483,7 +482,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
       `--slot-distance: ${formatCssNumber(visualLayout.itemOffsets[index] ?? 0)}rem`,
       `--item-z-index: ${zIndex}`,
       `--item-height: ${formatCssNumber(itemHeight)}rem`,
-      `--item-padding-block: ${formatCssNumber(paddingBlock)}rem`,
       `--preview-max-block-size: ${formatCssNumber(previewMaxHeight)}rem`,
       `--preview-opacity: ${formatCssNumber(focusAmount)}`,
     ].join('; ')

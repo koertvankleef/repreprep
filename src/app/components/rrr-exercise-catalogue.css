@@ -13,10 +13,17 @@ rrr-exercise-catalogue {
 
   .page {
     box-sizing: border-box;
-    inline-size: 100%;
-    max-inline-size: var(--rrr-exercise-browser-max-width);
+    inline-size: min(
+      100%,
+      calc(
+        var(--rrr-exercise-browser-max-width)
+        + var(--rrr-app-main-padding)
+        + var(--rrr-app-main-padding)
+      )
+    );
     block-size: 100%;
     min-block-size: 0;
+    padding-inline: var(--rrr-app-main-padding);
     overflow: hidden;
   }
 
@@ -92,7 +99,7 @@ rrr-exercise-catalogue {
     inline-size: 100%;
     block-size: var(--item-height);
     min-inline-size: 0;
-    padding: var(--item-padding-block) var(--rrr-spacing-s);
+    padding: var(--rrr-spacing-m);
     border: var(--rrr-exercise-browser-item-border);
     border-radius: 0;
     background: var(--rrr-exercise-browser-compact-bg);
@@ -102,6 +109,7 @@ rrr-exercise-catalogue {
     overflow: hidden;
     transform: translateY(calc(-50% + var(--slot-distance)));
     will-change: transform;
+    box-shadow: none;
   }
 
   .exercise-browser-item[data-interactive='false'] {

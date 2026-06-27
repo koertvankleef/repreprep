@@ -150,6 +150,8 @@ describe('rrr-app exercise filters', () => {
 
     const catalogue = app.shadowRoot?.querySelector<HTMLElement>('rrr-exercise-catalogue')
     const scrollProxy = catalogue?.querySelector<HTMLElement>('[data-exercise-scroll]')
+    expect(catalogue?.classList.contains('route-view-full')).toBe(true)
+    expect(catalogue?.classList.contains('route-view-padded')).toBe(false)
     expect(scrollProxy?.getAttribute('role')).toBe('region')
     expect(catalogue?.querySelector('.exercise-browser-section-title')?.tagName).toBe('H2')
     expect(catalogue?.querySelector('.exercise-browser-section-title')?.hasAttribute('aria-hidden')).toBe(false)
