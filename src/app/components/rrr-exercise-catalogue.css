@@ -3,11 +3,16 @@ rrr-exercise-catalogue {
   --rrr-exercise-browser-item-border: var(--rrr-border-width) solid var(--rrr-border-subtle);
   --rrr-exercise-browser-compact-bg: var(--rrr-surface-raised);
   --rrr-exercise-browser-focused-bg: var(--rrr-colors-grayscale-00);
+  --rrr-exercise-browser-bottom-clearance: calc(
+    var(--rrr-app-main-padding)
+    + var(--rrr-app-bottom-nav-height)
+    + env(safe-area-inset-bottom)
+  );
   position: relative;
   display: block;
   box-sizing: border-box;
-  block-size: calc(100dvh - var(--rrr-app-header-height) - var(--rrr-app-bottom-nav-height));
-  max-block-size: calc(100dvh - var(--rrr-app-header-height) - var(--rrr-app-bottom-nav-height));
+  block-size: calc(100dvh - var(--rrr-app-header-height));
+  max-block-size: calc(100dvh - var(--rrr-app-header-height));
   min-block-size: 0;
   overflow: hidden;
 
@@ -24,6 +29,7 @@ rrr-exercise-catalogue {
     block-size: 100%;
     min-block-size: 0;
     padding-inline: var(--rrr-app-main-padding);
+    padding-block-start: 0;
     overflow: hidden;
   }
 
@@ -56,9 +62,9 @@ rrr-exercise-catalogue {
     position: sticky;
     inset-block-start: 0;
     z-index: 1;
-    block-size: 100%;
+    block-size: calc(100% - var(--rrr-exercise-browser-bottom-clearance));
     min-block-size: 0;
-    overflow: hidden;
+    overflow: visible;
     overflow-anchor: none;
   }
 
@@ -75,8 +81,7 @@ rrr-exercise-catalogue {
     inline-size: 100%;
     block-size: 100%;
     min-block-size: 0;
-    padding: var(--rrr-spacing-s) 0;
-    overflow: hidden;
+    overflow: visible;
     touch-action: pan-y;
   }
 
@@ -84,6 +89,7 @@ rrr-exercise-catalogue {
     position: relative;
     block-size: 100%;
     min-block-size: 0;
+    overflow: visible;
   }
 
   .exercise-browser-item {
@@ -175,6 +181,11 @@ rrr-exercise-catalogue {
     inset-inline-start: 0;
     inline-size: auto;
     color: var(--rrr-color-heading);
+    font-size: var(--rrr-font-size-s);
+    font-weight: var(--rrr-font-weight-medium);
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
     opacity: 1;
     pointer-events: none;
     transform: translateY(calc(-50% + var(--slot-distance)));
@@ -206,12 +217,11 @@ rrr-exercise-catalogue {
     min-inline-size: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: calc(var(--rrr-font-size-default) + var(--near-amount) * 0.12rem);
+    color: var(--rrr-color-heading);
+    font-family: var(--rrr-font-family-heading);
+    font-size: var(--rrr-font-size-m);
+    font-weight: var(--rrr-font-weight-semibold);
     line-height: 1.2;
-  }
-
-  .exercise-browser-item[data-focused='true'] .exercise-browser-name {
-    font-size: var(--rrr-font-size-l);
   }
 
   .exercise-browser-meta,

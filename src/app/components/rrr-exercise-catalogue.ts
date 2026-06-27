@@ -10,8 +10,20 @@ const SCROLL_PIXELS_PER_ITEM = 120
 const COMPACT_ITEM_HEIGHT_REM = 5.25
 const FOCUSED_ITEM_HEIGHT_REM = 15.5
 const FOCUS_VISUAL_DEAD_ZONE = 0.04
-const SECTION_BOUNDARY_GAP_REM = 3.75
-const SECTION_TITLE_LEADING_REM = 1.75
+const SECTION_TITLE_HEIGHT_REM = 0.9 * 1.5
+const SECTION_GAP_BEFORE_REM = 1.25
+const SECTION_GAP_AFTER_REM = 0.25
+const SECTION_BOUNDARY_GAP_REM = (
+  SECTION_GAP_BEFORE_REM
+  + SECTION_TITLE_HEIGHT_REM
+  + SECTION_GAP_AFTER_REM
+)
+const START_FOCUS_ANCHOR_REM = (
+  FOCUSED_ITEM_HEIGHT_REM / 2
+  + SECTION_GAP_AFTER_REM
+  + SECTION_TITLE_HEIGHT_REM
+)
+const END_FOCUS_CLEARANCE_REM = FOCUSED_ITEM_HEIGHT_REM / 2
 
 type ExerciseVisualLayout = {
   itemOffsets: number[]
@@ -240,7 +252,11 @@ export class RrrExerciseCatalogue extends HTMLElement {
         <div class="exercise-browser-presentation" data-browser-presentation>
           ${this.renderBrowserPresentation(state)}
         </div>
-        <div class="exercise-browser-scroll-spacer" style="block-size: ${scrollRange}px;" aria-hidden="true"></div>
+        <div
+          class="exercise-browser-scroll-spacer"
+          style="block-size: calc(${scrollRange}px + var(--rrr-exercise-browser-bottom-clearance));"
+          aria-hidden="true"
+        ></div>
       </div>
     `
   }
@@ -259,7 +275,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
         <div
           class="exercise-browser-track"
           style="
-            --focus-anchor: ${formatCssNumber(getFocusAnchorPercent(state.visualPosition, state.items.length))}%;
+            --focus-anchor: ${getFocusAnchor(state.visualPosition, state.items.length)};
           "
         >
           ${visibleItems.map((exercise, offset) => this.renderExerciseBoundaryAndItem(
@@ -346,7 +362,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     return `
       <span class="exercise-browser-main">
         <span class="exercise-browser-heading">
-          <h4 class="exercise-browser-name">${escapeHtml(exercise.name)}</h4>
+          <span class="exercise-browser-name">${escapeHtml(exercise.name)}</span>
           ${exercise.createdByUser ? `<rrr-badge tone="accent">${t('exercise.badge.custom')}</rrr-badge>` : ''}
           ${used ? `<rrr-badge class="exercise-browser-used-badge">${t('exercise.badge.used')}</rrr-badge>` : ''}
         </span>
@@ -674,13 +690,21 @@ function createExerciseVisualLayout(
     centers[index] = previousBottom + gap + currentHeight / 2
 
     if (sectionBoundary) {
-      sectionTitleCenters[index] = previousBottom + gap / 2
+      sectionTitleCenters[index] = (
+        previousBottom
+        + SECTION_GAP_BEFORE_REM
+        + SECTION_TITLE_HEIGHT_REM / 2
+      )
     }
   }
 
   if (startIndex === 0) {
     const firstHeight = heights[0] ?? COMPACT_ITEM_HEIGHT_REM
-    sectionTitleCenters[0] = -firstHeight / 2 - SECTION_TITLE_LEADING_REM
+    sectionTitleCenters[0] = (
+      -firstHeight / 2
+      - SECTION_GAP_AFTER_REM
+      - SECTION_TITLE_HEIGHT_REM / 2
+    )
   }
 
   const lowerIndex = clamp(Math.floor(visualPosition), startIndex, endIndex)
@@ -737,26 +761,35 @@ function getVisualFocusAmount(absoluteDistance: number): number {
   return Math.max(0, 1 - (absoluteDistance - FOCUS_VISUAL_DEAD_ZONE) / (1 - FOCUS_VISUAL_DEAD_ZONE))
 }
 
-function getFocusAnchorPercent(visualPosition: number, itemCount: number): number {
+function getFocusAnchor(visualPosition: number, itemCount: number): string {
   if (itemCount <= 1) {
-    return 50
+    return `${formatCssNumber(START_FOCUS_ANCHOR_REM)}rem`
   }
 
   const lastIndex = itemCount - 1
   const edgeRange = Math.min(3, lastIndex / 2)
-  const edgeAnchor = itemCount === 2 ? 30 : itemCount === 3 ? 22 : 18
 
   if (visualPosition <= edgeRange) {
-    return edgeAnchor + (50 - edgeAnchor) * clamp(visualPosition / edgeRange, 0, 1)
+    const edgeProgress = clamp(visualPosition / edgeRange, 0, 1)
+
+    if (edgeProgress === 0) {
+      return `${formatCssNumber(START_FOCUS_ANCHOR_REM)}rem`
+    }
+
+    return `calc(${formatCssNumber(START_FOCUS_ANCHOR_REM * (1 - edgeProgress))}rem + ${formatCssNumber(50 * edgeProgress)}%)`
   }
 
   if (visualPosition >= lastIndex - edgeRange) {
     const edgeProgress = clamp((visualPosition - (lastIndex - edgeRange)) / edgeRange, 0, 1)
 
-    return 50 + (50 - edgeAnchor) * edgeProgress
+    if (edgeProgress === 1) {
+      return `calc(100% - ${formatCssNumber(END_FOCUS_CLEARANCE_REM)}rem)`
+    }
+
+    return `calc(${formatCssNumber(50 + 50 * edgeProgress)}% - ${formatCssNumber(END_FOCUS_CLEARANCE_REM * edgeProgress)}rem)`
   }
 
-  return 50
+  return '50%'
 }
 
 function clamp(value: number, min: number, max: number): number {
