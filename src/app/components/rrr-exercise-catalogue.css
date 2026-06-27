@@ -3,11 +3,7 @@ rrr-exercise-catalogue {
   --rrr-exercise-browser-item-border: var(--rrr-border-width) solid var(--rrr-border-subtle);
   --rrr-exercise-browser-compact-bg: var(--rrr-surface-raised);
   --rrr-exercise-browser-focused-bg: var(--rrr-colors-grayscale-00);
-  --rrr-exercise-browser-bottom-clearance: calc(
-    var(--rrr-app-main-padding)
-    + var(--rrr-app-bottom-nav-height)
-    + env(safe-area-inset-bottom)
-  );
+  --rrr-exercise-browser-bottom-clearance: calc(var(--rrr-app-main-padding) + var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
   position: relative;
   display: block;
   box-sizing: border-box;
@@ -18,14 +14,8 @@ rrr-exercise-catalogue {
 
   .page {
     box-sizing: border-box;
-    inline-size: min(
-      100%,
-      calc(
-        var(--rrr-exercise-browser-max-width)
-        + var(--rrr-app-main-padding)
-        + var(--rrr-app-main-padding)
-      )
-    );
+    inline-size: min(100%,
+        calc(var(--rrr-exercise-browser-max-width) + var(--rrr-app-main-padding) + var(--rrr-app-main-padding)));
     block-size: 100%;
     min-block-size: 0;
     padding-inline: var(--rrr-app-main-padding);
@@ -99,9 +89,9 @@ rrr-exercise-catalogue {
     inset-inline: 0;
     box-sizing: border-box;
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr);
     gap: var(--rrr-spacing-xs);
-    align-items: center;
     inline-size: 100%;
     block-size: var(--item-height);
     min-inline-size: 0;
@@ -114,8 +104,9 @@ rrr-exercise-catalogue {
     text-align: start;
     overflow: hidden;
     transform: translateY(calc(-50% + var(--slot-distance)));
-    will-change: transform;
+    will-change: transform, gap;
     box-shadow: none;
+    align-items: stretch;
   }
 
   .exercise-browser-item[data-interactive='false'] {
@@ -146,7 +137,6 @@ rrr-exercise-catalogue {
   }
 
   .exercise-browser-item[data-focused='true'] {
-    gap: var(--rrr-spacing-m);
     grid-template-columns: minmax(0, 1fr) auto;
     z-index: 10;
     background: var(--rrr-exercise-browser-focused-bg);
@@ -154,12 +144,16 @@ rrr-exercise-catalogue {
 
   .exercise-browser-preview {
     grid-column: 1;
+    grid-row: 2;
     display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
     gap: var(--rrr-spacing-s);
+
     max-block-size: var(--preview-max-block-size);
     min-block-size: 0;
     opacity: var(--preview-opacity);
     overflow: hidden;
+    align-self: stretch;
   }
 
   .exercise-browser-used-badge {
@@ -196,7 +190,6 @@ rrr-exercise-catalogue {
   .exercise-browser-main,
   .exercise-browser-preview,
   .exercise-browser-heading,
-  .exercise-browser-detail-line,
   .exercise-browser-profile-list,
   .exercise-browser-profile {
     min-inline-size: 0;
@@ -204,8 +197,10 @@ rrr-exercise-catalogue {
 
   .exercise-browser-main {
     display: grid;
-    gap: 0.12rem;
     min-block-size: 0;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
   }
 
   .exercise-browser-heading {
@@ -227,10 +222,8 @@ rrr-exercise-catalogue {
   }
 
   .exercise-browser-meta,
-  .exercise-browser-cue,
-  .exercise-browser-detail-line {
+  .exercise-browser-cue {
     color: var(--rrr-text-muted);
-    font-size: var(--rrr-font-size-s);
     line-height: 1.35;
   }
 
@@ -247,11 +240,6 @@ rrr-exercise-catalogue {
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
-  }
-
-  .exercise-browser-detail-line {
-    display: grid;
-    gap: var(--rrr-spacing-2xs);
   }
 
   .exercise-browser-detail-label {
@@ -280,10 +268,8 @@ rrr-exercise-catalogue {
   }
 
   .exercise-browser-open {
-    display: none;
-  }
-
-  .exercise-browser-item[data-focused='true'] .exercise-browser-open {
+    opacity: 0;
+    pointer-events: none;
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: stretch;
@@ -291,7 +277,10 @@ rrr-exercise-catalogue {
     place-items: center;
     color: var(--rrr-color-text);
     font-size: var(--rrr-font-size-l);
-    pointer-events: none;
+  }
+
+  .exercise-browser-item[data-focused='true'] .exercise-browser-open {
+    opacity: 1;
   }
 
   .exercise-browser-empty {

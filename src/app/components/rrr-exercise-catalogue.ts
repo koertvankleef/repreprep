@@ -5,9 +5,9 @@ import { FocusedSequenceController, type FocusSequenceState } from '../focused-s
 import { storageService } from '../storage-instance.ts'
 import styles from './rrr-exercise-catalogue.css?inline'
 
-const VISIBLE_RADIUS = 4
+const VISIBLE_RADIUS = 6
 const SCROLL_PIXELS_PER_ITEM = 120
-const COMPACT_ITEM_HEIGHT_REM = 5.25
+const COMPACT_ITEM_HEIGHT_REM = 4
 const FOCUSED_ITEM_HEIGHT_REM = 11
 const FOCUS_VISUAL_DEAD_ZONE = 0.04
 const SECTION_TITLE_HEIGHT_REM = 0.9 * 1.5
@@ -368,7 +368,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
           ${used ? `<rrr-badge class="exercise-browser-used-badge">${t('exercise.badge.used')}</rrr-badge>` : ''}
         </span>
         <span class="exercise-browser-meta">${escapeHtml(this.renderExerciseMeta(exercise))}</span>
-        <span class="exercise-browser-cue">${escapeHtml(getMovementCue(exercise.description))}</span>
       </span>
       ${this.renderFocusedDetails(exercise)}
     `
@@ -377,12 +376,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
   private renderFocusedDetails(exercise: ExerciseDefinition): string {
     return `
       <span class="exercise-browser-preview">
-        ${exercise.aliases.length > 0 ? `
-          <span class="exercise-browser-detail-line">
-            <span class="exercise-browser-detail-label">${t('exercise.detail.aliases')}</span>
-            <span>${escapeHtml(exercise.aliases.join(', '))}</span>
-          </span>
-        ` : ''}
+        <span class="exercise-browser-cue">${escapeHtml(getMovementCue(exercise.description))}</span>
         <span class="exercise-browser-profile-list">
           ${exercise.measurementProfiles.map((profile) => this.renderMeasurementProfile(profile)).join('')}
         </span>
