@@ -186,6 +186,7 @@ export const nlNlMessages = {
   'exercise.filter.equipment': 'Materiaal',
   'exercise.filter.clear': 'Filters wissen',
   'exercise.browser.label': 'Gefocuste oefeningbrowser',
+  'exercise.browser.focusedStatus': '{name}, oefening {index} van {count}',
   'exercise.browser.openDetails': 'Details openen',
   'exercise.browser.noDescription': 'Nog geen bewegingsomschrijving beschikbaar.',
   'exercise.form.name.placeholder': 'Naam van oefening',

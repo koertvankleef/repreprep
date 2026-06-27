@@ -85,7 +85,6 @@ export class RrrApp extends HTMLElement {
   private exerciseSearchDebounceId: number | null = null
   private exerciseFilterRailController: AbortController | null = null
   private exerciseFilterRailResizeObserver: ResizeObserver | null = null
-  private exerciseCatalogueScrollY = 0
   private currentRouteView: HTMLElement | null = null
   private readonly router = createHashRouter({
     routes: appRoutes,
@@ -566,17 +565,9 @@ export class RrrApp extends HTMLElement {
     return true
   }
 
-  private captureRouteState(route: Route | null): void {
-    if (route?.name === 'exercises') {
-      this.exerciseCatalogueScrollY = 0
-    }
-  }
-
-  private restoreRouteScrollPosition(route: Route): void {
-    const top = route.name === 'exercises' ? this.exerciseCatalogueScrollY : 0
-
+  private restoreRouteScrollPosition(): void {
     requestAnimationFrame(() => {
-      window.scrollTo(0, top)
+      window.scrollTo(0, 0)
     })
   }
 
@@ -1131,9 +1122,8 @@ export class RrrApp extends HTMLElement {
     const routeChanged = !previousRoute || !this.isSameRoute(previousRoute, route)
 
     if (routeChanged) {
-      this.captureRouteState(previousRoute)
       this.mountRouteView(route, this.computeRouteTransition(previousRoute, route))
-      this.restoreRouteScrollPosition(route)
+      this.restoreRouteScrollPosition()
     }
 
     if (!routeChanged && route.name === 'settings') {

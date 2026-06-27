@@ -186,6 +186,7 @@ export const enUsMessages = {
   'exercise.filter.equipment': 'Equipment',
   'exercise.filter.clear': 'Clear filters',
   'exercise.browser.label': 'Focused exercise browser',
+  'exercise.browser.focusedStatus': '{name}, exercise {index} of {count}',
   'exercise.browser.openDetails': 'Open details',
   'exercise.browser.noDescription': 'No movement description available yet.',
   'exercise.form.name.placeholder': 'Exercise name',

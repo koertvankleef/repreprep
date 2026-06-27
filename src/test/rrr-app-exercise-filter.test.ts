@@ -65,6 +65,12 @@ function getNativeInput(input: Element | null): HTMLInputElement {
   return nativeInput
 }
 
+async function waitForAnimationFrame(): Promise<void> {
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => resolve())
+  })
+}
+
 describe('rrr-app exercise filters', () => {
   beforeAll(async () => {
     installBrowserApiShims()
@@ -107,7 +113,7 @@ describe('rrr-app exercise filters', () => {
     })
     const filteredBrowser = catalogue?.querySelector<HTMLElement>('[data-result-count]')
     const filteredCount = Number(filteredBrowser?.dataset.resultCount)
-    const visibleItems = catalogue?.querySelectorAll('[role="option"]') ?? []
+    const visibleItems = catalogue?.querySelectorAll('.exercise-browser-item') ?? []
 
     expect(filteredCount).toBe(expectedMatches.length)
     expect(filteredCount).toBeLessThan(initialCount)
@@ -137,4 +143,52 @@ describe('rrr-app exercise filters', () => {
     expect(filteredCount).toBe(expectedMatches.length)
     expect(filteredCount).toBeLessThan(initialCount)
   }, 10_000)
+
+  it('maps native scroll position to focused exercise and preserves button semantics', async () => {
+    const app = document.createElement('rrr-app')
+    document.body.append(app)
+
+    const catalogue = app.shadowRoot?.querySelector<HTMLElement>('rrr-exercise-catalogue')
+    const scrollProxy = catalogue?.querySelector<HTMLElement>('[data-exercise-scroll]')
+    expect(scrollProxy?.getAttribute('role')).toBe('region')
+    expect(catalogue?.querySelector('.exercise-browser-section-title')?.tagName).toBe('H2')
+    expect(catalogue?.querySelector('.exercise-browser-section-title')?.hasAttribute('aria-hidden')).toBe(false)
+    expect(catalogue?.querySelector<HTMLElement>('.exercise-browser-track')?.getAttribute('style')).toContain('--focus-anchor: 18.0000%')
+    expect(catalogue?.querySelector<HTMLElement>('[data-index="0"]')?.dataset.sectionFirst).toBe('true')
+    expect(catalogue?.querySelector<HTMLElement>('[data-index="1"]')?.dataset.sectionLast).toBe('true')
+
+    scrollProxy!.scrollTop = 72
+    scrollProxy!.dispatchEvent(new Event('scroll'))
+    await waitForAnimationFrame()
+
+    const focusedItem = catalogue?.querySelector<HTMLElement>('[data-focused="true"]')
+    expect(focusedItem?.dataset.index).toBe('1')
+    expect(focusedItem?.tagName).toBe('BUTTON')
+    expect(focusedItem?.hasAttribute('role')).toBe(false)
+  })
+
+  it('preserves the focused exercise when it remains after filtering', async () => {
+    const { storageService } = await import('../app/storage-instance.ts')
+    const app = document.createElement('rrr-app')
+    document.body.append(app)
+
+    const catalogue = app.shadowRoot?.querySelector<HTMLElement>('rrr-exercise-catalogue') as HTMLElement & {
+      setSearchAndFilters(searchQuery: string, filters: { categories: string[]; equipment: string[] }): void
+    }
+    const sortedExercises = storageService.getData().exercises
+      .filter((exercise) => !exercise.archived)
+      .sort((left, right) => left.name.localeCompare(right.name))
+    const targetIndex = sortedExercises.findIndex((exercise) => exercise.categories.includes('cardio'))
+    const targetExercise = sortedExercises[targetIndex]
+    const scrollProxy = catalogue.querySelector<HTMLElement>('[data-exercise-scroll]')
+
+    expect(targetExercise).toBeTruthy()
+    scrollProxy!.scrollTop = targetIndex * 120
+    scrollProxy!.dispatchEvent(new Event('scroll'))
+    await waitForAnimationFrame()
+
+    catalogue.setSearchAndFilters('', { categories: ['cardio'], equipment: [] })
+
+    expect(catalogue.querySelector<HTMLElement>('[data-focused="true"]')?.dataset.exerciseId).toBe(targetExercise?.id)
+  })
 })

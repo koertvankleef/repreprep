@@ -1,4 +1,4 @@
-import { filterExercises, isExerciseUsedInRoutines, searchExercises, type ExerciseFilters } from '../../domain/exercise-service.ts'
+import { filterExercises, searchExercises, type ExerciseFilters } from '../../domain/exercise-service.ts'
 import type { AppData, Equipment, ExerciseDefinition, MeasurementProfile, MeasurementType, Muscle } from '../../domain/types.ts'
 import { t } from '../../i18n/index.ts'
 import { FocusedSequenceController, type FocusSequenceState } from '../focused-sequence-controller.ts'
@@ -14,17 +14,24 @@ const SECTION_BOUNDARY_GAP_REM = 3.75
 const SECTION_TITLE_LEADING_REM = 1.75
 
 type ExerciseVisualLayout = {
-  itemOffsets: Map<number, number>
-  markerOffsets: Map<number, number>
+  itemOffsets: number[]
+  sectionTitleOffsets: number[]
 }
 
+let catalogueInstanceCount = 0
+
 export class RrrExerciseCatalogue extends HTMLElement {
-  private readonly focusSequence = new FocusedSequenceController<ExerciseDefinition>(() => this.prefersReducedMotion())
+  private readonly focusSequence = new FocusedSequenceController<ExerciseDefinition>()
+  private readonly statusId = `exercise-browser-status-${catalogueInstanceCount += 1}`
   private searchQueryValue = ''
   private filtersValue: ExerciseFilters = { categories: [], equipment: [] }
   private focusedExerciseId: string | null = null
   private sequenceState = this.focusSequence.state
+  private usedExerciseIds = new Set<string>()
+  private announcedFocusedExerciseId: string | null = null
   private isRendering = false
+  private renderFrame = 0
+  private initialSyncFrame = 0
   private unsubscribeState: (() => void) | null = null
   private unsubscribeFocus: (() => void) | null = null
 
@@ -36,7 +43,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     this.sequenceState = state
 
     if (!this.isRendering) {
-      this.renderBrowser()
+      this.queueBrowserRender()
     }
   }
 
@@ -152,11 +159,12 @@ export class RrrExerciseCatalogue extends HTMLElement {
     this.addEventListener('click', this.handleClick)
     this.addEventListener('keydown', this.handleKeyDown)
     this.addEventListener('scroll', this.handleScroll, true)
+    this.isRendering = true
     this.unsubscribeState = this.focusSequence.onStateChange(this.handleSequenceStateChanged)
     this.unsubscribeFocus = this.focusSequence.onFocusChange(this.handleSequenceFocusChanged)
     this.render()
-    requestAnimationFrame(() => {
-      window.scrollTo(0, 0)
+    this.initialSyncFrame = requestAnimationFrame(() => {
+      this.initialSyncFrame = 0
       this.syncScrollProxyToState()
     })
   }
@@ -166,15 +174,17 @@ export class RrrExerciseCatalogue extends HTMLElement {
     this.removeEventListener('click', this.handleClick)
     this.removeEventListener('keydown', this.handleKeyDown)
     this.removeEventListener('scroll', this.handleScroll, true)
+    cancelAnimationFrame(this.renderFrame)
+    cancelAnimationFrame(this.initialSyncFrame)
+    this.renderFrame = 0
+    this.initialSyncFrame = 0
     this.unsubscribeState?.()
     this.unsubscribeFocus?.()
     this.unsubscribeState = null
     this.unsubscribeFocus = null
   }
 
-  private getFilteredExercises(): ExerciseDefinition[] {
-    const data = storageService.getData()
-
+  private getFilteredExercises(data: AppData): ExerciseDefinition[] {
     return filterExercises(
       searchExercises(
         data.exercises.filter((exercise) => !exercise.archived),
@@ -194,15 +204,14 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
     this.focusSequence.setItems(exercises, {
       focusedIndex: nextFocusedIndex,
-      animate: false,
       reason: currentFocusedId ? 'filter' : 'initial',
     })
 
+    this.sequenceState = this.focusSequence.state
     this.focusedExerciseId = exercises[nextFocusedIndex]?.id ?? null
   }
 
   private renderList(): string {
-    const data = storageService.getData()
     const state = this.sequenceState
 
     if (state.items.length === 0) {
@@ -220,20 +229,23 @@ export class RrrExerciseCatalogue extends HTMLElement {
         class="exercise-browser-scroll"
         data-exercise-scroll
         data-result-count="${state.items.length}"
-        role="listbox"
+        role="region"
         tabindex="0"
         aria-label="${escapeHtml(t('exercise.browser.label'))}"
-        aria-activedescendant="exercise-browser-item-${escapeHtml(state.items[state.focusedIndex]?.id ?? '')}"
+        aria-describedby="${this.statusId}"
       >
+        <span class="sr-only" id="${this.statusId}" aria-live="polite">
+          ${escapeHtml(this.getFocusedStatus())}
+        </span>
         <div class="exercise-browser-presentation" data-browser-presentation>
-          ${this.renderBrowserPresentation(data, state)}
+          ${this.renderBrowserPresentation(state)}
         </div>
         <div class="exercise-browser-scroll-spacer" style="block-size: ${scrollRange}px;" aria-hidden="true"></div>
       </div>
     `
   }
 
-  private renderBrowserPresentation(data: AppData, state: FocusSequenceState<ExerciseDefinition>): string {
+  private renderBrowserPresentation(state: FocusSequenceState<ExerciseDefinition>): string {
     const startIndex = Math.max(0, Math.floor(state.visualPosition) - VISIBLE_RADIUS)
     const endIndex = Math.min(state.items.length - 1, Math.ceil(state.visualPosition) + VISIBLE_RADIUS)
     const visibleItems = state.items.slice(startIndex, endIndex + 1)
@@ -247,13 +259,11 @@ export class RrrExerciseCatalogue extends HTMLElement {
         <div
           class="exercise-browser-track"
           style="
-            --visual-position: ${formatCssNumber(state.visualPosition)};
             --focus-anchor: ${formatCssNumber(getFocusAnchorPercent(state.visualPosition, state.items.length))}%;
           "
         >
           ${visibleItems.map((exercise, offset) => this.renderExerciseBoundaryAndItem(
             exercise,
-            data,
             startIndex + offset,
             startIndex,
             endIndex,
@@ -266,13 +276,12 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
   private renderExerciseBoundaryAndItem(
     exercise: ExerciseDefinition,
-    data: AppData,
     index: number,
     startIndex: number,
     endIndex: number,
     visualLayout: ExerciseVisualLayout,
   ): string {
-    return `${this.renderBoundaryMarker(exercise, index, startIndex, endIndex, visualLayout)}${this.renderExerciseItem(exercise, data, index, visualLayout)}`
+    return `${this.renderBoundaryMarker(exercise, index, startIndex, endIndex, visualLayout)}${this.renderExerciseItem(exercise, index, visualLayout)}`
   }
 
   private renderBoundaryMarker(
@@ -295,18 +304,16 @@ export class RrrExerciseCatalogue extends HTMLElement {
       <h2
         class="rrr-section-title exercise-browser-section-title"
         style="${this.getMarkerStyle(index, visualLayout)}"
-        aria-hidden="true"
       >${escapeHtml(sectionTitle)}</h2>
     `
   }
 
   private renderExerciseItem(
     exercise: ExerciseDefinition,
-    data: AppData,
     index: number,
     visualLayout: ExerciseVisualLayout,
   ): string {
-    const used = isExerciseUsedInRoutines(data, exercise.id)
+    const used = this.usedExerciseIds.has(exercise.id)
     const sectionTitle = getExerciseSectionTitle(exercise.name)
     const previousSectionTitle = index > 0 ? getExerciseSectionTitle(this.sequenceState.items[index - 1]?.name ?? '') : null
     const nextSectionTitle = index < this.sequenceState.items.length - 1
@@ -321,8 +328,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
         class="exercise-browser-item"
         style="${this.getItemStyle(index, this.sequenceState, visualLayout)}"
         type="button"
-        role="option"
-        aria-selected="${index === this.sequenceState.focusedIndex ? 'true' : 'false'}"
         aria-current="${index === this.sequenceState.focusedIndex ? 'true' : 'false'}"
         data-action="focus-exercise"
         data-exercise-id="${escapeHtml(exercise.id)}"
@@ -388,6 +393,20 @@ export class RrrExerciseCatalogue extends HTMLElement {
     return `${muscleText} • ${equipmentText}`
   }
 
+  private queueBrowserRender(): void {
+    if (this.renderFrame) {
+      return
+    }
+
+    this.renderFrame = requestAnimationFrame(() => {
+      this.renderFrame = 0
+
+      if (this.isConnected) {
+        this.renderBrowser()
+      }
+    })
+  }
+
   private renderBrowser(): void {
     const list = this.querySelector<HTMLElement>('[data-list="active"]')
 
@@ -408,15 +427,40 @@ export class RrrExerciseCatalogue extends HTMLElement {
       return
     }
 
-    scrollProxy.setAttribute(
-      'aria-activedescendant',
-      `exercise-browser-item-${this.sequenceState.items[this.sequenceState.focusedIndex]?.id ?? ''}`,
-    )
-    presentation.innerHTML = this.renderBrowserPresentation(storageService.getData(), this.sequenceState)
+    presentation.innerHTML = this.renderBrowserPresentation(this.sequenceState)
+    this.updateFocusedStatus(scrollProxy)
 
     if (shouldRestoreBrowserFocus) {
       scrollProxy.focus({ preventScroll: true })
     }
+  }
+
+  private updateFocusedStatus(scrollProxy: HTMLElement): void {
+    const focusedExercise = this.sequenceState.items[this.sequenceState.focusedIndex]
+
+    if (!focusedExercise || focusedExercise.id === this.announcedFocusedExerciseId) {
+      return
+    }
+
+    const status = scrollProxy.querySelector<HTMLElement>(`#${this.statusId}`)
+    if (status) {
+      status.textContent = this.getFocusedStatus()
+    }
+    this.announcedFocusedExerciseId = focusedExercise.id
+  }
+
+  private getFocusedStatus(): string {
+    const focusedExercise = this.sequenceState.items[this.sequenceState.focusedIndex]
+
+    if (!focusedExercise) {
+      return ''
+    }
+
+    return t('exercise.browser.focusedStatus', {
+      name: focusedExercise.name,
+      index: this.sequenceState.focusedIndex + 1,
+      count: this.sequenceState.items.length,
+    })
   }
 
   private getItemStyle(
@@ -434,11 +478,9 @@ export class RrrExerciseCatalogue extends HTMLElement {
     const paddingBlock = 0.55 + 0.7 * focusAmount
 
     return [
-      `--distance: ${formatCssNumber(distance)}`,
-      `--abs-distance: ${formatCssNumber(absoluteDistance)}`,
       `--focus-amount: ${formatCssNumber(focusAmount)}`,
       `--near-amount: ${formatCssNumber(nearAmount)}`,
-      `--slot-distance: ${formatCssNumber(visualLayout.itemOffsets.get(index) ?? 0)}rem`,
+      `--slot-distance: ${formatCssNumber(visualLayout.itemOffsets[index] ?? 0)}rem`,
       `--item-z-index: ${zIndex}`,
       `--item-height: ${formatCssNumber(itemHeight)}rem`,
       `--item-padding-block: ${formatCssNumber(paddingBlock)}rem`,
@@ -448,12 +490,11 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private getMarkerStyle(index: number, visualLayout: ExerciseVisualLayout): string {
-    const markerOffset = visualLayout.markerOffsets.get(index) ?? 0
+    const markerOffset = visualLayout.sectionTitleOffsets[index] ?? 0
     const absoluteDistance = Math.abs(index - 0.5 - this.sequenceState.visualPosition)
     const zIndex = Math.max(1, 18 - Math.round(absoluteDistance * 3))
 
     return [
-      `--abs-distance: ${formatCssNumber(absoluteDistance)}`,
       `--slot-distance: ${formatCssNumber(markerOffset)}rem`,
       `--item-z-index: ${zIndex}`,
     ].join('; ')
@@ -502,11 +543,16 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private render(): void {
+    cancelAnimationFrame(this.renderFrame)
+    this.renderFrame = 0
     const addExerciseLabel = escapeHtml(t('exercise.form.add'))
-    const exercises = this.getFilteredExercises()
+    const data = storageService.getData()
+    const exercises = this.getFilteredExercises(data)
 
     this.isRendering = true
+    this.usedExerciseIds = getUsedExerciseIds(data)
     this.syncFocusedSequence(exercises)
+    this.announcedFocusedExerciseId = exercises[this.sequenceState.focusedIndex]?.id ?? null
 
     this.innerHTML = `
       <style>${styles}</style>
@@ -607,56 +653,76 @@ function createExerciseVisualLayout(
   startIndex: number,
   endIndex: number,
 ): ExerciseVisualLayout {
-  const heights = new Map<number, number>()
-  const centers = new Map<number, number>()
-  const markerCenters = new Map<number, number>()
+  const heights: number[] = []
+  const centers: number[] = []
+  const sectionTitleCenters: number[] = []
 
   for (let index = startIndex; index <= endIndex; index += 1) {
-    heights.set(index, getItemHeightRem(index, visualPosition))
+    heights[index] = getItemHeightRem(index, visualPosition)
   }
 
-  centers.set(startIndex, 0)
+  centers[startIndex] = 0
 
   for (let index = startIndex + 1; index <= endIndex; index += 1) {
     const previousIndex = index - 1
-    const previousCenter = centers.get(previousIndex) ?? 0
-    const previousHeight = heights.get(previousIndex) ?? COMPACT_ITEM_HEIGHT_REM
-    const currentHeight = heights.get(index) ?? COMPACT_ITEM_HEIGHT_REM
+    const previousCenter = centers[previousIndex] ?? 0
+    const previousHeight = heights[previousIndex] ?? COMPACT_ITEM_HEIGHT_REM
+    const currentHeight = heights[index] ?? COMPACT_ITEM_HEIGHT_REM
     const sectionBoundary = getExerciseSectionTitle(items[previousIndex]?.name ?? '')
       !== getExerciseSectionTitle(items[index]?.name ?? '')
     const gap = sectionBoundary ? SECTION_BOUNDARY_GAP_REM : 0
     const previousBottom = previousCenter + previousHeight / 2
 
-    centers.set(index, previousBottom + gap + currentHeight / 2)
+    centers[index] = previousBottom + gap + currentHeight / 2
 
     if (sectionBoundary) {
-      markerCenters.set(index, previousBottom + gap / 2)
+      sectionTitleCenters[index] = previousBottom + gap / 2
     }
   }
 
   if (startIndex === 0) {
-    const firstHeight = heights.get(0) ?? COMPACT_ITEM_HEIGHT_REM
-    markerCenters.set(0, -firstHeight / 2 - SECTION_TITLE_LEADING_REM)
+    const firstHeight = heights[0] ?? COMPACT_ITEM_HEIGHT_REM
+    sectionTitleCenters[0] = -firstHeight / 2 - SECTION_TITLE_LEADING_REM
   }
 
   const lowerIndex = clamp(Math.floor(visualPosition), startIndex, endIndex)
   const upperIndex = clamp(Math.ceil(visualPosition), startIndex, endIndex)
   const interpolation = visualPosition - Math.floor(visualPosition)
-  const lowerCenter = centers.get(lowerIndex) ?? 0
-  const upperCenter = centers.get(upperIndex) ?? lowerCenter
+  const lowerCenter = centers[lowerIndex] ?? 0
+  const upperCenter = centers[upperIndex] ?? lowerCenter
   const referenceCenter = lowerCenter + (upperCenter - lowerCenter) * interpolation
-  const itemOffsets = new Map<number, number>()
-  const markerOffsets = new Map<number, number>()
+  const itemOffsets: number[] = []
+  const sectionTitleOffsets: number[] = []
 
-  centers.forEach((center, index) => {
-    itemOffsets.set(index, center - referenceCenter)
+  for (let index = startIndex; index <= endIndex; index += 1) {
+    itemOffsets[index] = (centers[index] ?? referenceCenter) - referenceCenter
+
+    const sectionTitleCenter = sectionTitleCenters[index]
+    if (sectionTitleCenter !== undefined) {
+      sectionTitleOffsets[index] = sectionTitleCenter - referenceCenter
+    }
+  }
+
+  return { itemOffsets, sectionTitleOffsets }
+}
+
+function getUsedExerciseIds(data: AppData): Set<string> {
+  const activeVersionIds = new Set(
+    data.routines
+      .filter((routine) => !routine.archived)
+      .map((routine) => routine.activeVersionId),
+  )
+  const usedExerciseIds = new Set<string>()
+
+  data.routineVersions.forEach((version) => {
+    if (!activeVersionIds.has(version.id)) {
+      return
+    }
+
+    version.exercises.forEach((entry) => usedExerciseIds.add(entry.exerciseId))
   })
 
-  markerCenters.forEach((center, index) => {
-    markerOffsets.set(index, center - referenceCenter)
-  })
-
-  return { itemOffsets, markerOffsets }
+  return usedExerciseIds
 }
 
 function getItemHeightRem(index: number, visualPosition: number): number {

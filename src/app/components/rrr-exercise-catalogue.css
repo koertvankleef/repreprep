@@ -1,5 +1,4 @@
 rrr-exercise-catalogue {
-  --rrr-exercise-catalogue-list-gap: var(--rrr-spacing-s);
   --rrr-exercise-browser-max-width: 48rem;
   --rrr-exercise-browser-item-border: var(--rrr-border-width) solid var(--rrr-border-subtle);
   --rrr-exercise-browser-compact-bg: var(--rrr-surface-raised);
@@ -71,7 +70,6 @@ rrr-exercise-catalogue {
     min-block-size: 0;
     padding: var(--rrr-spacing-s) 0;
     overflow: hidden;
-    outline: none;
     touch-action: pan-y;
   }
 
@@ -79,7 +77,6 @@ rrr-exercise-catalogue {
     position: relative;
     block-size: 100%;
     min-block-size: 0;
-    perspective: 60rem;
   }
 
   .exercise-browser-item {
@@ -95,7 +92,6 @@ rrr-exercise-catalogue {
     inline-size: 100%;
     block-size: var(--item-height);
     min-inline-size: 0;
-    margin-inline: auto;
     padding: var(--item-padding-block) var(--rrr-spacing-s);
     border: var(--rrr-exercise-browser-item-border);
     border-radius: 0;
@@ -103,13 +99,9 @@ rrr-exercise-catalogue {
     color: var(--rrr-color-text);
     font: inherit;
     text-align: start;
-    text-decoration: none;
-    opacity: 1;
-    pointer-events: auto;
     overflow: hidden;
     transform: translateY(calc(-50% + var(--slot-distance)));
-    transform-origin: center;
-    box-shadow: none;
+    will-change: transform;
   }
 
   .exercise-browser-item[data-interactive='false'] {
@@ -130,10 +122,6 @@ rrr-exercise-catalogue {
     border-end-end-radius: var(--rrr-radius-l);
   }
 
-  .exercise-browser-item {
-    will-change: transform, opacity;
-  }
-
   .exercise-browser-item:hover {
     border-color: color-mix(in oklab, var(--rrr-color-primary), transparent 40%);
   }
@@ -144,7 +132,6 @@ rrr-exercise-catalogue {
   }
 
   .exercise-browser-item[data-focused='true'] {
-    grid-template-columns: minmax(0, 1fr);
     gap: var(--rrr-spacing-m);
     z-index: 10;
     background: var(--rrr-exercise-browser-focused-bg);
@@ -154,6 +141,7 @@ rrr-exercise-catalogue {
     display: grid;
     gap: var(--rrr-spacing-s);
     max-block-size: var(--preview-max-block-size);
+    min-block-size: 0;
     opacity: var(--preview-opacity);
     overflow: hidden;
   }
@@ -244,10 +232,6 @@ rrr-exercise-catalogue {
     -webkit-box-orient: vertical;
   }
 
-  .exercise-browser-preview {
-    min-block-size: 0;
-  }
-
   .exercise-browser-detail-line {
     display: grid;
     gap: var(--rrr-spacing-2xs);
@@ -294,11 +278,11 @@ rrr-exercise-catalogue {
   }
 
   .exercise-browser-empty {
-    justify-self: center;
     inline-size: min(100%, var(--rrr-exercise-browser-max-width));
+    margin-inline: auto;
     padding: var(--rrr-spacing-xl);
     border: var(--rrr-exercise-browser-item-border);
-    border-radius: var(--rrr-exercise-browser-item-radius);
+    border-radius: var(--rrr-radius-l);
     background: var(--rrr-surface-raised);
     color: var(--rrr-text-muted);
     text-align: center;
@@ -321,10 +305,4 @@ rrr-exercise-catalogue {
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .exercise-browser-item {
-      transform: none;
-      will-change: auto;
-    }
-  }
 }
