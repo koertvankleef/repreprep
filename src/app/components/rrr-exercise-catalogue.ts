@@ -12,6 +12,9 @@ const TOUCH_ITEM_SIZE = 155
 const BOUNDARY_RELEASE_OFFSET = 0.42
 const FOCUS_SLOT_STEP_REM = 13.75
 const COMPACT_SLOT_STEP_REM = 6.8
+const COMPACT_ITEM_HEIGHT_REM = 5.25
+const FOCUSED_ITEM_HEIGHT_REM = 15.5
+const FOCUS_VISUAL_DEAD_ZONE = 0.04
 
 export class RrrExerciseCatalogue extends HTMLElement {
   private readonly focusSequence = new FocusedSequenceController<ExerciseDefinition>(() => this.prefersReducedMotion())
@@ -134,7 +137,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
     event.preventDefault()
     this.focusSequence.applyGestureDelta(deltaItems, 'wheel')
-    this.scheduleSnap('wheel')
   }
 
   private readonly handleTouchStart = (event: TouchEvent): void => {
@@ -298,10 +300,56 @@ export class RrrExerciseCatalogue extends HTMLElement {
         aria-label="${escapeHtml(t('exercise.browser.label'))}"
         aria-activedescendant="exercise-browser-item-${escapeHtml(state.items[state.focusedIndex]?.id ?? '')}"
       >
-        <div class="exercise-browser-track" style="--visual-position: ${formatCssNumber(state.visualPosition)};">
-          ${visibleItems.map((exercise, offset) => this.renderExerciseItem(exercise, data, startIndex + offset)).join('')}
+        <div
+          class="exercise-browser-track"
+          style="
+            --visual-position: ${formatCssNumber(state.visualPosition)};
+            --focus-anchor: ${formatCssNumber(getFocusAnchorPercent(state.visualPosition, state.items.length))}%;
+          "
+        >
+          ${visibleItems.map((exercise, offset) => this.renderExerciseBoundaryAndItem(
+            exercise,
+            data,
+            startIndex + offset,
+            startIndex,
+            endIndex,
+          )).join('')}
         </div>
       </div>
+    `
+  }
+
+  private renderExerciseBoundaryAndItem(
+    exercise: ExerciseDefinition,
+    data: AppData,
+    index: number,
+    startIndex: number,
+    endIndex: number,
+  ): string {
+    return `${this.renderBoundaryMarker(exercise, index, startIndex, endIndex)}${this.renderExerciseItem(exercise, data, index)}`
+  }
+
+  private renderBoundaryMarker(
+    exercise: ExerciseDefinition,
+    index: number,
+    startIndex: number,
+    endIndex: number,
+  ): string {
+    const sectionTitle = getExerciseSectionTitle(exercise.name)
+    const previousTitle = index > 0 ? getExerciseSectionTitle(this.sequenceState.items[index - 1]?.name ?? '') : null
+    const startsSection = index === 0 || sectionTitle !== previousTitle
+    const boundaryIsInsideRenderedRange = index === 0 || (index - 1 >= startIndex && index <= endIndex)
+
+    if (!startsSection || !boundaryIsInsideRenderedRange) {
+      return ''
+    }
+
+    return `
+      <span
+        class="exercise-browser-marker"
+        style="${this.getMarkerStyle(index)}"
+        aria-hidden="true"
+      >${escapeHtml(sectionTitle)}</span>
     `
   }
 
@@ -311,11 +359,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
     index: number,
   ): string {
     const used = isExerciseUsedInRoutines(data, exercise.id)
-    const sectionTitle = getExerciseSectionTitle(exercise.name)
-    const previousTitle = index > 0 ? getExerciseSectionTitle(this.sequenceState.items[index - 1]?.name ?? '') : null
-    const marker = sectionTitle !== previousTitle
-      ? `<span class="exercise-browser-marker" aria-hidden="true">${escapeHtml(sectionTitle)}</span>`
-      : ''
 
     return `
       <button
@@ -332,7 +375,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
         data-interactive="${this.isItemInteractive(index, this.sequenceState) ? 'true' : 'false'}"
         data-index="${index}"
       >
-        ${marker}
         ${this.renderExerciseContent(exercise, used)}
       </button>
     `
@@ -356,7 +398,6 @@ export class RrrExerciseCatalogue extends HTMLElement {
   private renderFocusedDetails(exercise: ExerciseDefinition): string {
     return `
       <span class="exercise-browser-preview">
-        <span class="exercise-browser-description">${escapeHtml(getPreviewDescription(exercise.description))}</span>
         ${exercise.aliases.length > 0 ? `
           <span class="exercise-browser-detail-line">
             <span class="exercise-browser-detail-label">${t('exercise.detail.aliases')}</span>
@@ -412,15 +453,39 @@ export class RrrExerciseCatalogue extends HTMLElement {
   private getItemStyle(index: number, state: FocusSequenceState<ExerciseDefinition>): string {
     const distance = index - state.visualPosition
     const absoluteDistance = Math.abs(distance)
-    const focusAmount = Math.max(0, 1 - absoluteDistance)
+    const focusAmount = getVisualFocusAmount(absoluteDistance)
     const nearAmount = Math.max(0, 1 - absoluteDistance / 3)
     const slotDistance = getSlotDistanceRem(distance)
     const zIndex = Math.max(1, 20 - Math.round(absoluteDistance * 3))
+    const itemHeight = COMPACT_ITEM_HEIGHT_REM + (FOCUSED_ITEM_HEIGHT_REM - COMPACT_ITEM_HEIGHT_REM) * focusAmount
+    const previewMaxHeight = 10 * focusAmount
+    const paddingBlock = 0.55 + 0.7 * focusAmount
 
     return [
       `--distance: ${formatCssNumber(distance)}`,
       `--abs-distance: ${formatCssNumber(absoluteDistance)}`,
       `--focus-amount: ${formatCssNumber(focusAmount)}`,
+      `--near-amount: ${formatCssNumber(nearAmount)}`,
+      `--slot-distance: ${formatCssNumber(slotDistance)}rem`,
+      `--item-z-index: ${zIndex}`,
+      `--item-height: ${formatCssNumber(itemHeight)}rem`,
+      `--item-padding-block: ${formatCssNumber(paddingBlock)}rem`,
+      `--preview-max-block-size: ${formatCssNumber(previewMaxHeight)}rem`,
+      `--preview-opacity: ${formatCssNumber(focusAmount)}`,
+    ].join('; ')
+  }
+
+  private getMarkerStyle(index: number): string {
+    const markerPosition = index === 0 ? -0.52 : index - 0.5
+    const distance = markerPosition - this.sequenceState.visualPosition
+    const absoluteDistance = Math.abs(distance)
+    const nearAmount = Math.max(0, 1 - absoluteDistance / 3)
+    const slotDistance = getSlotDistanceRem(distance)
+    const zIndex = Math.max(1, 18 - Math.round(absoluteDistance * 3))
+
+    return [
+      `--distance: ${formatCssNumber(distance)}`,
+      `--abs-distance: ${formatCssNumber(absoluteDistance)}`,
       `--near-amount: ${formatCssNumber(nearAmount)}`,
       `--slot-distance: ${formatCssNumber(slotDistance)}rem`,
       `--item-z-index: ${zIndex}`,
@@ -530,16 +595,6 @@ function getMovementCue(description: string): string {
   return truncateText(firstSentence, 132)
 }
 
-function getPreviewDescription(description: string): string {
-  const normalized = normalizeDescription(description)
-
-  if (!normalized) {
-    return t('exercise.browser.noDescription')
-  }
-
-  return truncateText(normalized, 360)
-}
-
 function normalizeDescription(description: string): string {
   return description.replace(/\s+/g, ' ').trim()
 }
@@ -587,10 +642,40 @@ function getSlotDistanceRem(distance: number): number {
   const direction = Math.sign(distance)
 
   if (absoluteDistance <= 1) {
-    return distance * FOCUS_SLOT_STEP_REM
+    return direction * FOCUS_SLOT_STEP_REM * Math.pow(absoluteDistance, 0.65)
   }
 
   return direction * (FOCUS_SLOT_STEP_REM + (absoluteDistance - 1) * COMPACT_SLOT_STEP_REM)
+}
+
+function getVisualFocusAmount(absoluteDistance: number): number {
+  if (absoluteDistance <= FOCUS_VISUAL_DEAD_ZONE) {
+    return 1
+  }
+
+  return Math.max(0, 1 - (absoluteDistance - FOCUS_VISUAL_DEAD_ZONE) / (1 - FOCUS_VISUAL_DEAD_ZONE))
+}
+
+function getFocusAnchorPercent(visualPosition: number, itemCount: number): number {
+  if (itemCount <= 1) {
+    return 50
+  }
+
+  const lastIndex = itemCount - 1
+  const edgeRange = Math.min(3, lastIndex / 2)
+  const edgeAnchor = itemCount === 2 ? 30 : itemCount === 3 ? 22 : 18
+
+  if (visualPosition <= edgeRange) {
+    return edgeAnchor + (50 - edgeAnchor) * clamp(visualPosition / edgeRange, 0, 1)
+  }
+
+  if (visualPosition >= lastIndex - edgeRange) {
+    const edgeProgress = clamp((visualPosition - (lastIndex - edgeRange)) / edgeRange, 0, 1)
+
+    return 50 + (50 - edgeAnchor) * edgeProgress
+  }
+
+  return 50
 }
 
 function clamp(value: number, min: number, max: number): number {
