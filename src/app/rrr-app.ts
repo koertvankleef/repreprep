@@ -62,6 +62,7 @@ type RouteHeader = {
 type ExerciseCatalogueElement = HTMLElement & {
   searchQuery: string
   filters: ExerciseFilters
+  focusedExerciseId: string | null
   setSearchAndFilters?: (searchQuery: string, filters: ExerciseFilters) => void
 }
 
@@ -82,6 +83,7 @@ export class RrrApp extends HTMLElement {
   private exerciseSearchQuery = ''
   private exerciseFiltersOpen = false
   private exerciseFilters: ExerciseFilters = { categories: [], equipment: [] }
+  private exerciseCatalogueFocusedId: string | null = null
   private exerciseSearchDebounceId: number | null = null
   private exerciseFilterRailController: AbortController | null = null
   private exerciseFilterRailResizeObserver: ResizeObserver | null = null
@@ -90,7 +92,11 @@ export class RrrApp extends HTMLElement {
     routes: appRoutes,
     notFoundRouteId: 'workouts',
     onRouteChange: (match) => {
-      this.route = this.toRoute(match)
+      const route = this.toRoute(match)
+      if (route.name === 'exercise-detail') {
+        this.exerciseCatalogueFocusedId = route.exerciseId
+      }
+      this.route = route
       this.render()
     },
   })
@@ -677,6 +683,7 @@ export class RrrApp extends HTMLElement {
     if (route.name === 'exercises') {
       const catalogue = document.createElement('rrr-exercise-catalogue') as ExerciseCatalogueElement
       const filters = this.cloneExerciseFilters()
+      catalogue.focusedExerciseId = this.exerciseCatalogueFocusedId
 
       if (catalogue.setSearchAndFilters) {
         catalogue.setSearchAndFilters(this.exerciseSearchQuery, filters)

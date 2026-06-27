@@ -8,7 +8,7 @@ import styles from './rrr-exercise-catalogue.css?inline'
 const VISIBLE_RADIUS = 4
 const SCROLL_PIXELS_PER_ITEM = 120
 const COMPACT_ITEM_HEIGHT_REM = 5.25
-const FOCUSED_ITEM_HEIGHT_REM = 15.5
+const FOCUSED_ITEM_HEIGHT_REM = 11
 const FOCUS_VISUAL_DEAD_ZONE = 0.04
 const SECTION_TITLE_HEIGHT_REM = 0.9 * 1.5
 const SECTION_GAP_BEFORE_REM = 1.25
@@ -37,7 +37,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
   private readonly statusId = `exercise-browser-status-${catalogueInstanceCount += 1}`
   private searchQueryValue = ''
   private filtersValue: ExerciseFilters = { categories: [], equipment: [] }
-  private focusedExerciseId: string | null = null
+  private focusedExerciseIdValue: string | null = null
   private sequenceState = this.focusSequence.state
   private usedExerciseIds = new Set<string>()
   private announcedFocusedExerciseId: string | null = null
@@ -60,17 +60,10 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private readonly handleSequenceFocusChanged = (event: { item: ExerciseDefinition }): void => {
-    this.focusedExerciseId = event.item.id
+    this.focusedExerciseIdValue = event.item.id
   }
 
   private readonly handleClick = (event: MouseEvent): void => {
-    const openButton = (event.target as Element | null)?.closest('[data-action="open-exercise"]')
-
-    if (openButton) {
-      this.openFocusedExercise()
-      return
-    }
-
     const itemButton = (event.target as Element | null)?.closest<HTMLButtonElement>('[data-action="focus-exercise"]')
 
     if (!itemButton) {
@@ -146,6 +139,14 @@ export class RrrExerciseCatalogue extends HTMLElement {
     return this.searchQueryValue
   }
 
+  set focusedExerciseId(value: string | null) {
+    this.focusedExerciseIdValue = value
+  }
+
+  get focusedExerciseId(): string | null {
+    return this.focusedExerciseIdValue
+  }
+
   set filters(value: ExerciseFilters) {
     this.setSearchAndFilters(this.searchQueryValue, value)
   }
@@ -208,7 +209,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
   }
 
   private syncFocusedSequence(exercises: ExerciseDefinition[]): void {
-    const currentFocusedId = this.focusedExerciseId ?? this.sequenceState.items[this.sequenceState.focusedIndex]?.id ?? null
+    const currentFocusedId = this.focusedExerciseIdValue ?? this.sequenceState.items[this.sequenceState.focusedIndex]?.id ?? null
     const focusedIndex = currentFocusedId
       ? exercises.findIndex((exercise) => exercise.id === currentFocusedId)
       : 0
@@ -220,7 +221,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     })
 
     this.sequenceState = this.focusSequence.state
-    this.focusedExerciseId = exercises[nextFocusedIndex]?.id ?? null
+    this.focusedExerciseIdValue = exercises[nextFocusedIndex]?.id ?? null
   }
 
   private renderList(): string {
@@ -385,7 +386,10 @@ export class RrrExerciseCatalogue extends HTMLElement {
         <span class="exercise-browser-profile-list">
           ${exercise.measurementProfiles.map((profile) => this.renderMeasurementProfile(profile)).join('')}
         </span>
-        <span class="exercise-browser-open" data-action="open-exercise">${t('exercise.browser.openDetails')}</span>
+      </span>
+      <span class="exercise-browser-open">
+        <span class="sr-only">${t('exercise.browser.openDetails')}</span>
+        <rrr-icon name="chevron-right"></rrr-icon>
       </span>
     `
   }

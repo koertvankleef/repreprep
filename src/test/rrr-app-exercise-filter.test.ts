@@ -156,7 +156,7 @@ describe('rrr-app exercise filters', () => {
       expect(catalogue?.querySelector('.exercise-browser-section-title')?.tagName).toBe('H2')
       expect(catalogue?.querySelector('.exercise-browser-section-title')?.hasAttribute('aria-hidden')).toBe(false)
       expect(catalogue?.querySelector('.exercise-browser-name')?.tagName).toBe('SPAN')
-      expect(catalogue?.querySelector<HTMLElement>('.exercise-browser-track')?.getAttribute('style')).toContain('--focus-anchor: 9.3500rem')
+      expect(catalogue?.querySelector<HTMLElement>('.exercise-browser-track')?.getAttribute('style')).toContain('--focus-anchor: 7.1000rem')
     expect(catalogue?.querySelector<HTMLElement>('[data-index="0"]')?.dataset.sectionFirst).toBe('true')
     expect(catalogue?.querySelector<HTMLElement>('[data-index="1"]')?.dataset.sectionLast).toBe('true')
 
@@ -193,5 +193,46 @@ describe('rrr-app exercise filters', () => {
     catalogue.setSearchAndFilters('', { categories: ['cardio'], equipment: [] })
 
     expect(catalogue.querySelector<HTMLElement>('[data-focused="true"]')?.dataset.exerciseId).toBe(targetExercise?.id)
+  })
+
+  it('restores the focused exercise after returning from its detail route', async () => {
+    const { storageService } = await import('../app/storage-instance.ts')
+    const app = document.createElement('rrr-app')
+    document.body.append(app)
+
+    const sortedExercises = storageService.getData().exercises
+      .filter((exercise) => !exercise.archived)
+      .sort((left, right) => left.name.localeCompare(right.name))
+    const targetIndex = Math.min(8, sortedExercises.length - 1)
+    const targetExercise = sortedExercises[targetIndex]
+    const catalogue = app.shadowRoot?.querySelector<HTMLElement>('rrr-exercise-catalogue')
+    const scrollProxy = catalogue?.querySelector<HTMLElement>('[data-exercise-scroll]')
+
+    expect(targetExercise).toBeTruthy()
+    scrollProxy!.scrollTop = targetIndex * 120
+    scrollProxy!.dispatchEvent(new Event('scroll'))
+    await waitForAnimationFrame()
+
+    catalogue
+      ?.querySelector<HTMLButtonElement>(`[data-exercise-id="${targetExercise?.id}"]`)
+      ?.click()
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+
+    expect(app.shadowRoot?.querySelector('.route-view-current')).toBeInstanceOf(
+      customElements.get('rrr-exercise-detail'),
+    )
+
+    window.history.replaceState({}, '', '#/exercises')
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+    await waitForAnimationFrame()
+
+    const restoredCatalogue = app.shadowRoot?.querySelector<HTMLElement>(
+      'rrr-exercise-catalogue.route-view-current',
+    )
+    const restoredScrollProxy = restoredCatalogue?.querySelector<HTMLElement>('[data-exercise-scroll]')
+
+    expect(restoredCatalogue?.querySelector<HTMLElement>('[data-focused="true"]')?.dataset.exerciseId)
+      .toBe(targetExercise?.id)
+    expect(restoredScrollProxy?.scrollTop).toBe(targetIndex * 120)
   })
 })
