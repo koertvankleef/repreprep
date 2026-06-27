@@ -7,11 +7,16 @@ import styles from './rrr-exercise-catalogue.css?inline'
 
 const VISIBLE_RADIUS = 4
 const SCROLL_PIXELS_PER_ITEM = 120
-const FOCUS_SLOT_STEP_REM = 13.75
-const COMPACT_SLOT_STEP_REM = 6.8
 const COMPACT_ITEM_HEIGHT_REM = 5.25
 const FOCUSED_ITEM_HEIGHT_REM = 15.5
 const FOCUS_VISUAL_DEAD_ZONE = 0.04
+const SECTION_BOUNDARY_GAP_REM = 3.75
+const SECTION_TITLE_LEADING_REM = 1.75
+
+type ExerciseVisualLayout = {
+  itemOffsets: Map<number, number>
+  markerOffsets: Map<number, number>
+}
 
 export class RrrExerciseCatalogue extends HTMLElement {
   private readonly focusSequence = new FocusedSequenceController<ExerciseDefinition>(() => this.prefersReducedMotion())
@@ -232,6 +237,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     const startIndex = Math.max(0, Math.floor(state.visualPosition) - VISIBLE_RADIUS)
     const endIndex = Math.min(state.items.length - 1, Math.ceil(state.visualPosition) + VISIBLE_RADIUS)
     const visibleItems = state.items.slice(startIndex, endIndex + 1)
+    const visualLayout = createExerciseVisualLayout(state.items, state.visualPosition, startIndex, endIndex)
 
     return `
       <div
@@ -251,6 +257,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
             startIndex + offset,
             startIndex,
             endIndex,
+            visualLayout,
           )).join('')}
         </div>
       </div>
@@ -263,8 +270,9 @@ export class RrrExerciseCatalogue extends HTMLElement {
     index: number,
     startIndex: number,
     endIndex: number,
+    visualLayout: ExerciseVisualLayout,
   ): string {
-    return `${this.renderBoundaryMarker(exercise, index, startIndex, endIndex)}${this.renderExerciseItem(exercise, data, index)}`
+    return `${this.renderBoundaryMarker(exercise, index, startIndex, endIndex, visualLayout)}${this.renderExerciseItem(exercise, data, index, visualLayout)}`
   }
 
   private renderBoundaryMarker(
@@ -272,6 +280,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     index: number,
     startIndex: number,
     endIndex: number,
+    visualLayout: ExerciseVisualLayout,
   ): string {
     const sectionTitle = getExerciseSectionTitle(exercise.name)
     const previousTitle = index > 0 ? getExerciseSectionTitle(this.sequenceState.items[index - 1]?.name ?? '') : null
@@ -283,11 +292,11 @@ export class RrrExerciseCatalogue extends HTMLElement {
     }
 
     return `
-      <span
-        class="exercise-browser-marker"
-        style="${this.getMarkerStyle(index)}"
+      <h2
+        class="rrr-section-title exercise-browser-section-title"
+        style="${this.getMarkerStyle(index, visualLayout)}"
         aria-hidden="true"
-      >${escapeHtml(sectionTitle)}</span>
+      >${escapeHtml(sectionTitle)}</h2>
     `
   }
 
@@ -295,14 +304,22 @@ export class RrrExerciseCatalogue extends HTMLElement {
     exercise: ExerciseDefinition,
     data: AppData,
     index: number,
+    visualLayout: ExerciseVisualLayout,
   ): string {
     const used = isExerciseUsedInRoutines(data, exercise.id)
+    const sectionTitle = getExerciseSectionTitle(exercise.name)
+    const previousSectionTitle = index > 0 ? getExerciseSectionTitle(this.sequenceState.items[index - 1]?.name ?? '') : null
+    const nextSectionTitle = index < this.sequenceState.items.length - 1
+      ? getExerciseSectionTitle(this.sequenceState.items[index + 1]?.name ?? '')
+      : null
+    const isSectionFirst = index === 0 || sectionTitle !== previousSectionTitle
+    const isSectionLast = index === this.sequenceState.items.length - 1 || sectionTitle !== nextSectionTitle
 
     return `
       <button
         id="exercise-browser-item-${escapeHtml(exercise.id)}"
         class="exercise-browser-item"
-        style="${this.getItemStyle(index, this.sequenceState)}"
+        style="${this.getItemStyle(index, this.sequenceState, visualLayout)}"
         type="button"
         role="option"
         aria-selected="${index === this.sequenceState.focusedIndex ? 'true' : 'false'}"
@@ -311,6 +328,8 @@ export class RrrExerciseCatalogue extends HTMLElement {
         data-exercise-id="${escapeHtml(exercise.id)}"
         data-focused="${index === this.sequenceState.focusedIndex ? 'true' : 'false'}"
         data-interactive="${this.isItemInteractive(index, this.sequenceState) ? 'true' : 'false'}"
+        data-section-first="${isSectionFirst ? 'true' : 'false'}"
+        data-section-last="${isSectionLast ? 'true' : 'false'}"
         data-index="${index}"
       >
         ${this.renderExerciseContent(exercise, used)}
@@ -322,7 +341,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     return `
       <span class="exercise-browser-main">
         <span class="exercise-browser-heading">
-          <span class="exercise-browser-name">${escapeHtml(exercise.name)}</span>
+          <h4 class="exercise-browser-name">${escapeHtml(exercise.name)}</h4>
           ${exercise.createdByUser ? `<rrr-badge tone="accent">${t('exercise.badge.custom')}</rrr-badge>` : ''}
           ${used ? `<rrr-badge class="exercise-browser-used-badge">${t('exercise.badge.used')}</rrr-badge>` : ''}
         </span>
@@ -400,14 +419,17 @@ export class RrrExerciseCatalogue extends HTMLElement {
     }
   }
 
-  private getItemStyle(index: number, state: FocusSequenceState<ExerciseDefinition>): string {
+  private getItemStyle(
+    index: number,
+    state: FocusSequenceState<ExerciseDefinition>,
+    visualLayout: ExerciseVisualLayout,
+  ): string {
     const distance = index - state.visualPosition
     const absoluteDistance = Math.abs(distance)
     const focusAmount = getVisualFocusAmount(absoluteDistance)
     const nearAmount = Math.max(0, 1 - absoluteDistance / 3)
-    const slotDistance = getSlotDistanceRem(distance)
     const zIndex = Math.max(1, 20 - Math.round(absoluteDistance * 3))
-    const itemHeight = COMPACT_ITEM_HEIGHT_REM + (FOCUSED_ITEM_HEIGHT_REM - COMPACT_ITEM_HEIGHT_REM) * focusAmount
+    const itemHeight = getItemHeightRem(index, state.visualPosition)
     const previewMaxHeight = 10 * focusAmount
     const paddingBlock = 0.55 + 0.7 * focusAmount
 
@@ -416,7 +438,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
       `--abs-distance: ${formatCssNumber(absoluteDistance)}`,
       `--focus-amount: ${formatCssNumber(focusAmount)}`,
       `--near-amount: ${formatCssNumber(nearAmount)}`,
-      `--slot-distance: ${formatCssNumber(slotDistance)}rem`,
+      `--slot-distance: ${formatCssNumber(visualLayout.itemOffsets.get(index) ?? 0)}rem`,
       `--item-z-index: ${zIndex}`,
       `--item-height: ${formatCssNumber(itemHeight)}rem`,
       `--item-padding-block: ${formatCssNumber(paddingBlock)}rem`,
@@ -425,19 +447,14 @@ export class RrrExerciseCatalogue extends HTMLElement {
     ].join('; ')
   }
 
-  private getMarkerStyle(index: number): string {
-    const markerPosition = index === 0 ? -0.52 : index - 0.5
-    const distance = markerPosition - this.sequenceState.visualPosition
-    const absoluteDistance = Math.abs(distance)
-    const nearAmount = Math.max(0, 1 - absoluteDistance / 3)
-    const slotDistance = getSlotDistanceRem(distance)
+  private getMarkerStyle(index: number, visualLayout: ExerciseVisualLayout): string {
+    const markerOffset = visualLayout.markerOffsets.get(index) ?? 0
+    const absoluteDistance = Math.abs(index - 0.5 - this.sequenceState.visualPosition)
     const zIndex = Math.max(1, 18 - Math.round(absoluteDistance * 3))
 
     return [
-      `--distance: ${formatCssNumber(distance)}`,
       `--abs-distance: ${formatCssNumber(absoluteDistance)}`,
-      `--near-amount: ${formatCssNumber(nearAmount)}`,
-      `--slot-distance: ${formatCssNumber(slotDistance)}rem`,
+      `--slot-distance: ${formatCssNumber(markerOffset)}rem`,
       `--item-z-index: ${zIndex}`,
     ].join('; ')
   }
@@ -584,15 +601,68 @@ function formatCssNumber(value: number): string {
   return value.toFixed(4)
 }
 
-function getSlotDistanceRem(distance: number): number {
-  const absoluteDistance = Math.abs(distance)
-  const direction = Math.sign(distance)
+function createExerciseVisualLayout(
+  items: ExerciseDefinition[],
+  visualPosition: number,
+  startIndex: number,
+  endIndex: number,
+): ExerciseVisualLayout {
+  const heights = new Map<number, number>()
+  const centers = new Map<number, number>()
+  const markerCenters = new Map<number, number>()
 
-  if (absoluteDistance <= 1) {
-    return direction * FOCUS_SLOT_STEP_REM * Math.pow(absoluteDistance, 0.65)
+  for (let index = startIndex; index <= endIndex; index += 1) {
+    heights.set(index, getItemHeightRem(index, visualPosition))
   }
 
-  return direction * (FOCUS_SLOT_STEP_REM + (absoluteDistance - 1) * COMPACT_SLOT_STEP_REM)
+  centers.set(startIndex, 0)
+
+  for (let index = startIndex + 1; index <= endIndex; index += 1) {
+    const previousIndex = index - 1
+    const previousCenter = centers.get(previousIndex) ?? 0
+    const previousHeight = heights.get(previousIndex) ?? COMPACT_ITEM_HEIGHT_REM
+    const currentHeight = heights.get(index) ?? COMPACT_ITEM_HEIGHT_REM
+    const sectionBoundary = getExerciseSectionTitle(items[previousIndex]?.name ?? '')
+      !== getExerciseSectionTitle(items[index]?.name ?? '')
+    const gap = sectionBoundary ? SECTION_BOUNDARY_GAP_REM : 0
+    const previousBottom = previousCenter + previousHeight / 2
+
+    centers.set(index, previousBottom + gap + currentHeight / 2)
+
+    if (sectionBoundary) {
+      markerCenters.set(index, previousBottom + gap / 2)
+    }
+  }
+
+  if (startIndex === 0) {
+    const firstHeight = heights.get(0) ?? COMPACT_ITEM_HEIGHT_REM
+    markerCenters.set(0, -firstHeight / 2 - SECTION_TITLE_LEADING_REM)
+  }
+
+  const lowerIndex = clamp(Math.floor(visualPosition), startIndex, endIndex)
+  const upperIndex = clamp(Math.ceil(visualPosition), startIndex, endIndex)
+  const interpolation = visualPosition - Math.floor(visualPosition)
+  const lowerCenter = centers.get(lowerIndex) ?? 0
+  const upperCenter = centers.get(upperIndex) ?? lowerCenter
+  const referenceCenter = lowerCenter + (upperCenter - lowerCenter) * interpolation
+  const itemOffsets = new Map<number, number>()
+  const markerOffsets = new Map<number, number>()
+
+  centers.forEach((center, index) => {
+    itemOffsets.set(index, center - referenceCenter)
+  })
+
+  markerCenters.forEach((center, index) => {
+    markerOffsets.set(index, center - referenceCenter)
+  })
+
+  return { itemOffsets, markerOffsets }
+}
+
+function getItemHeightRem(index: number, visualPosition: number): number {
+  const focusAmount = getVisualFocusAmount(Math.abs(index - visualPosition))
+
+  return COMPACT_ITEM_HEIGHT_REM + (FOCUSED_ITEM_HEIGHT_REM - COMPACT_ITEM_HEIGHT_REM) * focusAmount
 }
 
 function getVisualFocusAmount(absoluteDistance: number): number {
