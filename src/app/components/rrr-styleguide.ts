@@ -455,6 +455,92 @@ export class RrrStyleguide extends HTMLElement {
             </div>
           </section>
 
+          <rrr-section>
+            <span slot="heading">${t('styleguide.section.listRows')}</span>
+            <span slot="description">${t('styleguide.listRows.description')}</span>
+            <div class="list-showcase">
+              <rrr-list-card>
+                <rrr-list-row
+                  href="#/settings"
+                  label="${t('styleguide.listRows.navigation')}"
+                  accessory="chevron"
+                >
+                  <rrr-icon slot="leading" name="settings"></rrr-icon>
+                </rrr-list-row>
+                <rrr-list-row
+                  href="#/settings"
+                  label="${t('styleguide.listRows.currentValue')}"
+                  value-text="${t('app.theme.dark')}"
+                  accessory="value-chevron"
+                >
+                  <rrr-icon slot="leading" name="weather-moon"></rrr-icon>
+                </rrr-list-row>
+                <rrr-list-row
+                  control="switch"
+                  name="styleguide-wake-lock"
+                  label="${t('styleguide.listRows.switch')}"
+                  description="${t('styleguide.listRows.switchDescription')}"
+                  checked
+                >
+                  <rrr-icon slot="leading" name="weather-sunny"></rrr-icon>
+                </rrr-list-row>
+                <rrr-list-row
+                  label="${t('styleguide.listRows.informational')}"
+                  description="${t('styleguide.listRows.informationalDescription')}"
+                  accessory="badge"
+                  value-text="${t('styleguide.listRows.badge')}"
+                ></rrr-list-row>
+              </rrr-list-card>
+
+              <rrr-list-card role="radiogroup" aria-label="${t('styleguide.listRows.radioGroup')}">
+                <rrr-list-row control="radio" name="styleguide-theme" value="auto" label="${t('app.theme.auto')}">
+                  <rrr-icon slot="leading" name="circle-half-fill"></rrr-icon>
+                </rrr-list-row>
+                <rrr-list-row control="radio" name="styleguide-theme" value="light" label="${t('app.theme.light')}">
+                  <rrr-icon slot="leading" name="weather-sunny"></rrr-icon>
+                </rrr-list-row>
+                <rrr-list-row control="radio" name="styleguide-theme" value="dark" label="${t('app.theme.dark')}" checked>
+                  <rrr-icon slot="leading" name="weather-moon"></rrr-icon>
+                </rrr-list-row>
+              </rrr-list-card>
+
+              <rrr-list-card>
+                <rrr-list-row
+                  control="checkbox"
+                  name="styleguide-checkbox-row"
+                  label="${t('styleguide.listRows.checkbox')}"
+                  checked
+                ></rrr-list-row>
+                <rrr-list-row
+                  activation="button"
+                  label="${t('styleguide.listRows.action')}"
+                >
+                  <rrr-icon slot="leading" name="arrow-export-up"></rrr-icon>
+                </rrr-list-row>
+                <rrr-list-row
+                  activation="button"
+                  label="${t('styleguide.listRows.disabled')}"
+                  disabled
+                ></rrr-list-row>
+                <rrr-list-row
+                  activation="button"
+                  label="${t('styleguide.listRows.destructive')}"
+                  destructive
+                ></rrr-list-row>
+              </rrr-list-card>
+
+              <rrr-list-card>
+                <rrr-list-row
+                  label="${t('styleguide.listRows.custom')}"
+                  description="${t('styleguide.listRows.customDescription')}"
+                  accessory="custom"
+                >
+                  <rrr-badge slot="trailing" tone="success">${t('styleguide.listRows.ready')}</rrr-badge>
+                </rrr-list-row>
+              </rrr-list-card>
+            </div>
+          </rrr-section>
+
           <section class="rrr-section">
             <h2 class="rrr-section-title">${t('styleguide.section.inputs')}</h2>
             <div class="rrr-section-card">

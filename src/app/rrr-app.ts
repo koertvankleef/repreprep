@@ -35,6 +35,11 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: unknown
 }
 
+type DisplayPreferenceChangeDetail = {
+  preference: 'theme' | 'contrast'
+  value: string
+}
+
 type Route =
   | { name: 'workouts' }
   | { name: 'workout-edit'; workoutId: string }
@@ -48,6 +53,7 @@ type Route =
   | { name: 'routine-edit'; routineId: string }
   | { name: 'styleguide' }
   | { name: 'settings' }
+  | { name: 'settings-appearance' }
 
 type RouteTransition = 'none' | 'sub-forward' | 'sub-back' | 'main-switch'
 
@@ -135,6 +141,19 @@ export class RrrApp extends HTMLElement {
 
     this.route = { name: 'workouts' }
     this.render()
+  }
+
+  private readonly handleDisplayPreferenceChange = (event: Event): void => {
+    const { preference, value } = (event as CustomEvent<DisplayPreferenceChangeDetail>).detail
+
+    if (preference === 'theme' && (value === 'light' || value === 'dark' || value === 'auto')) {
+      this.setThemeMode(value)
+      return
+    }
+
+    if (preference === 'contrast' && (value === 'normal' || value === 'high')) {
+      this.setContrastMode(value)
+    }
   }
 
   private readonly handleClick = (event: Event): void => {
@@ -323,6 +342,7 @@ export class RrrApp extends HTMLElement {
     window.addEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.addEventListener('click', this.handleClick)
     this.shadowRoot?.addEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
+    this.shadowRoot?.addEventListener('rrr-display-preference-change', this.handleDisplayPreferenceChange as EventListener)
     this.isStandalone = window.matchMedia('(display-mode: standalone)').matches
     if (this.isStandalone) {
       this.installAvailable = false
@@ -343,6 +363,7 @@ export class RrrApp extends HTMLElement {
     window.removeEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.removeEventListener('click', this.handleClick)
     this.shadowRoot?.removeEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
+    this.shadowRoot?.removeEventListener('rrr-display-preference-change', this.handleDisplayPreferenceChange as EventListener)
     this.router.dispose()
   }
 
@@ -426,6 +447,10 @@ export class RrrApp extends HTMLElement {
       return { name: 'settings' }
     }
 
+    if (match.route.id === 'settings-appearance') {
+      return { name: 'settings-appearance' }
+    }
+
     return { name: 'workouts' }
   }
 
@@ -439,6 +464,7 @@ export class RrrApp extends HTMLElement {
   private getBackHref(): string | null {
     const route = this.route
     if (route.name === 'settings') return this.settingsReturnHash
+    if (route.name === 'settings-appearance') return '#/settings'
     if (route.name === 'workout-edit') return '#/workouts'
     if (route.name === 'workout-log') return '#/workouts'
     if (route.name === 'routine-new') return '#/routines'
@@ -508,8 +534,9 @@ export class RrrApp extends HTMLElement {
       || route.name === 'routine-edit'
       || route.name === 'exercise-detail'
       || route.name === 'settings'
+      || route.name === 'settings-appearance'
     ) {
-      return 1
+      return route.name === 'settings-appearance' ? 2 : 1
     }
 
     return 0
@@ -725,9 +752,15 @@ export class RrrApp extends HTMLElement {
     if (route.name === 'settings') {
       const settingsEl = document.createElement('rrr-settings')
       settingsEl.setAttribute('theme', this.displayPreferences.theme)
-      settingsEl.setAttribute('contrast', this.displayPreferences.contrast)
       settingsEl.setAttribute('styleguide-enabled', this.styleguideEnabled ? 'true' : 'false')
       return settingsEl
+    }
+
+    if (route.name === 'settings-appearance') {
+      const appearanceEl = document.createElement('rrr-appearance-settings')
+      appearanceEl.setAttribute('theme', this.displayPreferences.theme)
+      appearanceEl.setAttribute('contrast', this.displayPreferences.contrast)
+      return appearanceEl
     }
 
     return document.createElement('rrr-import-export')
@@ -914,6 +947,10 @@ export class RrrApp extends HTMLElement {
 
     if (route.name === 'settings') {
       return t('app.settings.title')
+    }
+
+    if (route.name === 'settings-appearance') {
+      return t('app.settings.appearance')
     }
 
     return ''
@@ -1136,8 +1173,15 @@ export class RrrApp extends HTMLElement {
       const settingsEl = this.shadowRoot.querySelector<HTMLElement>('#view > rrr-settings.route-view-current')
       if (settingsEl) {
         settingsEl.setAttribute('theme', this.displayPreferences.theme)
-        settingsEl.setAttribute('contrast', this.displayPreferences.contrast)
         settingsEl.setAttribute('styleguide-enabled', this.styleguideEnabled ? 'true' : 'false')
+      }
+    }
+
+    if (!routeChanged && route.name === 'settings-appearance') {
+      const appearanceEl = this.shadowRoot.querySelector<HTMLElement>('#view > rrr-appearance-settings.route-view-current')
+      if (appearanceEl) {
+        appearanceEl.setAttribute('theme', this.displayPreferences.theme)
+        appearanceEl.setAttribute('contrast', this.displayPreferences.contrast)
       }
     }
 

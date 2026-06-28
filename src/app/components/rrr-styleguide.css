@@ -180,6 +180,11 @@
   background: var(--rrr-surface-base);
 }
 
+.list-showcase {
+  display: grid;
+  gap: var(--rrr-spacing-l);
+}
+
 .scale-preview.elevation {
   inline-size: 2.5rem;
   border-radius: var(--rrr-radius-s);

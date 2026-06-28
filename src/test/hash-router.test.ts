@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
+import { appRoutes } from '../domain/routes.ts'
 
 type Meta = { title: string }
 
@@ -66,5 +67,13 @@ describe('createHashRouter', () => {
     expect(last?.params.workoutId).toBe('42')
 
     router.dispose()
+  })
+})
+
+test('app routes include the appearance settings subpage', () => {
+  expect(appRoutes).toContainEqual({
+    id: 'settings-appearance',
+    pattern: '/settings/appearance',
+    meta: { nav: 'settings' },
   })
 })

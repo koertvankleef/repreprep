@@ -2,7 +2,7 @@ import { getLocale, t } from '../../i18n/index.ts'
 import styles from './rrr-settings.css?inline'
 
 export class RrrSettings extends HTMLElement {
-  static observedAttributes = ['styleguide-enabled', 'contrast']
+  static observedAttributes = ['styleguide-enabled', 'theme']
   private resetPanelOpen = false
   private resetDateInput = ''
 
@@ -111,57 +111,56 @@ export class RrrSettings extends HTMLElement {
 
   private render(): void {
     const styleguideEnabled = this.getAttribute('styleguide-enabled') === 'true'
-    const contrast = this.getAttribute('contrast') ?? 'normal'
+    const theme = this.getAttribute('theme') ?? 'auto'
+    const themeLabel = theme === 'light'
+      ? t('app.theme.light')
+      : theme === 'dark'
+        ? t('app.theme.dark')
+        : t('app.theme.auto')
 
     this.innerHTML = `
       <style>${styles}</style>
       <div class="page">
-        <section class="rrr-section">
-          <h2 class="rrr-section-title">${t('app.settings.navigation')}</h2>
-          <div class="rrr-section-card rrr-section-card--flush">
-            <a class="rrr-section-link" href="#/import-export">
-              <rrr-icon name="arrow-export-up"></rrr-icon>
-              <span>${t('app.nav.importExport')}</span>
-            </a>
+        <rrr-section>
+          <span slot="heading">${t('app.settings.navigation')}</span>
+          <rrr-list-card>
+            <rrr-list-row
+              href="#/import-export"
+              label="${t('app.nav.importExport')}"
+              accessory="chevron"
+            >
+              <rrr-icon slot="leading" name="arrow-export-up"></rrr-icon>
+            </rrr-list-row>
             ${styleguideEnabled ? `
-              <a class="rrr-section-link" href="#/styleguide">
-                <rrr-icon name="braces"></rrr-icon>
-                <span>${t('app.nav.styleguide')}</span>
-              </a>
+              <rrr-list-row
+                href="#/styleguide"
+                label="${t('app.nav.styleguide')}"
+                accessory="chevron"
+              >
+                <rrr-icon slot="leading" name="braces"></rrr-icon>
+              </rrr-list-row>
             ` : ''}
-          </div>
-        </section>
+          </rrr-list-card>
+        </rrr-section>
 
-        <section class="rrr-section">
-          <h2 class="rrr-section-title">${t('app.settings.display')}</h2>
-          <div class="rrr-section-card">
-            <div class="control-row">
-              <span class="control-label">${t('app.theme.contrast')}</span>
-              <div class="control-group" role="group" aria-label="${t('app.theme.contrast')}">
-                <rrr-tooltip><rrr-button
-                  type="button"
-                  variant="ghost"
-                  data-action="contrast-normal"
-                  aria-pressed="${contrast === 'normal'}"
-                  aria-label="${t('app.theme.contrastNormal')}"
-                  title="${t('app.theme.contrastNormal')}"
-                ><rrr-icon name="circle-half-fill"></rrr-icon></rrr-button></rrr-tooltip>
-                <rrr-tooltip><rrr-button
-                  type="button"
-                  variant="ghost"
-                  data-action="contrast-high"
-                  aria-pressed="${contrast === 'high'}"
-                  aria-label="${t('app.theme.contrastHigh')}"
-                  title="${t('app.theme.contrastHigh')}"
-                ><rrr-icon name="shield"></rrr-icon></rrr-button></rrr-tooltip>
-              </div>
-            </div>
-          </div>
-        </section>
+        <rrr-section>
+          <span slot="heading">${t('app.settings.display')}</span>
+          <rrr-list-card>
+            <rrr-list-row
+              href="#/settings/appearance"
+              label="${t('app.settings.appearance')}"
+              description="${t('app.settings.appearanceDescription')}"
+              value-text="${themeLabel}"
+              accessory="value-chevron"
+            >
+              <rrr-icon slot="leading" name="circle-half-fill"></rrr-icon>
+            </rrr-list-row>
+          </rrr-list-card>
+        </rrr-section>
 
-        <section class="rrr-section">
-          <h2 class="rrr-section-title">${t('app.settings.data')}</h2>
-          <div class="rrr-section-card rrr-section-card--flush danger-card">
+        <rrr-section>
+          <span slot="heading">${t('app.settings.data')}</span>
+          <rrr-list-card class="danger-card">
             <div class="danger-card-content">
               <h3 class="danger-title">${t('app.settings.resetData.title')}</h3>
               <p class="danger-copy">${t('app.settings.resetData.description')}</p>
@@ -193,8 +192,8 @@ export class RrrSettings extends HTMLElement {
                 </div>
               </div>
             ` : ''}
-          </div>
-        </section>
+          </rrr-list-card>
+        </rrr-section>
       </div>
     `
 

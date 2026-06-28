@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  --rrr-section-gap: var(--rrr-spacing-xs);
+  --rrr-section-heading-color: var(--rrr-color-heading);
+  --rrr-section-heading-font-family: var(--rrr-font-family-heading);
+  --rrr-section-heading-font-size: var(--rrr-font-size-s);
+  --rrr-section-heading-font-weight: var(--rrr-font-weight-medium);
+  --rrr-section-heading-letter-spacing: 0.05em;
+  --rrr-section-description-color: var(--rrr-colors-activity-indigo-90);
+  --rrr-section-description-font-size: var(--rrr-font-size-s);
+}
+
+.section,
+.header {
+  display: grid;
+}
+
+.section {
+  gap: var(--rrr-section-gap);
+}
+
+.header {
+  gap: var(--rrr-spacing-2xs);
+}
+
+.header[hidden],
+.heading[hidden],
+.description[hidden] {
+  display: none;
+}
+
+.heading {
+  color: var(--rrr-section-heading-color);
+  font-family: var(--rrr-section-heading-font-family);
+  font-size: var(--rrr-section-heading-font-size);
+  font-weight: var(--rrr-section-heading-font-weight);
+  letter-spacing: var(--rrr-section-heading-letter-spacing);
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.description {
+  color: var(--rrr-section-description-color);
+  font-size: var(--rrr-section-description-font-size);
+}
+
+::slotted([slot='heading']),
+::slotted([slot='description']) {
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-transform: inherit;
+}

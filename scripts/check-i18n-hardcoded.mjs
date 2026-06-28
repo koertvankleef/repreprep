@@ -8,6 +8,7 @@ const filesToCheck = [
   'src/app/components/rrr-exercise-detail.ts',
   'src/app/components/rrr-exercise-entry.ts',
   'src/app/components/rrr-exercise-history.ts',
+  'src/app/components/rrr-appearance-settings.ts',
   'src/app/components/rrr-import-export.ts',
   'src/app/components/rrr-routine-editor.ts',
   'src/app/components/rrr-routine-list.ts',

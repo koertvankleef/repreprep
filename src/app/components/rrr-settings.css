@@ -14,32 +14,6 @@ rrr-settings {
   font-size: var(--rrr-font-size-xl);
 }
 
-.control-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--rrr-spacing-m);
-}
-
-.control-group {
-  display: inline-flex;
-  gap: var(--rrr-spacing-2xs);
-  padding: var(--rrr-spacing-2xs);
-  border-radius: var(--rrr-radius-s);
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-40);
-  background: var(--rrr-colors-grayscale-00);
-}
-
-.control-group rrr-button[aria-pressed='true'] > button[data-rrr-button-inner] {
-  background: var(--rrr-colors-activity-indigo-60);
-  border-color: var(--rrr-colors-activity-indigo-70);
-  color: var(--rrr-color-primary-contrast);
-}
-
-.danger-card {
-  gap: var(--rrr-spacing-s);
-}
-
 .danger-card-content {
   display: grid;
   gap: var(--rrr-spacing-xs);
