@@ -118,7 +118,7 @@ export class RrrSettings extends HTMLElement {
       <div class="page">
         <section class="rrr-section">
           <h2 class="rrr-section-title">${t('app.settings.navigation')}</h2>
-          <div class="rrr-section-card">
+          <div class="rrr-section-card rrr-section-card--flush">
             <a class="rrr-section-link" href="#/import-export">
               <rrr-icon name="arrow-export-up"></rrr-icon>
               <span>${t('app.nav.importExport')}</span>
@@ -161,7 +161,7 @@ export class RrrSettings extends HTMLElement {
 
         <section class="rrr-section">
           <h2 class="rrr-section-title">${t('app.settings.data')}</h2>
-          <div class="rrr-section-card danger-card">
+          <div class="rrr-section-card rrr-section-card--flush danger-card">
             <div class="danger-card-content">
               <h3 class="danger-title">${t('app.settings.resetData.title')}</h3>
               <p class="danger-copy">${t('app.settings.resetData.description')}</p>

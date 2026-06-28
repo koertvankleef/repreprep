@@ -19,7 +19,6 @@ rrr-settings {
   align-items: center;
   justify-content: space-between;
   gap: var(--rrr-spacing-m);
-  padding: var(--rrr-spacing-m);
 }
 
 .control-group {

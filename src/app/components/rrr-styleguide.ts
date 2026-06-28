@@ -333,17 +333,29 @@ export class RrrStyleguide extends HTMLElement {
       <section class="page">
         <section class="rrr-section">
           <div class="rrr-section-card">
-          <div class="intro">
             <p>${t('styleguide.subtitle')}</p>
             <p class="sample-text">${t('styleguide.localOnly')}</p>
             <p class="sample-text">${t('styleguide.localeInfo', { browserLocale: navigator.language, activeLocale: getLocale() })}</p>
+          </div>
+        </section>
+
+        <section class="rrr-section">
+          <h2 class="rrr-section-title">${t('styleguide.section.typography')}</h2>
+          <div class="rrr-section-card">
+          <div class="showcase-block">
+            <div class="component-column">
+              <h1>${t('styleguide.typography.heading1')}</h1>
+              <h2>${t('styleguide.typography.heading2')}</h2>
+              <h3>${t('styleguide.typography.heading3')}</h3>
+              <p>${t('styleguide.typography.body')}</p>
+            </div>
           </div>
           </div>
         </section>
 
         <div class="stack">
           <section class="rrr-section">
-            <h3 class="rrr-section-title">${t('styleguide.section.tooltips')}</h3>
+            <h2 class="rrr-section-title">${t('styleguide.section.tooltips')}</h2>
             <div class="rrr-section-card">
             <div class="showcase-block">
               <p class="sample-text">${t('styleguide.tooltips.description')}</p>
@@ -365,7 +377,7 @@ export class RrrStyleguide extends HTMLElement {
           </section>
 
           <section class="rrr-section">
-            <h3 class="rrr-section-title">${t('styleguide.section.buttons')}</h3>
+            <h2 class="rrr-section-title">${t('styleguide.section.buttons')}</h2>
             <div class="rrr-section-card">
             <div class="showcase-block">
               <p class="sample-text">${t('styleguide.buttonGuidance')}</p>
@@ -420,7 +432,7 @@ export class RrrStyleguide extends HTMLElement {
           </section>
 
           <section class="rrr-section">
-            <h3 class="rrr-section-title">${t('styleguide.section.badges')}</h3>
+            <h2 class="rrr-section-title">${t('styleguide.section.badges')}</h2>
             <div class="rrr-section-card">
             <div class="showcase-block">
               <p class="sample-text">${t('styleguide.badges.description')}</p>
@@ -444,7 +456,7 @@ export class RrrStyleguide extends HTMLElement {
           </section>
 
           <section class="rrr-section">
-            <h3 class="rrr-section-title">${t('styleguide.section.inputs')}</h3>
+            <h2 class="rrr-section-title">${t('styleguide.section.inputs')}</h2>
             <div class="rrr-section-card">
             <div class="showcase-block">
               <div class="showcase-grid">
@@ -476,7 +488,7 @@ export class RrrStyleguide extends HTMLElement {
           </section>
 
           <section class="rrr-section">
-            <h3 class="rrr-section-title">${t('styleguide.section.icons')}</h3>
+            <h2 class="rrr-section-title">${t('styleguide.section.icons')}</h2>
             <div class="rrr-section-card">
             <div class="showcase-block">
               <p class="sample-text">${t('styleguide.icons.description')}</p>
@@ -503,7 +515,7 @@ export class RrrStyleguide extends HTMLElement {
           </section>
 
           <section class="rrr-section">
-            <h3 class="rrr-section-title">${t('styleguide.section.checkboxes')}</h3>
+            <h2 class="rrr-section-title">${t('styleguide.section.checkboxes')}</h2>
             <div class="rrr-section-card">
             <div class="showcase-block">
               <div class="showcase-grid">
@@ -521,7 +533,7 @@ export class RrrStyleguide extends HTMLElement {
           </section>
 
           <section class="rrr-section">
-            <h3 class="rrr-section-title">${t('styleguide.section.toasts')}</h3>
+            <h2 class="rrr-section-title">${t('styleguide.section.toasts')}</h2>
             <div class="rrr-section-card">
             <div class="showcase-block">
               <p class="sample-text">${t('styleguide.toasts.description')}</p>
@@ -540,7 +552,7 @@ export class RrrStyleguide extends HTMLElement {
           </section>
 
           <section class="rrr-section">
-            <h3 class="rrr-section-title">${t('styleguide.section.colors')}</h3>
+            <h2 class="rrr-section-title">${t('styleguide.section.colors')}</h2>
             <div class="rrr-section-card">
             <div class="showcase-block">
               <p class="sample-text">${t('styleguide.colors.description')}</p>
@@ -550,25 +562,11 @@ export class RrrStyleguide extends HTMLElement {
           </section>
 
           <section class="rrr-section">
-            <h3 class="rrr-section-title">${t('styleguide.section.scales')}</h3>
+            <h2 class="rrr-section-title">${t('styleguide.section.scales')}</h2>
             <div class="rrr-section-card">
             <div class="showcase-block">
               <p class="sample-text">${t('styleguide.scales.description')}</p>
               <div class="scale-groups">${this.renderTokenScales()}</div>
-            </div>
-            </div>
-          </section>
-
-          <section class="rrr-section">
-            <h3 class="rrr-section-title">${t('styleguide.section.typography')}</h3>
-            <div class="rrr-section-card">
-            <div class="showcase-block">
-              <div class="component-column">
-                <h1>${t('styleguide.typography.heading1')}</h1>
-                <h2>${t('styleguide.typography.heading2')}</h2>
-                <h3>${t('styleguide.typography.heading3')}</h3>
-                <p>${t('styleguide.typography.body')}</p>
-              </div>
             </div>
             </div>
           </section>

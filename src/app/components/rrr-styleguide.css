@@ -1,9 +1,3 @@
-.intro {
-  display: grid;
-  gap: var(--rrr-spacing-s);
-  padding: var(--rrr-spacing-xl);
-}
-
 .stack {
   display: grid;
   gap: var(--rrr-spacing-xl);
@@ -18,7 +12,6 @@
 .showcase-block {
   display: grid;
   gap: var(--rrr-spacing-s);
-  padding: var(--rrr-spacing-xl);
 }
 
 .button-row {

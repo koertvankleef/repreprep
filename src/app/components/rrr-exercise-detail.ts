@@ -59,7 +59,7 @@ export class RrrExerciseDetail extends HTMLElement {
       <section class="page detail-page">
         <section class="rrr-section">
           <h2 class="rrr-section-title">${t('exercise.detail.notFoundTitle')}</h2>
-          <div class="rrr-section-card">
+          <div class="rrr-section-card rrr-section-card--flush">
             <p class="rrr-section-row">${t('exercise.detail.notFound')}</p>
           </div>
         </section>
@@ -105,7 +105,7 @@ export class RrrExerciseDetail extends HTMLElement {
     return `
       <section class="rrr-section">
         <h2 class="rrr-section-title">${escapeHtml(title)}</h2>
-        <dl class="rrr-section-card detail-list">
+        <dl class="rrr-section-card rrr-section-card--flush detail-list">
           ${rows.map((row) => this.renderDetailRow(row)).join('')}
         </dl>
       </section>

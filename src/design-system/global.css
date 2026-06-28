@@ -30,15 +30,16 @@ h6 {
 }
 
 h2 {
-  font-size: var(--rrr-font-size-l);
-  font-weight: var(--rrr-font-weight-semibold);
-}
-
-h3 {
   font-size: var(--rrr-font-size-s);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: var(--rrr-font-weight-medium);
+}
+
+h3 {
+  font-size: var(--rrr-font-size-m);
+  font-weight: var(--rrr-font-weight-semibold);
+  line-height: 1.2;
 }
 
 h4 {
@@ -195,12 +196,18 @@ a:hover {
 
 .rrr-section-card {
   display: grid;
-  gap: 0;
+  gap: var(--rrr-spacing-s);
   margin: 0;
+  padding: var(--rrr-spacing-m);
   background: var(--rrr-surface-raised);
   border: var(--rrr-border-width) solid var(--rrr-border-subtle);
   border-radius: var(--rrr-radius-l);
   overflow: hidden;
+}
+
+.rrr-section-card--flush {
+  gap: 0;
+  padding: 0;
 }
 
 .rrr-section-link,

@@ -217,7 +217,7 @@ rrr-exercise-catalogue {
     color: var(--rrr-color-heading);
     font-family: var(--rrr-font-family-heading);
     font-size: var(--rrr-font-size-m);
-    font-weight: var(--rrr-font-weight-medium);
+    font-weight: var(--rrr-font-weight-semibold);
     line-height: 1.2;
   }
 
