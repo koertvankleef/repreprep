@@ -57,7 +57,7 @@ export class RrrAppearanceSettings extends HTMLElement {
               ${theme === 'auto' ? 'checked' : ''}
               data-preference="theme"
             >
-              <rrr-icon slot="leading" name="circle-half-fill"></rrr-icon>
+              <rrr-icon slot="leading" name="arrow-sync"></rrr-icon>
             </rrr-list-row>
             <rrr-list-row
               control="radio"

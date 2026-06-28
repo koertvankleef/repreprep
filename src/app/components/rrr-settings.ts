@@ -153,7 +153,7 @@ export class RrrSettings extends HTMLElement {
               value-text="${themeLabel}"
               accessory="value-chevron"
             >
-              <rrr-icon slot="leading" name="circle-half-fill"></rrr-icon>
+              <rrr-icon slot="leading" name="color"></rrr-icon>
             </rrr-list-row>
           </rrr-list-card>
         </rrr-section>

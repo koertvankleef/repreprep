@@ -112,7 +112,7 @@ describe('settings structure', () => {
 
     const appearanceRow = settings.querySelector<RrrListRow>('rrr-list-row[href="#/settings/appearance"]')
 
-    expect(appearanceRow?.getAttribute('value-text')).toBe('Dark mode')
+    expect(appearanceRow?.getAttribute('value-text')).toBe('Dark')
     expect(appearanceRow?.getAttribute('accessory')).toBe('value-chevron')
   })
 

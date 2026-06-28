@@ -494,7 +494,7 @@ export class RrrStyleguide extends HTMLElement {
 
               <rrr-list-card role="radiogroup" aria-label="${t('styleguide.listRows.radioGroup')}">
                 <rrr-list-row control="radio" name="styleguide-theme" value="auto" label="${t('app.theme.auto')}">
-                  <rrr-icon slot="leading" name="circle-half-fill"></rrr-icon>
+                  <rrr-icon slot="leading" name="arrow-sync"></rrr-icon>
                 </rrr-list-row>
                 <rrr-list-row control="radio" name="styleguide-theme" value="light" label="${t('app.theme.light')}">
                   <rrr-icon slot="leading" name="weather-sunny"></rrr-icon>
