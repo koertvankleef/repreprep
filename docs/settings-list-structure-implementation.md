@@ -224,7 +224,7 @@ using keyboard-only navigation in every supported theme/contrast combination.
 
 Latest automated result:
 
-- `npm.cmd test -- --run`: 120 tests passed;
+- `npm.cmd test -- --run`: 121 tests passed;
 - `npm.cmd run build`: passed;
 - `npm.cmd run check:architecture`: passed;
 - `npm.cmd run icons:check`: passed with the existing unused-icon inventory;
@@ -235,7 +235,7 @@ Latest automated result:
 
 - Redesigning all list-heavy application screens in the first pass.
 - Copying Discord styling.
-- Removing the options/theme surface before settings is complete.
+- Adding a replacement generic options surface without route-specific actions.
 - Forcing warning panels, forms, or other rich content into a single row.
 - Encoding application-specific settings behavior inside the design system.
 

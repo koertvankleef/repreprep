@@ -445,7 +445,7 @@ nav {
   block-size: var(--rrr-control-min-block-size);
 }
 
-.options-trigger {
+.header-settings {
   justify-self: end;
 }
 
@@ -602,82 +602,6 @@ main {
 }
 
 
-/* ── Options panel (side drawer, mobile-first) ───────────────────────── */
-
-.options-panel {
-  position: fixed;
-  inset: 0 0 0 auto;
-  margin: 0;
-  inline-size: min(20rem, 90vw);
-  block-size: 100%;
-  max-block-size: 100%;
-  padding: 0;
-  border: none;
-  border-left: var(--rrr-app-nav-border-width) solid var(--rrr-app-nav-border-color);
-  box-shadow: var(--rrr-app-nav-shadow);
-  background: var(--rrr-app-nav-background);
-  font-family: var(--rrr-app-link-font-family);
-  overflow: hidden;
-}
-
-.options-panel[open] {
-  display: flex;
-  flex-direction: column;
-  animation: options-panel-in 0.2s ease forwards;
-}
-
-.options-panel::backdrop {
-  background: rgb(0 0 0 / 40%);
-  backdrop-filter: blur(2px);
-}
-
-.options-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--rrr-spacing-m) var(--rrr-spacing-s) var(--rrr-spacing-m) var(--rrr-spacing-l);
-  border-bottom: var(--rrr-app-nav-border-width) solid var(--rrr-app-nav-border-color);
-  flex-shrink: 0;
-}
-
-.options-panel-title {
-  font-family: var(--rrr-app-link-font-family);
-  font-size: var(--rrr-font-size-m);
-  font-weight: 600;
-  color: var(--rrr-colors-grayscale-90);
-}
-
-.options-panel-body {
-  flex: 1;
-  padding: var(--rrr-spacing-s);
-  display: flex;
-  flex-direction: column;
-  gap: var(--rrr-spacing-2xs);
-  overflow-y: auto;
-}
-
-.options-menu-item {
-  width: 100%;
-  justify-content: flex-start;
-  gap: var(--rrr-spacing-s);
-}
-
-.options-menu-item>button[data-rrr-button-inner] {
-  justify-content: flex-start;
-  gap: var(--rrr-spacing-s);
-  width: 100%;
-}
-
-@keyframes options-panel-in {
-  from {
-    transform: translateX(100%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
 @media screen and (min-width: 48rem) {
   :host {
     --rrr-app-nav-padding: var(--rrr-spacing-l) var(--rrr-spacing-m);
@@ -760,15 +684,6 @@ main {
 
   .standard-app-header {
     grid-template-columns: auto minmax(0, 1fr) auto;
-  }
-
-  .app-header-spacer {
-    display: none;
-  }
-
-  /* contextual options live in the mobile top bar */
-  .options-trigger {
-    display: none;
   }
 
   #view>.route-view-padded {

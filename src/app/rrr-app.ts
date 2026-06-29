@@ -83,9 +83,7 @@ export class RrrApp extends HTMLElement {
   private isStandalone = window.matchMedia('(display-mode: standalone)').matches
   private stopWatchingSystemThemePreference: (() => void) | null = null
   private readonly styleguideEnabled = import.meta.env.DEV || localHosts.has(window.location.hostname)
-  private optionsPanelOpen = false
   private shellRendered = false
-  private settingsReturnHash = '#/workouts'
   private exerciseSearchQuery = ''
   private exerciseFiltersOpen = false
   private exerciseFilters: ExerciseFilters = { categories: [], equipment: [] }
@@ -172,22 +170,7 @@ export class RrrApp extends HTMLElement {
       return
     }
 
-    if (action === 'open-options') {
-      this.optionsPanelOpen = true
-      this.render()
-      return
-    }
-
-    if (action === 'close-options') {
-      this.shadowRoot?.querySelector<HTMLDialogElement>('.options-panel')?.close()
-      this.optionsPanelOpen = false
-      return
-    }
-
     if (action === 'open-settings') {
-      this.settingsReturnHash = window.location.hash || '#/workouts'
-      this.shadowRoot?.querySelector<HTMLDialogElement>('.options-panel')?.close()
-      this.optionsPanelOpen = false
       window.location.hash = '/settings'
       return
     }
@@ -404,7 +387,7 @@ export class RrrApp extends HTMLElement {
 
   private getBackHref(): string | null {
     const route = this.route
-    if (route.name === 'settings') return this.settingsReturnHash
+    if (route.name === 'settings') return '#/workouts'
     if (route.name === 'settings-appearance') return '#/settings'
     if (route.name === 'workout-edit') return '#/workouts'
     if (route.name === 'workout-log') return '#/workouts'
@@ -420,22 +403,6 @@ export class RrrApp extends HTMLElement {
     }
 
     return import.meta.env.DEV || this.installAvailable
-  }
-
-  private renderOptionsPanelContent(route: Route): string {
-    const items: string[] = []
-
-    // Settings is available from every screen
-    items.push(`
-      <rrr-button type="button" variant="ghost" class="options-menu-item" data-action="open-settings">
-        <rrr-icon name="settings"></rrr-icon>
-        <span>${t('app.options.settings')}</span>
-      </rrr-button>
-    `)
-
-    void route // future: add per-route contextual items here
-
-    return items.join('')
   }
 
   private renderNavLink(routeName: Route['name'], href: string, label: string, iconName: string): string {
@@ -737,11 +704,6 @@ export class RrrApp extends HTMLElement {
       }
     })
 
-    const optionsBody = this.shadowRoot?.querySelector<HTMLElement>('.options-panel-body')
-    if (optionsBody) {
-      optionsBody.innerHTML = this.renderOptionsPanelContent(route)
-    }
-
     this.syncHeaderHeight()
   }
 
@@ -799,24 +761,8 @@ export class RrrApp extends HTMLElement {
         <main>
           <div id="view"></div>
         </main>
-        <dialog class="options-panel" aria-label="${t('app.options.title')}">
-          <header class="options-panel-header">
-            <span class="options-panel-title">${t('app.options.title')}</span>
-            <rrr-button type="button" variant="ghost" data-action="close-options" aria-label="${t('app.options.close')}" title="${t('app.options.close')}"><rrr-icon name="dismiss"></rrr-icon></rrr-button>
-          </header>
-          <div class="options-panel-body">
-            ${this.renderOptionsPanelContent(route)}
-          </div>
-        </dialog>
       </div>
     `
-
-    const panel = this.shadowRoot.querySelector<HTMLDialogElement>('.options-panel')
-    if (panel) {
-      panel.addEventListener('close', () => {
-        this.optionsPanelOpen = false
-      })
-    }
 
     this.shellRendered = true
   }
@@ -902,6 +848,9 @@ export class RrrApp extends HTMLElement {
     const backContent = backHref
       ? `<rrr-button type="button" variant="ghost" tone="neutral" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}"><rrr-icon name="arrow-left"></rrr-icon></rrr-button>`
       : '<span class="app-header-spacer" aria-hidden="true"></span>'
+    const actionContent = route.name === 'workouts'
+      ? `<rrr-button type="button" variant="ghost" tone="neutral" class="header-settings" data-action="open-settings" aria-label="${t('app.settings.title')}" title="${t('app.settings.title')}"><rrr-icon name="settings"></rrr-icon></rrr-button>`
+      : '<span class="app-header-spacer" aria-hidden="true"></span>'
 
     return {
       className: 'app-header-primary-standard',
@@ -909,7 +858,7 @@ export class RrrApp extends HTMLElement {
         <div class="standard-app-header">
           ${backContent}
           <h1 class="app-header-title">${escapeHtml(this.getHeaderTitle(route))}</h1>
-          <rrr-button type="button" variant="ghost" tone="neutral" class="options-trigger" data-action="open-options" aria-label="${t('app.header.options')}" title="${t('app.header.options')}"><rrr-icon name="more-vertical"></rrr-icon></rrr-button>
+          ${actionContent}
         </div>
       `,
     }
@@ -1125,11 +1074,6 @@ export class RrrApp extends HTMLElement {
     }
 
     this.previousRoute = route
-
-    const panel = this.shadowRoot.querySelector<HTMLDialogElement>('.options-panel')
-    if (panel && this.optionsPanelOpen && !panel.open) {
-      panel.showModal()
-    }
   }
 }
 

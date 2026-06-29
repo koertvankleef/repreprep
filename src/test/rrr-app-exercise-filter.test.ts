@@ -90,6 +90,42 @@ describe('rrr-app exercise filters', () => {
     storageService.resetAllData()
   })
 
+  it('shows Settings only on Today and returns from Settings to Today', () => {
+    window.location.hash = '#/workouts'
+    const app = document.createElement('rrr-app')
+    document.body.append(app)
+
+    const settingsButton = app.shadowRoot?.querySelector<HTMLElement>(
+      'rrr-button[data-action="open-settings"]',
+    )
+
+    expect(settingsButton).toBeTruthy()
+    expect(settingsButton?.querySelector('rrr-icon')?.getAttribute('name')).toBe('settings')
+    expect(app.shadowRoot?.querySelector('.options-panel')).toBeNull()
+
+    settingsButton?.click()
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+
+    expect(window.location.hash).toBe('#/settings')
+    expect(app.shadowRoot?.querySelector('rrr-button[data-action="open-settings"]')).toBeNull()
+
+    const backButton = app.shadowRoot?.querySelector<HTMLElement>(
+      'rrr-button[data-action="navigate-back"]',
+    )
+    expect(backButton).toBeTruthy()
+
+    backButton?.click()
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+
+    expect(window.location.hash).toBe('#/workouts')
+    expect(app.shadowRoot?.querySelector('rrr-button[data-action="open-settings"]')).toBeTruthy()
+
+    window.location.hash = '#/routines'
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+
+    expect(app.shadowRoot?.querySelector('rrr-button[data-action="open-settings"]')).toBeNull()
+  })
+
   it('updates the mounted exercise list when filtering without a search term', async () => {
     const { storageService } = await import('../app/storage-instance.ts')
     const app = document.createElement('rrr-app')
