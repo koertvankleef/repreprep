@@ -72,7 +72,8 @@ button {
   transition: background var(--rrr-transition-default), border-color var(--rrr-transition-default), box-shadow var(--rrr-transition-default), transform var(--rrr-transition-default);
 }
 
-button:hover {
+button:hover,
+button:active {
   background: var(--rrr-colors-activity-indigo-70);
   border-color: var(--rrr-colors-activity-indigo-70);
   box-shadow: var(--rrr-depth-2-shadow);
@@ -130,7 +131,8 @@ a {
   color: var(--rrr-color-link);
 }
 
-a:hover {
+a:hover,
+a:active {
   color: var(--rrr-color-link-hover);
 }
 
@@ -241,7 +243,8 @@ a:hover {
   --_rrr-section-link-hover-color: var(--rrr-button-fg);
 }
 
-.rrr-section-link:hover {
+.rrr-section-link:hover,
+.rrr-section-link:active {
   background: var(--_rrr-section-link-hover-background);
   color: var(--_rrr-section-link-hover-color);
 }

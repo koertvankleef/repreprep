@@ -116,7 +116,8 @@ rrr-button[rounded][icon-only] > button[data-rrr-button-inner] {
   aspect-ratio: 1 / 1;
 }
 
-rrr-button > button[data-rrr-button-inner]:hover:enabled {
+rrr-button > button[data-rrr-button-inner]:hover:enabled,
+rrr-button > button[data-rrr-button-inner]:active:enabled {
   background: var(--_bg-hover);
   border-color: var(--_bg-hover);
   box-shadow: var(--rrr-button-hover-shadow);
@@ -134,7 +135,8 @@ rrr-button[variant='outline'] > button[data-rrr-button-inner] {
   box-shadow: none;
 }
 
-rrr-button[variant='outline'] > button[data-rrr-button-inner]:hover:enabled {
+rrr-button[variant='outline'] > button[data-rrr-button-inner]:hover:enabled,
+rrr-button[variant='outline'] > button[data-rrr-button-inner]:active:enabled {
   background: color-mix(in oklab, var(--_bg), transparent 82%);
   color: var(--_interactive-fg);
   border-color: var(--_interactive-fg);
@@ -147,7 +149,8 @@ rrr-button[variant='ghost'] > button[data-rrr-button-inner] {
   box-shadow: none;
 }
 
-rrr-button[variant='ghost'] > button[data-rrr-button-inner]:hover:enabled {
+rrr-button[variant='ghost'] > button[data-rrr-button-inner]:hover:enabled,
+rrr-button[variant='ghost'] > button[data-rrr-button-inner]:active:enabled {
   background: color-mix(in oklab, var(--_bg), transparent 85%);
   color: var(--_interactive-fg);
   border-color: transparent;

@@ -92,7 +92,8 @@ nav {
   text-overflow: ellipsis;
 }
 
-.nav-link:hover {
+.nav-link:hover,
+.nav-link:active {
   background: var(--rrr-app-link-hover-background);
   color: var(--rrr-app-link-hover-color);
 }

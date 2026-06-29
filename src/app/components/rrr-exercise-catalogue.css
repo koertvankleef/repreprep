@@ -127,8 +127,14 @@ rrr-exercise-catalogue {
     border-end-end-radius: var(--rrr-radius-l);
   }
 
-  .exercise-browser-item:hover {
+  .exercise-browser-item:hover,
+  .exercise-browser-item:active {
     border-color: color-mix(in oklab, var(--rrr-color-primary), transparent 40%);
+  }
+
+  .exercise-browser-item:active {
+    background: color-mix(in oklab, var(--rrr-exercise-browser-compact-bg), var(--rrr-color-primary) 8%);
+    transform: translateY(calc(-50% + var(--slot-distance)));
   }
 
   .exercise-browser-item:focus-visible {
@@ -140,6 +146,10 @@ rrr-exercise-catalogue {
     grid-template-columns: minmax(0, 1fr) auto;
     z-index: 10;
     background: var(--rrr-exercise-browser-focused-bg);
+  }
+
+  .exercise-browser-item[data-focused='true']:active {
+    background: color-mix(in oklab, var(--rrr-exercise-browser-focused-bg), var(--rrr-color-primary) 8%);
   }
 
   .exercise-browser-preview {

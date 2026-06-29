@@ -49,7 +49,9 @@
 }
 
 :host(:not([disabled])) .row--interactive:hover,
-:host(:not([disabled])) .row--control:hover {
+:host(:not([disabled])) .row--interactive:active,
+:host(:not([disabled])) .row--control:hover,
+:host(:not([disabled])) .row--control:active {
   background: var(--rrr-list-row-background-hover);
   color: var(--rrr-list-row-color);
   box-shadow: none;

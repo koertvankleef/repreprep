@@ -242,6 +242,7 @@ class RrrToastElement extends HTMLElement {
         }
 
         .toast-action:hover,
+        .toast-action:active,
         .toast-action:focus-visible {
           background: var(--toast-action-bg-hover);
           outline: none;
@@ -255,6 +256,7 @@ class RrrToastElement extends HTMLElement {
         }
 
         .toast-close:hover,
+        .toast-close:active,
         .toast-close:focus-visible {
           background: var(--toast-close-bg-hover);
           outline: none;

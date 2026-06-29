@@ -1,5 +1,6 @@
 :root {
   color-scheme: light dark;
+  -webkit-tap-highlight-color: transparent;
 
   --rrr-colors-grayscale-100: oklch(0.91% 0.0065 266.00);
   --rrr-colors-grayscale-90: oklch(27.05% 0.0160 264.00);
