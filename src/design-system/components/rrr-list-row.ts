@@ -157,6 +157,9 @@ export class RrrListRow extends HTMLElement {
   private renderContent(): string {
     const label = this.escapeHtml(this.getAttribute('label') ?? '')
     const description = this.getAttribute('description')
+    const body = this.querySelector('[slot="body"]')
+      ? '<span class="body"><slot name="body"></slot></span>'
+      : ''
     const leading = this.querySelector('[slot="leading"]')
       ? '<span class="leading"><slot name="leading"></slot></span>'
       : ''
@@ -164,6 +167,7 @@ export class RrrListRow extends HTMLElement {
       <span class="content">
         <span class="label">${label}</span>
         ${description ? `<span class="description">${this.escapeHtml(description)}</span>` : ''}
+        ${body}
       </span>
     `
 

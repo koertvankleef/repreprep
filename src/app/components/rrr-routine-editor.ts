@@ -1,10 +1,8 @@
 import { storageService } from '../storage-instance.ts'
 import { getActiveExercises } from '../../domain/exercise-service.ts'
 import { createRoutineExercise, getActiveRoutineVersion, getRoutine } from '../../domain/routine-service.ts'
-import { createWorkoutFromRoutine } from '../../domain/workout-service.ts'
 import { t } from '../../i18n/index.ts'
 import type { PlannedSet, RoutineExercise } from '../../domain/types.ts'
-import { todayIso } from '../../utils/date.ts'
 import styles from './rrr-routine-editor.css?inline'
 
 export class RrrRoutineEditor extends HTMLElement {
@@ -149,13 +147,8 @@ export class RrrRoutineEditor extends HTMLElement {
         return
       }
 
-      if (action === 'start-workout') {
-        this.startWorkout()
-        return
-      }
-
       if (action === 'back') {
-        window.location.hash = '#/routines'
+        window.location.hash = this.getReturnHash()
       }
     })
   }
@@ -306,28 +299,13 @@ export class RrrRoutineEditor extends HTMLElement {
 
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
     this.routineIdValue = saved.id
-    window.location.hash = '#/routines'
+    window.location.hash = `#/routines/${encodeURIComponent(saved.id)}`
   }
 
-  private startWorkout(): void {
-    if (!this.routineIdValue) {
-      this.setStatus(t('routineEditor.status.saveFirst'), 'error')
-      this.render()
-      return
-    }
-
-    const data = storageService.getData()
-    const workout = createWorkoutFromRoutine(data, this.routineIdValue, todayIso())
-
-    if (!workout) {
-      this.setStatus(t('routineEditor.status.startError'), 'error')
-      this.render()
-      return
-    }
-
-    storageService.saveWorkout(workout)
-    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    window.location.hash = `#/workouts/${workout.id}/log`
+  private getReturnHash(): string {
+    return this.routineIdValue && getRoutine(storageService.getData(), this.routineIdValue)
+      ? `#/routines/${encodeURIComponent(this.routineIdValue)}`
+      : '#/routines'
   }
 
   private render(): void {
@@ -451,7 +429,6 @@ export class RrrRoutineEditor extends HTMLElement {
           </div>
           <div class="actions">
             <rrr-button type="button" data-action="save">${t('routineEditor.action.save')}</rrr-button>
-            ${isEditing ? `<rrr-button type="button" data-action="start-workout">${t('routineEditor.action.startWorkout')}</rrr-button>` : ''}
             <rrr-button type="button" variant="outline" data-action="back">${t('action.cancel')}</rrr-button>
           </div>
         </div>

@@ -1,21 +1,14 @@
 rrr-routine-list {
-  --rrr-routine-list-gap: var(--rrr-spacing-l);
-  --rrr-routine-list-title-weight: var(--rrr-font-weight-bold);
-  --rrr-routine-list-title-size: var(--rrr-font-size-l);
-  --rrr-routine-list-meta-size: var(--rrr-font-size-s);
+  --rrr-routine-list-body-gap: var(--rrr-spacing-xs) var(--rrr-spacing-m);
+  --rrr-routine-list-body-color: var(--rrr-text-muted);
+  --rrr-routine-list-body-size: var(--rrr-font-size-s);
 }
 
-.list {
-  display: grid;
-  gap: var(--rrr-routine-list-gap);
-}
-
-.card-title {
-  font-weight: var(--rrr-routine-list-title-weight);
-  font-size: var(--rrr-routine-list-title-size);
-  color: var(--rrr-color-heading);
-}
-
-.card-meta {
-  font-size: var(--rrr-routine-list-meta-size);
+.routine-row-body {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: var(--rrr-routine-list-body-gap);
+  color: var(--rrr-routine-list-body-color);
+  font-size: var(--rrr-routine-list-body-size);
 }

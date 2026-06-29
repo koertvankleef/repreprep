@@ -9,7 +9,8 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] Add a user-facing toggle for auto-advance / auto-continue in workout flow, separate from the actual auto-advance behavior design.
 - [ ] Refine timed-exercise IxD: current grace/Edit behavior can restart the timed set, which feels wrong and needs a cleaner interaction model.
 - [ ] Bottom main navigation on mobile; left side of screen navigation on desktop; minimised variant on tablet.
-- [ ] Routine detail page after creation/editing: routine name as title, small edit affordance, exercise list, add-exercise action, and start button.
+- [x] Add a read-only Routine Details page after creation/editing with the routine name as title, a header Edit affordance, exercise list, and Start Workout action.
+- [ ] Define a trustworthy routine-duration estimation policy before adding estimated duration to routine summaries.
 - [ ] Prefill routine names automatically; do not require the user to invent one from scratch.
 - [ ] [low priority] Use NATO/geographic-style routine naming and consider whether the natural 26-routine cap is acceptable.
 - [ ] Settings/options as right-hand side sidepanel that pops over the current page, with instant toggles and buttons that navigate to deeper sections when needed.

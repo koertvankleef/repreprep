@@ -107,6 +107,19 @@ describe('list structure primitives', () => {
     expect(row?.checked).toBe(true)
   })
 
+  test('renders arbitrary non-interactive row body content below the description', () => {
+    document.body.innerHTML = `
+      <rrr-list-row label="Full Body" description="Push-ups, Plank" href="#/routines/1">
+        <span slot="body" data-routine-meta>Chest · Last started yesterday</span>
+      </rrr-list-row>
+    `
+
+    const row = document.querySelector<RrrListRow>('rrr-list-row')
+    const bodySlot = row?.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="body"]')
+
+    expect(bodySlot?.assignedElements()[0]?.hasAttribute('data-routine-meta')).toBe(true)
+  })
+
   test('hides an empty section header and reveals slotted section copy', async () => {
     const section = document.createElement('rrr-section')
     document.body.appendChild(section)

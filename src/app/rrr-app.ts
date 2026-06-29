@@ -5,6 +5,8 @@ import type { Equipment, ExerciseCategory } from '../domain/types.ts'
 import type { ExerciseFilters } from '../domain/exercise-service.ts'
 import {
   appRoutes,
+  getAppRouteBackHref,
+  getAppRouteEndLink,
   getAppRouteMeta,
   toAppRoute,
   type AppNavId,
@@ -372,6 +374,10 @@ export class RrrApp extends HTMLElement {
       return a.workoutId === b.workoutId
     }
 
+    if (a.name === 'routine-detail' && b.name === 'routine-detail') {
+      return a.routineId === b.routineId
+    }
+
     if (a.name === 'routine-edit' && b.name === 'routine-edit') {
       return a.routineId === b.routineId
     }
@@ -525,6 +531,12 @@ export class RrrApp extends HTMLElement {
       return document.createElement('rrr-routine-editor')
     }
 
+    if (route.name === 'routine-detail') {
+      const detail = document.createElement('rrr-routine-detail') as HTMLElement & { routineId: string | null }
+      detail.routineId = route.routineId
+      return detail
+    }
+
     if (route.name === 'routine-edit') {
       const editor = document.createElement('rrr-routine-editor') as HTMLElement & { routineId: string | null }
       editor.routineId = route.routineId
@@ -653,13 +665,17 @@ export class RrrApp extends HTMLElement {
   }
 
   private getHeaderTitle(route: AppRoute): string {
-    if (route.name === 'routine-edit') {
+    if (route.name === 'routine-detail' || route.name === 'routine-edit') {
       const routineName = storageService
         .getData()
         .routines.find((routine) => routine.id === route.routineId)?.name
 
-      if (routineName) {
+      if (routineName && route.name === 'routine-edit') {
         return t('app.header.routineEditNamed', { name: routineName })
+      }
+
+      if (routineName) {
+        return routineName
       }
 
       return t(getAppRouteMeta(route).titleKey)
@@ -698,7 +714,8 @@ export class RrrApp extends HTMLElement {
   }
 
   private createStandardHeader(route: AppRoute): RouteHeader {
-    const { backHref, endLink } = getAppRouteMeta(route)
+    const backHref = getAppRouteBackHref(route)
+    const endLink = getAppRouteEndLink(route)
     const backContent = backHref
       ? this.renderHeaderLink({
           href: backHref,

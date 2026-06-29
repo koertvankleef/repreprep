@@ -10,6 +10,7 @@ export type AppRouteId =
   | 'import-export'
   | 'routines'
   | 'routine-new'
+  | 'routine-detail'
   | 'routine-edit'
   | 'styleguide'
   | 'settings'
@@ -34,6 +35,7 @@ export type AppRoute =
   | { name: 'import-export' }
   | { name: 'routines' }
   | { name: 'routine-new' }
+  | { name: 'routine-detail'; routineId: string }
   | { name: 'routine-edit'; routineId: string }
   | { name: 'styleguide' }
   | { name: 'settings' }
@@ -45,6 +47,8 @@ export type AppHeaderLink = {
   labelKey: string
 }
 
+type AppRouteValue<T> = T | ((route: AppRoute) => T)
+
 export type AppRouteMeta = {
   nav: AppNavId
   depth: 0 | 1 | 2
@@ -52,8 +56,8 @@ export type AppRouteMeta = {
   surface: 'full' | 'padded'
   header: 'standard' | 'exercise-catalogue'
   titleKey: string
-  backHref?: string
-  endLink?: AppHeaderLink
+  backHref?: AppRouteValue<string>
+  endLink?: AppRouteValue<AppHeaderLink>
 }
 
 export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
@@ -184,7 +188,7 @@ export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
     },
   },
   {
-    id: 'routine-edit',
+    id: 'routine-detail',
     pattern: '/routines/:routineId',
     meta: {
       nav: 'routines',
@@ -192,8 +196,30 @@ export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
       main: false,
       surface: 'padded',
       header: 'standard',
-      titleKey: 'app.header.routineEdit',
+      titleKey: 'routineDetail.notFound.title',
       backHref: '#/routines',
+      endLink: (route) => ({
+        href: route.name === 'routine-detail'
+          ? `#/routines/${encodeURIComponent(route.routineId)}/edit`
+          : '#/routines',
+        icon: 'edit',
+        labelKey: 'routineDetail.action.edit',
+      }),
+    },
+  },
+  {
+    id: 'routine-edit',
+    pattern: '/routines/:routineId/edit',
+    meta: {
+      nav: 'routines',
+      depth: 2,
+      main: false,
+      surface: 'padded',
+      header: 'standard',
+      titleKey: 'app.header.routineEdit',
+      backHref: (route) => route.name === 'routine-edit'
+        ? `#/routines/${encodeURIComponent(route.routineId)}`
+        : '#/routines',
     },
   },
   {
@@ -239,6 +265,16 @@ export function getAppRouteMeta(route: AppRoute | AppRouteId): AppRouteMeta {
   return meta
 }
 
+export function getAppRouteBackHref(route: AppRoute): string | undefined {
+  const backHref = getAppRouteMeta(route).backHref
+  return typeof backHref === 'function' ? backHref(route) : backHref
+}
+
+export function getAppRouteEndLink(route: AppRoute): AppHeaderLink | undefined {
+  const endLink = getAppRouteMeta(route).endLink
+  return typeof endLink === 'function' ? endLink(route) : endLink
+}
+
 export function toAppRoute(
   match: HashRouteMatch<AppRouteMeta>,
   styleguideEnabled: boolean,
@@ -257,7 +293,7 @@ export function toAppRoute(
     return { name: routeId, workoutId: match.params.workoutId ?? '' }
   }
 
-  if (routeId === 'routine-edit') {
+  if (routeId === 'routine-detail' || routeId === 'routine-edit') {
     return { name: routeId, routineId: match.params.routineId ?? '' }
   }
 

@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
-import { appRoutes, getAppRouteMeta } from '../app/app-routes.ts'
+import {
+  appRoutes,
+  getAppRouteBackHref,
+  getAppRouteEndLink,
+  getAppRouteMeta,
+} from '../app/app-routes.ts'
 
 type Meta = { title: string }
 
@@ -92,4 +97,18 @@ test('app route metadata defines route-specific header links', () => {
     icon: 'add',
     labelKey: 'routineList.new',
   })
+  expect(getAppRouteEndLink({ name: 'routine-detail', routineId: 'routine 1' })).toEqual({
+    href: '#/routines/routine%201/edit',
+    icon: 'edit',
+    labelKey: 'routineDetail.action.edit',
+  })
+  expect(getAppRouteBackHref({ name: 'routine-edit', routineId: 'routine 1' }))
+    .toBe('#/routines/routine%201')
+})
+
+test('app routes separate routine details from routine editing', () => {
+  expect(appRoutes.find((route) => route.id === 'routine-detail')?.pattern)
+    .toBe('/routines/:routineId')
+  expect(appRoutes.find((route) => route.id === 'routine-edit')?.pattern)
+    .toBe('/routines/:routineId/edit')
 })

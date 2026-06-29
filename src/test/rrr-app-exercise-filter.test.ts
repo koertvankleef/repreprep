@@ -137,6 +137,26 @@ describe('rrr-app exercise filters', () => {
     app.remove()
   })
 
+  it('renders routine details with an Edit header link', async () => {
+    const { storageService } = await import('../app/storage-instance.ts')
+    const routineId = storageService.getData().routines[0]?.id ?? ''
+    window.location.hash = `#/routines/${routineId}`
+    const app = document.createElement('rrr-app')
+    document.body.append(app)
+
+    expect(app.shadowRoot?.querySelector('rrr-routine-detail')).toBeTruthy()
+    expect(
+      app.shadowRoot?.querySelector<HTMLAnchorElement>(
+        `a.header-action[href="#/routines/${routineId}/edit"]`,
+      ),
+    ).toBeTruthy()
+    expect(
+      app.shadowRoot
+        ?.querySelector('rrr-routine-detail')
+        ?.querySelector('rrr-button[data-action="start-workout"]'),
+    ).toBeTruthy()
+  })
+
   it('updates the mounted exercise list when filtering without a search term', async () => {
     const { storageService } = await import('../app/storage-instance.ts')
     const app = document.createElement('rrr-app')
