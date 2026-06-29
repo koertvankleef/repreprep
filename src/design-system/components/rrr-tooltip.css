@@ -4,10 +4,9 @@
 }
 
 /*
-  Global popup styles.
-  This sheet is adopted into document.adoptedStyleSheets so the rule below applies
-  to the singleton #rrr-tooltip-popup element that lives directly in <body>.
-  CSS variables resolve from :root, so design tokens work as normal.
+  Portalled popup styles.
+  This sheet is adopted into the trigger's document or shadow root so the singleton
+  popup can inherit that root's typography and still use the shared design tokens.
 */
 #rrr-tooltip-popup {
   position: fixed;

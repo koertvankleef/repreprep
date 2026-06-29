@@ -25,21 +25,33 @@ export class RrrTooltip extends HTMLElement {
   private static showTimer: ReturnType<typeof setTimeout> | null = null
   private static hideTimer: ReturnType<typeof setTimeout> | null = null
   private static popup: HTMLDivElement | null = null
-  private static stylesInjected = false
+  private static repositionFrame: number | null = null
+  private static styledRoots = new WeakSet<Document | ShadowRoot>()
 
-  private static getPopup(): HTMLDivElement {
+  private static getPopup(trigger: Element): HTMLDivElement {
+    const triggerRoot = trigger.getRootNode()
+    const popupRoot = triggerRoot instanceof Document || triggerRoot instanceof ShadowRoot
+      ? triggerRoot
+      : document
+
+    if (!RrrTooltip.styledRoots.has(popupRoot)) {
+      popupRoot.adoptedStyleSheets = [...popupRoot.adoptedStyleSheets, tooltipSheet]
+      RrrTooltip.styledRoots.add(popupRoot)
+    }
+
     if (!RrrTooltip.popup) {
-      if (!RrrTooltip.stylesInjected) {
-        document.adoptedStyleSheets = [...document.adoptedStyleSheets, tooltipSheet]
-        RrrTooltip.stylesInjected = true
-      }
       const el = document.createElement('div')
       el.id = POPUP_ID
       el.setAttribute('role', 'tooltip')
       el.setAttribute('aria-hidden', 'true')
-      document.body.appendChild(el)
       RrrTooltip.popup = el
     }
+
+    const popupContainer = popupRoot instanceof Document ? popupRoot.body : popupRoot
+    if (RrrTooltip.popup.parentNode !== popupContainer) {
+      popupContainer.appendChild(RrrTooltip.popup)
+    }
+
     return RrrTooltip.popup
   }
 
@@ -54,9 +66,13 @@ export class RrrTooltip extends HTMLElement {
     }
   }
 
-  /** Hide the active tooltip immediately. Called by viewport-change listeners and Escape. */
+  /** Hide the active tooltip immediately. Called on scrolling and Escape. */
   static hide(): void {
     RrrTooltip.clearTimers()
+    if (RrrTooltip.repositionFrame !== null) {
+      cancelAnimationFrame(RrrTooltip.repositionFrame)
+      RrrTooltip.repositionFrame = null
+    }
     const popup = RrrTooltip.popup
     if (popup) {
       popup.setAttribute('aria-hidden', 'true')
@@ -69,6 +85,26 @@ export class RrrTooltip extends HTMLElement {
     document.removeEventListener('keydown', RrrTooltip.onDocKeyDown)
   }
 
+  static scheduleReposition(): void {
+    if (!RrrTooltip.activeOwner || RrrTooltip.repositionFrame !== null) {
+      return
+    }
+
+    RrrTooltip.repositionFrame = requestAnimationFrame(() => {
+      RrrTooltip.repositionFrame = null
+      const owner = RrrTooltip.activeOwner
+      const trigger = owner?.currentTrigger
+      const text = owner?.storedTitle
+
+      if (!trigger?.isConnected || !text) {
+        RrrTooltip.hide()
+        return
+      }
+
+      RrrTooltip.positionAndShow(trigger, text)
+    })
+  }
+
   private static onDocKeyDown(e: KeyboardEvent): void {
     if (e.key === 'Escape') {
       RrrTooltip.hide()
@@ -76,7 +112,7 @@ export class RrrTooltip extends HTMLElement {
   }
 
   private static positionAndShow(trigger: Element, text: string): void {
-    const el = RrrTooltip.getPopup()
+    const el = RrrTooltip.getPopup(trigger)
     el.textContent = text
 
     // Render at origin to measure natural dimensions
@@ -88,23 +124,25 @@ export class RrrTooltip extends HTMLElement {
     const popupW = el.offsetWidth
     const popupH = el.offsetHeight
     const triggerRect = trigger.getBoundingClientRect()
-    const vw = window.innerWidth
-    const vh = window.innerHeight
+    const viewportLeft = window.visualViewport?.offsetLeft ?? 0
+    const viewportTop = window.visualViewport?.offsetTop ?? 0
+    const viewportRight = viewportLeft + (window.visualViewport?.width ?? window.innerWidth)
+    const viewportBottom = viewportTop + (window.visualViewport?.height ?? window.innerHeight)
 
     // Prefer above; flip to below when too close to the top edge
     let top = triggerRect.top - popupH - OFFSET
     let placement: 'above' | 'below' = 'above'
-    if (top < MARGIN) {
+    if (top < viewportTop + MARGIN) {
       top = triggerRect.bottom + OFFSET
       placement = 'below'
     }
 
     // Clamp vertically
-    top = Math.max(MARGIN, Math.min(top, vh - popupH - MARGIN))
+    top = Math.max(viewportTop + MARGIN, Math.min(top, viewportBottom - popupH - MARGIN))
 
     // Center horizontally over trigger, clamp to viewport
     let left = triggerRect.left + triggerRect.width / 2 - popupW / 2
-    left = Math.max(MARGIN, Math.min(left, vw - popupW - MARGIN))
+    left = Math.max(viewportLeft + MARGIN, Math.min(left, viewportRight - popupW - MARGIN))
 
     el.style.top = `${Math.round(top)}px`
     el.style.left = `${Math.round(left)}px`
@@ -336,14 +374,14 @@ export class RrrTooltip extends HTMLElement {
   }
 }
 
-// ─── Viewport-change dismiss ──────────────────────────────────────────────────
-// Registered once at module load time. Hides any open tooltip immediately when
-// the viewport resizes, scrolls, or the orientation changes — cached positions
-// are invalid after any of these.
+// ─── Viewport-change handling ─────────────────────────────────────────────────
+// Registered once at module load time. Viewport changes reposition an open
+// tooltip after layout settles; scrolling dismisses it immediately.
 
-window.addEventListener('resize', RrrTooltip.hide, { passive: true })
+window.addEventListener('resize', RrrTooltip.scheduleReposition, { passive: true })
 window.addEventListener('scroll', RrrTooltip.hide, { passive: true, capture: true })
-window.addEventListener('orientationchange', RrrTooltip.hide)
+window.addEventListener('orientationchange', RrrTooltip.scheduleReposition)
+window.visualViewport?.addEventListener('resize', RrrTooltip.scheduleReposition, { passive: true })
 
 // ─── Registration ─────────────────────────────────────────────────────────────
 
