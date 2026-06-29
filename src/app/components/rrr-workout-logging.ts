@@ -66,11 +66,11 @@ export class RrrWorkoutLogging extends HTMLElement {
     this.exerciseEntryIds = []
     this.innerHTML = `
       <section class="page">
-        <rrr-card size="lg">
+        <div class="rrr-card">
           <h2>Workout logging unavailable</h2>
           <p>${message}</p>
           <rrr-button type="button" data-action="back">Back to workouts</rrr-button>
-        </rrr-card>
+        </div>
       </section>
     `
 

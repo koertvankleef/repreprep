@@ -339,10 +339,10 @@ export class RrrRoutineEditor extends HTMLElement {
       this.innerHTML = `
         <style>${styles}</style>
         <section class="page">
-          <rrr-card size="lg">
+          <div class="rrr-card">
             <h2>${t('routineEditor.notFound.title')}</h2>
             <rrr-button type="button" variant="outline" data-action="back">${t('routineEditor.notFound.back')}</rrr-button>
-          </rrr-card>
+          </div>
         </section>
       `
       return
@@ -430,7 +430,7 @@ export class RrrRoutineEditor extends HTMLElement {
     this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <rrr-card size="lg">
+        <div class="rrr-card">
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('routineEditor.status.default')}</p>
           <div class="row">
             <rrr-input label="${t('field.name')}" name="routine-name" placeholder="${t('routineEditor.field.name.placeholder')}"></rrr-input>
@@ -454,7 +454,7 @@ export class RrrRoutineEditor extends HTMLElement {
             ${isEditing ? `<rrr-button type="button" data-action="start-workout">${t('routineEditor.action.startWorkout')}</rrr-button>` : ''}
             <rrr-button type="button" variant="outline" data-action="back">${t('action.cancel')}</rrr-button>
           </div>
-        </rrr-card>
+        </div>
       </section>
     `
 

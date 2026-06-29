@@ -123,7 +123,7 @@ export class RrrSettings extends HTMLElement {
       <div class="page">
         <rrr-section>
           <span slot="heading">${t('app.settings.navigation')}</span>
-          <rrr-list-card>
+          <div class="rrr-list-card">
             <rrr-list-row
               href="#/import-export"
               label="${t('app.nav.importExport')}"
@@ -140,12 +140,12 @@ export class RrrSettings extends HTMLElement {
                 <rrr-icon slot="leading" name="braces"></rrr-icon>
               </rrr-list-row>
             ` : ''}
-          </rrr-list-card>
+          </div>
         </rrr-section>
 
         <rrr-section>
           <span slot="heading">${t('app.settings.display')}</span>
-          <rrr-list-card>
+          <div class="rrr-list-card">
             <rrr-list-row
               href="#/settings/appearance"
               label="${t('app.settings.appearance')}"
@@ -155,12 +155,12 @@ export class RrrSettings extends HTMLElement {
             >
               <rrr-icon slot="leading" name="color"></rrr-icon>
             </rrr-list-row>
-          </rrr-list-card>
+          </div>
         </rrr-section>
 
         <rrr-section>
           <span slot="heading">${t('app.settings.data')}</span>
-          <rrr-list-card class="danger-card">
+          <div class="rrr-list-card danger-card">
             <div class="danger-card-content">
               <h3 class="danger-title">${t('app.settings.resetData.title')}</h3>
               <p class="danger-copy">${t('app.settings.resetData.description')}</p>
@@ -192,7 +192,7 @@ export class RrrSettings extends HTMLElement {
                 </div>
               </div>
             ` : ''}
-          </rrr-list-card>
+          </div>
         </rrr-section>
       </div>
     `

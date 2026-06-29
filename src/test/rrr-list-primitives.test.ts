@@ -20,10 +20,10 @@ beforeEach(() => {
 describe('list structure primitives', () => {
   test('renders navigation and action rows with honest interactive elements', () => {
     document.body.innerHTML = `
-      <rrr-list-card>
+      <div class="rrr-list-card">
         <rrr-list-row href="#/settings" label="Settings" accessory="chevron"></rrr-list-row>
         <rrr-list-row activation="button" label="Export data" disabled></rrr-list-row>
-      </rrr-list-card>
+      </div>
     `
 
     const rows = Array.from(document.querySelectorAll<RrrListRow>('rrr-list-row'))
@@ -46,6 +46,8 @@ describe('list structure primitives', () => {
     `
     await Promise.resolve()
 
+    expect(document.querySelector('rrr-list-card')?.shadowRoot).toBeNull()
+
     const rows = Array.from(document.querySelectorAll<RrrListRow>('rrr-list-row'))
     const firstInput = rows[0]?.shadowRoot?.querySelector<HTMLInputElement>('input')
     const secondInput = rows[1]?.shadowRoot?.querySelector<HTMLInputElement>('input')
@@ -67,6 +69,29 @@ describe('list structure primitives', () => {
 
     expect(rows[1]?.checked).toBe(false)
     expect(rows[2]?.checked).toBe(true)
+  })
+
+  test('updates radio tab stops when rows are added dynamically', async () => {
+    const card = document.createElement('rrr-list-card')
+    const row = document.createElement('rrr-list-row') as RrrListRow
+    row.setAttribute('control', 'radio')
+    row.setAttribute('name', 'theme')
+    row.setAttribute('value', 'auto')
+    row.setAttribute('label', 'Automatic')
+    card.appendChild(row)
+    document.body.appendChild(card)
+    await Promise.resolve()
+
+    const secondRow = document.createElement('rrr-list-row') as RrrListRow
+    secondRow.setAttribute('control', 'radio')
+    secondRow.setAttribute('name', 'theme')
+    secondRow.setAttribute('value', 'dark')
+    secondRow.setAttribute('label', 'Dark')
+    card.appendChild(secondRow)
+    await Promise.resolve()
+
+    expect(row.shadowRoot?.querySelector<HTMLInputElement>('input')?.tabIndex).toBe(0)
+    expect(secondRow.shadowRoot?.querySelector<HTMLInputElement>('input')?.tabIndex).toBe(-1)
   })
 
   test('renders switch semantics and reflects its checked state', () => {

@@ -108,7 +108,7 @@ export class RrrExerciseHistory extends HTMLElement {
     this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <rrr-card size="lg">
+        <div class="rrr-card">
           ${
             exercises.length === 0
               ? `<p>${t('history.empty.addExercise')}</p>`
@@ -125,7 +125,7 @@ export class RrrExerciseHistory extends HTMLElement {
                 <div class="history-list" aria-live="polite">${this.renderSets()}</div>
               `
           }
-        </rrr-card>
+        </div>
       </section>
     `
 

@@ -459,7 +459,7 @@ export class RrrStyleguide extends HTMLElement {
             <span slot="heading">${t('styleguide.section.listRows')}</span>
             <span slot="description">${t('styleguide.listRows.description')}</span>
             <div class="list-showcase">
-              <rrr-list-card>
+              <div class="rrr-list-card">
                 <rrr-list-row
                   href="#/settings"
                   label="${t('styleguide.listRows.navigation')}"
@@ -490,7 +490,7 @@ export class RrrStyleguide extends HTMLElement {
                   accessory="badge"
                   value-text="${t('styleguide.listRows.badge')}"
                 ></rrr-list-row>
-              </rrr-list-card>
+              </div>
 
               <rrr-list-card role="radiogroup" aria-label="${t('styleguide.listRows.radioGroup')}">
                 <rrr-list-row control="radio" name="styleguide-theme" value="auto" label="${t('app.theme.auto')}">
@@ -504,7 +504,7 @@ export class RrrStyleguide extends HTMLElement {
                 </rrr-list-row>
               </rrr-list-card>
 
-              <rrr-list-card>
+              <div class="rrr-list-card">
                 <rrr-list-row
                   control="checkbox"
                   name="styleguide-checkbox-row"
@@ -527,9 +527,9 @@ export class RrrStyleguide extends HTMLElement {
                   label="${t('styleguide.listRows.destructive')}"
                   destructive
                 ></rrr-list-row>
-              </rrr-list-card>
+              </div>
 
-              <rrr-list-card>
+              <div class="rrr-list-card">
                 <rrr-list-row
                   label="${t('styleguide.listRows.custom')}"
                   description="${t('styleguide.listRows.customDescription')}"
@@ -537,7 +537,7 @@ export class RrrStyleguide extends HTMLElement {
                 >
                   <rrr-badge slot="trailing" tone="success">${t('styleguide.listRows.ready')}</rrr-badge>
                 </rrr-list-row>
-              </rrr-list-card>
+              </div>
             </div>
           </rrr-section>
 

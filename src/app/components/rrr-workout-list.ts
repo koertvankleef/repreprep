@@ -115,7 +115,7 @@ export class RrrWorkoutList extends HTMLElement {
                       .join(', ')
 
                     return `
-                      <rrr-card size="md">
+                      <article class="rrr-card">
                         <h3>${workoutDate}</h3>
                         <p>${summary || t('workoutList.exercise.none')}</p>
                         <p>${workout.notes || t('workoutList.notes.none')}</p>
@@ -123,7 +123,7 @@ export class RrrWorkoutList extends HTMLElement {
                           <rrr-button type="button" variant="ghost" data-action="edit" data-id="${workout.id}" aria-label="${t('workoutList.action.editAria', { date: workoutDate })}"><rrr-icon name="edit"></rrr-icon></rrr-button>
                           <rrr-button type="button" variant="ghost" tone="danger" data-action="delete" data-id="${workout.id}" aria-label="${t('workoutList.action.deleteAria', { date: workoutDate })}"><rrr-icon name="delete"></rrr-icon></rrr-button>
                         </div>
-                      </rrr-card>
+                      </article>
                     `
                   })
                   .join('')

@@ -201,20 +201,29 @@ a:active {
   text-transform: uppercase;
 }
 
-.rrr-section-card {
-  display: grid;
-  gap: var(--rrr-spacing-s);
+:where(.rrr-card, .rrr-list-card, rrr-list-card, .rrr-section-card) {
+  display: block;
+  min-inline-size: 0;
   margin: 0;
-  padding: var(--rrr-spacing-m);
-  background: var(--rrr-surface-raised);
-  border: var(--rrr-border-width) solid var(--rrr-border-subtle);
-  border-radius: var(--rrr-radius-l);
+  background: var(--rrr-card-background, var(--rrr-surface-raised));
+  border: var(--rrr-border-width) solid var(--rrr-card-border-color, var(--rrr-border-subtle));
+  border-radius: var(--rrr-card-border-radius, var(--rrr-radius-l));
   overflow: hidden;
 }
 
-.rrr-section-card--flush {
+:where(.rrr-card, .rrr-section-card) {
+  display: grid;
+  gap: var(--rrr-card-gap, var(--rrr-spacing-s));
+  padding: var(--rrr-card-padding, var(--rrr-spacing-m));
+}
+
+:where(.rrr-list-card, rrr-list-card, .rrr-section-card--flush) {
   gap: 0;
   padding: 0;
+}
+
+:where(.rrr-list-card, rrr-list-card) > rrr-list-row:not(:last-child) {
+  border-block-end: var(--rrr-border-width) solid var(--rrr-card-divider-color, var(--rrr-border-subtle));
 }
 
 .rrr-section-link,

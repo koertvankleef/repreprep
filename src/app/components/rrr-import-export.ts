@@ -58,7 +58,7 @@ export class RrrImportExport extends HTMLElement {
     this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <rrr-card size="lg">
+        <div class="rrr-card">
           <p id="storage-description">${t('importExport.storageDescription')} <code>${this.storageKey}</code>.</p>
           <div>
             <rrr-button type="button" data-action="export">${t('importExport.action.export')}</rrr-button>
@@ -76,7 +76,7 @@ export class RrrImportExport extends HTMLElement {
               ? `<p class="status-message status-${this.statusType}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage}</p>`
               : `<p class="status-message" role="status" aria-live="polite" aria-atomic="true">${t('importExport.status.default')}</p>`
           }
-        </rrr-card>
+        </div>
       </section>
     `
 

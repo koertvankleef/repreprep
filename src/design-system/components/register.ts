@@ -1,5 +1,4 @@
 import { registerRrrBadge } from './rrr-badge.ts'
-import { registerRrrCard } from './rrr-card.ts'
 import { registerRrrButton } from './rrr-button.ts'
 import { registerRrrCheckbox } from './rrr-checkbox.ts'
 import { registerRrrDialogHost } from './rrr-dialog-host.ts'
@@ -20,7 +19,6 @@ export function registerDesignSystemComponents(): void {
   registerRrrSelect()
   registerRrrCheckbox()
   registerRrrIcon()
-  registerRrrCard()
   registerRrrSection()
   registerRrrListCard()
   registerRrrListRow()

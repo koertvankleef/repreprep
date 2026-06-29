@@ -175,10 +175,10 @@ export class RrrWorkoutEditor extends HTMLElement {
       this.innerHTML = `
         <style>${styles}</style>
         <section class="page">
-          <rrr-card size="lg">
+          <div class="rrr-card">
             <h2>${t('workout.notFound.title')}</h2>
             <rrr-button type="button" variant="outline" data-action="back">${t('workout.notFound.back')}</rrr-button>
-          </rrr-card>
+          </div>
         </section>
       `
 
@@ -195,7 +195,7 @@ export class RrrWorkoutEditor extends HTMLElement {
     this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <rrr-card size="lg">
+        <div class="rrr-card">
           <div>
             <p>${subtitle}</p>
           </div>
@@ -218,7 +218,7 @@ export class RrrWorkoutEditor extends HTMLElement {
             <rrr-button type="button" data-action="save">${t('workout.action.save')}</rrr-button>
             <rrr-button type="button" variant="outline" data-action="cancel">${t('action.cancel')}</rrr-button>
           </div>
-        </rrr-card>
+        </div>
       </section>
     `
 

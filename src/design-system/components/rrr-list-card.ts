@@ -1,10 +1,13 @@
 import { defineCustomElementOnce } from './shared.ts'
 import type { RrrListRow } from './rrr-list-row.ts'
-import styles from './rrr-list-card.css?inline'
 
 const radioKeys = new Set(['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'])
 
 export class RrrListCard extends HTMLElement {
+  private readonly rowObserver = new MutationObserver(() => {
+    this.syncAllRadioTabStops()
+  })
+
   private readonly handleChange = (event: Event): void => {
     const row = this.findRadioRow(event)
     if (!row?.checked) {
@@ -50,33 +53,17 @@ export class RrrListCard extends HTMLElement {
     rows[nextIndex]?.selectControl()
   }
 
-  private readonly handleSlotChange = (): void => {
-    this.syncAllRadioTabStops()
-  }
-
-  constructor() {
-    super()
-
-    const shadowRoot = this.attachShadow({ mode: 'open' })
-    shadowRoot.innerHTML = `
-      <style>${styles}</style>
-      <div class="card">
-        <slot></slot>
-      </div>
-    `
-  }
-
   connectedCallback(): void {
     this.addEventListener('change', this.handleChange)
     this.addEventListener('keydown', this.handleKeyDown)
-    this.shadowRoot?.addEventListener('slotchange', this.handleSlotChange)
+    this.rowObserver.observe(this, { childList: true })
     queueMicrotask(() => this.syncAllRadioTabStops())
   }
 
   disconnectedCallback(): void {
     this.removeEventListener('change', this.handleChange)
     this.removeEventListener('keydown', this.handleKeyDown)
-    this.shadowRoot?.removeEventListener('slotchange', this.handleSlotChange)
+    this.rowObserver.disconnect()
   }
 
   private findRadioRow(event: Event): RrrListRow | undefined {

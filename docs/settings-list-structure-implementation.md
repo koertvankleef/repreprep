@@ -2,9 +2,9 @@
 
 ## Status
 
-First vertical slice implemented. The reusable primitives, radio-row behavior,
-styleguide showcase, and settings migration are complete. Manual visual and
-large-text review remains.
+The reusable primitives, radio-row behavior, styleguide showcase, settings
+migration, and flat-card consolidation are complete. The manual visual and
+large-text review has been completed to a sufficient level for this slice.
 
 This document tracks the introduction of reusable section, list-card, row, and
 accessory primitives. The settings screen is the first consumer, not the place
@@ -52,10 +52,13 @@ settings version is stable.
 
 ## Component Contract
 
-Implemented components:
+Implemented components and shared recipes:
 
 - `rrr-section`: layout and section heading treatment;
-- `rrr-list-card`: unpadded list container, rounded clipping, and dividers;
+- `.rrr-card`: a native-element class for padded rich content;
+- `.rrr-list-card`: a native-element class for unpadded row collections;
+- `rrr-list-card`: the light-DOM behavioral form of the list-card recipe,
+  reserved for coordinated radio-row keyboard behavior;
 - `rrr-list-row`: shared row layout and states;
 - a small accessory API built into `rrr-list-row`, with `leading` and
   `trailing` slots for icons, genuine controls, and exceptional content.
@@ -77,8 +80,13 @@ subpage boundary rather than a larger section-heading variant.
 
 These ownership rules apply:
 
-- `rrr-card` remains the generic padded content card. A list card is a distinct
-  composition and should not silently change existing `rrr-card` behavior.
+- Cards share one flat surface recipe: background, border, radius, and clipping.
+- Use `.rrr-card` on the most appropriate native element for padded rich
+  content. It owns its inset and internal gap.
+- Use `.rrr-list-card` for ordinary edge-to-edge row collections.
+- Use the `rrr-list-card` custom element only when its coordinated radio-group
+  behavior is required. It deliberately has no Shadow DOM and shares the exact
+  visual recipe used by `.rrr-list-card`.
 - The list card owns separators and rounded clipping.
 - The row owns spacing, alignment, minimum hit-target size, and row states.
 - The application owns feature data, routing, translations, and preference
@@ -140,8 +148,8 @@ keyboard, and assistive technology.
       informational, disabled, selected, and destructive examples.
 - ✅ Show titles with subtitles and long/localized content.
 - ✅ Show icon-and-text appearance choices.
-- [ ] Check narrow mobile width, wrapping, zoom, and large text.
-- [ ] Check light, dark, normal-contrast, and high-contrast modes.
+- ✅ Check narrow mobile width, wrapping, zoom, and large text.
+- ✅ Check light, dark, normal-contrast, and high-contrast modes.
 
 Deliverable: all supported compositions can be reviewed without visiting a
 feature screen.
@@ -170,12 +178,15 @@ segmented icon control as the default choice pattern.
 
 - [ ] Remove or reduce obsolete global `.rrr-section-*` helpers after all
       current consumers are inventoried.
-- [ ] Document when to use `rrr-card`, `rrr-list-card`, and a bespoke layout.
+- ✅ Replace the presentation-only `rrr-card` custom element with the shared
+      `.rrr-card` recipe and native semantic elements.
+- ✅ Document when to use `.rrr-card`, `.rrr-list-card`, `rrr-list-card`, and a
+      bespoke layout.
 - [ ] Identify the next single list-heavy screen to migrate.
 - [ ] Create separate follow-up work for routines, exercise catalogue, history,
       equipment, and data-management surfaces.
-- [ ] Reassess the prominent app-level theme controls only after settings
-      stands on its own; removal is not required by this implementation.
+- ✅ Reassess the prominent app-level theme controls after settings stands on
+      its own; the duplicate controls have been removed.
 
 Deliverable: one stable pattern, documented migration guidance, and no
 accidental redesign of every list screen at once.
@@ -213,7 +224,7 @@ using keyboard-only navigation in every supported theme/contrast combination.
 
 Latest automated result:
 
-- `npm.cmd test -- --run`: 113 tests passed;
+- `npm.cmd test -- --run`: 120 tests passed;
 - `npm.cmd run build`: passed;
 - `npm.cmd run check:architecture`: passed;
 - `npm.cmd run icons:check`: passed with the existing unused-icon inventory;
@@ -227,3 +238,19 @@ Latest automated result:
 - Removing the options/theme surface before settings is complete.
 - Forcing warning panels, forms, or other rich content into a single row.
 - Encoding application-specific settings behavior inside the design system.
+
+## Card choice guidance
+
+Use `.rrr-card` on a native `article`, `section`, or `div` when arbitrary rich
+content needs a padded flat surface. Choose the element for its document
+semantics; the class supplies presentation only.
+
+Use `.rrr-list-card` on a native container when its direct children are
+`rrr-list-row` elements and no group behavior is required. Use
+`<rrr-list-card>` for the same composition only when radio rows need coordinated
+selection and roving keyboard tab stops.
+
+Use a bespoke feature layout when the content is not honestly a card or row
+collection, or when independent interactive controls would create nested
+interaction inside a full-row target. Bespoke layouts may reuse the shared card
+class without becoming design-system components.
