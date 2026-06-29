@@ -190,6 +190,7 @@
   --rrr-color-scheme: light;
 
   --rrr-color-heading: var(--rrr-colors-activity-indigo-80);
+  --rrr-list-row-icon-color: var(--rrr-colors-activity-indigo-70);
 
   --rrr-font-family: 'Exo 2', system-ui, -apple-system, sans-serif;
   --rrr-font-family-heading: 'Oxanium', system-ui, -apple-system, sans-serif;
@@ -227,6 +228,7 @@
   --rrr-depth-3-shadow: 0 4px 10px #0000007d, 0 2px 6px #00000052;
 
   --rrr-color-heading: var(--rrr-colors-activity-indigo-30);
+  --rrr-list-row-icon-color: var(--rrr-colors-activity-indigo-40);
 }
 
 :root[data-contrast='high'] {
@@ -259,6 +261,7 @@
   --rrr-color-link-hover: var(--rrr-colors-serene-mint-90);
   --rrr-color-scheme: light;
   --rrr-color-heading: #000000;
+  --rrr-list-row-icon-color: var(--rrr-colors-activity-indigo-80);
 
   --global-focus-ring-color: #000000;
   --rrr-depth-1-shadow: 0 0 0 1px #000000;
@@ -292,6 +295,7 @@
   --rrr-color-link-hover: var(--rrr-colors-serene-mint-20);
   --rrr-color-scheme: dark;
   --rrr-color-heading: #ffffff;
+  --rrr-list-row-icon-color: var(--rrr-colors-activity-indigo-20);
 
   --global-focus-ring-color: #ffffff;
   --rrr-depth-1-shadow: 0 0 0 1px #ffffff;

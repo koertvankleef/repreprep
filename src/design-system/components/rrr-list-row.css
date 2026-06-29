@@ -6,7 +6,6 @@
   --rrr-list-row-color: var(--rrr-color-text);
   --rrr-list-row-description-color: var(--rrr-text-muted);
   --rrr-list-row-destructive-color: var(--rrr-colors-context-danger-70);
-  --rrr-list-row-icon-color: var(--rrr-colors-activity-indigo-70);
   --rrr-list-row-min-block-size: var(--rrr-sizes-grid-7);
   --rrr-list-row-padding-block: var(--rrr-spacing-m);
   --rrr-list-row-padding-inline: var(--rrr-spacing-m);
@@ -78,7 +77,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--rrr-list-row-icon-color);
+  color: var(--rrr-list-row-icon-color, var(--rrr-colors-activity-indigo-70));
   font-size: 1.25rem;
 }
 
