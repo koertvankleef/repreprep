@@ -3,8 +3,15 @@ import { t } from '../i18n/index.ts'
 import { equipmentValues, exerciseCategories } from '../domain/exercise-metadata.ts'
 import type { Equipment, ExerciseCategory } from '../domain/types.ts'
 import type { ExerciseFilters } from '../domain/exercise-service.ts'
-import { appRoutes, type AppRouteMeta } from '../domain/routes.ts'
-import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
+import {
+  appRoutes,
+  getAppRouteMeta,
+  toAppRoute,
+  type AppNavId,
+  type AppRoute,
+  type AppHeaderLink,
+} from './app-routes.ts'
+import { createHashRouter } from '../foundation/hash-router.ts'
 import { toastService } from '../foundation/toast.ts'
 import {
   applyDisplayPreferences,
@@ -40,21 +47,6 @@ type DisplayPreferenceChangeDetail = {
   value: string
 }
 
-type Route =
-  | { name: 'workouts' }
-  | { name: 'workout-edit'; workoutId: string }
-  | { name: 'workout-log'; workoutId: string }
-  | { name: 'exercises' }
-  | { name: 'exercise-detail'; exerciseId: string }
-  | { name: 'history' }
-  | { name: 'import-export' }
-  | { name: 'routines' }
-  | { name: 'routine-new' }
-  | { name: 'routine-edit'; routineId: string }
-  | { name: 'styleguide' }
-  | { name: 'settings' }
-  | { name: 'settings-appearance' }
-
 type RouteTransition = 'none' | 'sub-forward' | 'sub-back' | 'main-switch'
 
 type RouteHeader = {
@@ -75,8 +67,8 @@ type ExerciseCatalogueElement = HTMLElement & {
 const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
 
 export class RrrApp extends HTMLElement {
-  private route: Route = { name: 'workouts' }
-  private previousRoute: Route | null = null
+  private route: AppRoute = { name: 'workouts' }
+  private previousRoute: AppRoute | null = null
   private displayPreferences: DisplayPreferences = loadDisplayPreferences()
   private installPromptEvent: BeforeInstallPromptEvent | null = null
   private installAvailable = false
@@ -96,7 +88,7 @@ export class RrrApp extends HTMLElement {
     routes: appRoutes,
     notFoundRouteId: 'workouts',
     onRouteChange: (match) => {
-      const route = this.toRoute(match)
+      const route = toAppRoute(match, this.styleguideEnabled)
       if (route.name === 'exercise-detail') {
         this.exerciseCatalogueFocusedId = route.exerciseId
       }
@@ -170,16 +162,6 @@ export class RrrApp extends HTMLElement {
       return
     }
 
-    if (action === 'open-settings') {
-      window.location.hash = '/settings'
-      return
-    }
-
-    if (action === 'new-routine') {
-      window.location.hash = '/routines/new'
-      return
-    }
-
     if (action === 'toggle-exercise-filters') {
       this.exerciseFiltersOpen = !this.exerciseFiltersOpen
       this.render()
@@ -199,13 +181,6 @@ export class RrrApp extends HTMLElement {
       return
     }
 
-    if (action === 'navigate-back') {
-      const href = this.getBackHref()
-      if (href) {
-        window.location.hash = href.replace(/^#/, '')
-      }
-      return
-    }
   }
 
   private setThemeMode(theme: ThemeMode): void {
@@ -331,77 +306,6 @@ export class RrrApp extends HTMLElement {
     this.router.dispose()
   }
 
-  private toRoute(match: HashRouteMatch<AppRouteMeta>): Route {
-    if (match.route.id === 'workout-log') {
-      return { name: 'workout-log', workoutId: match.params.workoutId ?? '' }
-    }
-
-    if (match.route.id === 'workout-edit') {
-      return { name: 'workout-edit', workoutId: match.params.workoutId ?? '' }
-    }
-
-    if (match.route.id === 'routine-edit') {
-      return { name: 'routine-edit', routineId: match.params.routineId ?? '' }
-    }
-
-    if (match.route.id === 'routine-new') {
-      return { name: 'routine-new' }
-    }
-
-    if (match.route.id === 'routines') {
-      return { name: 'routines' }
-    }
-
-    if (match.route.id === 'exercises') {
-      return { name: 'exercises' }
-    }
-
-    if (match.route.id === 'exercise-detail') {
-      return { name: 'exercise-detail', exerciseId: match.params.exerciseId ?? '' }
-    }
-
-    if (match.route.id === 'history') {
-      return { name: 'history' }
-    }
-
-    if (match.route.id === 'import-export') {
-      return { name: 'import-export' }
-    }
-
-    if (match.route.id === 'styleguide' && this.styleguideEnabled) {
-      return { name: 'styleguide' }
-    }
-
-    if (match.route.id === 'settings') {
-      return { name: 'settings' }
-    }
-
-    if (match.route.id === 'settings-appearance') {
-      return { name: 'settings-appearance' }
-    }
-
-    return { name: 'workouts' }
-  }
-
-  private linkClass(routeName: Route['name'], current: Route['name']): string {
-    if (routeName === current) return 'active'
-    if (routeName === 'routines' && (current === 'routine-new' || current === 'routine-edit')) return 'active'
-    if (routeName === 'exercises' && current === 'exercise-detail') return 'active'
-    return ''
-  }
-
-  private getBackHref(): string | null {
-    const route = this.route
-    if (route.name === 'settings') return '#/workouts'
-    if (route.name === 'settings-appearance') return '#/settings'
-    if (route.name === 'workout-edit') return '#/workouts'
-    if (route.name === 'workout-log') return '#/workouts'
-    if (route.name === 'routine-new') return '#/routines'
-    if (route.name === 'routine-edit') return '#/routines'
-    if (route.name === 'exercise-detail') return '#/exercises'
-    return null
-  }
-
   private shouldShowInstallButton(): boolean {
     if (this.isStandalone) {
       return false
@@ -410,10 +314,10 @@ export class RrrApp extends HTMLElement {
     return import.meta.env.DEV || this.installAvailable
   }
 
-  private renderNavLink(routeName: Route['name'], href: string, label: string, iconName: string): string {
-    const linkStateClass = this.linkClass(routeName, this.route.name)
-    const activeClass = linkStateClass ? 'nav-link active' : 'nav-link'
-    const ariaCurrent = linkStateClass ? ' aria-current="page"' : ''
+  private renderNavLink(routeName: AppNavId, href: string, label: string, iconName: string): string {
+    const isActive = getAppRouteMeta(this.route).nav === routeName
+    const activeClass = isActive ? 'nav-link active' : 'nav-link'
+    const ariaCurrent = isActive ? ' aria-current="page"' : ''
 
     return `
       <a class="${activeClass}" data-route-name="${routeName}" href="${href}"${ariaCurrent}>
@@ -432,54 +336,30 @@ export class RrrApp extends HTMLElement {
     `
   }
 
-  private routeDepth(route: Route): number {
-    if (
-      route.name === 'workout-edit'
-      || route.name === 'workout-log'
-      || route.name === 'routine-new'
-      || route.name === 'routine-edit'
-      || route.name === 'exercise-detail'
-      || route.name === 'settings'
-      || route.name === 'settings-appearance'
-    ) {
-      return route.name === 'settings-appearance' ? 2 : 1
-    }
-
-    return 0
-  }
-
-  private isMainRoute(route: Route): boolean {
-    return route.name === 'workouts' || route.name === 'routines' || route.name === 'exercises' || route.name === 'history'
-  }
-
-  private getRouteSurface(route: Route): 'full' | 'padded' {
-    return route.name === 'exercises' ? 'full' : 'padded'
-  }
-
-  private computeRouteTransition(from: Route | null, to: Route): RouteTransition {
+  private computeRouteTransition(from: AppRoute | null, to: AppRoute): RouteTransition {
     if (!from || from.name === to.name) {
       return 'none'
     }
 
-    if (this.isMainRoute(from) && this.isMainRoute(to)) {
+    const fromMeta = getAppRouteMeta(from)
+    const toMeta = getAppRouteMeta(to)
+
+    if (fromMeta.main && toMeta.main) {
       return 'main-switch'
     }
 
-    const fromDepth = this.routeDepth(from)
-    const toDepth = this.routeDepth(to)
-
-    if (toDepth > fromDepth) {
+    if (toMeta.depth > fromMeta.depth) {
       return 'sub-forward'
     }
 
-    if (toDepth < fromDepth) {
+    if (toMeta.depth < fromMeta.depth) {
       return 'sub-back'
     }
 
     return 'sub-forward'
   }
 
-  private isSameRoute(a: Route, b: Route): boolean {
+  private isSameRoute(a: AppRoute, b: AppRoute): boolean {
     if (a.name !== b.name) {
       return false
     }
@@ -596,7 +476,7 @@ export class RrrApp extends HTMLElement {
     this.exerciseFilterRailResizeObserver = null
   }
 
-  private createRouteViewElement(route: Route): HTMLElement {
+  private createRouteViewElement(route: AppRoute): HTMLElement {
     if (route.name === 'workouts') {
       return document.createElement('rrr-workout-list')
     }
@@ -672,7 +552,7 @@ export class RrrApp extends HTMLElement {
     return document.createElement('rrr-import-export')
   }
 
-  private updateShellState(route: Route): void {
+  private updateShellState(route: AppRoute): void {
     const appHeader = this.shadowRoot?.querySelector<HTMLElement>('.app-header')
     const header = this.createRouteHeader(route)
     this.clearExerciseFilterRailBinding()
@@ -695,12 +575,12 @@ export class RrrApp extends HTMLElement {
 
     const links = this.shadowRoot?.querySelectorAll<HTMLAnchorElement>('.primary-nav .nav-link[data-route-name]')
     links?.forEach((link) => {
-      const routeName = link.dataset.routeName as Route['name'] | undefined
+      const routeName = link.dataset.routeName as AppNavId | undefined
       if (!routeName) {
         return
       }
 
-      const isActive = this.linkClass(routeName, route.name) !== ''
+      const isActive = getAppRouteMeta(route).nav === routeName
       link.classList.toggle('active', isActive)
       if (isActive) {
         link.setAttribute('aria-current', 'page')
@@ -712,7 +592,7 @@ export class RrrApp extends HTMLElement {
     this.syncHeaderHeight()
   }
 
-  private mountRouteView(route: Route, transition: RouteTransition): void {
+  private mountRouteView(route: AppRoute, transition: RouteTransition): void {
     const viewHost = this.shadowRoot?.querySelector<HTMLElement>('#view')
     if (!viewHost) {
       return
@@ -720,7 +600,7 @@ export class RrrApp extends HTMLElement {
 
     const currentView = viewHost.querySelector<HTMLElement>('.route-view-current')
     const nextView = this.createRouteViewElement(route)
-    nextView.classList.add('route-view', `route-view-${this.getRouteSurface(route)}`, 'route-view-current')
+    nextView.classList.add('route-view', `route-view-${getAppRouteMeta(route).surface}`, 'route-view-current')
     this.currentRouteView = nextView
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -744,7 +624,7 @@ export class RrrApp extends HTMLElement {
     nextView.addEventListener('animationend', finish, { once: true })
   }
 
-  private renderShell(route: Route): void {
+  private renderShell(route: AppRoute): void {
     if (!this.shadowRoot) {
       return
     }
@@ -772,27 +652,7 @@ export class RrrApp extends HTMLElement {
     this.shellRendered = true
   }
 
-  private getHeaderTitle(route: Route): string {
-    if (route.name === 'workouts') {
-      return t('app.nav.today')
-    }
-
-    if (route.name === 'workout-edit') {
-      return t('app.header.workoutEdit')
-    }
-
-    if (route.name === 'workout-log') {
-      return t('app.header.workoutLog')
-    }
-
-    if (route.name === 'routines') {
-      return t('app.nav.routines')
-    }
-
-    if (route.name === 'routine-new') {
-      return t('app.header.routineNew')
-    }
-
+  private getHeaderTitle(route: AppRoute): string {
     if (route.name === 'routine-edit') {
       const routineName = storageService
         .getData()
@@ -802,11 +662,7 @@ export class RrrApp extends HTMLElement {
         return t('app.header.routineEditNamed', { name: routineName })
       }
 
-      return t('app.header.routineEdit')
-    }
-
-    if (route.name === 'exercises') {
-      return t('app.nav.exercises')
+      return t(getAppRouteMeta(route).titleKey)
     }
 
     if (route.name === 'exercise-detail') {
@@ -814,52 +670,45 @@ export class RrrApp extends HTMLElement {
         .getData()
         .exercises.find((exercise) => exercise.id === route.exerciseId)?.name
 
-      return exerciseName ?? t('exercise.detail.notFoundTitle')
+      return exerciseName ?? t(getAppRouteMeta(route).titleKey)
     }
 
-    if (route.name === 'history') {
-      return t('app.nav.history')
-    }
-
-    if (route.name === 'import-export') {
-      return t('app.nav.importExport')
-    }
-
-    if (route.name === 'styleguide') {
-      return t('app.nav.styleguide')
-    }
-
-    if (route.name === 'settings') {
-      return t('app.settings.title')
-    }
-
-    if (route.name === 'settings-appearance') {
-      return t('app.settings.appearance')
-    }
-
-    return ''
+    return t(getAppRouteMeta(route).titleKey)
   }
 
-  private createRouteHeader(route: Route): RouteHeader {
-    if (route.name === 'exercises') {
+  private renderHeaderLink(link: AppHeaderLink, className: string): string {
+    const label = escapeHtml(t(link.labelKey))
+
+    return `
+      <a
+        class="header-icon-link ${className}"
+        href="${escapeHtml(link.href)}"
+        aria-label="${label}"
+        title="${label}"
+      ><rrr-icon name="${escapeHtml(link.icon)}"></rrr-icon></a>
+    `
+  }
+
+  private createRouteHeader(route: AppRoute): RouteHeader {
+    if (getAppRouteMeta(route).header === 'exercise-catalogue') {
       return this.createExerciseCatalogueHeader()
     }
 
     return this.createStandardHeader(route)
   }
 
-  private createStandardHeader(route: Route): RouteHeader {
-    const backHref = this.getBackHref()
+  private createStandardHeader(route: AppRoute): RouteHeader {
+    const { backHref, endLink } = getAppRouteMeta(route)
     const backContent = backHref
-      ? `<rrr-button type="button" variant="ghost" tone="neutral" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}"><rrr-icon name="arrow-left"></rrr-icon></rrr-button>`
+      ? this.renderHeaderLink({
+          href: backHref,
+          icon: 'arrow-left',
+          labelKey: 'app.settings.back',
+        }, 'header-back')
       : '<span class="app-header-spacer" aria-hidden="true"></span>'
-    let actionContent = '<span class="app-header-spacer" aria-hidden="true"></span>'
-
-    if (route.name === 'workouts') {
-      actionContent = `<rrr-button type="button" variant="ghost" tone="neutral" class="header-action" data-action="open-settings" aria-label="${t('app.settings.title')}" title="${t('app.settings.title')}"><rrr-icon name="settings"></rrr-icon></rrr-button>`
-    } else if (route.name === 'routines') {
-      actionContent = `<rrr-button type="button" variant="ghost" tone="neutral" class="header-action" data-action="new-routine" aria-label="${t('routineList.new')}" title="${t('routineList.new')}"><rrr-icon name="add"></rrr-icon></rrr-button>`
-    }
+    const actionContent = endLink
+      ? this.renderHeaderLink(endLink, 'header-action')
+      : '<span class="app-header-spacer" aria-hidden="true"></span>'
 
     return {
       className: 'app-header-primary-standard',

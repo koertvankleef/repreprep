@@ -446,6 +446,34 @@ nav {
   block-size: var(--rrr-control-min-block-size);
 }
 
+.header-icon-link {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--rrr-control-min-block-size);
+  block-size: var(--rrr-control-min-block-size);
+  border: var(--rrr-border-width) solid transparent;
+  border-radius: var(--rrr-radius-s);
+  color: var(--rrr-color-primary-contrast);
+  text-decoration: none;
+  transition: background var(--rrr-transition-default), transform var(--rrr-transition-default);
+}
+
+.header-icon-link:hover,
+.header-icon-link:active {
+  background: color-mix(in oklab, var(--rrr-color-primary-contrast), transparent 85%);
+  color: var(--rrr-color-primary-contrast);
+}
+
+.header-icon-link:active {
+  transform: translateY(1px);
+}
+
+.header-icon-link rrr-icon {
+  font-size: 1.25rem;
+}
+
 .header-action {
   justify-self: end;
 }

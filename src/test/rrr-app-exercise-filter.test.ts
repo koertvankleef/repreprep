@@ -95,43 +95,43 @@ describe('rrr-app exercise filters', () => {
     const app = document.createElement('rrr-app')
     document.body.append(app)
 
-    const settingsButton = app.shadowRoot?.querySelector<HTMLElement>(
-      'rrr-button[data-action="open-settings"]',
+    const settingsLink = app.shadowRoot?.querySelector<HTMLAnchorElement>(
+      'a.header-action[href="#/settings"]',
     )
 
-    expect(settingsButton).toBeTruthy()
-    expect(settingsButton?.querySelector('rrr-icon')?.getAttribute('name')).toBe('settings')
+    expect(settingsLink).toBeTruthy()
+    expect(settingsLink?.querySelector('rrr-icon')?.getAttribute('name')).toBe('settings')
     expect(app.shadowRoot?.querySelector('.options-panel')).toBeNull()
 
-    settingsButton?.click()
+    window.location.hash = settingsLink?.hash ?? ''
     window.dispatchEvent(new HashChangeEvent('hashchange'))
 
     expect(window.location.hash).toBe('#/settings')
-    expect(app.shadowRoot?.querySelector('rrr-button[data-action="open-settings"]')).toBeNull()
+    expect(app.shadowRoot?.querySelector('a.header-action')).toBeNull()
 
-    const backButton = app.shadowRoot?.querySelector<HTMLElement>(
-      'rrr-button[data-action="navigate-back"]',
+    const backLink = app.shadowRoot?.querySelector<HTMLAnchorElement>(
+      'a.header-back[href="#/workouts"]',
     )
-    expect(backButton).toBeTruthy()
+    expect(backLink).toBeTruthy()
 
-    backButton?.click()
+    window.location.hash = backLink?.hash ?? ''
     window.dispatchEvent(new HashChangeEvent('hashchange'))
 
     expect(window.location.hash).toBe('#/workouts')
-    expect(app.shadowRoot?.querySelector('rrr-button[data-action="open-settings"]')).toBeTruthy()
+    expect(app.shadowRoot?.querySelector('a.header-action[href="#/settings"]')).toBeTruthy()
 
     window.location.hash = '#/routines'
     window.dispatchEvent(new HashChangeEvent('hashchange'))
 
-    expect(app.shadowRoot?.querySelector('rrr-button[data-action="open-settings"]')).toBeNull()
+    expect(app.shadowRoot?.querySelector('a.header-action[href="#/settings"]')).toBeNull()
 
-    const newRoutineButton = app.shadowRoot?.querySelector<HTMLElement>(
-      'rrr-button[data-action="new-routine"]',
+    const newRoutineLink = app.shadowRoot?.querySelector<HTMLAnchorElement>(
+      'a.header-action[href="#/routines/new"]',
     )
-    expect(newRoutineButton).toBeTruthy()
-    expect(newRoutineButton?.querySelector('rrr-icon')?.getAttribute('name')).toBe('add')
+    expect(newRoutineLink).toBeTruthy()
+    expect(newRoutineLink?.querySelector('rrr-icon')?.getAttribute('name')).toBe('add')
 
-    newRoutineButton?.click()
+    window.location.hash = newRoutineLink?.hash ?? ''
 
     expect(window.location.hash).toBe('#/routines/new')
     app.remove()

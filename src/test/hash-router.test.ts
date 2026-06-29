@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
-import { appRoutes } from '../domain/routes.ts'
+import { appRoutes, getAppRouteMeta } from '../app/app-routes.ts'
 
 type Meta = { title: string }
 
@@ -71,9 +71,25 @@ describe('createHashRouter', () => {
 })
 
 test('app routes include the appearance settings subpage', () => {
-  expect(appRoutes).toContainEqual({
-    id: 'settings-appearance',
-    pattern: '/settings/appearance',
-    meta: { nav: 'settings' },
+  const appearanceRoute = appRoutes.find((route) => route.id === 'settings-appearance')
+
+  expect(appearanceRoute?.pattern).toBe('/settings/appearance')
+  expect(appearanceRoute?.meta).toMatchObject({
+    nav: 'settings',
+    depth: 2,
+    backHref: '#/settings',
+  })
+})
+
+test('app route metadata defines route-specific header links', () => {
+  expect(getAppRouteMeta('workouts').endLink).toEqual({
+    href: '#/settings',
+    icon: 'settings',
+    labelKey: 'app.settings.title',
+  })
+  expect(getAppRouteMeta('routines').endLink).toEqual({
+    href: '#/routines/new',
+    icon: 'add',
+    labelKey: 'routineList.new',
   })
 })

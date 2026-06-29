@@ -224,7 +224,7 @@ using keyboard-only navigation in every supported theme/contrast combination.
 
 Latest automated result:
 
-- `npm.cmd test -- --run`: 121 tests passed;
+- `npm.cmd test -- --run`: 122 tests passed;
 - `npm.cmd run build`: passed;
 - `npm.cmd run check:architecture`: passed;
 - `npm.cmd run icons:check`: passed with the existing unused-icon inventory;

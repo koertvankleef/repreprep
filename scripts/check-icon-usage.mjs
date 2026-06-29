@@ -8,8 +8,12 @@ const repoRoot = path.resolve(__dirname, '..')
 const spritePath = path.resolve(repoRoot, 'src', 'design-system', 'icons', 'sprite.ts')
 const srcDir = path.resolve(repoRoot, 'src')
 
-// Matches: <rrr-icon name="some-icon"> or <rrr-icon name='some-icon'>
-const iconUsagePattern = /<rrr-icon[^>]+name=["']([a-z0-9-]+)["']/g
+const iconUsagePatterns = [
+  // Matches: <rrr-icon name="some-icon"> or <rrr-icon name='some-icon'>
+  /<rrr-icon[^>]+name=["']([a-z0-9-]+)["']/g,
+  // Matches declarative component metadata such as: icon: 'some-icon'
+  /\bicon:\s*["']([a-z0-9-]+)["']/g,
+]
 
 async function walk(dirPath) {
   const entries = await fs.readdir(dirPath, { withFileTypes: true })
@@ -34,15 +38,17 @@ async function collectUsedIcons() {
   for (const filePath of files) {
     const content = await fs.readFile(filePath, 'utf8')
     const relPath = path.relative(repoRoot, filePath).replaceAll('\\', '/')
-    let match
+    for (const iconUsagePattern of iconUsagePatterns) {
+      let match
 
-    iconUsagePattern.lastIndex = 0
-    while ((match = iconUsagePattern.exec(content)) !== null) {
-      const name = match[1]
-      if (!used.has(name)) {
-        used.set(name, [])
+      iconUsagePattern.lastIndex = 0
+      while ((match = iconUsagePattern.exec(content)) !== null) {
+        const name = match[1]
+        if (!used.has(name)) {
+          used.set(name, [])
+        }
+        used.get(name).push(relPath)
       }
-      used.get(name).push(relPath)
     }
   }
 
