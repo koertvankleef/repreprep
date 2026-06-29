@@ -172,30 +172,6 @@ export class RrrApp extends HTMLElement {
       return
     }
 
-    if (action === 'theme-light') {
-      this.setThemeMode('light')
-      return
-    }
-
-    if (action === 'theme-dark') {
-      this.setThemeMode('dark')
-      return
-    }
-
-    if (action === 'theme-auto') {
-      this.setThemeMode('auto')
-      return
-    }
-
-    if (action === 'contrast-normal') {
-      this.setContrastMode('normal')
-      return
-    }
-
-    if (action === 'contrast-high') {
-      this.setContrastMode('high')
-    }
-
     if (action === 'open-options') {
       this.optionsPanelOpen = true
       this.render()
@@ -367,41 +343,6 @@ export class RrrApp extends HTMLElement {
     this.router.dispose()
   }
 
-  private renderThemeControls(): string {
-    const theme = this.displayPreferences.theme
-
-    return `
-      <div class="nav-controls" aria-label="${t('app.theme.controls')}" role="group">
-        <div class="nav-control-group" aria-label="${t('app.theme.mode')}" role="group">
-          <rrr-tooltip><rrr-button
-            type="button"
-            variant="ghost"
-            data-action="theme-light"
-            aria-pressed="${theme === 'light'}"
-            aria-label="${t('app.theme.light')}"
-            title="${t('app.theme.light')}"
-          ><rrr-icon name="weather-sunny"></rrr-icon></rrr-button></rrr-tooltip>
-          <rrr-tooltip><rrr-button
-            type="button"
-            variant="ghost"
-            data-action="theme-dark"
-            aria-pressed="${theme === 'dark'}"
-            aria-label="${t('app.theme.dark')}"
-            title="${t('app.theme.dark')}"
-          ><rrr-icon name="weather-moon"></rrr-icon></rrr-button></rrr-tooltip>
-          <rrr-tooltip><rrr-button
-            type="button"
-            variant="ghost"
-            data-action="theme-auto"
-            aria-pressed="${theme === 'auto'}"
-            aria-label="${t('app.theme.auto')}"
-            title="${t('app.theme.auto')}"
-          ><rrr-icon name="arrow-sync"></rrr-icon></rrr-button></rrr-tooltip>
-        </div>
-      </div>
-    `
-  }
-
   private toRoute(match: HashRouteMatch<AppRouteMeta>): Route {
     if (match.route.id === 'workout-log') {
       return { name: 'workout-log', workoutId: match.params.workoutId ?? '' }
@@ -483,13 +424,6 @@ export class RrrApp extends HTMLElement {
 
   private renderOptionsPanelContent(route: Route): string {
     const items: string[] = []
-
-    items.push(`
-      <section class="options-panel-section">
-        <h2 class="options-panel-section-title">${t('app.settings.display')}</h2>
-        ${this.renderThemeControls()}
-      </section>
-    `)
 
     // Settings is available from every screen
     items.push(`
@@ -855,7 +789,6 @@ export class RrrApp extends HTMLElement {
             ${this.renderPrimaryNav()}
           </div>
           <div class="nav-utilities">
-            ${this.renderThemeControls()}
             ${this.shouldShowInstallButton() ? `<rrr-button type="button" variant="outline" data-action="install-app">${t('app.action.install')}</rrr-button>` : ''}
           </div>
         </nav>

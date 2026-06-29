@@ -23,7 +23,6 @@
   --rrr-app-header-height: 3.5rem;
   --rrr-app-link-font-family: var(--rrr-font-family-heading);
   --rrr-app-main-padding: var(--rrr-spacing-s);
-  --rrr-app-control-radius: var(--rrr-radius-s);
 
   /* From globals.css, unavoidable duplication */
   min-height: 100vh;
@@ -41,6 +40,7 @@
     "header"
     "main";
   min-height: 100dvh;
+  background: inherit;
 }
 
 nav {
@@ -104,33 +104,12 @@ nav {
 }
 
 .nav-utilities {
-  /* on mobile nav-utilities are hidden — they live in the header instead */
+  /* Installation remains available from the desktop navigation only. */
   display: none;
 }
 
 .nav-utilities>rrr-button[data-action="install-app"] {
   width: auto;
-}
-
-.nav-controls {
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  gap: var(--rrr-spacing-xs);
-}
-
-.nav-control-group {
-  display: inline-flex;
-  gap: var(--rrr-spacing-2xs);
-  padding: var(--rrr-spacing-2xs);
-  border-radius: var(--rrr-app-control-radius);
-  border: var(--rrr-border-width) solid var(--rrr-colors-grayscale-40);
-  background: var(--rrr-colors-grayscale-00);
-}
-
-.nav-control-group rrr-button[aria-pressed="true"]>button[data-rrr-button-inner] {
-  background: var(--rrr-colors-activity-indigo-60);
-  border-color: var(--rrr-colors-activity-indigo-70);
-  color: var(--rrr-color-primary-contrast);
 }
 
 .app-header {
@@ -504,7 +483,6 @@ main {
 }
 
 #view>.route-view-full {
-  background: var(--rrr-color-background);
   padding-bottom: calc(var(--rrr-app-bottom-nav-height) + env(safe-area-inset-bottom));
 }
 
@@ -676,26 +654,6 @@ main {
   flex-direction: column;
   gap: var(--rrr-spacing-2xs);
   overflow-y: auto;
-}
-
-.options-panel-section {
-  display: grid;
-  gap: var(--rrr-spacing-xs);
-  padding: var(--rrr-spacing-2xs) var(--rrr-spacing-2xs) var(--rrr-spacing-s);
-}
-
-.options-panel-section-title {
-  margin: 0;
-  font-family: var(--rrr-font-family-heading);
-  font-size: var(--rrr-font-size-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--rrr-colors-grayscale-60);
-}
-
-.options-panel .nav-controls {
-  margin: 0;
 }
 
 .options-menu-item {
