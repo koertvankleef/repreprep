@@ -94,52 +94,52 @@ These ownership rules apply:
 
 ### 1. Contract and foundation
 
-- [x] Confirm component names and the minimal attribute/slot/event API.
-- [x] Decide the semantic activation model for link, button, selection-control,
+- ✅ Confirm component names and the minimal attribute/slot/event API.
+- ✅ Decide the semantic activation model for link, button, selection-control,
       and non-interactive rows.
-- [x] Define component-scoped tokens for section spacing, row height and
+- ✅ Define component-scoped tokens for section spacing, row height and
       padding, divider color, accessory spacing, and state colors.
-- [x] Move section-heading typography out of semantic heading defaults and into
+- ✅ Move section-heading typography out of semantic heading defaults and into
       the section primitive.
-- [x] Record the intended large-text and narrow-screen behavior.
+- ✅ Record the intended large-text and narrow-screen behavior.
 
 Deliverable: agreed component contract with no settings-specific concepts in
 the design-system layer.
 
 ### 2. Core design-system primitives
 
-- [x] Implement and register `rrr-section`.
-- [x] Implement and register `rrr-list-card`.
-- [x] Implement and register `rrr-list-row`.
-- [x] Support leading icon/custom content.
-- [x] Support label and optional description.
-- [x] Support no accessory, chevron, value, value-and-chevron, switch, radio,
+- ✅ Implement and register `rrr-section`.
+- ✅ Implement and register `rrr-list-card`.
+- ✅ Implement and register `rrr-list-row`.
+- ✅ Support leading icon/custom content.
+- ✅ Support label and optional description.
+- ✅ Support no accessory, chevron, value, value-and-chevron, switch, radio,
       checkbox, badge, and custom trailing content.
-- [x] Support interactive, disabled, selected/current, and destructive states.
-- [x] Make the full row target available where its semantics permit.
-- [x] Ensure list cards add exactly one divider between adjacent rows.
+- ✅ Support interactive, disabled, selected/current, and destructive states.
+- ✅ Make the full row target available where its semantics permit.
+- ✅ Ensure list cards add exactly one divider between adjacent rows.
 
 Deliverable: primitives can be composed without app-local structural CSS.
 
 ### 3. Radio-row behavior
 
-- [x] Build one-of-many selection from normal list rows.
-- [x] Use native radio semantics and preserve keyboard interaction.
-- [x] Allow optional leading icons while keeping visible text labels.
-- [x] Make selection state legible without relying on color alone.
-- [x] Emit one stable change event for application consumers.
+- ✅ Build one-of-many selection from normal list rows.
+- ✅ Use native radio semantics and preserve keyboard interaction.
+- ✅ Allow optional leading icons while keeping visible text labels.
+- ✅ Make selection state legible without relying on color alone.
+- ✅ Emit one stable change event for application consumers.
 
 Deliverable: text-only and icon-and-text radio cards work with pointer,
 keyboard, and assistive technology.
 
 ### 4. Styleguide proving ground
 
-- [x] Add a dedicated "Sections and list rows" styleguide section.
-- [x] Show one-row and multi-row cards.
-- [x] Show navigation, current-value, switch, radio, checkbox, action,
+- ✅ Add a dedicated "Sections and list rows" styleguide section.
+- ✅ Show one-row and multi-row cards.
+- ✅ Show navigation, current-value, switch, radio, checkbox, action,
       informational, disabled, selected, and destructive examples.
-- [x] Show titles with subtitles and long/localized content.
-- [x] Show icon-and-text appearance choices.
+- ✅ Show titles with subtitles and long/localized content.
+- ✅ Show icon-and-text appearance choices.
 - [ ] Check narrow mobile width, wrapping, zoom, and large text.
 - [ ] Check light, dark, normal-contrast, and high-contrast modes.
 
@@ -148,20 +148,20 @@ feature screen.
 
 ### 5. Settings migration
 
-- [x] Replace settings' `.rrr-section-*` structure with the new primitives.
-- [x] Render Import / Export and the optional styleguide link as navigation
+- ✅ Replace settings' `.rrr-section-*` structure with the new primitives.
+- ✅ Render Import / Export and the optional styleguide link as navigation
       rows.
-- [x] Present Appearance as a value-and-chevron row on the settings overview.
-- [x] Place Automatic, Light, and Dark theme radio rows on a dedicated
+- ✅ Present Appearance as a value-and-chevron row on the settings overview.
+- ✅ Place Automatic, Light, and Dark theme radio rows on a dedicated
       Appearance subpage, including icon and text.
-- [x] Present contrast as a clearly named section on the Appearance subpage; do
+- ✅ Present contrast as a clearly named section on the Appearance subpage; do
       not conflate it with theme.
-- [x] Show current values on overview/navigation rows where a subpage is used.
-- [x] Preserve the richer reset-data warning and confirmation as a deliberate
+- ✅ Show current values on overview/navigation rows where a subpage is used.
+- ✅ Preserve the richer reset-data warning and confirmation as a deliberate
       card-content exception.
-- [x] Remove settings-local row/control-group CSS made obsolete by the
+- ✅ Remove settings-local row/control-group CSS made obsolete by the
       primitives.
-- [x] Keep preference persistence and existing reset behavior unchanged.
+- ✅ Keep preference persistence and existing reset behavior unchanged.
 
 Deliverable: settings is composed from the shared grammar and no longer uses a
 segmented icon control as the default choice pattern.
@@ -182,19 +182,19 @@ accidental redesign of every list screen at once.
 
 ## Acceptance Checklist
 
-- [x] A radio group renders as a card of standard rows.
-- [x] Radio rows support optional leading icons and visible text.
-- [x] Navigation and setting rows share the same base row.
-- [x] Rows have consistent alignment, spacing, and minimum hit targets.
-- [x] Cards consistently clip corners and render dividers.
-- [x] Top-level settings can communicate current values.
-- [x] Interactive rows expose correct link, button, or form-control semantics.
-- [x] Keyboard focus is visible and keyboard operation is complete.
-- [x] Disabled and selected states are programmatically exposed.
-- [x] No state depends on color or an icon alone.
-- [x] Long labels, subtitles, and translated values wrap without overlap.
-- [x] The settings screen has no primary segmented icon choice control.
-- [x] Existing settings behavior and stored preferences still work.
+- ✅ A radio group renders as a card of standard rows.
+- ✅ Radio rows support optional leading icons and visible text.
+- ✅ Navigation and setting rows share the same base row.
+- ✅ Rows have consistent alignment, spacing, and minimum hit targets.
+- ✅ Cards consistently clip corners and render dividers.
+- ✅ Top-level settings can communicate current values.
+- ✅ Interactive rows expose correct link, button, or form-control semantics.
+- ✅ Keyboard focus is visible and keyboard operation is complete.
+- ✅ Disabled and selected states are programmatically exposed.
+- ✅ No state depends on color or an icon alone.
+- ✅ Long labels, subtitles, and translated values wrap without overlap.
+- ✅ The settings screen has no primary segmented icon choice control.
+- ✅ Existing settings behavior and stored preferences still work.
 
 ## Verification
 

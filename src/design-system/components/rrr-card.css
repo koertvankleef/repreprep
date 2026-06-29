@@ -1,6 +1,6 @@
 :host {
   display: block;
-  --rrr-card-background: var(--rrr-colors-grayscale-00);
+  --rrr-card-background: var(--rrr-surface-raised);
   --rrr-card-border-radius: var(--rrr-radius-l);
   --rrr-card-shadow: var(--rrr-shadow-card);
   --rrr-card-padding-md: var(--rrr-spacing-l);
