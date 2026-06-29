@@ -40,12 +40,7 @@ export class RrrRoutineList extends HTMLElement {
     this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <div class="header">
-          <div>
-            <p>${t('routineList.subtitle')}</p>
-          </div>
-          <rrr-button type="button" tone="accent" rounded data-action="new"><rrr-icon name="add"></rrr-icon>${t('routineList.new')}</rrr-button>
-        </div>
+        <p>${t('routineList.subtitle')}</p>
         <div class="list">
           ${
             routines.length === 0
@@ -72,10 +67,6 @@ export class RrrRoutineList extends HTMLElement {
         </div>
       </section>
     `
-
-    this.querySelector<HTMLElement>('rrr-button[data-action="new"]')?.addEventListener('click', () => {
-      window.location.hash = '#/routines/new'
-    })
 
     this.querySelectorAll<HTMLElement>('rrr-button[data-action="start"]').forEach((btn) => {
       btn.addEventListener('click', () => {

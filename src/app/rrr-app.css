@@ -12,10 +12,10 @@
   --rrr-app-link-radius: var(--rrr-radius-m);
   --rrr-app-link-color: var(--rrr-colors-grayscale-80);
   --rrr-app-link-transition: var(--rrr-transition-default);
-  --rrr-app-link-hover-background: var(--rrr-colors-activity-indigo-10);
-  --rrr-app-link-hover-color: var(--rrr-colors-activity-indigo-80);
+  --rrr-app-link-hover-background: color-mix(in oklab, var(--rrr-color-primary), transparent 85%);
+  --rrr-app-link-hover-color: var(--rrr-button-fg);
   --rrr-app-link-active-background: var(--rrr-colors-activity-indigo-60);
-  --rrr-app-link-active-color: var(--rrr-colors-activity-indigo-80);
+  --rrr-app-link-active-color: var(--rrr-color-heading);
   --rrr-app-link-active-shadow: var(--rrr-shadow-button);
   --rrr-app-link-font-size-mobile: 0.62rem;
   --rrr-app-link-font-size-desktop: var(--rrr-font-size-s);
@@ -101,6 +101,7 @@ nav {
 .nav-link.active {
   border-color: var(--rrr-app-link-active-background);
   color: var(--rrr-app-link-active-color);
+  background: var(--rrr-app-link-hover-background);
 }
 
 .nav-utilities {
@@ -445,7 +446,7 @@ nav {
   block-size: var(--rrr-control-min-block-size);
 }
 
-.header-settings {
+.header-action {
   justify-self: end;
 }
 

@@ -175,6 +175,11 @@ export class RrrApp extends HTMLElement {
       return
     }
 
+    if (action === 'new-routine') {
+      window.location.hash = '/routines/new'
+      return
+    }
+
     if (action === 'toggle-exercise-filters') {
       this.exerciseFiltersOpen = !this.exerciseFiltersOpen
       this.render()
@@ -848,9 +853,13 @@ export class RrrApp extends HTMLElement {
     const backContent = backHref
       ? `<rrr-button type="button" variant="ghost" tone="neutral" class="header-back" data-action="navigate-back" aria-label="${t('app.settings.back')}"><rrr-icon name="arrow-left"></rrr-icon></rrr-button>`
       : '<span class="app-header-spacer" aria-hidden="true"></span>'
-    const actionContent = route.name === 'workouts'
-      ? `<rrr-button type="button" variant="ghost" tone="neutral" class="header-settings" data-action="open-settings" aria-label="${t('app.settings.title')}" title="${t('app.settings.title')}"><rrr-icon name="settings"></rrr-icon></rrr-button>`
-      : '<span class="app-header-spacer" aria-hidden="true"></span>'
+    let actionContent = '<span class="app-header-spacer" aria-hidden="true"></span>'
+
+    if (route.name === 'workouts') {
+      actionContent = `<rrr-button type="button" variant="ghost" tone="neutral" class="header-action" data-action="open-settings" aria-label="${t('app.settings.title')}" title="${t('app.settings.title')}"><rrr-icon name="settings"></rrr-icon></rrr-button>`
+    } else if (route.name === 'routines') {
+      actionContent = `<rrr-button type="button" variant="ghost" tone="neutral" class="header-action" data-action="new-routine" aria-label="${t('routineList.new')}" title="${t('routineList.new')}"><rrr-icon name="add"></rrr-icon></rrr-button>`
+    }
 
     return {
       className: 'app-header-primary-standard',

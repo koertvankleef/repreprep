@@ -90,7 +90,7 @@ describe('rrr-app exercise filters', () => {
     storageService.resetAllData()
   })
 
-  it('shows Settings only on Today and returns from Settings to Today', () => {
+  it('shows route-specific header actions and preserves their navigation', () => {
     window.location.hash = '#/workouts'
     const app = document.createElement('rrr-app')
     document.body.append(app)
@@ -124,6 +124,17 @@ describe('rrr-app exercise filters', () => {
     window.dispatchEvent(new HashChangeEvent('hashchange'))
 
     expect(app.shadowRoot?.querySelector('rrr-button[data-action="open-settings"]')).toBeNull()
+
+    const newRoutineButton = app.shadowRoot?.querySelector<HTMLElement>(
+      'rrr-button[data-action="new-routine"]',
+    )
+    expect(newRoutineButton).toBeTruthy()
+    expect(newRoutineButton?.querySelector('rrr-icon')?.getAttribute('name')).toBe('add')
+
+    newRoutineButton?.click()
+
+    expect(window.location.hash).toBe('#/routines/new')
+    app.remove()
   })
 
   it('updates the mounted exercise list when filtering without a search term', async () => {
