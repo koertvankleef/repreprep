@@ -137,9 +137,9 @@
   --rrr-depth-1-shadow: 0 1px 2px #00000012, 0 1px 1px #0000000f;
   /* Depth 2: default component elevation (for example: cards, tiles, input groups). */
   --rrr-depth-2-shadow: 0 2px 4px #00000014, 0 1px 2px #0000000a;
-  /* Depth 3: attention surfaces above regular content (for example: dialogs, popovers, sticky panels). */
+  /* Depth 3: attention surfaces above regular content (for example: popovers, sticky panels). */
   --rrr-depth-3-shadow: 0 3px 8px #00000018, 0 2px 4px #0000000d;
-  /* Depth 4: strong elevation for high-priority overlays (for example: dropdown menus, command palettes). */
+  /* Depth 4: strong elevation for high-priority overlays (for example: dialogs, dropdown menus, command palettes). */
   --rrr-depth-4-shadow: 0 6px 16px #0000001f, 0 3px 7px #00000007;
   /* Depth 5: maximum emphasis, use sparingly (for example: blocking modals, urgent callouts, tour coachmarks). */
   --rrr-depth-5-shadow: 0 10px 28px #00000024, 0 5px 12px #0000000c;
@@ -147,7 +147,7 @@
   /* Semantic mappings for common use-cases */
   --rrr-shadow-button: var(--rrr-depth-1-shadow);
   --rrr-shadow-card: var(--rrr-depth-2-shadow);
-  --rrr-shadow-dialog: var(--rrr-depth-3-shadow);
+  --rrr-shadow-dialog: var(--rrr-depth-4-shadow);
 
   /* Core border primitive */
   --rrr-border-width: 1.44px;

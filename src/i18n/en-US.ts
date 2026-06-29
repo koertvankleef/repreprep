@@ -333,8 +333,8 @@ export const enUsMessages = {
   'workoutList.notes.none': 'No notes',
   'workoutList.action.editAria': 'Edit workout on {date}',
   'workoutList.action.deleteAria': 'Delete workout on {date}',
-  'workoutList.dialog.delete.title': 'Delete Workout',
-  'workoutList.dialog.delete.message': 'Delete this workout? This cannot be undone.',
+  'workoutList.dialog.delete.title': 'Delete workout?',
+  'workoutList.dialog.delete.message': 'This cannot be undone.',
 
   'routineList.title': 'Routines',
   'routineList.subtitle': 'Reusable workout templates',

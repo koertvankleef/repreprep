@@ -5,8 +5,8 @@
 
 /*
   Portalled popup styles.
-  This sheet is adopted into the trigger's document or shadow root so the singleton
-  popup can inherit that root's typography and still use the shared design tokens.
+  This sheet is adopted into the popup's document or shadow root. The singleton
+  inherits that root's typography and moves inside an open dialog when necessary.
 */
 #rrr-tooltip-popup {
   position: fixed;

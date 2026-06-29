@@ -75,6 +75,24 @@ describe('rrr-tooltip popup', () => {
     expect(document.querySelector('#rrr-tooltip-popup')).toBeNull()
   })
 
+  test('mounts the popup inside an open dialog so it remains in the top layer', async () => {
+    const host = document.createElement('div')
+    const root = host.attachShadow({ mode: 'open' })
+    root.innerHTML = `
+      <dialog open>
+        <rrr-tooltip><button title="Dialog help">Trigger</button></rrr-tooltip>
+      </dialog>
+    `
+    document.body.appendChild(host)
+    await Promise.resolve()
+
+    root.querySelector<HTMLElement>('rrr-tooltip')?.setAttribute('open', '')
+
+    const dialog = root.querySelector('dialog')
+    expect(dialog?.querySelector('#rrr-tooltip-popup')).not.toBeNull()
+    expect(root.querySelector(':scope > #rrr-tooltip-popup')).toBeNull()
+  })
+
   test('repositions an open popup after the viewport resizes', async () => {
     const { root, trigger } = await createOpenTooltip()
     let top = 100

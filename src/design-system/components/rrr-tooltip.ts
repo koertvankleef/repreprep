@@ -28,10 +28,27 @@ export class RrrTooltip extends HTMLElement {
   private static repositionFrame: number | null = null
   private static styledRoots = new WeakSet<Document | ShadowRoot>()
 
+  private static getContainingOpenDialog(trigger: Element): HTMLDialogElement | null {
+    let current: Element | null = trigger
+
+    while (current) {
+      const dialog = current.closest<HTMLDialogElement>('dialog[open]')
+      if (dialog) {
+        return dialog
+      }
+
+      const root = current.getRootNode()
+      current = root instanceof ShadowRoot ? root.host : null
+    }
+
+    return null
+  }
+
   private static getPopup(trigger: Element): HTMLDivElement {
-    const triggerRoot = trigger.getRootNode()
-    const popupRoot = triggerRoot instanceof Document || triggerRoot instanceof ShadowRoot
-      ? triggerRoot
+    const dialog = RrrTooltip.getContainingOpenDialog(trigger)
+    const targetRoot = dialog?.getRootNode() ?? trigger.getRootNode()
+    const popupRoot = targetRoot instanceof Document || targetRoot instanceof ShadowRoot
+      ? targetRoot
       : document
 
     if (!RrrTooltip.styledRoots.has(popupRoot)) {
@@ -47,7 +64,7 @@ export class RrrTooltip extends HTMLElement {
       RrrTooltip.popup = el
     }
 
-    const popupContainer = popupRoot instanceof Document ? popupRoot.body : popupRoot
+    const popupContainer = dialog ?? (popupRoot instanceof Document ? popupRoot.body : popupRoot)
     if (RrrTooltip.popup.parentNode !== popupContainer) {
       popupContainer.appendChild(RrrTooltip.popup)
     }

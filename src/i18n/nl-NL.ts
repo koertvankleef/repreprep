@@ -333,8 +333,8 @@ export const nlNlMessages = {
   'workoutList.notes.none': 'Geen notities',
   'workoutList.action.editAria': 'Bewerk workout op {date}',
   'workoutList.action.deleteAria': 'Verwijder workout op {date}',
-  'workoutList.dialog.delete.title': 'Workout verwijderen',
-  'workoutList.dialog.delete.message': 'Deze workout verwijderen? Dit kan niet ongedaan worden gemaakt.',
+  'workoutList.dialog.delete.title': 'Workout verwijderen?',
+  'workoutList.dialog.delete.message': 'Dit kan niet ongedaan worden gemaakt.',
 
   'routineList.title': 'Routines',
   'routineList.subtitle': 'Herbruikbare workouttemplates',

@@ -2,12 +2,12 @@ rrr-dialog-host {
   display: contents;
   --rrr-dialog-width: min(32rem, calc(100vw - 2rem));
   --rrr-dialog-border-width: var(--rrr-border-width);
-  --rrr-dialog-border-color: var(--rrr-colors-grayscale-20);
+  --rrr-dialog-border-color: var(--rrr-colors-grayscale-00);
   --rrr-dialog-border-radius: var(--rrr-radius-xl);
   --rrr-dialog-background: var(--rrr-colors-grayscale-00);
   --rrr-dialog-color: var(--rrr-colors-grayscale-100);
   --rrr-dialog-shadow: var(--rrr-shadow-dialog);
-  --rrr-dialog-backdrop: color-mix(in oklch, var(--rrr-colors-grayscale-100) 30%, transparent);
+  --rrr-dialog-backdrop: color-mix(in oklch, var(--rrr-colors-grayscale-90) 30%, transparent);
   --rrr-dialog-panel-padding: var(--rrr-spacing-xl);
   --rrr-dialog-panel-gap: var(--rrr-spacing-l);
   --rrr-dialog-actions-gap: var(--rrr-spacing-s);
@@ -15,7 +15,7 @@ rrr-dialog-host {
   --rrr-dialog-error-color: var(--rrr-colors-context-danger-70);
 }
 
-dialog {
+rrr-dialog-host dialog {
   width: var(--rrr-dialog-width);
   border: var(--rrr-dialog-border-width) solid var(--rrr-dialog-border-color);
   border-radius: var(--rrr-dialog-border-radius);
@@ -25,37 +25,37 @@ dialog {
   box-shadow: var(--rrr-dialog-shadow);
 }
 
-dialog::backdrop {
+rrr-dialog-host dialog::backdrop {
   background: var(--rrr-dialog-backdrop);
 }
 
-.dialog-panel {
+rrr-dialog-host .dialog-panel {
   padding: var(--rrr-dialog-panel-padding);
   display: grid;
   gap: var(--rrr-dialog-panel-gap);
 }
 
-.dialog-actions {
+rrr-dialog-host .dialog-actions {
   display: flex;
   justify-content: flex-end;
   gap: var(--rrr-dialog-actions-gap);
   flex-wrap: wrap;
 }
 
-.dialog-message {
+rrr-dialog-host .dialog-message {
   margin: 0;
 }
 
-.dialog-field {
+rrr-dialog-host .dialog-field {
   display: grid;
   gap: var(--rrr-dialog-field-gap);
 }
 
-.dialog-field input {
+rrr-dialog-host .dialog-field input {
   width: 100%;
 }
 
-.dialog-error {
+rrr-dialog-host .dialog-error {
   color: var(--rrr-dialog-error-color);
   margin: 0;
   min-height: 1.25rem;
