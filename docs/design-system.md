@@ -32,6 +32,27 @@ other metadata support that identity.
 Settings choices, navigation entries, routines, and exercises within a routine
 are identity-first even when some of them are not interactive.
 
+“Informational” is not itself a reason to use a property row. A static entity
+still uses `rrr-list-row` when its name is what users need to identify first.
+
+Use `activation="button"` for state-changing actions that belong in a list
+flow. This preserves native button semantics while using the same identity-first
+presentation:
+
+```html
+<div class="rrr-list-card">
+  <rrr-list-row
+    activation="button"
+    label="Start workout"
+  ></rrr-list-row>
+</div>
+```
+
+Author labels and descriptions through the element's `label` and `description`
+attributes. Classes such as `.rrr-list-row__label` and
+`.rrr-list-row__description` belong to generated internals and are not an
+authoring API.
+
 ### Value-first property rows
 
 Use a property list when the property schema is predictable and the user

@@ -14,6 +14,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   document.body.innerHTML = ''
+  window.location.hash = ''
   localStorage.clear()
   storageService.resetAllData()
 })
@@ -43,7 +44,7 @@ describe('value-first property lists', () => {
     expect(detail.querySelector('.rrr-detail-row')).toBeNull()
   })
 
-  test('uses properties for the Routine overview and identity rows for its exercises', async () => {
+  test('uses properties for the Routine overview and identity rows for its exercises and action', async () => {
     const routine = storageService.getData().routines[0]!
     const detail = new RrrRoutineDetail()
     detail.routineId = routine.id
@@ -52,10 +53,32 @@ describe('value-first property lists', () => {
 
     const propertyList = detail.querySelector<HTMLDListElement>('dl.rrr-property-list')
     const exerciseList = detail.querySelector<HTMLDivElement>('.rrr-list-card')
+    const actionRow = detail.querySelector<HTMLElement>('rrr-list-row[data-action="start-workout"]')
+    const sections = detail.querySelectorAll('rrr-section')
 
     expect(propertyList).not.toBeNull()
     expectSemanticPropertyRows(propertyList!)
     expect(propertyList?.querySelector('rrr-list-row')).toBeNull()
     expect(exerciseList?.querySelector('rrr-list-row')).not.toBeNull()
+    expect(actionRow?.getAttribute('activation')).toBe('button')
+    expect(actionRow?.querySelector(':scope > button')).not.toBeNull()
+    expect(actionRow?.parentElement?.previousElementSibling).toBe(sections[1])
+    expect(detail.querySelector('rrr-button[data-action="start-workout"]')).toBeNull()
+  })
+
+  test('starts an active workout from the bottom action row', async () => {
+    const routine = storageService.getData().routines[0]!
+    const initialWorkoutCount = storageService.getData().workouts.length
+    const detail = new RrrRoutineDetail()
+    detail.routineId = routine.id
+    document.body.append(detail)
+    await Promise.resolve()
+
+    detail
+      .querySelector<HTMLButtonElement>('rrr-list-row[data-action="start-workout"] > button')
+      ?.click()
+
+    expect(storageService.getData().workouts).toHaveLength(initialWorkoutCount + 1)
+    expect(window.location.hash).toMatch(/^#\/workouts\/.+\/log$/)
   })
 })

@@ -70,7 +70,7 @@ export const enUsMessages = {
   'app.theme.contrastNormal': 'Normal',
   'app.theme.contrastHigh': 'High',
   'app.header.workoutEdit': 'Edit Workout',
-  'app.header.workoutLog': 'Log Workout',
+  'app.header.workoutLog': 'Active Workout',
   'app.header.routineNew': 'New Routine',
   'app.header.routineEdit': 'Edit Routine',
   'app.header.routineEditNamed': 'Edit: {name}',

@@ -70,7 +70,7 @@ export const nlNlMessages = {
   'app.theme.contrastNormal': 'Normaal',
   'app.theme.contrastHigh': 'Hoog',
   'app.header.workoutEdit': 'Workout bewerken',
-  'app.header.workoutLog': 'Workout loggen',
+  'app.header.workoutLog': 'Actieve workout',
   'app.header.routineNew': 'Nieuwe routine',
   'app.header.routineEdit': 'Routine bewerken',
   'app.header.routineEditNamed': 'Bewerken: {name}',

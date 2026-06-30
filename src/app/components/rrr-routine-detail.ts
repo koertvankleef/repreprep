@@ -5,7 +5,6 @@ import { toastService } from '../../foundation/toast.ts'
 import { formatDate, t, tPlural } from '../../i18n/index.ts'
 import type { Muscle, RoutineExercise } from '../../domain/types.ts'
 import { todayIso } from '../../utils/date.ts'
-import styles from './rrr-routine-detail.css?inline'
 
 export class RrrRoutineDetail extends HTMLElement {
   private routineIdValue: string | null = null
@@ -80,7 +79,6 @@ export class RrrRoutineDetail extends HTMLElement {
 
     if (!summary) {
       this.innerHTML = `
-        <style>${styles}</style>
         <section class="page">
           <p>${t('routineDetail.notFound.description')}</p>
         </section>
@@ -101,12 +99,8 @@ export class RrrRoutineDetail extends HTMLElement {
       : t('routineDetail.lastStartedNever')
 
     this.innerHTML = `
-      <style>${styles}</style>
       <section class="page">
         ${summary.routine.description ? `<p>${escapeHtml(summary.routine.description)}</p>` : ''}
-        <div class="primary-action">
-          <rrr-button type="button" data-action="start-workout">${t('routineDetail.action.start')}</rrr-button>
-        </div>
 
         <rrr-section>
           <span slot="heading">${t('routineDetail.section.overview')}</span>
@@ -132,10 +126,18 @@ export class RrrRoutineDetail extends HTMLElement {
               : `<p>${t('routineDetail.exercises.empty')}</p>`
           }
         </rrr-section>
+
+        <div class="rrr-list-card">
+          <rrr-list-row
+            activation="button"
+            label="${t('routineDetail.action.start')}"
+            data-action="start-workout"
+          ></rrr-list-row>
+        </div>
       </section>
     `
 
-    this.querySelector<HTMLElement>('rrr-button[data-action="start-workout"]')
+    this.querySelector<HTMLElement>('rrr-list-row[data-action="start-workout"]')
       ?.addEventListener('click', () => this.startWorkout())
   }
 }
