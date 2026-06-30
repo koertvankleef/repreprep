@@ -1,0 +1,48 @@
+:where(.rrr-row, .rrr-property-row) {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: var(--rrr-row-min-block-size, var(--rrr-sizes-grid-7));
+  margin: 0;
+  padding: var(--rrr-row-padding-block, var(--rrr-spacing-m))
+    var(--rrr-row-padding-inline, var(--rrr-spacing-m));
+  border: 0;
+  border-radius: 0;
+  background: var(--rrr-row-background, var(--rrr-surface-raised));
+  color: var(--rrr-row-color, var(--rrr-color-text));
+  font: inherit;
+  line-height: 1.35;
+  text-align: start;
+  text-decoration: none;
+  box-shadow: none;
+}
+
+.rrr-property-list {
+  display: grid;
+}
+
+.rrr-property-row {
+  display: grid;
+  align-items: start;
+  gap: var(--rrr-spacing-xs);
+}
+
+.rrr-property-row > dt,
+.rrr-property-row > dd {
+  margin: 0;
+}
+
+.rrr-property-row > dt {
+  color: var(--rrr-text-muted);
+  font-size: var(--rrr-font-size-s);
+}
+
+.rrr-property-row > dd {
+  min-inline-size: 0;
+}
+
+@media screen and (min-width: 48rem) {
+  .rrr-property-row {
+    grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr);
+    gap: var(--rrr-spacing-l);
+  }
+}

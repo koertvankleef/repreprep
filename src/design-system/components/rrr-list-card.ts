@@ -53,9 +53,14 @@ export class RrrListCard extends HTMLElement {
     rows[nextIndex]?.selectControl()
   }
 
+  private readonly handleRowReady = (): void => {
+    this.syncAllRadioTabStops()
+  }
+
   connectedCallback(): void {
     this.addEventListener('change', this.handleChange)
     this.addEventListener('keydown', this.handleKeyDown)
+    this.addEventListener('rrr-list-row-ready', this.handleRowReady)
     this.rowObserver.observe(this, { childList: true })
     queueMicrotask(() => this.syncAllRadioTabStops())
   }
@@ -63,6 +68,7 @@ export class RrrListCard extends HTMLElement {
   disconnectedCallback(): void {
     this.removeEventListener('change', this.handleChange)
     this.removeEventListener('keydown', this.handleKeyDown)
+    this.removeEventListener('rrr-list-row-ready', this.handleRowReady)
     this.rowObserver.disconnect()
   }
 
