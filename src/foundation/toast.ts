@@ -1,4 +1,5 @@
 import { t } from '../i18n/index.ts'
+import { getTopSheetPresentation, subscribeToSheetStack } from './presentation-stack.ts'
 
 export type ToastType = 'info' | 'success' | 'warning' | 'danger' | 'neutral'
 
@@ -303,6 +304,11 @@ function getDurationMs(options: ToastOptions): number {
 
 class ToastService {
   private nextId = 1
+  private root: HTMLElement | null = null
+
+  constructor() {
+    subscribeToSheetStack(() => this.placeRoot())
+  }
 
   show(options: ToastOptions): number {
     this.ensureRegistered()
@@ -355,17 +361,25 @@ class ToastService {
   }
 
   private ensureRoot(): HTMLElement {
-    let root = document.getElementById(TOAST_ROOT_ID)
-    if (root) {
-      return root
+    if (!this.root) {
+      this.root = document.createElement('div')
+      this.root.id = TOAST_ROOT_ID
+      this.root.className = 'rrr-toast-root'
     }
 
-    root = document.createElement('div')
-    root.id = TOAST_ROOT_ID
-    root.className = 'rrr-toast-root'
-    document.body.appendChild(root)
+    this.placeRoot()
+    return this.root
+  }
 
-    return root
+  private placeRoot(): void {
+    if (!this.root) {
+      return
+    }
+
+    const container = getTopSheetPresentation()?.dialog ?? document.body
+    if (this.root.parentNode !== container) {
+      container.appendChild(this.root)
+    }
   }
 }
 

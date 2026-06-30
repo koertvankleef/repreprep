@@ -143,6 +143,7 @@ describe('rrr-app exercise filters', () => {
     window.location.hash = `#/routines/${routineId}`
     const app = document.createElement('rrr-app')
     document.body.append(app)
+    await Promise.resolve()
 
     expect(app.shadowRoot?.querySelector('rrr-routine-detail')).toBeTruthy()
     expect(
@@ -150,11 +151,12 @@ describe('rrr-app exercise filters', () => {
         `a.header-action[href="#/routines/${routineId}/edit"]`,
       ),
     ).toBeTruthy()
-    expect(
-      app.shadowRoot
-        ?.querySelector('rrr-routine-detail')
-        ?.querySelector('rrr-button[data-action="start-workout"]'),
-    ).toBeTruthy()
+    const startAction = app.shadowRoot
+      ?.querySelector('rrr-routine-detail')
+      ?.querySelector<HTMLElement>('rrr-list-row[data-action="start-workout"]')
+
+    expect(startAction?.getAttribute('activation')).toBe('button')
+    expect(startAction?.querySelector(':scope > button')).toBeTruthy()
   })
 
   it('updates the mounted exercise list when filtering without a search term', async () => {

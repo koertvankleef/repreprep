@@ -1,0 +1,130 @@
+rrr-sheet {
+  display: contents;
+  --rrr-sheet-width: min(100%, 40rem);
+  --rrr-sheet-max-height: calc(100dvh - env(safe-area-inset-top) - var(--rrr-spacing-l));
+  --rrr-sheet-background: var(--rrr-surface-base);
+  --rrr-sheet-color: var(--rrr-color-text);
+  --rrr-sheet-radius: var(--rrr-radius-xl);
+  --rrr-sheet-shadow: var(--rrr-shadow-dialog);
+  --rrr-sheet-backdrop: color-mix(in oklch, var(--rrr-colors-grayscale-90) 32%, transparent);
+  --rrr-sheet-padding-inline: var(--rrr-app-main-padding, var(--rrr-spacing-l));
+  --rrr-sheet-padding-block: var(--rrr-spacing-l);
+  --rrr-sheet-gap: var(--rrr-spacing-l);
+  --rrr-sheet-handle-color: var(--rrr-colors-grayscale-50);
+  --rrr-sheet-motion-duration: 220ms;
+  --rrr-sheet-motion-easing: cubic-bezier(.2, .8, .2, 1);
+  --rrr-sheet-drag-offset: 0px;
+}
+
+rrr-sheet dialog {
+  box-sizing: border-box;
+  inset: auto 0 0;
+  width: var(--rrr-sheet-width);
+  max-width: 100vw;
+  max-height: var(--rrr-sheet-max-height);
+  margin: auto auto 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  color: var(--rrr-sheet-color);
+}
+
+rrr-sheet dialog[open] .sheet-panel {
+  @starting-style {
+    transform: translateY(100%);
+  }
+}
+
+rrr-sheet dialog[data-dragging] .sheet-panel {
+  transition: none;
+}
+
+rrr-sheet dialog[data-closing] .sheet-panel {
+  transform: translateY(100%);
+}
+
+rrr-sheet dialog::backdrop {
+  background: var(--rrr-sheet-backdrop);
+  opacity: 1;
+  transition:
+    opacity var(--rrr-sheet-motion-duration) ease,
+    display var(--rrr-sheet-motion-duration) allow-discrete,
+    overlay var(--rrr-sheet-motion-duration) allow-discrete;
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+rrr-sheet dialog[data-closing]::backdrop {
+  opacity: 0;
+}
+
+rrr-sheet .sheet-panel {
+  display: flex;
+  max-height: var(--rrr-sheet-max-height);
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--rrr-sheet-radius) var(--rrr-sheet-radius) 0 0;
+  background: var(--rrr-sheet-background);
+  box-shadow: var(--rrr-sheet-shadow);
+  transform: translateY(var(--rrr-sheet-drag-offset));
+  transition: transform var(--rrr-sheet-motion-duration) var(--rrr-sheet-motion-easing);
+}
+
+rrr-sheet .sheet-handle-region {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  min-block-size: 2rem;
+  cursor: grab;
+  touch-action: none;
+}
+
+rrr-sheet .sheet-handle-region:active {
+  cursor: grabbing;
+}
+
+rrr-sheet .sheet-handle {
+  inline-size: 2.75rem;
+  block-size: .3rem;
+  border-radius: 999px;
+  background: var(--rrr-sheet-handle-color);
+}
+
+rrr-sheet .sheet-content {
+  display: grid;
+  gap: var(--rrr-sheet-gap);
+  padding:
+    var(--rrr-spacing-s)
+    var(--rrr-sheet-padding-inline)
+    calc(var(--rrr-sheet-padding-block) + env(safe-area-inset-bottom));
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+rrr-sheet .sheet-title {
+  color: var(--rrr-sheet-color);
+  text-align: center;
+}
+
+rrr-sheet .sheet-message {
+  margin: 0;
+  text-align: center;
+}
+
+rrr-sheet .sheet-action {
+  display: block;
+}
+
+rrr-sheet .sheet-action > button[data-rrr-button-inner] {
+  inline-size: 100%;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  rrr-sheet {
+    --rrr-sheet-motion-duration: 1ms;
+  }
+}

@@ -10,7 +10,7 @@
 */
 #rrr-tooltip-popup {
   position: fixed;
-  z-index: 9999;
+  z-index: 3000;
   pointer-events: none;
   user-select: none;
 

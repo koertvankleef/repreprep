@@ -5,7 +5,7 @@ import { toastService } from '../../foundation/toast.ts'
 import { formatDate, t, tPlural } from '../../i18n/index.ts'
 import type { Muscle, RoutineExercise } from '../../domain/types.ts'
 import { todayIso } from '../../utils/date.ts'
-import styles from './rrr-routine-detail.css?inline'
+import { confirmSheet } from '../../utils/sheet-service.ts'
 
 export class RrrRoutineDetail extends HTMLElement {
   private routineIdValue: string | null = null
@@ -48,6 +48,35 @@ export class RrrRoutineDetail extends HTMLElement {
     window.location.hash = `#/workouts/${workout.id}/log`
   }
 
+  private editWorkout(): void {
+    if (!this.routineIdValue) {
+      return
+    }
+
+    window.location.hash = `#/routines/${encodeURIComponent(this.routineIdValue)}/edit`
+  }
+
+  private async deleteRoutine(): Promise<void> {
+    if (!this.routineIdValue) {
+      return
+    }
+
+    const confirmed = await confirmSheet({
+      title: t('routineDetail.dialog.delete.title'),
+      message: t('routineDetail.dialog.delete.message'),
+      confirmLabel: t('action.delete'),
+      confirmTone: 'danger',
+    })
+
+    if (!confirmed) {
+      return
+    }
+
+    storageService.archiveRoutine(this.routineIdValue)
+    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+    window.location.hash = '#/routines'
+  }
+
   private renderExerciseRow(routineExercise: RoutineExercise): string {
     const exercise = storageService
       .getData()
@@ -63,6 +92,15 @@ export class RrrRoutineDetail extends HTMLElement {
     `
   }
 
+  private renderPropertyRow(label: string, value: string): string {
+    return `
+      <div class="rrr-property-row">
+        <dt>${escapeHtml(label)}</dt>
+        <dd>${escapeHtml(value)}</dd>
+      </div>
+    `
+  }
+
   private render(): void {
     const routineId = this.routineIdValue
     const summary = routineId
@@ -71,7 +109,6 @@ export class RrrRoutineDetail extends HTMLElement {
 
     if (!summary) {
       this.innerHTML = `
-        <style>${styles}</style>
         <section class="page">
           <p>${t('routineDetail.notFound.description')}</p>
         </section>
@@ -92,29 +129,19 @@ export class RrrRoutineDetail extends HTMLElement {
       : t('routineDetail.lastStartedNever')
 
     this.innerHTML = `
-      <style>${styles}</style>
       <section class="page">
         ${summary.routine.description ? `<p>${escapeHtml(summary.routine.description)}</p>` : ''}
-        <div class="primary-action">
-          <rrr-button type="button" data-action="start-workout">${t('routineDetail.action.start')}</rrr-button>
-        </div>
 
         <rrr-section>
           <span slot="heading">${t('routineDetail.section.overview')}</span>
-          <div class="rrr-list-card">
-            <rrr-list-row
-              label="${t('routineDetail.exercises.label')}"
-              description="${escapeHtml(tPlural('message.routine.exerciseCount', exerciseCount))}"
-            ></rrr-list-row>
-            <rrr-list-row
-              label="${t('routineDetail.muscles.label')}"
-              description="${escapeHtml(primaryMuscles)}"
-            ></rrr-list-row>
-            <rrr-list-row
-              label="${t('routineDetail.lastStarted.label')}"
-              description="${escapeHtml(lastStarted)}"
-            ></rrr-list-row>
-          </div>
+          <dl class="rrr-property-list">
+            ${this.renderPropertyRow(
+              t('routineDetail.exercises.label'),
+              tPlural('message.routine.exerciseCount', exerciseCount),
+            )}
+            ${this.renderPropertyRow(t('routineDetail.muscles.label'), primaryMuscles)}
+            ${this.renderPropertyRow(t('routineDetail.lastStarted.label'), lastStarted)}
+          </dl>
         </rrr-section>
 
         <rrr-section>
@@ -129,11 +156,44 @@ export class RrrRoutineDetail extends HTMLElement {
               : `<p>${t('routineDetail.exercises.empty')}</p>`
           }
         </rrr-section>
+
+        <div class="rrr-list-card">
+          <rrr-list-row
+            activation="button"
+            label="${t('routineDetail.action.start')}"
+            data-action="start-workout"
+          >
+            <rrr-icon slot="leading" name="play"></rrr-icon>
+          </rrr-list-row>
+        </div>
+
+        <div class="rrr-list-card">
+          <rrr-list-row
+            activation="button"
+            label="${t('routineDetail.action.edit')}"
+            data-action="edit-workout"
+            accessory="value-chevron"
+          >
+            <rrr-icon slot="leading" name="edit"></rrr-icon>
+          </rrr-list-row>
+          <rrr-list-row
+            activation="button"
+            label="${t('action.delete')}"
+            data-action="delete-routine"
+            tone="danger"
+          >
+            <rrr-icon slot="leading" name="delete"></rrr-icon>
+          </rrr-list-row>
+        </div>
       </section>
     `
 
-    this.querySelector<HTMLElement>('rrr-button[data-action="start-workout"]')
+    this.querySelector<HTMLElement>('rrr-list-row[data-action="start-workout"]')
       ?.addEventListener('click', () => this.startWorkout())
+    this.querySelector<HTMLElement>('rrr-list-row[data-action="edit-workout"]')
+      ?.addEventListener('click', () => this.editWorkout())
+    this.querySelector<HTMLElement>('rrr-list-row[data-action="delete-routine"]')
+      ?.addEventListener('click', () => void this.deleteRoutine())
   }
 }
 

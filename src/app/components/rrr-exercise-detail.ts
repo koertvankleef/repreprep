@@ -11,7 +11,7 @@ import { formatDate, t } from '../../i18n/index.ts'
 import { storageService } from '../storage-instance.ts'
 import styles from './rrr-exercise-detail.css?inline'
 
-type DetailRow = {
+type PropertyRow = {
   label: string
   value: string
 }
@@ -57,18 +57,18 @@ export class RrrExerciseDetail extends HTMLElement {
   private renderNotFound(): string {
     return `
       <section class="page detail-page">
-        <section class="rrr-section">
-          <h2 class="rrr-section-title">${t('exercise.detail.notFoundTitle')}</h2>
-          <div class="rrr-section-card rrr-section-card--flush">
-            <p class="rrr-section-row">${t('exercise.detail.notFound')}</p>
+        <rrr-section>
+          <span slot="heading">${t('exercise.detail.notFoundTitle')}</span>
+          <div class="rrr-card">
+            <p>${t('exercise.detail.notFound')}</p>
           </div>
-        </section>
+        </rrr-section>
       </section>
     `
   }
 
   private renderExercise(exercise: ExerciseDefinition, usedInRoutines: boolean): string {
-    const overviewRows: DetailRow[] = [
+    const overviewRows: PropertyRow[] = [
       { label: t('exercise.detail.description'), value: this.renderText(exercise.description) },
       { label: t('exercise.detail.aliases'), value: this.renderBadgeList(exercise.aliases, (alias) => alias) },
       { label: t('exercise.detail.origin'), value: this.renderOrigin(exercise.createdByUser) },
@@ -78,7 +78,7 @@ export class RrrExerciseDetail extends HTMLElement {
       { label: t('exercise.detail.usedInRoutines'), value: this.renderText(usedInRoutines ? t('exercise.detail.yes') : t('exercise.detail.no')) },
     ]
 
-    const classificationRows: DetailRow[] = [
+    const classificationRows: PropertyRow[] = [
       { label: t('exercise.detail.categories'), value: this.renderBadgeList(exercise.categories, getCategoryLabel) },
       { label: t('exercise.detail.equipment'), value: this.renderBadgeList(exercise.equipment, getEquipmentLabel) },
       { label: t('exercise.detail.primaryMuscles'), value: this.renderBadgeList(exercise.primaryMuscles, getMuscleLabel) },
@@ -86,7 +86,7 @@ export class RrrExerciseDetail extends HTMLElement {
       { label: t('exercise.detail.measurementProfiles'), value: this.renderMeasurementProfiles(exercise.measurementProfiles) },
     ]
 
-    const recordRows: DetailRow[] = [
+    const recordRows: PropertyRow[] = [
       { label: t('exercise.detail.id'), value: this.renderCode(exercise.id) },
       { label: t('exercise.detail.created'), value: this.renderText(this.formatTimestamp(exercise.createdAt)) },
       { label: t('exercise.detail.updated'), value: this.renderText(this.formatTimestamp(exercise.updatedAt)) },
@@ -94,27 +94,27 @@ export class RrrExerciseDetail extends HTMLElement {
 
     return `
       <section class="page detail-page">
-        ${this.renderDetailSection(t('exercise.detail.overview'), overviewRows)}
-        ${this.renderDetailSection(t('exercise.detail.classification'), classificationRows)}
-        ${this.renderDetailSection(t('exercise.detail.record'), recordRows)}
+        ${this.renderPropertySection(t('exercise.detail.overview'), overviewRows)}
+        ${this.renderPropertySection(t('exercise.detail.classification'), classificationRows)}
+        ${this.renderPropertySection(t('exercise.detail.record'), recordRows)}
       </section>
     `
   }
 
-  private renderDetailSection(title: string, rows: DetailRow[]): string {
+  private renderPropertySection(title: string, rows: PropertyRow[]): string {
     return `
-      <section class="rrr-section">
-        <h2 class="rrr-section-title">${escapeHtml(title)}</h2>
-        <dl class="rrr-section-card rrr-section-card--flush detail-list">
-          ${rows.map((row) => this.renderDetailRow(row)).join('')}
+      <rrr-section>
+        <span slot="heading">${escapeHtml(title)}</span>
+        <dl class="rrr-property-list">
+          ${rows.map((row) => this.renderPropertyRow(row)).join('')}
         </dl>
-      </section>
+      </rrr-section>
     `
   }
 
-  private renderDetailRow(row: DetailRow): string {
+  private renderPropertyRow(row: PropertyRow): string {
     return `
-      <div class="rrr-detail-row rrr-section-row">
+      <div class="rrr-property-row">
         <dt>${escapeHtml(row.label)}</dt>
         <dd>${row.value}</dd>
       </div>

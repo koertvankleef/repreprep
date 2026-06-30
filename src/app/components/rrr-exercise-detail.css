@@ -5,10 +5,6 @@ rrr-exercise-detail {
     gap: var(--rrr-spacing-l);
   }
 
-  .detail-list {
-    display: grid;
-  }
-
   .badge-list,
   .profile,
   .profile-list {

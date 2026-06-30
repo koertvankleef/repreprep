@@ -665,6 +665,39 @@ The app should feel:
 
 Visual design should help users feel capable and oriented, not hyped or soothed into vagueness.
 
+## 19.1 Visual Hierarchy Should Follow the Reading Task
+
+Consistency does not require every row to give its label and value the same
+emphasis. The hierarchy should reflect what the user needs to find first.
+
+When rows represent entities, destinations, actions, or choices, their labels
+are primary because users must first identify what each row is. Descriptions,
+values, and metadata provide supporting context.
+
+When rows present a predictable set of properties, their values are primary.
+The labels mainly help users locate those values, particularly after the layout
+becomes familiar.
+
+## Implications
+
+* Prefer one reading task per visual group.
+* Allow different hierarchy patterns in separate groups on the same page.
+* Base hierarchy on semantic purpose, not on whether a row happens to be
+  interactive.
+* Keep shared geometry and visual grammar consistent without erasing meaningful
+  differences in emphasis.
+* Avoid APIs named after visual outcomes when a semantic pattern can express
+  why that hierarchy exists.
+
+## Decision rule
+
+Ask:
+
+> Is the user trying to identify what this row represents, or inspect the value
+> of a property they already expect?
+
+Emphasise the identity in the first case and the value in the second.
+
 ---
 
 # 20. MVP Product Scope
