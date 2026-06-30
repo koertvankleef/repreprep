@@ -71,6 +71,10 @@ other metadata support that identity.
 Settings choices, navigation entries, routines, and exercises within a routine
 are identity-first even when some of them are not interactive.
 
+Navigation and action rows use the icon accent color for their primary label to
+reinforce that they activate something. Selection controls and static rows keep
+the normal text color; destructive actions use the danger color.
+
 “Informational” is not itself a reason to use a property row. A static entity
 still uses `rrr-list-row` when its name is what users need to identify first.
 

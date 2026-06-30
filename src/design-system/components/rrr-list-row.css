@@ -100,6 +100,14 @@ rrr-list-row[destructive] .rrr-list-row__leading {
   font-weight: var(--rrr-font-weight-medium);
 }
 
+.rrr-list-row__row--interactive .rrr-list-row__label {
+  color: var(--rrr-list-row-icon-color, var(--rrr-colors-activity-indigo-70));
+}
+
+rrr-list-row[destructive] .rrr-list-row__label {
+  color: var(--rrr-list-row-destructive-color);
+}
+
 .rrr-list-row__description {
   color: var(--rrr-list-row-description-color);
   font-size: var(--rrr-font-size-s);
