@@ -1,6 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { initLocale } from '../i18n/index.ts'
 import { registerRrrListRow } from '../design-system/components/rrr-list-row.ts'
+import { registerRrrDialogHost } from '../design-system/components/rrr-dialog-host.ts'
 import { registerRrrSection } from '../design-system/components/rrr-section.ts'
 import { storageService } from '../app/storage-instance.ts'
 import { RrrExerciseDetail } from '../app/components/rrr-exercise-detail.ts'
@@ -8,8 +9,22 @@ import { RrrRoutineDetail } from '../app/components/rrr-routine-detail.ts'
 
 beforeAll(() => {
   initLocale('en-US')
+  registerRrrDialogHost()
   registerRrrListRow()
   registerRrrSection()
+
+  Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
+    configurable: true,
+    value(this: HTMLDialogElement): void {
+      this.open = true
+    },
+  })
+  Object.defineProperty(HTMLDialogElement.prototype, 'close', {
+    configurable: true,
+    value(this: HTMLDialogElement): void {
+      this.open = false
+    },
+  })
 })
 
 beforeEach(() => {
@@ -81,5 +96,35 @@ describe('value-first property lists', () => {
 
     expect(storageService.getData().workouts).toHaveLength(initialWorkoutCount + 1)
     expect(window.location.hash).toMatch(/^#\/workouts\/.+\/log$/)
+  })
+
+  test('only deletes a routine after confirmation and returns to the routine list', async () => {
+    const routine = storageService.getData().routines[0]!
+    const detail = new RrrRoutineDetail()
+    detail.routineId = routine.id
+    document.body.append(detail)
+    await Promise.resolve()
+
+    detail
+      .querySelector<HTMLButtonElement>('rrr-list-row[data-action="delete-routine"] > button')
+      ?.click()
+
+    const dialogHost = document.querySelector('rrr-dialog-host')
+    expect(dialogHost?.querySelector('.dialog-title')?.textContent).toBe('Delete routine?')
+    expect(storageService.getData().routines.find(({ id }) => id === routine.id)?.archived).toBe(false)
+
+    dialogHost?.querySelector<HTMLElement>('rrr-button[data-action="cancel"]')?.click()
+    await Promise.resolve()
+
+    expect(storageService.getData().routines.find(({ id }) => id === routine.id)?.archived).toBe(false)
+
+    detail
+      .querySelector<HTMLButtonElement>('rrr-list-row[data-action="delete-routine"] > button')
+      ?.click()
+    dialogHost?.querySelector<HTMLElement>('rrr-button[data-action="confirm"]')?.click()
+    await Promise.resolve()
+
+    expect(storageService.getData().routines.find(({ id }) => id === routine.id)?.archived).toBe(true)
+    expect(window.location.hash).toBe('#/routines')
   })
 })

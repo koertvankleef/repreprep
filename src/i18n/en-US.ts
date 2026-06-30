@@ -363,6 +363,8 @@ export const enUsMessages = {
   'routineDetail.action.edit': 'Edit routine',
   'routineDetail.action.start': 'Start Workout',
   'routineDetail.startError': 'Could not start a workout from this routine.',
+  'routineDetail.dialog.delete.title': 'Delete routine?',
+  'routineDetail.dialog.delete.message': 'This cannot be undone. Existing workout history will be preserved.',
   'routineDetail.section.overview': 'Overview',
   'routineDetail.section.exercises': 'Exercises',
   'routineDetail.exercises.label': 'Exercises',

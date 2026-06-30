@@ -363,6 +363,8 @@ export const nlNlMessages = {
   'routineDetail.action.edit': 'Routine bewerken',
   'routineDetail.action.start': 'Workout starten',
   'routineDetail.startError': 'Kon geen workout starten vanuit deze routine.',
+  'routineDetail.dialog.delete.title': 'Routine verwijderen?',
+  'routineDetail.dialog.delete.message': 'Dit kan niet ongedaan worden gemaakt. Bestaande workoutgeschiedenis blijft behouden.',
   'routineDetail.section.overview': 'Overzicht',
   'routineDetail.section.exercises': 'Oefeningen',
   'routineDetail.exercises.label': 'Oefeningen',

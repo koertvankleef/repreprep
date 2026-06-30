@@ -5,6 +5,7 @@ import { toastService } from '../../foundation/toast.ts'
 import { formatDate, t, tPlural } from '../../i18n/index.ts'
 import type { Muscle, RoutineExercise } from '../../domain/types.ts'
 import { todayIso } from '../../utils/date.ts'
+import { confirmDialog } from '../../utils/dialog-service.ts'
 
 export class RrrRoutineDetail extends HTMLElement {
   private routineIdValue: string | null = null
@@ -53,6 +54,27 @@ export class RrrRoutineDetail extends HTMLElement {
     }
 
     window.location.hash = `#/routines/${encodeURIComponent(this.routineIdValue)}/edit`
+  }
+
+  private async deleteRoutine(): Promise<void> {
+    if (!this.routineIdValue) {
+      return
+    }
+
+    const confirmed = await confirmDialog({
+      title: t('routineDetail.dialog.delete.title'),
+      message: t('routineDetail.dialog.delete.message'),
+      confirmLabel: t('action.delete'),
+      cancelLabel: t('action.cancel'),
+    })
+
+    if (!confirmed) {
+      return
+    }
+
+    storageService.archiveRoutine(this.routineIdValue)
+    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+    window.location.hash = '#/routines'
   }
 
   private renderExerciseRow(routineExercise: RoutineExercise): string {
@@ -157,7 +179,7 @@ export class RrrRoutineDetail extends HTMLElement {
           <rrr-list-row
             activation="button"
             label="${t('action.delete')}"
-            data-action="delete-workout"
+            data-action="delete-routine"
             tone="danger"
           >
             <rrr-icon slot="leading" name="delete"></rrr-icon>
@@ -170,6 +192,8 @@ export class RrrRoutineDetail extends HTMLElement {
       ?.addEventListener('click', () => this.startWorkout())
     this.querySelector<HTMLElement>('rrr-list-row[data-action="edit-workout"]')
       ?.addEventListener('click', () => this.editWorkout())
+    this.querySelector<HTMLElement>('rrr-list-row[data-action="delete-routine"]')
+      ?.addEventListener('click', () => void this.deleteRoutine())
   }
 }
 
