@@ -132,7 +132,9 @@ export class RrrRoutineDetail extends HTMLElement {
             activation="button"
             label="${t('routineDetail.action.start')}"
             data-action="start-workout"
-          ></rrr-list-row>
+          >
+            <rrr-icon slot="leading" name="play"></rrr-icon>
+          </rrr-list-row>
         </div>
       </section>
     `

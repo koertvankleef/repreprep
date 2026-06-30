@@ -57,12 +57,12 @@ export class RrrExerciseDetail extends HTMLElement {
   private renderNotFound(): string {
     return `
       <section class="page detail-page">
-        <section class="rrr-section">
-          <h2 class="rrr-section-title">${t('exercise.detail.notFoundTitle')}</h2>
-          <div class="rrr-section-card rrr-section-card--flush">
-            <p class="rrr-section-row">${t('exercise.detail.notFound')}</p>
+        <rrr-section>
+          <span slot="heading">${t('exercise.detail.notFoundTitle')}</span>
+          <div class="rrr-card">
+            <p>${t('exercise.detail.notFound')}</p>
           </div>
-        </section>
+        </rrr-section>
       </section>
     `
   }
@@ -103,12 +103,12 @@ export class RrrExerciseDetail extends HTMLElement {
 
   private renderPropertySection(title: string, rows: PropertyRow[]): string {
     return `
-      <section class="rrr-section">
-        <h2 class="rrr-section-title">${escapeHtml(title)}</h2>
+      <rrr-section>
+        <span slot="heading">${escapeHtml(title)}</span>
         <dl class="rrr-property-list">
           ${rows.map((row) => this.renderPropertyRow(row)).join('')}
         </dl>
-      </section>
+      </rrr-section>
     `
   }
 

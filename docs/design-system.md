@@ -5,6 +5,45 @@ interaction patterns in `src/design-system`. Product rationale lives in
 `product-design-principles.md`; this document turns that rationale into coding
 guidance.
 
+## Sections
+
+Use `rrr-section` to group related page content under the standard section
+heading treatment. Supply plain text through `slot="heading"` and, when useful,
+`slot="description"`. Use `heading-level` only to represent the document
+hierarchy; it does not change the visual treatment.
+
+```html
+<rrr-section>
+  <span slot="heading">Exercises</span>
+  <span slot="description">Exercises included in this routine.</span>
+  <!-- section content -->
+</rrr-section>
+```
+
+A need for a visually larger heading usually indicates a page or subpage
+boundary, not another section variant. Feature-specific structures that cannot
+use `rrr-section`, such as a virtualized catalogue marker, should own clearly
+scoped feature styles rather than depend on legacy global section classes.
+
+## Card choice
+
+Use `.rrr-card` on an appropriate native `article`, `section`, or `div` when
+arbitrary rich content needs a padded flat surface. Choose the element for its
+document semantics; the class supplies presentation.
+
+Use `.rrr-list-card` on a native container whose direct children are
+`rrr-list-row` elements and no coordinated group behavior is required. Use the
+`rrr-list-card` custom element for the same composition only when radio rows
+need coordinated selection and roving keyboard tab stops.
+
+Use `.rrr-property-list` on a native `dl` for predictable value-first
+properties. It owns the same grouped surface and dividers as other row cards.
+
+Use a bespoke feature layout when content is not honestly a card or row
+collection, or when independent controls would create invalid nested
+interactions. Bespoke layouts may still reuse `.rrr-card` when a flat padded
+surface is appropriate.
+
 ## Row hierarchy follows the reading task
 
 Choose a row pattern by asking what the user needs to find first. Do not choose

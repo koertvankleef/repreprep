@@ -13,7 +13,6 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] Define a trustworthy routine-duration estimation policy before adding estimated duration to routine summaries.
 - [ ] Prefill routine names automatically; do not require the user to invent one from scratch.
 - [ ] [low priority] Use NATO/geographic-style routine naming and consider whether the natural 26-routine cap is acceptable.
-- [ ] Settings/options as right-hand side sidepanel that pops over the current page, with instant toggles and buttons that navigate to deeper sections when needed.
 - [ ] When the app loads incompatible local storage data, show a toast error message with a close button and proceed with a blank slate.
 - [ ] Non-MVP follow-up: allow the user one chance to download the data after having cleared it from storage.
 - [ ] Expand trust/history surfaces around existing import/export and history features so users can clearly review progress and feel ownership of their data.
@@ -28,5 +27,4 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] Add toast-level messaging rules for non-blocking issues that may have consequences.
 - [ ] Keep inline feedback for local form or import/export validation issues and field-level corrections.
 - [ ] In places with item lists like the History page: use swipe right/left actions for things like delete (with an undo toast with grace period!). This also requires that we hint at this functionality the first time the user sees an item in this list (by letting the swipe movement show for a second as a 'peek')
-- [x] Move the intended section-heading typography onto `.rrr-section-title` in the design system so its appearance does not depend on the semantic heading level used.
 

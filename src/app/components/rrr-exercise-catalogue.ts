@@ -319,7 +319,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
 
     return `
       <h2
-        class="rrr-section-title exercise-browser-section-title"
+        class="exercise-browser-section-title"
         style="${this.getMarkerStyle(index, visualLayout)}"
       >${escapeHtml(sectionTitle)}</h2>
     `

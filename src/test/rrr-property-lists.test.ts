@@ -62,6 +62,7 @@ describe('value-first property lists', () => {
     expect(exerciseList?.querySelector('rrr-list-row')).not.toBeNull()
     expect(actionRow?.getAttribute('activation')).toBe('button')
     expect(actionRow?.querySelector(':scope > button')).not.toBeNull()
+    expect(actionRow?.querySelector('rrr-icon[slot="leading"][name="play"]')).not.toBeNull()
     expect(actionRow?.parentElement?.previousElementSibling).toBe(sections[1])
     expect(detail.querySelector('rrr-button[data-action="start-workout"]')).toBeNull()
   })
