@@ -63,6 +63,15 @@ export class RrrRoutineDetail extends HTMLElement {
     `
   }
 
+  private renderPropertyRow(label: string, value: string): string {
+    return `
+      <div class="rrr-property-row">
+        <dt>${escapeHtml(label)}</dt>
+        <dd>${escapeHtml(value)}</dd>
+      </div>
+    `
+  }
+
   private render(): void {
     const routineId = this.routineIdValue
     const summary = routineId
@@ -101,20 +110,14 @@ export class RrrRoutineDetail extends HTMLElement {
 
         <rrr-section>
           <span slot="heading">${t('routineDetail.section.overview')}</span>
-          <div class="rrr-list-card">
-            <rrr-list-row
-              label="${t('routineDetail.exercises.label')}"
-              description="${escapeHtml(tPlural('message.routine.exerciseCount', exerciseCount))}"
-            ></rrr-list-row>
-            <rrr-list-row
-              label="${t('routineDetail.muscles.label')}"
-              description="${escapeHtml(primaryMuscles)}"
-            ></rrr-list-row>
-            <rrr-list-row
-              label="${t('routineDetail.lastStarted.label')}"
-              description="${escapeHtml(lastStarted)}"
-            ></rrr-list-row>
-          </div>
+          <dl class="rrr-property-list">
+            ${this.renderPropertyRow(
+              t('routineDetail.exercises.label'),
+              tPlural('message.routine.exerciseCount', exerciseCount),
+            )}
+            ${this.renderPropertyRow(t('routineDetail.muscles.label'), primaryMuscles)}
+            ${this.renderPropertyRow(t('routineDetail.lastStarted.label'), lastStarted)}
+          </dl>
         </rrr-section>
 
         <rrr-section>

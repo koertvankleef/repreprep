@@ -1,4 +1,5 @@
-:where(.rrr-row, .rrr-property-row) {
+.rrr-row,
+.rrr-property-row {
   box-sizing: border-box;
   inline-size: 100%;
   min-block-size: var(--rrr-row-min-block-size, var(--rrr-sizes-grid-7));

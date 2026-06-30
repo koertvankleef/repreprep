@@ -55,6 +55,11 @@ rrr-list-row[destructive] .rrr-list-row__row {
 rrr-list-row[disabled] .rrr-list-row__row {
   cursor: not-allowed;
   opacity: 0.55;
+  border: 0;
+  background: var(--rrr-list-row-background);
+  color: var(--rrr-list-row-color);
+  box-shadow: none;
+  transform: none;
 }
 
 .rrr-list-row__row:focus-visible {

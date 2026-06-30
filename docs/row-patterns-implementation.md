@@ -71,22 +71,22 @@ Do not replace these concepts with visual switches such as
 
 ### 3. Property-list pattern
 
-- [ ] Replace legacy `rrr-detail-row` CSS with `rrr-property-list` and
+- [x] Replace legacy `rrr-detail-row` CSS with `rrr-property-list` and
   `rrr-property-row`.
 - [x] Keep values primary and labels secondary.
 - [x] Reuse the shared row foundation without duplicating declarations.
-- [ ] Verify narrow and wide responsive arrangements.
+- [x] Verify narrow and wide responsive arrangements.
 
 ### 4. Migrations
 
-- [ ] Migrate Exercise Details.
-- [ ] Migrate the Routine Details overview.
-- [ ] Keep Routine Details exercises as identity-first rows.
-- [ ] Audit remaining static `rrr-list-row` instances for their reading task.
+- [x] Migrate Exercise Details.
+- [x] Migrate the Routine Details overview.
+- [x] Keep Routine Details exercises as identity-first rows.
+- [x] Audit remaining static `rrr-list-row` instances for their reading task.
 
 ### 5. Demonstration and verification
 
-- [ ] Show both patterns together in the styleguide.
+- [x] Show both patterns together in the styleguide.
 - [x] Update unit and app-level tests.
 - [x] Verify native semantics and keyboard behavior.
 - [ ] Verify light/dark and normal/high-contrast combinations.
@@ -117,3 +117,19 @@ Foundation/light-DOM chunk:
 - Mobile Routine-page visual check: no presentation regression observed.
 - `npm.cmd run check:i18n`: still reports the existing hardcoded styleguide
   demonstration labels; this chunk introduced no new findings.
+
+Property-pattern migration chunk:
+
+- `npm.cmd test -- --run`: passed, 132 tests across 24 files.
+- `npm.cmd run build`: passed.
+- `npm.cmd run check:architecture`: passed.
+- `npm.cmd run icons:check`: passed.
+- `git diff --check`: passed.
+- Exercise Details now uses three semantic property groups.
+- Routine Details now uses a value-first overview and an identity-first
+  exercise group.
+- The styleguide demonstrates both reading tasks together.
+- Narrow and wide styleguide checks confirmed stacked and two-column property
+  arrangements.
+- Visual checking caught and fixed global button styles leaking into light-DOM
+  action rows.

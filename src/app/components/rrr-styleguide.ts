@@ -459,6 +459,11 @@ export class RrrStyleguide extends HTMLElement {
             <span slot="heading">${t('styleguide.section.listRows')}</span>
             <span slot="description">${t('styleguide.listRows.description')}</span>
             <div class="list-showcase">
+              <div class="showcase-block">
+                <h3>${t('styleguide.listRows.identityHeading')}</h3>
+                <p class="sample-text">${t('styleguide.listRows.identityDescription')}</p>
+              </div>
+
               <div class="rrr-list-card">
                 <rrr-list-row
                   href="#/settings"
@@ -537,6 +542,21 @@ export class RrrStyleguide extends HTMLElement {
                 >
                   <rrr-badge slot="trailing" tone="success">${t('styleguide.listRows.ready')}</rrr-badge>
                 </rrr-list-row>
+              </div>
+
+              <div class="showcase-block">
+                <h3>${t('styleguide.listRows.propertyHeading')}</h3>
+                <p class="sample-text">${t('styleguide.listRows.propertyDescription')}</p>
+                <dl class="rrr-property-list">
+                  <div class="rrr-property-row">
+                    <dt>${t('styleguide.listRows.propertyLastStarted')}</dt>
+                    <dd>${t('styleguide.listRows.propertyLastStartedValue')}</dd>
+                  </div>
+                  <div class="rrr-property-row">
+                    <dt>${t('styleguide.listRows.propertyDefaultUnit')}</dt>
+                    <dd>${t('styleguide.listRows.propertyDefaultUnitValue')}</dd>
+                  </div>
+                </dl>
               </div>
             </div>
           </rrr-section>
