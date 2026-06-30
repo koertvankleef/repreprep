@@ -209,7 +209,7 @@ a:active {
   padding: 0;
 }
 
-:where(.rrr-list-card, rrr-list-card, .rrr-property-list) > :not(:last-child) {
+:where(.rrr-list-card, rrr-list-card) > :not(:last-child) {
   border-block-end: var(--rrr-border-width) solid var(--rrr-card-divider-color, var(--rrr-border-subtle));
 }
 

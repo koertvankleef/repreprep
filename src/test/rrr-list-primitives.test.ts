@@ -38,6 +38,19 @@ describe('list structure primitives', () => {
     expect(rows[1]?.getAttribute('aria-disabled')).toBe('true')
   })
 
+  test('supports the standard button tones on action rows', async () => {
+    const tones = ['primary', 'neutral', 'accent', 'info', 'success', 'warning', 'danger']
+    document.body.innerHTML = tones
+      .map((tone) => `<rrr-list-row activation="button" tone="${tone}" label="${tone}"></rrr-list-row>`)
+      .join('')
+    await Promise.resolve()
+
+    const rows = Array.from(document.querySelectorAll<RrrListRow>('rrr-list-row'))
+
+    expect(rows.map((row) => row.getAttribute('tone'))).toEqual(tones)
+    expect(rows.every((row) => row.querySelector(':scope > button') !== null)).toBe(true)
+  })
+
   test('keeps one radio row selected and supports arrow-key selection', async () => {
     document.body.innerHTML = `
       <rrr-list-card role="radiogroup" aria-label="Theme">

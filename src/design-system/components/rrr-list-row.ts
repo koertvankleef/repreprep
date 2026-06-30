@@ -15,7 +15,6 @@ export class RrrListRow extends HTMLElement {
     'checked',
     'control',
     'description',
-    'destructive',
     'disabled',
     'href',
     'label',

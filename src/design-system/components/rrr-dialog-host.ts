@@ -163,7 +163,7 @@ export class RrrDialogHost extends HTMLElement {
       <style>${styles}</style>
       <dialog aria-labelledby="${titleId}" aria-describedby="${messageId}">
         <div class="dialog-panel" role="document">
-          <h2 id="${titleId}">${escapeHtml(this.dialogTitle)}</h2>
+          <h3 id="${titleId}" class="dialog-title">${escapeHtml(this.dialogTitle)}</h3>
           <p class="dialog-message" id="${messageId}">${escapeHtml(this.message)}</p>
           ${promptContent}
           <div class="dialog-actions">

@@ -195,6 +195,7 @@ export const enUsMessages = {
   'styleguide.typography.heading1': 'Heading level 1',
   'styleguide.typography.heading2': 'Heading level 2',
   'styleguide.typography.heading3': 'Heading level 3',
+  'styleguide.typography.heading4': 'Heading level 4',
   'styleguide.typography.body': 'Body copy should read comfortably and reflect the default app rhythm.',
 
   'dialog.validation.required': 'This field is required.',

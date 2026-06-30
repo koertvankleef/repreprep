@@ -22,9 +22,21 @@
 }
 
 .rrr-property-row {
+  position: relative;
   display: grid;
   align-items: start;
   gap: var(--rrr-spacing-xs);
+}
+
+.rrr-property-list > .rrr-property-row:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: var(--rrr-row-padding-inline, var(--rrr-spacing-m));
+  inset-inline-end: 0;
+  inset-block-end: 0;
+  border-block-end: var(--rrr-border-width) solid
+    var(--rrr-card-divider-color, var(--rrr-border-subtle));
+  pointer-events: none;
 }
 
 .rrr-property-row > dt,

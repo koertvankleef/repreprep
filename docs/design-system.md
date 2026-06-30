@@ -38,6 +38,9 @@ need coordinated selection and roving keyboard tab stops.
 
 Use `.rrr-property-list` on a native `dl` for predictable value-first
 properties. It owns the same grouped surface and dividers as other row cards.
+Its dividers begin at the property content inset to reinforce that the rows are
+fields describing one object. List cards retain full-width dividers between
+peer entities, choices, and actions.
 
 Use a bespoke feature layout when content is not honestly a card or row
 collection, or when independent controls would create invalid nested
@@ -73,7 +76,20 @@ are identity-first even when some of them are not interactive.
 
 Navigation and action rows use the icon accent color for their primary label to
 reinforce that they activate something. Selection controls and static rows keep
-the normal text color; destructive actions use the danger color.
+the normal text color.
+
+Action rows accept the same semantic tones as buttons: `primary` (the default),
+`neutral`, `accent`, `info`, `success`, `warning`, and `danger`. A tone colors
+the row's primary label and leading icon and supplies a subtle matching
+hover/active tint; it does not turn the row into a solid button:
+
+```html
+<rrr-list-row
+  activation="button"
+  tone="danger"
+  label="Delete routine"
+></rrr-list-row>
+```
 
 “Informational” is not itself a reason to use a property row. A static entity
 still uses `rrr-list-row` when its name is what users need to identify first.

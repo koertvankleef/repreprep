@@ -195,6 +195,7 @@ export const nlNlMessages = {
   'styleguide.typography.heading1': 'Kopniveau 1',
   'styleguide.typography.heading2': 'Kopniveau 2',
   'styleguide.typography.heading3': 'Kopniveau 3',
+  'styleguide.typography.heading4': 'Kopniveau 4',
   'styleguide.typography.body': 'Lopende tekst moet prettig lezen en het standaard ritme van de app volgen.',
 
   'dialog.validation.required': 'Dit veld is verplicht.',

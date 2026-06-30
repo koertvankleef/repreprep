@@ -47,6 +47,14 @@ export class RrrRoutineDetail extends HTMLElement {
     window.location.hash = `#/workouts/${workout.id}/log`
   }
 
+  private editWorkout(): void {
+    if (!this.routineIdValue) {
+      return
+    }
+
+    window.location.hash = `#/routines/${encodeURIComponent(this.routineIdValue)}/edit`
+  }
+
   private renderExerciseRow(routineExercise: RoutineExercise): string {
     const exercise = storageService
       .getData()
@@ -136,11 +144,32 @@ export class RrrRoutineDetail extends HTMLElement {
             <rrr-icon slot="leading" name="play"></rrr-icon>
           </rrr-list-row>
         </div>
+
+        <div class="rrr-list-card">
+          <rrr-list-row
+            activation="button"
+            label="${t('routineDetail.action.edit')}"
+            data-action="edit-workout"
+            accessory="value-chevron"
+          >
+            <rrr-icon slot="leading" name="edit"></rrr-icon>
+          </rrr-list-row>
+          <rrr-list-row
+            activation="button"
+            label="${t('action.delete')}"
+            data-action="delete-workout"
+            tone="danger"
+          >
+            <rrr-icon slot="leading" name="delete"></rrr-icon>
+          </rrr-list-row>
+        </div>
       </section>
     `
 
     this.querySelector<HTMLElement>('rrr-list-row[data-action="start-workout"]')
       ?.addEventListener('click', () => this.startWorkout())
+    this.querySelector<HTMLElement>('rrr-list-row[data-action="edit-workout"]')
+      ?.addEventListener('click', () => this.editWorkout())
   }
 }
 

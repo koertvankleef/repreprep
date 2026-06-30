@@ -347,6 +347,7 @@ export class RrrStyleguide extends HTMLElement {
               <h1>${t('styleguide.typography.heading1')}</h1>
               <h2>${t('styleguide.typography.heading2')}</h2>
               <h3>${t('styleguide.typography.heading3')}</h3>
+              <h4>${t('styleguide.typography.heading4')}</h4>
               <p>${t('styleguide.typography.body')}</p>
             </div>
           </div>
@@ -530,7 +531,7 @@ export class RrrStyleguide extends HTMLElement {
                 <rrr-list-row
                   activation="button"
                   label="${t('styleguide.listRows.destructive')}"
-                  destructive
+                  tone="danger"
                 ></rrr-list-row>
               </div>
 

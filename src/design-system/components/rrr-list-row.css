@@ -2,10 +2,17 @@ rrr-list-row {
   display: block;
   min-inline-size: 0;
   --rrr-list-row-background: var(--rrr-surface-raised);
-  --rrr-list-row-background-hover: color-mix(in oklab, var(--rrr-color-primary), transparent 92%);
   --rrr-list-row-color: var(--rrr-color-text);
   --rrr-list-row-description-color: var(--rrr-text-muted);
-  --rrr-list-row-destructive-color: var(--rrr-colors-context-danger-70);
+  --rrr-list-row-tone-primary-color: var(--rrr-list-row-icon-color);
+  --rrr-list-row-tone-neutral-color: var(--rrr-button-neutral-fg, var(--rrr-color-text));
+  --rrr-list-row-tone-accent-color: var(--rrr-button-fg-accent);
+  --rrr-list-row-tone-info-color: var(--rrr-button-fg-info);
+  --rrr-list-row-tone-success-color: var(--rrr-button-fg-success);
+  --rrr-list-row-tone-warning-color: var(--rrr-button-fg-warning);
+  --rrr-list-row-tone-danger-color: var(--rrr-button-fg-danger);
+  --rrr-list-row-tone-color: var(--rrr-list-row-tone-primary-color);
+  --rrr-list-row-background-hover: color-mix(in oklab, var(--rrr-list-row-tone-color), transparent 92%);
   --rrr-list-row-min-block-size: var(--rrr-sizes-grid-7);
   --rrr-list-row-padding-block: var(--rrr-spacing-m);
   --rrr-list-row-padding-inline: var(--rrr-spacing-m);
@@ -16,6 +23,34 @@ rrr-list-row {
   --rrr-row-min-block-size: var(--rrr-list-row-min-block-size);
   --rrr-row-padding-block: var(--rrr-list-row-padding-block);
   --rrr-row-padding-inline: var(--rrr-list-row-padding-inline);
+}
+
+rrr-list-row[tone='primary'] {
+  --rrr-list-row-tone-color: var(--rrr-list-row-tone-primary-color);
+}
+
+rrr-list-row[tone='neutral'] {
+  --rrr-list-row-tone-color: var(--rrr-list-row-tone-neutral-color);
+}
+
+rrr-list-row[tone='accent'] {
+  --rrr-list-row-tone-color: var(--rrr-list-row-tone-accent-color);
+}
+
+rrr-list-row[tone='info'] {
+  --rrr-list-row-tone-color: var(--rrr-list-row-tone-info-color);
+}
+
+rrr-list-row[tone='success'] {
+  --rrr-list-row-tone-color: var(--rrr-list-row-tone-success-color);
+}
+
+rrr-list-row[tone='warning'] {
+  --rrr-list-row-tone-color: var(--rrr-list-row-tone-warning-color);
+}
+
+rrr-list-row[tone='danger'] {
+  --rrr-list-row-tone-color: var(--rrr-list-row-tone-danger-color);
 }
 
 .rrr-list-row__row {
@@ -48,10 +83,6 @@ rrr-list-row:not([disabled]) .rrr-list-row__row--control:active {
   transform: none;
 }
 
-rrr-list-row[destructive] .rrr-list-row__row {
-  color: var(--rrr-list-row-destructive-color);
-}
-
 rrr-list-row[disabled] .rrr-list-row__row {
   cursor: not-allowed;
   opacity: 0.55;
@@ -73,12 +104,8 @@ rrr-list-row[disabled] .rrr-list-row__row {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--rrr-list-row-icon-color, var(--rrr-colors-activity-indigo-70));
+  color: var(--rrr-list-row-tone-color);
   font-size: 1.25rem;
-}
-
-rrr-list-row[destructive] .rrr-list-row__leading {
-  color: currentColor;
 }
 
 .rrr-list-row__content {
@@ -101,11 +128,7 @@ rrr-list-row[destructive] .rrr-list-row__leading {
 }
 
 .rrr-list-row__row--interactive .rrr-list-row__label {
-  color: var(--rrr-list-row-icon-color, var(--rrr-colors-activity-indigo-70));
-}
-
-rrr-list-row[destructive] .rrr-list-row__label {
-  color: var(--rrr-list-row-destructive-color);
+  color: var(--rrr-list-row-tone-color);
 }
 
 .rrr-list-row__description {
