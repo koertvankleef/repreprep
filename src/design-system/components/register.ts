@@ -8,6 +8,7 @@ import { registerRrrListCard } from './rrr-list-card.ts'
 import { registerRrrListRow } from './rrr-list-row.ts'
 import { registerRrrSection } from './rrr-section.ts'
 import { registerRrrSelect } from './rrr-select.ts'
+import { registerRrrSheet } from './rrr-sheet.ts'
 import { registerRrrTextarea } from './rrr-textarea.ts'
 import { registerRrrTooltip } from './rrr-tooltip.ts'
 
@@ -22,6 +23,7 @@ export function registerDesignSystemComponents(): void {
   registerRrrSection()
   registerRrrListCard()
   registerRrrListRow()
+  registerRrrSheet()
   registerRrrDialogHost()
   registerRrrTooltip()
 }

@@ -5,7 +5,7 @@ import { toastService } from '../../foundation/toast.ts'
 import { formatDate, t, tPlural } from '../../i18n/index.ts'
 import type { Muscle, RoutineExercise } from '../../domain/types.ts'
 import { todayIso } from '../../utils/date.ts'
-import { confirmDialog } from '../../utils/dialog-service.ts'
+import { confirmSheet } from '../../utils/sheet-service.ts'
 
 export class RrrRoutineDetail extends HTMLElement {
   private routineIdValue: string | null = null
@@ -61,11 +61,11 @@ export class RrrRoutineDetail extends HTMLElement {
       return
     }
 
-    const confirmed = await confirmDialog({
+    const confirmed = await confirmSheet({
       title: t('routineDetail.dialog.delete.title'),
       message: t('routineDetail.dialog.delete.message'),
       confirmLabel: t('action.delete'),
-      cancelLabel: t('action.cancel'),
+      confirmTone: 'danger',
     })
 
     if (!confirmed) {
