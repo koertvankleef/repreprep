@@ -32,6 +32,11 @@ import {
   saveLanguagePreference,
   type LanguagePreference,
 } from './language-preferences.ts'
+import {
+  escapeHtml,
+  getEquipmentLabel,
+  getExerciseCategoryLabel,
+} from './render-helpers.ts'
 import globalStyles from '../design-system/global.css?inline'
 import appStyles from './rrr-app.css?inline'
 
@@ -323,11 +328,11 @@ export class RrrApp extends HTMLElement {
   }
 
   private async renameCurrentRoutine(): Promise<void> {
-    if (this.route.name !== 'routine-edit') {
+    if (this.route.name !== 'routine-detail') {
       return
     }
 
-    const editor = this.currentRouteView?.tagName.toLowerCase() === 'rrr-routine-editor'
+    const editor = this.currentRouteView?.tagName.toLowerCase() === 'rrr-routine-detail'
       ? this.currentRouteView as RoutineEditorElement
       : null
 
@@ -892,7 +897,7 @@ export class RrrApp extends HTMLElement {
           labelKey: 'app.settings.back',
         }, 'header-back')
       : '<span class="app-header-spacer" aria-hidden="true"></span>'
-    const actionContent = route.name === 'routine-edit'
+    const actionContent = route.name === 'routine-detail'
       ? this.renderRoutineRenameButton()
       : endLink
         ? this.renderHeaderLink(endLink, 'header-action')
@@ -1132,18 +1137,6 @@ export class RrrApp extends HTMLElement {
 
     this.previousRoute = route
   }
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-}
-
-function getExerciseCategoryLabel(category: ExerciseCategory): string {
-  return t(`exercise.category.${category}`)
-}
-
-function getEquipmentLabel(equipment: Equipment): string {
-  return t(`exercise.equipment.${equipment}`)
 }
 
 function toggleArrayValue<T>(values: readonly T[], value: T): T[] {

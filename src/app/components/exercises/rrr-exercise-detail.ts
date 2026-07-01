@@ -1,20 +1,20 @@
 import { getExercise, isExerciseUsedInRoutines } from '../../../domain/exercise-service.ts'
 import type {
-  Equipment,
-  ExerciseCategory,
   ExerciseDefinition,
   MeasurementProfile,
-  MeasurementType,
-  Muscle,
 } from '../../../domain/types.ts'
 import { formatDate, t } from '../../../i18n/index.ts'
+import {
+  escapeHtml,
+  getEquipmentLabel,
+  getExerciseCategoryLabel,
+  getMeasurementTypeLabel,
+  getMuscleLabel,
+  renderPropertyRow,
+  type PropertyRow,
+} from '../../render-helpers.ts'
 import { storageService } from '../../storage-instance.ts'
 import styles from './rrr-exercise-detail.css?inline'
-
-type PropertyRow = {
-  label: string
-  value: string
-}
 
 export class RrrExerciseDetail extends HTMLElement {
   private exerciseIdValue: string | null = null
@@ -69,27 +69,27 @@ export class RrrExerciseDetail extends HTMLElement {
 
   private renderExercise(exercise: ExerciseDefinition, usedInRoutines: boolean): string {
     const overviewRows: PropertyRow[] = [
-      { label: t('exercise.detail.description'), value: this.renderText(exercise.description) },
-      { label: t('exercise.detail.aliases'), value: this.renderBadgeList(exercise.aliases, (alias) => alias) },
-      { label: t('exercise.detail.origin'), value: this.renderOrigin(exercise.createdByUser) },
-      { label: t('exercise.detail.type'), value: this.renderBadge(this.getKindLabel(exercise)) },
-      { label: t('exercise.detail.defaultUnit'), value: this.renderText(this.getDefaultUnitLabel(exercise.defaultUnit)) },
-      { label: t('exercise.detail.status'), value: this.renderBadge(exercise.archived ? t('exercise.detail.archived') : t('exercise.detail.active')) },
-      { label: t('exercise.detail.usedInRoutines'), value: this.renderText(usedInRoutines ? t('exercise.detail.yes') : t('exercise.detail.no')) },
+      { label: t('exercise.detail.description'), htmlString: this.renderText(exercise.description) },
+      { label: t('exercise.detail.aliases'), htmlString: this.renderBadgeList(exercise.aliases, (alias) => alias) },
+      { label: t('exercise.detail.origin'), htmlString: this.renderOrigin(exercise.createdByUser) },
+      { label: t('exercise.detail.type'), htmlString: this.renderBadge(this.getKindLabel(exercise)) },
+      { label: t('exercise.detail.defaultUnit'), htmlString: this.renderText(this.getDefaultUnitLabel(exercise.defaultUnit)) },
+      { label: t('exercise.detail.status'), htmlString: this.renderBadge(exercise.archived ? t('exercise.detail.archived') : t('exercise.detail.active')) },
+      { label: t('exercise.detail.usedInRoutines'), htmlString: this.renderText(usedInRoutines ? t('exercise.detail.yes') : t('exercise.detail.no')) },
     ]
 
     const classificationRows: PropertyRow[] = [
-      { label: t('exercise.detail.categories'), value: this.renderBadgeList(exercise.categories, getCategoryLabel) },
-      { label: t('exercise.detail.equipment'), value: this.renderBadgeList(exercise.equipment, getEquipmentLabel) },
-      { label: t('exercise.detail.primaryMuscles'), value: this.renderBadgeList(exercise.primaryMuscles, getMuscleLabel) },
-      { label: t('exercise.detail.secondaryMuscles'), value: this.renderBadgeList(exercise.secondaryMuscles, getMuscleLabel) },
-      { label: t('exercise.detail.measurementProfiles'), value: this.renderMeasurementProfiles(exercise.measurementProfiles) },
+      { label: t('exercise.detail.categories'), htmlString: this.renderBadgeList(exercise.categories, getExerciseCategoryLabel) },
+      { label: t('exercise.detail.equipment'), htmlString: this.renderBadgeList(exercise.equipment, getEquipmentLabel) },
+      { label: t('exercise.detail.primaryMuscles'), htmlString: this.renderBadgeList(exercise.primaryMuscles, getMuscleLabel) },
+      { label: t('exercise.detail.secondaryMuscles'), htmlString: this.renderBadgeList(exercise.secondaryMuscles, getMuscleLabel) },
+      { label: t('exercise.detail.measurementProfiles'), htmlString: this.renderMeasurementProfiles(exercise.measurementProfiles) },
     ]
 
     const recordRows: PropertyRow[] = [
-      { label: t('exercise.detail.id'), value: this.renderCode(exercise.id) },
-      { label: t('exercise.detail.created'), value: this.renderText(this.formatTimestamp(exercise.createdAt)) },
-      { label: t('exercise.detail.updated'), value: this.renderText(this.formatTimestamp(exercise.updatedAt)) },
+      { label: t('exercise.detail.id'), htmlString: this.renderCode(exercise.id) },
+      { label: t('exercise.detail.created'), htmlString: this.renderText(this.formatTimestamp(exercise.createdAt)) },
+      { label: t('exercise.detail.updated'), htmlString: this.renderText(this.formatTimestamp(exercise.updatedAt)) },
     ]
 
     return `
@@ -106,18 +106,9 @@ export class RrrExerciseDetail extends HTMLElement {
       <rrr-section>
         <span slot="heading">${escapeHtml(title)}</span>
         <dl class="rrr-property-list">
-          ${rows.map((row) => this.renderPropertyRow(row)).join('')}
+          ${rows.map((row) => renderPropertyRow(row)).join('')}
         </dl>
       </rrr-section>
-    `
-  }
-
-  private renderPropertyRow(row: PropertyRow): string {
-    return `
-      <div class="rrr-property-row">
-        <dt>${escapeHtml(row.label)}</dt>
-        <dd>${row.value}</dd>
-      </div>
     `
   }
 
@@ -211,26 +202,6 @@ export class RrrExerciseDetail extends HTMLElement {
       timeStyle: 'short',
     })
   }
-}
-
-function getCategoryLabel(category: ExerciseCategory): string {
-  return t(`exercise.category.${category}`)
-}
-
-function getEquipmentLabel(equipment: Equipment): string {
-  return t(`exercise.equipment.${equipment}`)
-}
-
-function getMuscleLabel(muscle: Muscle): string {
-  return t(`exercise.muscle.${muscle}`)
-}
-
-function getMeasurementTypeLabel(type: MeasurementType): string {
-  return t(`exercise.measurement.${type}`)
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 customElements.define('rrr-exercise-detail', RrrExerciseDetail)

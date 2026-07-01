@@ -2,7 +2,8 @@ import { storageService } from '../../storage-instance.ts'
 import { getExercise } from '../../../domain/exercise-service.ts'
 import { getActiveRoutines } from '../../../domain/routine-service.ts'
 import { createWorkoutFromRoutine } from '../../../domain/workout-service.ts'
-import { formatDate as formatLocalizedDate, t } from '../../../i18n/index.ts'
+import { t } from '../../../i18n/index.ts'
+import { formatCalendarDate } from '../../render-helpers.ts'
 import { todayIso } from '../../../utils/date.ts'
 import styles from './rrr-workout-list.css?inline'
 import { confirmSheet } from '../../../utils/sheet-service.ts'
@@ -53,18 +54,7 @@ export class RrrWorkoutList extends HTMLElement {
   }
 
   private formatWorkoutDate(value: string): string {
-    const date = new Date(`${value}T12:00:00`)
-
-    if (Number.isNaN(date.getTime())) {
-      return value
-    }
-
-    return formatLocalizedDate(date, {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    })
+    return formatCalendarDate(value)
   }
 
   private render(): void {

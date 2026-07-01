@@ -1,6 +1,7 @@
 import { createTimeSet, createRepsSet } from '../../../../domain/workout-service.ts'
 import { t } from '../../../../i18n/index.ts'
 import type { ExerciseDefinition, SetEntry, WorkoutExerciseEntry } from '../../../../domain/types.ts'
+import { escapeHtml } from '../../../render-helpers.ts'
 import './rrr-set-entry.ts'
 import styles from './rrr-exercise-entry.css?inline'
 
@@ -180,10 +181,6 @@ export class RrrExerciseEntry extends HTMLElement {
       }
     }
   }
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 customElements.define('rrr-exercise-entry', RrrExerciseEntry)

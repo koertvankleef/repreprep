@@ -1,5 +1,9 @@
 import type { AppData, ExerciseDefinition, SetEntry, Workout } from '../../../../domain/types.ts'
-import type { Exercise, TimelineItem } from './rrr-workout-logging-model.ts'
+import {
+  buildTimeline,
+  type Exercise,
+  type TimelineItem,
+} from './rrr-workout-logging-model.ts'
 
 export interface WorkoutLoggingAdapterOptions {
   defaultRestSeconds?: number
@@ -117,34 +121,4 @@ function inferPreviousPerformance(sets: SetEntry[]): string | null {
   }
 
   return `${safeReps} reps @ ${lastSet.weightKg}kg`
-}
-
-function buildTimeline(exercises: Exercise[], transitionSeconds: number): TimelineItem[] {
-  const safeTransitionSeconds = Math.max(0, transitionSeconds)
-  const timeline: TimelineItem[] = []
-
-  exercises.forEach((exercise, exerciseIndex) => {
-    for (let setNumber = 1; setNumber <= exercise.totalSets; setNumber += 1) {
-      timeline.push({ kind: 'set', exerciseIndex, setNumber })
-
-      if (setNumber < exercise.totalSets) {
-        timeline.push({
-          kind: 'rest',
-          exerciseIndex,
-          setNumber,
-          durationSeconds: exercise.restSeconds,
-        })
-      }
-    }
-
-    if (exerciseIndex < exercises.length - 1) {
-      timeline.push({
-        kind: 'transition',
-        exerciseIndex,
-        durationSeconds: safeTransitionSeconds,
-      })
-    }
-  })
-
-  return timeline
 }

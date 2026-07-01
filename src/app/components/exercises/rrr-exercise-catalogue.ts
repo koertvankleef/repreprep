@@ -1,7 +1,13 @@
 import { filterExercises, searchExercises, type ExerciseFilters } from '../../../domain/exercise-service.ts'
-import type { AppData, Equipment, ExerciseDefinition, MeasurementProfile, MeasurementType, Muscle } from '../../../domain/types.ts'
+import type { AppData, ExerciseDefinition, MeasurementProfile } from '../../../domain/types.ts'
 import { t } from '../../../i18n/index.ts'
 import { FocusedSequenceController, type FocusSequenceState } from '../../focused-sequence-controller.ts'
+import {
+  escapeHtml,
+  getEquipmentLabel,
+  getMeasurementTypeLabel,
+  getMuscleLabel,
+} from '../../render-helpers.ts'
 import { storageService } from '../../storage-instance.ts'
 import styles from './rrr-exercise-catalogue.css?inline'
 
@@ -643,18 +649,6 @@ function truncateText(text: string, maxLength: number): string {
   return `${truncated}...`
 }
 
-function getEquipmentLabel(equipment: Equipment): string {
-  return t(`exercise.equipment.${equipment}`)
-}
-
-function getMuscleLabel(muscle: Muscle): string {
-  return t(`exercise.muscle.${muscle}`)
-}
-
-function getMeasurementTypeLabel(type: MeasurementType): string {
-  return t(`exercise.measurement.${type}`)
-}
-
 function formatCssNumber(value: number): string {
   return value.toFixed(4)
 }
@@ -792,10 +786,6 @@ function getFocusAnchor(visualPosition: number, itemCount: number): string {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max)
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 customElements.define('rrr-exercise-catalogue', RrrExerciseCatalogue)

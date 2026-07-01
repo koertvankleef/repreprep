@@ -1,6 +1,7 @@
 import { storageService } from '../../storage-instance.ts'
 import { getExerciseHistory, getPersonalRecord } from '../../../domain/history-service.ts'
-import { formatDate, t } from '../../../i18n/index.ts'
+import { t } from '../../../i18n/index.ts'
+import { formatCalendarDate } from '../../render-helpers.ts'
 import styles from './rrr-exercise-history.css?inline'
 
 export class RrrExerciseHistory extends HTMLElement {
@@ -88,18 +89,7 @@ export class RrrExerciseHistory extends HTMLElement {
   }
 
   private formatHistoryDate(value: string): string {
-    const date = new Date(`${value}T12:00:00`)
-
-    if (Number.isNaN(date.getTime())) {
-      return value
-    }
-
-    return formatDate(date, {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    })
+    return formatCalendarDate(value)
   }
 
   private render(): void {

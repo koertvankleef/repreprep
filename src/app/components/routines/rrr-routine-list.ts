@@ -3,8 +3,9 @@ import {
   getRoutineListSections,
   type RoutineSummary,
 } from '../../../domain/routine-summary-service.ts'
-import { formatDate, t } from '../../../i18n/index.ts'
+import { t } from '../../../i18n/index.ts'
 import type { Muscle } from '../../../domain/types.ts'
+import { escapeHtml, formatShortDate, getMuscleLabel } from '../../render-helpers.ts'
 import styles from './rrr-routine-list.css?inline'
 
 const previewExerciseCount = 3
@@ -31,11 +32,7 @@ export class RrrRoutineList extends HTMLElement {
     })
     const lastStarted = summary.lastStartedAt
       ? t('routineList.lastStarted', {
-          date: formatDate(new Date(summary.lastStartedAt), {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-          }),
+          date: formatShortDate(new Date(summary.lastStartedAt)),
         })
       : t('routineList.lastStartedNever')
 
@@ -120,14 +117,6 @@ export class RrrRoutineList extends HTMLElement {
       </section>
     `
   }
-}
-
-function getMuscleLabel(muscle: Muscle): string {
-  return t(`exercise.muscle.${muscle}`)
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 customElements.define('rrr-routine-list', RrrRoutineList)

@@ -2,13 +2,23 @@ import { storageService } from '../../storage-instance.ts'
 import { getRoutineSummary } from '../../../domain/routine-summary-service.ts'
 import { createWorkoutFromRoutine } from '../../../domain/workout-service.ts'
 import { toastService } from '../../../foundation/toast.ts'
-import { formatDate, t, tPlural } from '../../../i18n/index.ts'
-import type { Muscle, RoutineExercise } from '../../../domain/types.ts'
+import { t, tPlural } from '../../../i18n/index.ts'
+import type { RoutineExercise } from '../../../domain/types.ts'
 import { todayIso } from '../../../utils/date.ts'
-import { confirmSheet } from '../../../utils/sheet-service.ts'
+import { confirmSheet, presentSheet } from '../../../utils/sheet-service.ts'
+import { getActiveRoutineVersion, getRoutine } from '../../../domain/routine-service.ts'
+import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
+import {
+  escapeHtml,
+  formatShortDate,
+  getMuscleLabel,
+  renderPropertyRow,
+} from '../../render-helpers.ts'
 
 export class RrrRoutineDetail extends HTMLElement {
   private routineIdValue: string | null = null
+  private renameSheetActive = false
+  private name = ''
 
   private readonly handleDataChanged = (): void => {
     this.render()
@@ -16,7 +26,7 @@ export class RrrRoutineDetail extends HTMLElement {
 
   set routineId(value: string | null) {
     this.routineIdValue = value
-    this.render()
+    this.initialize()
   }
 
   get routineId(): string | null {
@@ -25,11 +35,96 @@ export class RrrRoutineDetail extends HTMLElement {
 
   connectedCallback(): void {
     window.addEventListener('rrr-data-changed', this.handleDataChanged)
-    this.render()
+    this.initialize()
   }
 
   disconnectedCallback(): void {
     window.removeEventListener('rrr-data-changed', this.handleDataChanged)
+  }
+
+  private initialize(): void {
+    const data = storageService.getData()
+
+    if (this.routineIdValue) {
+      const routine = getRoutine(data, this.routineIdValue)
+
+      if (!routine) {
+        this.name = ''
+        // this.exercises = []
+        this.render()
+        return
+      }
+
+      const version = getActiveRoutineVersion(data, this.routineIdValue)
+
+      this.name = routine.name
+      /* this.transitionSeconds = Math.max(0, version?.transitionSeconds ?? RrrRoutineEditor.defaultTransitionSeconds)
+      this.exercises = version
+        ? version.exercises.map((exercise) => ({
+            ...exercise,
+            restSeconds: Math.max(0, exercise.restSeconds ?? RrrRoutineEditor.defaultRestSeconds),
+          }))
+        : [] */
+    } else {
+      this.name = ''
+      // this.transitionSeconds = RrrRoutineEditor.defaultTransitionSeconds
+      // this.exercises = []
+    }
+
+    this.render()
+  }
+
+  async openRenameSheet(): Promise<boolean> {
+    const routineId = this.routineIdValue
+    const routine = routineId ? getRoutine(storageService.getData(), routineId) : undefined
+
+    if (!routine || this.renameSheetActive) {
+      return false
+    }
+
+    const sheet = document.createElement('rrr-sheet') as RrrSheet
+    const heading = document.createElement('h3')
+    heading.slot = 'heading'
+    heading.className = 'sheet-title'
+    heading.textContent = t('routineEditor.dialog.rename.title')
+
+    const nameInput = document.createElement('rrr-input') as HTMLElement & { value: string }
+    nameInput.slot = 'body'
+    nameInput.setAttribute('autofocus', '')
+    nameInput.setAttribute('label', t('routineEditor.dialog.rename.label'))
+    nameInput.setAttribute('required', '')
+    nameInput.value = routine.name
+
+    const confirmButton = document.createElement('rrr-button')
+    confirmButton.slot = 'actions'
+    confirmButton.setAttribute('type', 'button')
+    confirmButton.setAttribute('data-sheet-result', 'confirm')
+    confirmButton.textContent = t('action.confirm')
+
+    const syncConfirmation = (): void => {
+      confirmButton.toggleAttribute('disabled', !nameInput.value.trim())
+    }
+    nameInput.addEventListener('input', syncConfirmation)
+    syncConfirmation()
+
+    sheet.append(heading, nameInput, confirmButton)
+    this.renameSheetActive = true
+
+    try {
+      const result = await presentSheet(sheet)
+      const name = nameInput.value.trim()
+
+      if (result !== 'confirm' || !name || name === routine.name) {
+        return false
+      }
+
+      storageService.renameRoutine(routine.id, name)
+      this.name = name
+      window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+      return true
+    } finally {
+      this.renameSheetActive = false
+    }
   }
 
   private startWorkout(): void {
@@ -92,15 +187,6 @@ export class RrrRoutineDetail extends HTMLElement {
     `
   }
 
-  private renderPropertyRow(label: string, value: string): string {
-    return `
-      <div class="rrr-property-row">
-        <dt>${escapeHtml(label)}</dt>
-        <dd>${escapeHtml(value)}</dd>
-      </div>
-    `
-  }
-
   private render(): void {
     const routineId = this.routineIdValue
     const summary = routineId
@@ -121,11 +207,7 @@ export class RrrRoutineDetail extends HTMLElement {
       ? summary.primaryMuscles.map(getMuscleLabel).join(', ')
       : t('routineDetail.muscles.none')
     const lastStarted = summary.lastStartedAt
-      ? formatDate(new Date(summary.lastStartedAt), {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
-        })
+      ? formatShortDate(new Date(summary.lastStartedAt))
       : t('routineDetail.lastStartedNever')
 
     this.innerHTML = `
@@ -135,12 +217,10 @@ export class RrrRoutineDetail extends HTMLElement {
         <rrr-section>
           <span slot="heading">${t('routineDetail.section.overview')}</span>
           <dl class="rrr-property-list">
-            ${this.renderPropertyRow(
-              t('routineDetail.exercises.label'),
-              tPlural('message.routine.exerciseCount', exerciseCount),
-            )}
-            ${this.renderPropertyRow(t('routineDetail.muscles.label'), primaryMuscles)}
-            ${this.renderPropertyRow(t('routineDetail.lastStarted.label'), lastStarted)}
+            ${renderPropertyRow({
+              label: t('routineDetail.muscles.label'),
+              textValue: primaryMuscles,
+            })}
           </dl>
         </rrr-section>
 
@@ -185,6 +265,20 @@ export class RrrRoutineDetail extends HTMLElement {
             </rrr-list-row>
           </div>
         </rrr-section>
+
+        <rrr-section>
+          <span slot="heading">Data</span>
+          <dl class="rrr-property-list">
+            ${renderPropertyRow({
+              label: t('routineDetail.exercises.label'),
+              textValue: tPlural('message.routine.exerciseCount', exerciseCount),
+            })}
+            ${renderPropertyRow({
+              label: t('routineDetail.lastStarted.label'),
+              textValue: lastStarted,
+            })}
+          </dl>
+        </rrr-section>
       </section>
     `
 
@@ -195,14 +289,6 @@ export class RrrRoutineDetail extends HTMLElement {
     this.querySelector<HTMLElement>('rrr-list-row[data-action="delete-routine"]')
       ?.addEventListener('click', () => void this.deleteRoutine())
   }
-}
-
-function getMuscleLabel(muscle: Muscle): string {
-  return t(`exercise.muscle.${muscle}`)
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 customElements.define('rrr-routine-detail', RrrRoutineDetail)

@@ -155,6 +155,7 @@ export let EXERCISES: Exercise[] = DEFAULT_EXERCISES
 export let EXERCISE_TRANSITION_SECONDS = DEFAULT_EXERCISE_TRANSITION_SECONDS
 
 export function buildTimeline(exercises: Exercise[], exerciseTransitionSeconds: number): TimelineItem[] {
+  const safeTransitionSeconds = Math.max(0, exerciseTransitionSeconds)
   const timeline: TimelineItem[] = []
 
   exercises.forEach((exercise, exerciseIndex) => {
@@ -167,7 +168,7 @@ export function buildTimeline(exercises: Exercise[], exerciseTransitionSeconds: 
     }
 
     if (exerciseIndex < exercises.length - 1) {
-      timeline.push({ kind: 'transition', exerciseIndex, durationSeconds: exerciseTransitionSeconds })
+      timeline.push({ kind: 'transition', exerciseIndex, durationSeconds: safeTransitionSeconds })
     }
   })
 
