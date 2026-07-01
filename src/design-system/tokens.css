@@ -14,7 +14,7 @@
   --rrr-colors-grayscale-10: oklch(98.82% 0.0015 176.00);
   --rrr-colors-grayscale-00: oklch(100.00% 0.0000 0.00);
 
-  /* Brand mapping: brand-inspired tone derived from --rrr-colors-serene-mint-60 (#108981). */
+  /* Brand mapping: brand-inspired tone derived from --rrr-colors-serene-mint-60. */
   --rrr-colors-serene-mint-10: oklch(95.26% 0.0284 184.51);
   --rrr-colors-serene-mint-20: oklch(87.59% 0.0456 187.50);
   --rrr-colors-serene-mint-30: oklch(79.92% 0.0660 192.20);
