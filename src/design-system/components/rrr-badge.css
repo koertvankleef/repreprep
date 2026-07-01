@@ -32,7 +32,7 @@ rrr-badge {
 
 rrr-badge[tone='neutral'] {
   --_tone: var(--rrr-color-text);
-  --_solid-fg: var(--rrr-color-background);
+  --_solid-fg: var(--rrr-surface-base);
 }
 
 rrr-badge[tone='accent'] {

@@ -2,9 +2,9 @@ rrr-dialog-host {
   display: contents;
   --rrr-dialog-width: 100%;
   --rrr-dialog-border-width: var(--rrr-border-width);
-  --rrr-dialog-border-color: var(--rrr-color-background);
+  --rrr-dialog-border-color: var(--rrr-surface-base);
   --rrr-dialog-border-radius: var(--rrr-radius-xl);
-  --rrr-dialog-background: var(--rrr-color-background);
+  --rrr-dialog-background: var(--rrr-surface-base);
   --rrr-dialog-color: var(--rrr-colors-grayscale-100);
   --rrr-dialog-shadow: var(--rrr-shadow-dialog);
   --rrr-dialog-backdrop: color-mix(in oklch, var(--rrr-colors-grayscale-90) 30%, transparent);

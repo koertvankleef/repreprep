@@ -8,7 +8,7 @@
     var(--rrr-row-padding-inline, var(--rrr-spacing-m));
   border: 0;
   border-radius: 0;
-  background: var(--rrr-row-background, var(--rrr-surface-raised));
+  background: var(--rrr-row-background);
   color: var(--rrr-row-color, var(--rrr-color-text));
   font: inherit;
   line-height: 1.35;

@@ -34,7 +34,7 @@
 
 :host([tone='neutral']) {
   --_accent-bg: var(--rrr-input-neutral-bg, var(--rrr-color-text));
-  --_accent-bg-hover: var(--rrr-input-neutral-bg-hover, color-mix(in oklab, var(--rrr-color-text), var(--rrr-color-background) 16%));
+  --_accent-bg-hover: var(--rrr-input-neutral-bg-hover, color-mix(in oklab, var(--rrr-color-text), var(--rrr-surface-base) 16%));
   --_interactive-fg: var(--rrr-input-neutral-fg, var(--rrr-color-text));
 }
 

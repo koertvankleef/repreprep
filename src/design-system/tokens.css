@@ -175,7 +175,7 @@
   --rrr-button-fg-danger: var(--rrr-colors-context-danger-70);
 
   /* Surface and content semantics */
-  --rrr-surface-base: var(--rrr-colors-grayscale-30);
+  --rrr-surface-base: var(--rrr-colors-grayscale-20);
   --rrr-surface-raised: var(--rrr-colors-grayscale-00);
   --rrr-border-subtle: var(--rrr-colors-grayscale-30);
   --rrr-text-muted: var(--rrr-colors-grayscale-70);
@@ -183,7 +183,6 @@
   /* App-level semantic tokens used by the current UI surface. */
   --rrr-color-primary: var(--rrr-colors-activity-indigo-60);
   --rrr-color-primary-contrast: var(--rrr-colors-grayscale-00);
-  --rrr-color-background: var(--rrr-surface-base);
   --rrr-color-text: var(--rrr-colors-grayscale-90);
   --rrr-color-link: var(--rrr-colors-activity-indigo-70);
   --rrr-color-link-hover: var(--rrr-colors-serene-mint-70);
@@ -220,7 +219,8 @@
   --rrr-color-link: var(--rrr-colors-activity-indigo-20);
   --rrr-color-link-hover: var(--rrr-colors-serene-mint-20);
   --rrr-color-scheme: dark;
-  --rrr-surface-raised: var(--rrr-colors-grayscale-20);
+  --rrr-surface-base: var(--rrr-colors-grayscale-20);
+  --rrr-surface-raised: var(--rrr-colors-grayscale-00);
 
   --global-focus-ring-color: var(--rrr-colors-grayscale-100);
   --rrr-depth-1-shadow: 0 1px 2px #0000004f, 0 1px 1px #00000040;
@@ -252,7 +252,6 @@
 
   --rrr-color-primary: var(--rrr-colors-activity-indigo-60);
   --rrr-color-primary-contrast: #ffffff;
-  --rrr-surface-base: #ffffff;
   --rrr-surface-raised: #ffffff;
   --rrr-border-subtle: #000000;
   --rrr-text-muted: var(--rrr-colors-grayscale-70);
@@ -286,8 +285,8 @@
 
   --rrr-color-primary: var(--rrr-colors-activity-indigo-60);
   --rrr-color-primary-contrast: #ffffff;
-  --rrr-surface-base: #000000;
-  --rrr-surface-raised: #0f0f0f;
+  --rrr-surface-base: var(--rrr-colors-grayscale-30);
+  --rrr-surface-raised: var(--rrr-colors-grayscale-20);
   --rrr-border-subtle: #ffffff;
   --rrr-text-muted: var(--rrr-colors-grayscale-80);
   --rrr-color-text: #ffffff;

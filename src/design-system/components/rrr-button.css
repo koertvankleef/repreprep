@@ -36,8 +36,8 @@ rrr-button[size='s'] {
 
 rrr-button[tone='neutral'] {
   --_bg: var(--rrr-button-neutral-bg, var(--rrr-color-text));
-  --_bg-hover: var(--rrr-button-neutral-bg-hover, color-mix(in oklab, var(--rrr-color-text), var(--rrr-color-background) 16%));
-  --_fg: var(--rrr-button-neutral-fg-solid, var(--rrr-color-background));
+  --_bg-hover: var(--rrr-button-neutral-bg-hover, color-mix(in oklab, var(--rrr-color-text), var(--rrr-surface-base) 16%));
+  --_fg: var(--rrr-button-neutral-fg-solid, var(--rrr-surface-base));
   --_interactive-fg: var(--rrr-button-neutral-fg, var(--rrr-color-text));
 }
 
