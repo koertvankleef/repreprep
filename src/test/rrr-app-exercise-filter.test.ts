@@ -108,10 +108,10 @@ describe('rrr-app exercise filters', () => {
     window.dispatchEvent(new HashChangeEvent('hashchange'))
 
     expect(window.location.hash).toBe('#/settings')
-    expect(app.shadowRoot?.querySelector('a.header-action')).toBeNull()
+    expect(app.shadowRoot?.querySelector('.route-header-layer-current a.header-action')).toBeNull()
 
     const backLink = app.shadowRoot?.querySelector<HTMLAnchorElement>(
-      'a.header-back[href="#/workouts"]',
+      '.route-header-layer-current a.header-back[href="#/workouts"]',
     )
     expect(backLink).toBeTruthy()
 
@@ -119,15 +119,15 @@ describe('rrr-app exercise filters', () => {
     window.dispatchEvent(new HashChangeEvent('hashchange'))
 
     expect(window.location.hash).toBe('#/workouts')
-    expect(app.shadowRoot?.querySelector('a.header-action[href="#/settings"]')).toBeTruthy()
+    expect(app.shadowRoot?.querySelector('.route-header-layer-current a.header-action[href="#/settings"]')).toBeTruthy()
 
     window.location.hash = '#/routines'
     window.dispatchEvent(new HashChangeEvent('hashchange'))
 
-    expect(app.shadowRoot?.querySelector('a.header-action[href="#/settings"]')).toBeNull()
+    expect(app.shadowRoot?.querySelector('.route-header-layer-current a.header-action[href="#/settings"]')).toBeNull()
 
     const newRoutineLink = app.shadowRoot?.querySelector<HTMLAnchorElement>(
-      'a.header-action[href="#/routines/new"]',
+      '.route-header-layer-current a.header-action[href="#/routines/new"]',
     )
     expect(newRoutineLink).toBeTruthy()
     expect(newRoutineLink?.querySelector('rrr-icon')?.getAttribute('name')).toBe('add')
@@ -136,6 +136,71 @@ describe('rrr-app exercise filters', () => {
 
     expect(window.location.hash).toBe('#/routines/new')
     app.remove()
+  })
+
+  it('matches header transition direction to main and subpage navigation', () => {
+    window.location.hash = '#/workouts'
+    const app = document.createElement('rrr-app')
+    document.body.append(app)
+
+    window.location.hash = '#/routines'
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+
+    const appHeader = app.shadowRoot?.querySelector('.app-header')
+    let entering = appHeader?.querySelector<HTMLElement>('.route-header-layer-enter-main-switch')
+    let outgoing = appHeader?.querySelector<HTMLElement>('.route-header-layer-exit-main-switch')
+    expect(entering).toBeTruthy()
+    expect(outgoing?.inert).toBe(true)
+    entering?.dispatchEvent(new Event('animationend'))
+    expect(appHeader?.querySelectorAll('.app-header-primary > .route-header-layer')).toHaveLength(1)
+
+    window.location.hash = '#/routines/new'
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+    entering = appHeader?.querySelector<HTMLElement>('.route-header-layer-enter-sub-forward')
+    outgoing = appHeader?.querySelector<HTMLElement>('.route-header-layer-exit-sub-forward')
+    expect(entering).toBeTruthy()
+    expect(outgoing?.inert).toBe(true)
+    entering?.dispatchEvent(new Event('animationend'))
+
+    window.location.hash = '#/routines'
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+    entering = appHeader?.querySelector<HTMLElement>('.route-header-layer-enter-sub-back')
+    outgoing = appHeader?.querySelector<HTMLElement>('.route-header-layer-exit-sub-back')
+    expect(entering).toBeTruthy()
+    expect(outgoing?.inert).toBe(true)
+    entering?.dispatchEvent(new Event('animationend'))
+  }, 10_000)
+
+  it('replaces header content without animation when reduced motion is preferred', () => {
+    const originalMatchMedia = window.matchMedia
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: () => ({
+        matches: true,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }),
+    })
+
+    try {
+      window.location.hash = '#/workouts'
+      const app = document.createElement('rrr-app')
+      document.body.append(app)
+
+      window.location.hash = '#/routines'
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+
+      const appHeader = app.shadowRoot?.querySelector('.app-header')
+      expect(appHeader?.classList.contains('is-transitioning')).toBe(false)
+      expect(appHeader?.querySelectorAll('.app-header-primary > .route-header-layer')).toHaveLength(1)
+      expect(appHeader?.querySelector('.route-header-layer-enter-main-switch')).toBeNull()
+      app.remove()
+    } finally {
+      Object.defineProperty(window, 'matchMedia', {
+        configurable: true,
+        value: originalMatchMedia,
+      })
+    }
   })
 
   it('updates persistent shell labels when the language changes', () => {
@@ -175,7 +240,7 @@ describe('rrr-app exercise filters', () => {
     const startAction = detail
       ?.querySelector<HTMLElement>('rrr-list-row[data-action="start-workout"]')
 
-    expect(app.shadowRoot?.querySelector('a.header-action')).toBeNull()
+    expect(app.shadowRoot?.querySelector('.route-header-layer-current a.header-action')).toBeNull()
     expect(editAction?.getAttribute('activation')).toBe('button')
     editAction?.querySelector<HTMLButtonElement>(':scope > button')?.click()
     expect(window.location.hash).toBe(`#/routines/${routineId}/edit`)

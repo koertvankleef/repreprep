@@ -67,7 +67,7 @@ type RouteHeader = {
   html: string
   secondaryClassName?: string
   secondaryHtml?: string
-  bind?: (header: HTMLElement) => void
+  bind?: (primaryHeader: HTMLElement, secondaryHeader: HTMLElement) => void
 }
 
 type ExerciseCatalogueElement = HTMLElement & {
@@ -109,6 +109,7 @@ export class RrrApp extends HTMLElement {
   private exerciseFilterRailController: AbortController | null = null
   private exerciseFilterRailResizeObserver: ResizeObserver | null = null
   private currentRouteView: HTMLElement | null = null
+  private finishHeaderTransition: (() => void) | null = null
   private readonly router = createHashRouter({
     routes: appRoutes,
     notFoundRouteId: 'workouts',
@@ -618,25 +619,11 @@ export class RrrApp extends HTMLElement {
     return document.createElement('rrr-import-export')
   }
 
-  private updateShellState(route: AppRoute): void {
+  private updateShellState(route: AppRoute, transition: RouteTransition = 'none'): void {
     const appHeader = this.shadowRoot?.querySelector<HTMLElement>('.app-header')
     const header = this.createRouteHeader(route)
-    this.clearExerciseFilterRailBinding()
-    const headerInner = this.shadowRoot?.querySelector<HTMLElement>('.app-header-primary')
-    if (headerInner) {
-      headerInner.className = ['app-header-primary', header.className].filter(Boolean).join(' ')
-      headerInner.innerHTML = header.html
-    }
-
-    const secondaryHeader = this.shadowRoot?.querySelector<HTMLElement>('.app-header-secondary')
-    if (secondaryHeader) {
-      secondaryHeader.className = ['app-header-secondary', header.secondaryClassName].filter(Boolean).join(' ')
-      secondaryHeader.hidden = !header.secondaryHtml
-      secondaryHeader.innerHTML = header.secondaryHtml ?? ''
-    }
-
     if (appHeader) {
-      header.bind?.(appHeader)
+      this.mountRouteHeader(appHeader, header, transition)
     }
 
     const links = this.shadowRoot?.querySelectorAll<HTMLAnchorElement>('.primary-nav .nav-link[data-route-name]')
@@ -665,7 +652,87 @@ export class RrrApp extends HTMLElement {
       installButton.textContent = t('app.action.install')
     }
 
+  }
+
+  private mountRouteHeader(
+    appHeader: HTMLElement,
+    header: RouteHeader,
+    transition: RouteTransition,
+  ): void {
+    const primaryHost = appHeader.querySelector<HTMLElement>('.app-header-primary')
+    const secondaryHost = appHeader.querySelector<HTMLElement>('.app-header-secondary')
+    if (!primaryHost || !secondaryHost) {
+      return
+    }
+
+    this.finishHeaderTransition?.()
+    this.clearExerciseFilterRailBinding()
+    this.finishHeaderTransition?.()
+    this.finishHeaderTransition = null
+
+    const currentPrimary = primaryHost.querySelector<HTMLElement>(':scope > .route-header-layer-current')
+    const currentSecondary = secondaryHost.querySelector<HTMLElement>(':scope > .route-header-layer-current')
+    const nextPrimary = this.createHeaderLayer(header.html, header.className)
+    const nextSecondary = this.createHeaderLayer(header.secondaryHtml ?? '', header.secondaryClassName)
+    nextPrimary.classList.add('route-header-layer-current')
+    nextSecondary.classList.add('route-header-layer-current')
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!currentPrimary || transition === 'none' || reduceMotion) {
+      primaryHost.replaceChildren(nextPrimary)
+      secondaryHost.replaceChildren(nextSecondary)
+      secondaryHost.hidden = !header.secondaryHtml
+      header.bind?.(nextPrimary, nextSecondary)
+      this.syncHeaderHeight()
+      return
+    }
+
+    currentPrimary.classList.remove('route-header-layer-current')
+    currentPrimary.classList.add(`route-header-layer-exit-${transition}`)
+    currentPrimary.inert = true
+    currentPrimary.setAttribute('aria-hidden', 'true')
+    nextPrimary.classList.add(`route-header-layer-enter-${transition}`)
+    primaryHost.append(nextPrimary)
+
+    if (currentSecondary) {
+      currentSecondary.classList.remove('route-header-layer-current')
+      currentSecondary.classList.add(`route-header-layer-exit-${transition}`)
+      currentSecondary.inert = true
+      currentSecondary.setAttribute('aria-hidden', 'true')
+    }
+    nextSecondary.classList.add(`route-header-layer-enter-${transition}`)
+    secondaryHost.hidden = false
+    secondaryHost.append(nextSecondary)
+    appHeader.classList.add('is-transitioning')
+    header.bind?.(nextPrimary, nextSecondary)
+
+    let finished = false
+    const finish = (): void => {
+      if (finished) {
+        return
+      }
+
+      finished = true
+      currentPrimary.remove()
+      currentSecondary?.remove()
+      nextPrimary.classList.remove(`route-header-layer-enter-${transition}`)
+      nextSecondary.classList.remove(`route-header-layer-enter-${transition}`)
+      appHeader.classList.remove('is-transitioning')
+      secondaryHost.hidden = !header.secondaryHtml
+      this.finishHeaderTransition = null
+      this.syncHeaderHeight()
+    }
+
+    this.finishHeaderTransition = finish
+    nextPrimary.addEventListener('animationend', finish, { once: true })
     this.syncHeaderHeight()
+  }
+
+  private createHeaderLayer(html: string, className?: string): HTMLElement {
+    const layer = document.createElement('div')
+    layer.className = ['route-header-layer', className].filter(Boolean).join(' ')
+    layer.innerHTML = html
+    return layer
   }
 
   private mountRouteView(route: AppRoute, transition: RouteTransition): void {
@@ -843,8 +910,8 @@ export class RrrApp extends HTMLElement {
         ><rrr-icon name="filter"></rrr-icon></rrr-button>
         </div>
       `,
-      bind: (header) => {
-        const searchInput = header.querySelector<HTMLElement & { value: string }>('rrr-input[name="exercise-search"]')
+      bind: (primaryHeader, secondaryHeader) => {
+        const searchInput = primaryHeader.querySelector<HTMLElement & { value: string }>('rrr-input[name="exercise-search"]')
 
         if (searchInput) {
           const syncSearchInput = (): void => {
@@ -862,7 +929,7 @@ export class RrrApp extends HTMLElement {
           })
         }
 
-        this.bindExerciseFilterRail(header)
+        this.bindExerciseFilterRail(secondaryHeader)
       },
     }
   }
@@ -984,9 +1051,12 @@ export class RrrApp extends HTMLElement {
 
     const previousRoute = this.previousRoute
     const routeChanged = !previousRoute || !this.isSameRoute(previousRoute, route)
+    const transition = routeChanged
+      ? this.computeRouteTransition(previousRoute, route)
+      : 'none'
 
     if (routeChanged) {
-      this.mountRouteView(route, this.computeRouteTransition(previousRoute, route))
+      this.mountRouteView(route, transition)
       this.restoreRouteScrollPosition()
     }
 
@@ -1014,7 +1084,7 @@ export class RrrApp extends HTMLElement {
       }
     }
 
-    this.updateShellState(route)
+    this.updateShellState(route, transition)
 
     if (!routeChanged && route.name === 'exercises') {
       this.syncExerciseCatalogueState()

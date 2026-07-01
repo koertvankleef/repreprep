@@ -144,8 +144,48 @@ nav {
 .app-header-primary,
 .app-header-secondary {
   box-sizing: border-box;
+  display: grid;
   width: 100%;
   min-width: 0;
+}
+
+.route-header-layer {
+  grid-area: 1 / 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.app-header.is-transitioning .app-header-primary,
+.app-header.is-transitioning .app-header-secondary {
+  overflow: clip;
+}
+
+.app-header.is-transitioning .route-header-layer {
+  will-change: transform, opacity;
+}
+
+.route-header-layer-enter-sub-forward {
+  animation: route-view-enter-sub-forward var(--rrr-transition-fromto) both;
+}
+
+.route-header-layer-exit-sub-forward {
+  animation: route-view-exit-sub-forward var(--rrr-transition-fromto) both;
+}
+
+.route-header-layer-enter-sub-back {
+  animation: route-view-enter-sub-back var(--rrr-transition-fromto) both;
+}
+
+.route-header-layer-exit-sub-back {
+  animation: route-view-exit-sub-back var(--rrr-transition-fromto) both;
+}
+
+.route-header-layer-enter-main-switch {
+  animation: route-view-enter-main-switch var(--rrr-transition-fromto) both;
+}
+
+.route-header-layer-exit-main-switch {
+  animation: route-view-exit-main-switch var(--rrr-transition-fromto) both;
 }
 
 .app-header-primary {
@@ -624,7 +664,8 @@ main {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #view.is-transitioning>.route-view {
+  #view.is-transitioning>.route-view,
+  .app-header.is-transitioning .route-header-layer {
     animation: none;
     transform: none;
   }
