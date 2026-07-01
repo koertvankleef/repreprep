@@ -71,7 +71,7 @@ button {
   padding: var(--rrr-spacing-s) var(--rrr-spacing-l);
   cursor: pointer;
   background: var(--rrr-color-primary);
-  color: var(--rrr-color-primary-contrast);
+  color: var(--rrr-color-contrast);
   box-shadow: var(--rrr-shadow-button);
   transition: background var(--rrr-transition-default), border-color var(--rrr-transition-default), box-shadow var(--rrr-transition-default), transform var(--rrr-transition-default);
 }

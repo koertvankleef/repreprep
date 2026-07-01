@@ -22,12 +22,12 @@ rrr-badge {
   --rrr-badge-font-weight: var(--rrr-font-weight-medium);
   --rrr-badge-line-height: 1.2;
 
-  --_tone: var(--rrr-colors-activity-indigo-60);
-  --_soft-bg: color-mix(in oklab, var(--rrr-surface-raised) 86%, var(--_tone) 14%);
-  --_soft-border: color-mix(in oklab, var(--rrr-surface-raised) 58%, var(--_tone) 42%);
-  --_soft-fg: color-mix(in oklab, var(--_tone) 64%, var(--rrr-color-text) 36%);
+  --_tone: var(--rrr-color-primary);
+  --_soft-bg: color-mix(in oklab, var(--rrr-surface-raised) 67%, var(--_tone) 33%);
+  --_soft-border: color-mix(in oklab, var(--rrr-surface-raised) 62%, var(--_tone) 38%);
+  --_soft-fg: color-mix(in oklab, var(--_tone) 75%, var(--rrr-color-contrast-negative) 25%);
   --_solid-bg: var(--_tone);
-  --_solid-fg: var(--rrr-color-primary-contrast);
+  --_solid-fg: var(--rrr-color-contrast);
 }
 
 rrr-badge[tone='neutral'] {
@@ -36,7 +36,7 @@ rrr-badge[tone='neutral'] {
 }
 
 rrr-badge[tone='accent'] {
-  --_tone: var(--rrr-colors-serene-mint-60);
+  --_tone: var(--rrr-color-accent);
 }
 
 rrr-badge[tone='info'] {
