@@ -4,6 +4,7 @@ import { registerRrrListCard } from '../design-system/components/rrr-list-card.t
 import { registerRrrListRow, type RrrListRow } from '../design-system/components/rrr-list-row.ts'
 import { registerRrrSection } from '../design-system/components/rrr-section.ts'
 import '../app/components/rrr-appearance-settings.ts'
+import '../app/components/rrr-language-settings.ts'
 import '../app/components/rrr-settings.ts'
 
 beforeAll(() => {
@@ -189,6 +190,31 @@ describe('list structure primitives', () => {
 })
 
 describe('settings structure', () => {
+  test('keeps the dev-only styleguide orphaned above display', () => {
+    const settings = document.createElement('rrr-settings')
+    settings.setAttribute('styleguide-enabled', 'true')
+    document.body.appendChild(settings)
+
+    const sections = Array.from(settings.querySelectorAll('rrr-section'))
+    const styleguideSection = sections[0]
+
+    expect(styleguideSection?.querySelector('rrr-list-row[href="#/settings/styleguide"]')).not.toBeNull()
+    expect(styleguideSection?.querySelector('[slot="heading"]')).toBeNull()
+  })
+
+  test('puts import and export first in the data section', () => {
+    const settings = document.createElement('rrr-settings')
+    document.body.appendChild(settings)
+
+    const dataSection = Array.from(settings.querySelectorAll('rrr-section'))
+      .find((section) => section.querySelector('[slot="heading"]')?.textContent === 'Data')
+    const rows = Array.from(dataSection?.querySelectorAll<RrrListRow>('rrr-list-row') ?? [])
+
+    expect(rows[0]?.getAttribute('href')).toBe('#/settings/import-export')
+    expect(rows[1]?.dataset.action).toBe('delete-app-data')
+    expect(settings.querySelector('rrr-list-row[href="#/settings/styleguide"]')).toBeNull()
+  })
+
   test('links to the appearance subpage and shows the current theme', () => {
     const settings = document.createElement('rrr-settings')
     settings.setAttribute('theme', 'dark')
@@ -198,6 +224,17 @@ describe('settings structure', () => {
 
     expect(appearanceRow?.getAttribute('value-text')).toBe('Dark')
     expect(appearanceRow?.getAttribute('accessory')).toBe('value-chevron')
+  })
+
+  test('links to the language subpage and shows the current preference', () => {
+    const settings = document.createElement('rrr-settings')
+    settings.setAttribute('language', 'nl-NL')
+    document.body.appendChild(settings)
+
+    const languageRow = settings.querySelector<RrrListRow>('rrr-list-row[href="#/settings/language"]')
+
+    expect(languageRow?.getAttribute('value-text')).toBe('Dutch')
+    expect(languageRow?.getAttribute('accessory')).toBe('value-chevron')
   })
 
   test('emits preference changes from native radio rows', async () => {
@@ -216,6 +253,23 @@ describe('settings structure', () => {
     expect((preferenceChange.mock.calls[0]?.[0] as CustomEvent).detail).toEqual({
       preference: 'theme',
       value: 'dark',
+    })
+  })
+
+  test('emits language changes from native radio rows', async () => {
+    const settings = document.createElement('rrr-language-settings')
+    settings.setAttribute('language', 'auto')
+    const preferenceChange = vi.fn()
+    settings.addEventListener('rrr-language-preference-change', preferenceChange)
+    document.body.appendChild(settings)
+    await Promise.resolve()
+
+    const dutchRow = settings.querySelector<RrrListRow>('rrr-list-row[value="nl-NL"]')
+    dutchRow?.querySelector<HTMLInputElement>('input')?.click()
+
+    expect(preferenceChange).toHaveBeenCalledOnce()
+    expect((preferenceChange.mock.calls[0]?.[0] as CustomEvent).detail).toEqual({
+      language: 'nl-NL',
     })
   })
 })

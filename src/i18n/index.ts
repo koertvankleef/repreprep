@@ -1,7 +1,7 @@
 import { enUsMessages } from './en-US.ts'
 import { nlNlMessages } from './nl-NL.ts'
 
-type LocaleCode = 'en-US' | 'nl-NL'
+export type LocaleCode = 'en-US' | 'nl-NL'
 type MessageEntry = string | { value: string; context?: string }
 type MessageDictionary = Record<string, MessageEntry>
 type MessageParams = Record<string, string | number>

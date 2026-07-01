@@ -86,6 +86,17 @@ test('app routes include the appearance settings subpage', () => {
   })
 })
 
+test('app routes include the language settings subpage', () => {
+  const languageRoute = appRoutes.find((route) => route.id === 'settings-language')
+
+  expect(languageRoute?.pattern).toBe('/settings/language')
+  expect(languageRoute?.meta).toMatchObject({
+    nav: 'settings',
+    depth: 2,
+    backHref: '#/settings',
+  })
+})
+
 test('app route metadata defines route-specific header links', () => {
   expect(getAppRouteMeta('workouts').endLink).toEqual({
     href: '#/settings',

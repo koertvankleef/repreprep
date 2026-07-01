@@ -1,7 +1,7 @@
-import { initLocale } from './i18n/index.ts'
 import { mountIconSprite } from './design-system/icons/sprite.ts'
+import { applyLanguagePreference, loadLanguagePreference } from './app/language-preferences.ts'
 
-initLocale(navigator.language)
+applyLanguagePreference(loadLanguagePreference())
 mountIconSprite()
 
 if (!import.meta.env.DEV && 'serviceWorker' in navigator) {

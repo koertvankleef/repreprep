@@ -25,6 +25,13 @@ import {
   type DisplayPreferences,
   type ThemeMode,
 } from './theme-preferences.ts'
+import {
+  applyLanguagePreference,
+  clearLanguagePreference,
+  loadLanguagePreference,
+  saveLanguagePreference,
+  type LanguagePreference,
+} from './language-preferences.ts'
 import globalStyles from '../design-system/global.css?inline'
 import appStyles from './rrr-app.css?inline'
 
@@ -49,6 +56,10 @@ type DisplayPreferenceChangeDetail = {
   value: string
 }
 
+type LanguagePreferenceChangeDetail = {
+  language: string
+}
+
 type RouteTransition = 'none' | 'sub-forward' | 'sub-back' | 'main-switch'
 
 type RouteHeader = {
@@ -67,11 +78,23 @@ type ExerciseCatalogueElement = HTMLElement & {
 }
 
 const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
+const primaryNavigationItems: ReadonlyArray<{
+  routeName: AppNavId
+  href: string
+  labelKey: string
+  iconName: string
+}> = [
+  { routeName: 'workouts', href: '#/workouts', labelKey: 'app.nav.today', iconName: 'calendar-date' },
+  { routeName: 'routines', href: '#/routines', labelKey: 'app.nav.routines', iconName: 'clipboard' },
+  { routeName: 'exercises', href: '#/exercises', labelKey: 'app.nav.exercises', iconName: 'compose' },
+  { routeName: 'history', href: '#/history', labelKey: 'app.nav.history', iconName: 'data-trending' },
+]
 
 export class RrrApp extends HTMLElement {
   private route: AppRoute = { name: 'workouts' }
   private previousRoute: AppRoute | null = null
   private displayPreferences: DisplayPreferences = loadDisplayPreferences()
+  private languagePreference: LanguagePreference = loadLanguagePreference()
   private installPromptEvent: BeforeInstallPromptEvent | null = null
   private installAvailable = false
   private isStandalone = window.matchMedia('(display-mode: standalone)').matches
@@ -122,8 +145,11 @@ export class RrrApp extends HTMLElement {
   private readonly handleClearDataRequest = (): void => {
     storageService.resetAllData()
     clearDisplayPreferences()
+    clearLanguagePreference()
     this.displayPreferences = loadDisplayPreferences()
+    this.languagePreference = loadLanguagePreference()
     applyDisplayPreferences(this.displayPreferences)
+    applyLanguagePreference(this.languagePreference)
     toastService.success(t('app.settings.resetData.success'))
 
     if (window.location.hash !== '#/workouts') {
@@ -146,6 +172,22 @@ export class RrrApp extends HTMLElement {
     if (preference === 'contrast' && (value === 'normal' || value === 'high')) {
       this.setContrastMode(value)
     }
+  }
+
+  private readonly handleLanguagePreferenceChange = (event: Event): void => {
+    const { language } = (event as CustomEvent<LanguagePreferenceChangeDetail>).detail
+    if (language !== 'auto' && language !== 'en-US' && language !== 'nl-NL') {
+      return
+    }
+
+    if (this.languagePreference === language) {
+      return
+    }
+
+    this.languagePreference = language
+    applyLanguagePreference(language)
+    saveLanguagePreference(language)
+    this.render()
   }
 
   private readonly handleClick = (event: Event): void => {
@@ -272,6 +314,7 @@ export class RrrApp extends HTMLElement {
   connectedCallback(): void {
     void storageService.getData()
     applyDisplayPreferences(this.displayPreferences)
+    applyLanguagePreference(this.languagePreference)
     this.stopWatchingSystemThemePreference = watchSystemThemePreference(() => {
       if (this.displayPreferences.theme !== 'auto') {
         return
@@ -284,6 +327,7 @@ export class RrrApp extends HTMLElement {
     this.shadowRoot?.addEventListener('click', this.handleClick)
     this.shadowRoot?.addEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
     this.shadowRoot?.addEventListener('rrr-display-preference-change', this.handleDisplayPreferenceChange as EventListener)
+    this.shadowRoot?.addEventListener('rrr-language-preference-change', this.handleLanguagePreferenceChange as EventListener)
     this.isStandalone = window.matchMedia('(display-mode: standalone)').matches
     if (this.isStandalone) {
       this.installAvailable = false
@@ -305,6 +349,7 @@ export class RrrApp extends HTMLElement {
     this.shadowRoot?.removeEventListener('click', this.handleClick)
     this.shadowRoot?.removeEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
     this.shadowRoot?.removeEventListener('rrr-display-preference-change', this.handleDisplayPreferenceChange as EventListener)
+    this.shadowRoot?.removeEventListener('rrr-language-preference-change', this.handleLanguagePreferenceChange as EventListener)
     this.router.dispose()
   }
 
@@ -330,12 +375,9 @@ export class RrrApp extends HTMLElement {
   }
 
   private renderPrimaryNav(): string {
-    return `
-      ${this.renderNavLink('workouts', '#/workouts', t('app.nav.today'), 'calendar-date')}
-      ${this.renderNavLink('routines', '#/routines', t('app.nav.routines'), 'clipboard')}
-      ${this.renderNavLink('exercises', '#/exercises', t('app.nav.exercises'), 'compose')}
-      ${this.renderNavLink('history', '#/history', t('app.nav.history'), 'data-trending')}
-    `
+    return primaryNavigationItems
+      .map((item) => this.renderNavLink(item.routeName, item.href, t(item.labelKey), item.iconName))
+      .join('')
   }
 
   private computeRouteTransition(from: AppRoute | null, to: AppRoute): RouteTransition {
@@ -543,13 +585,18 @@ export class RrrApp extends HTMLElement {
       return editor
     }
 
-    if (route.name === 'styleguide') {
+    if (route.name === 'settings-styleguide') {
       return document.createElement('rrr-styleguide')
+    }
+
+    if (route.name === 'settings-import-export') {
+      return document.createElement('rrr-import-export')
     }
 
     if (route.name === 'settings') {
       const settingsEl = document.createElement('rrr-settings')
       settingsEl.setAttribute('theme', this.displayPreferences.theme)
+      settingsEl.setAttribute('language', this.languagePreference)
       settingsEl.setAttribute('styleguide-enabled', this.styleguideEnabled ? 'true' : 'false')
       return settingsEl
     }
@@ -561,6 +608,13 @@ export class RrrApp extends HTMLElement {
       return appearanceEl
     }
 
+    if (route.name === 'settings-language') {
+      const languageEl = document.createElement('rrr-language-settings')
+      languageEl.setAttribute('language', this.languagePreference)
+      return languageEl
+    }
+
+    /* TODO ! default to an error toast and returning to home/Today page */
     return document.createElement('rrr-import-export')
   }
 
@@ -594,12 +648,22 @@ export class RrrApp extends HTMLElement {
 
       const isActive = getAppRouteMeta(route).nav === routeName
       link.classList.toggle('active', isActive)
+      const item = primaryNavigationItems.find((candidate) => candidate.routeName === routeName)
+      const label = link.querySelector<HTMLElement>('span')
+      if (item && label) {
+        label.textContent = t(item.labelKey)
+      }
       if (isActive) {
         link.setAttribute('aria-current', 'page')
       } else {
         link.removeAttribute('aria-current')
       }
     })
+
+    const installButton = this.shadowRoot?.querySelector<HTMLElement>('[data-action="install-app"]')
+    if (installButton) {
+      installButton.textContent = t('app.action.install')
+    }
 
     this.syncHeaderHeight()
   }
@@ -930,6 +994,7 @@ export class RrrApp extends HTMLElement {
       const settingsEl = this.shadowRoot.querySelector<HTMLElement>('#view > rrr-settings.route-view-current')
       if (settingsEl) {
         settingsEl.setAttribute('theme', this.displayPreferences.theme)
+        settingsEl.setAttribute('language', this.languagePreference)
         settingsEl.setAttribute('styleguide-enabled', this.styleguideEnabled ? 'true' : 'false')
       }
     }
@@ -939,6 +1004,13 @@ export class RrrApp extends HTMLElement {
       if (appearanceEl) {
         appearanceEl.setAttribute('theme', this.displayPreferences.theme)
         appearanceEl.setAttribute('contrast', this.displayPreferences.contrast)
+      }
+    }
+
+    if (!routeChanged && route.name === 'settings-language') {
+      const languageEl = this.shadowRoot.querySelector<HTMLElement>('#view > rrr-language-settings.route-view-current')
+      if (languageEl) {
+        languageEl.setAttribute('language', this.languagePreference)
       }
     }
 

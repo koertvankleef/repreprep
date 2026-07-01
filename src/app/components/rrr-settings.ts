@@ -4,7 +4,7 @@ import { presentSheet } from '../../utils/sheet-service.ts'
 import styles from './rrr-settings.css?inline'
 
 export class RrrSettings extends HTMLElement {
-  static observedAttributes = ['styleguide-enabled', 'theme']
+  static observedAttributes = ['styleguide-enabled', 'theme', 'language']
 
   connectedCallback(): void {
     this.render()
@@ -119,36 +119,34 @@ export class RrrSettings extends HTMLElement {
   private render(): void {
     const styleguideEnabled = this.getAttribute('styleguide-enabled') === 'true'
     const theme = this.getAttribute('theme') ?? 'auto'
+    const language = this.getAttribute('language') ?? 'auto'
     const themeLabel = theme === 'light'
       ? t('app.theme.light')
       : theme === 'dark'
         ? t('app.theme.dark')
         : t('app.theme.auto')
+    const languageLabel = language === 'en-US'
+      ? t('app.language.english')
+      : language === 'nl-NL'
+        ? t('app.language.dutch')
+        : t('app.language.auto')
 
     this.innerHTML = `
       <style>${styles}</style>
       <div class="page">
-        <rrr-section>
-          <span slot="heading">${t('app.settings.navigation')}</span>
-          <div class="rrr-list-card">
-            <rrr-list-row
-              href="#/import-export"
-              label="${t('app.nav.importExport')}"
-              accessory="chevron"
-            >
-              <rrr-icon slot="leading" name="arrow-export-up"></rrr-icon>
-            </rrr-list-row>
-            ${styleguideEnabled ? `
+        ${styleguideEnabled ? `
+          <rrr-section>
+            <div class="rrr-list-card">
               <rrr-list-row
-                href="#/styleguide"
-                label="${t('app.nav.styleguide')}"
+                href="#/settings/styleguide"
+                label="${t('app.settings.styleguide')}"
                 accessory="chevron"
               >
                 <rrr-icon slot="leading" name="braces"></rrr-icon>
               </rrr-list-row>
-            ` : ''}
-          </div>
-        </rrr-section>
+            </div>
+          </rrr-section>
+        ` : ''}
 
         <rrr-section>
           <span slot="heading">${t('app.settings.display')}</span>
@@ -162,12 +160,27 @@ export class RrrSettings extends HTMLElement {
             >
               <rrr-icon slot="leading" name="color"></rrr-icon>
             </rrr-list-row>
+            <rrr-list-row
+              href="#/settings/language"
+              label="${t('app.settings.language')}"
+              value-text="${languageLabel}"
+              accessory="value-chevron"
+            >
+              <rrr-icon slot="leading" name="language"></rrr-icon>
+            </rrr-list-row>
           </div>
         </rrr-section>
 
         <rrr-section>
           <span slot="heading">${t('app.settings.data')}</span>
           <div class="rrr-list-card">
+            <rrr-list-row
+              href="#/settings/import-export"
+              label="${t('app.settings.importExport')}"
+              accessory="chevron"
+            >
+              <rrr-icon slot="leading" name="arrow-export-up"></rrr-icon>
+            </rrr-list-row>
             <rrr-list-row
               activation="button"
               label="${t('app.settings.resetData.open')}"

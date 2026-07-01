@@ -1,0 +1,7 @@
+rrr-language-settings {
+.page {
+  display: grid;
+  gap: var(--rrr-spacing-xl);
+  max-width: 48rem;
+}
+}

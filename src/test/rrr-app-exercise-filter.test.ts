@@ -1,5 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { filterExercises, searchExercises } from '../domain/exercise-service.ts'
+import { saveLanguagePreference } from '../app/language-preferences.ts'
 
 type StylesheetHost = (Document | ShadowRoot) & {
   __adoptedStyleSheets?: CSSStyleSheet[]
@@ -135,6 +136,28 @@ describe('rrr-app exercise filters', () => {
 
     expect(window.location.hash).toBe('#/routines/new')
     app.remove()
+  })
+
+  it('updates persistent shell labels when the language changes', () => {
+    saveLanguagePreference('nl-NL')
+    window.location.hash = '#/settings/language'
+    const app = document.createElement('rrr-app')
+    document.body.append(app)
+
+    const getNavLabels = (): string[] => Array
+      .from(app.shadowRoot?.querySelectorAll<HTMLElement>('.primary-nav .nav-link span') ?? [])
+      .map((label) => label.textContent ?? '')
+
+    expect(getNavLabels()).toEqual(['Vandaag', 'Routines', 'Oefeningen', 'Geschiedenis'])
+
+    const languageSettings = app.shadowRoot?.querySelector('rrr-language-settings')
+    languageSettings?.dispatchEvent(new CustomEvent('rrr-language-preference-change', {
+      bubbles: true,
+      composed: true,
+      detail: { language: 'en-US' },
+    }))
+
+    expect(getNavLabels()).toEqual(['Today', 'Routines', 'Exercises', 'History'])
   })
 
   it('renders routine details with an Edit header link', async () => {

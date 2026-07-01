@@ -7,22 +7,21 @@ export type AppRouteId =
   | 'exercises'
   | 'exercise-detail'
   | 'history'
-  | 'import-export'
   | 'routines'
   | 'routine-new'
   | 'routine-detail'
   | 'routine-edit'
-  | 'styleguide'
   | 'settings'
   | 'settings-appearance'
+  | 'settings-language'
+  | 'settings-import-export'
+  | 'settings-styleguide'
 
 export type AppNavId =
   | 'workouts'
   | 'routines'
   | 'exercises'
   | 'history'
-  | 'import-export'
-  | 'styleguide'
   | 'settings'
 
 export type AppRoute =
@@ -32,14 +31,15 @@ export type AppRoute =
   | { name: 'exercises' }
   | { name: 'exercise-detail'; exerciseId: string }
   | { name: 'history' }
-  | { name: 'import-export' }
   | { name: 'routines' }
   | { name: 'routine-new' }
   | { name: 'routine-detail'; routineId: string }
   | { name: 'routine-edit'; routineId: string }
-  | { name: 'styleguide' }
   | { name: 'settings' }
   | { name: 'settings-appearance' }
+  | { name: 'settings-language' }
+  | { name: 'settings-import-export' }
+  | { name: 'settings-styleguide' }
 
 export type AppHeaderLink = {
   href: string
@@ -138,30 +138,6 @@ export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
     },
   },
   {
-    id: 'import-export',
-    pattern: '/import-export',
-    meta: {
-      nav: 'import-export',
-      depth: 0,
-      main: false,
-      surface: 'padded',
-      header: 'standard',
-      titleKey: 'app.nav.importExport',
-    },
-  },
-  {
-    id: 'styleguide',
-    pattern: '/styleguide',
-    meta: {
-      nav: 'styleguide',
-      depth: 0,
-      main: false,
-      surface: 'padded',
-      header: 'standard',
-      titleKey: 'app.nav.styleguide',
-    },
-  },
-  {
     id: 'routines',
     pattern: '/routines',
     meta: {
@@ -248,6 +224,45 @@ export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
       backHref: '#/settings',
     },
   },
+  {
+    id: 'settings-language',
+    pattern: '/settings/language',
+    meta: {
+      nav: 'settings',
+      depth: 2,
+      main: false,
+      surface: 'padded',
+      header: 'standard',
+      titleKey: 'app.settings.language',
+      backHref: '#/settings',
+    },
+  },
+  {
+    id: 'settings-import-export',
+    pattern: '/settings/import-export',
+    meta: {
+      nav: 'settings',
+      depth: 2,
+      main: false,
+      surface: 'padded',
+      header: 'standard',
+      titleKey: 'app.settings.importExport',
+      backHref: '#/settings',
+    },
+  },
+  {
+    id: 'settings-styleguide',
+    pattern: '/settings/styleguide',
+    meta: {
+      nav: 'settings',
+      depth: 2,
+      main: false,
+      surface: 'padded',
+      header: 'standard',
+      titleKey: 'app.settings.styleguide',
+      backHref: '#/settings',
+    },
+  },
 ]
 
 const routeMetaById = new Map(
@@ -281,7 +296,7 @@ export function toAppRoute(
 ): AppRoute {
   const routeId = match.route.id as AppRouteId
 
-  if (routeId === 'styleguide' && !styleguideEnabled) {
+  if (routeId === 'settings-styleguide' && !styleguideEnabled) {
     return { name: 'workouts' }
   }
 
