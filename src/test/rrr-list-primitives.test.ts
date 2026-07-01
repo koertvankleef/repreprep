@@ -3,9 +3,9 @@ import { initLocale } from '../i18n/index.ts'
 import { registerRrrListCard } from '../design-system/components/rrr-list-card.ts'
 import { registerRrrListRow, type RrrListRow } from '../design-system/components/rrr-list-row.ts'
 import { registerRrrSection } from '../design-system/components/rrr-section.ts'
-import '../app/components/rrr-appearance-settings.ts'
-import '../app/components/rrr-language-settings.ts'
-import '../app/components/rrr-settings.ts'
+import '../app/components/settings/rrr-appearance-settings.ts'
+import '../app/components/settings/rrr-language-settings.ts'
+import '../app/components/settings/rrr-settings.ts'
 
 beforeAll(() => {
   initLocale('en-US')

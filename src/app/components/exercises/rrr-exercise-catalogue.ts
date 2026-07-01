@@ -1,8 +1,8 @@
-import { filterExercises, searchExercises, type ExerciseFilters } from '../../domain/exercise-service.ts'
-import type { AppData, Equipment, ExerciseDefinition, MeasurementProfile, MeasurementType, Muscle } from '../../domain/types.ts'
-import { t } from '../../i18n/index.ts'
-import { FocusedSequenceController, type FocusSequenceState } from '../focused-sequence-controller.ts'
-import { storageService } from '../storage-instance.ts'
+import { filterExercises, searchExercises, type ExerciseFilters } from '../../../domain/exercise-service.ts'
+import type { AppData, Equipment, ExerciseDefinition, MeasurementProfile, MeasurementType, Muscle } from '../../../domain/types.ts'
+import { t } from '../../../i18n/index.ts'
+import { FocusedSequenceController, type FocusSequenceState } from '../../focused-sequence-controller.ts'
+import { storageService } from '../../storage-instance.ts'
 import styles from './rrr-exercise-catalogue.css?inline'
 
 const VISIBLE_RADIUS = 6

@@ -1,6 +1,6 @@
-import type { RrrSheet } from '../../design-system/components/rrr-sheet.ts'
-import { getLocale, t } from '../../i18n/index.ts'
-import { presentSheet } from '../../utils/sheet-service.ts'
+import type { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
+import { getLocale, t } from '../../../i18n/index.ts'
+import { presentSheet } from '../../../utils/sheet-service.ts'
 import styles from './rrr-settings.css?inline'
 
 export class RrrSettings extends HTMLElement {

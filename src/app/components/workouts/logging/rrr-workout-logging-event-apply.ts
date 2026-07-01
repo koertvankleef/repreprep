@@ -1,4 +1,4 @@
-import type { Workout } from '../../domain/types.ts'
+import type { Workout } from '../../../../domain/types.ts'
 import type { WorkoutEvent } from './rrr-workout-logging-model.ts'
 
 export function applyWorkoutLoggingEventToWorkout(

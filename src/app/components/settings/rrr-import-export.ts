@@ -1,11 +1,11 @@
-import { storageService } from '../storage-instance.ts'
-import { t } from '../../i18n/index.ts'
-import { exportToJson } from '../../import-export/json-export-service.ts'
-import { importFromJson } from '../../import-export/json-import-service.ts'
+import { storageService } from '../../storage-instance.ts'
+import { t } from '../../../i18n/index.ts'
+import { exportToJson } from '../../../import-export/json-export-service.ts'
+import { importFromJson } from '../../../import-export/json-import-service.ts'
 import styles from './rrr-import-export.css?inline'
-import { confirmSheet } from '../../utils/sheet-service.ts'
-import { toastService } from '../../foundation/toast.ts'
-import type { RrrListRow } from '../../design-system/components/rrr-list-row.ts'
+import { confirmSheet } from '../../../utils/sheet-service.ts'
+import { toastService } from '../../../foundation/toast.ts'
+import type { RrrListRow } from '../../../design-system/components/rrr-list-row.ts'
 
 export class RrrImportExport extends HTMLElement {
   private readonly storageKey = 'repreprep:data'

@@ -1,4 +1,4 @@
-import { getExercise, isExerciseUsedInRoutines } from '../../domain/exercise-service.ts'
+import { getExercise, isExerciseUsedInRoutines } from '../../../domain/exercise-service.ts'
 import type {
   Equipment,
   ExerciseCategory,
@@ -6,9 +6,9 @@ import type {
   MeasurementProfile,
   MeasurementType,
   Muscle,
-} from '../../domain/types.ts'
-import { formatDate, t } from '../../i18n/index.ts'
-import { storageService } from '../storage-instance.ts'
+} from '../../../domain/types.ts'
+import { formatDate, t } from '../../../i18n/index.ts'
+import { storageService } from '../../storage-instance.ts'
 import styles from './rrr-exercise-detail.css?inline'
 
 type PropertyRow = {

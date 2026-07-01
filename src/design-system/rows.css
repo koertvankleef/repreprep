@@ -42,6 +42,7 @@
 .rrr-property-row > dt,
 .rrr-property-row > dd {
   margin: 0;
+  font-weight: var(--rrr-font-weight-medium);
 }
 
 .rrr-property-row > dt {

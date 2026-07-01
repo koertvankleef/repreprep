@@ -3,7 +3,7 @@ import { initLocale } from '../i18n/index.ts'
 import { registerRrrListRow } from '../design-system/components/rrr-list-row.ts'
 import { registerRrrSection } from '../design-system/components/rrr-section.ts'
 import { storageService } from '../app/storage-instance.ts'
-import '../app/components/rrr-routine-list.ts'
+import '../app/components/routines/rrr-routine-list.ts'
 
 beforeAll(() => {
   initLocale('en-US')

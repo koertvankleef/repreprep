@@ -4,8 +4,8 @@ import { registerRrrListRow } from '../design-system/components/rrr-list-row.ts'
 import { registerRrrSheet } from '../design-system/components/rrr-sheet.ts'
 import { registerRrrSection } from '../design-system/components/rrr-section.ts'
 import { storageService } from '../app/storage-instance.ts'
-import { RrrExerciseDetail } from '../app/components/rrr-exercise-detail.ts'
-import { RrrRoutineDetail } from '../app/components/rrr-routine-detail.ts'
+import { RrrExerciseDetail } from '../app/components/exercises/rrr-exercise-detail.ts'
+import { RrrRoutineDetail } from '../app/components/routines/rrr-routine-detail.ts'
 
 beforeAll(() => {
   initLocale('en-US')

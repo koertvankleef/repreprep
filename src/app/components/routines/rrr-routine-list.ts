@@ -1,10 +1,10 @@
-import { storageService } from '../storage-instance.ts'
+import { storageService } from '../../storage-instance.ts'
 import {
   getRoutineListSections,
   type RoutineSummary,
-} from '../../domain/routine-summary-service.ts'
-import { formatDate, t } from '../../i18n/index.ts'
-import type { Muscle } from '../../domain/types.ts'
+} from '../../../domain/routine-summary-service.ts'
+import { formatDate, t } from '../../../i18n/index.ts'
+import type { Muscle } from '../../../domain/types.ts'
 import styles from './rrr-routine-list.css?inline'
 
 const previewExerciseCount = 3

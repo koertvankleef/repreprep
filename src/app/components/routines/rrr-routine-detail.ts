@@ -1,11 +1,11 @@
-import { storageService } from '../storage-instance.ts'
-import { getRoutineSummary } from '../../domain/routine-summary-service.ts'
-import { createWorkoutFromRoutine } from '../../domain/workout-service.ts'
-import { toastService } from '../../foundation/toast.ts'
-import { formatDate, t, tPlural } from '../../i18n/index.ts'
-import type { Muscle, RoutineExercise } from '../../domain/types.ts'
-import { todayIso } from '../../utils/date.ts'
-import { confirmSheet } from '../../utils/sheet-service.ts'
+import { storageService } from '../../storage-instance.ts'
+import { getRoutineSummary } from '../../../domain/routine-summary-service.ts'
+import { createWorkoutFromRoutine } from '../../../domain/workout-service.ts'
+import { toastService } from '../../../foundation/toast.ts'
+import { formatDate, t, tPlural } from '../../../i18n/index.ts'
+import type { Muscle, RoutineExercise } from '../../../domain/types.ts'
+import { todayIso } from '../../../utils/date.ts'
+import { confirmSheet } from '../../../utils/sheet-service.ts'
 
 export class RrrRoutineDetail extends HTMLElement {
   private routineIdValue: string | null = null

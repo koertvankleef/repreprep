@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
 import type { Workout, WorkoutExerciseEntry } from '../domain/types.ts'
-import { applyWorkoutLoggingEventToWorkout } from '../app/components/rrr-workout-logging-event-apply.ts'
+import { applyWorkoutLoggingEventToWorkout } from '../app/components/workouts/logging/rrr-workout-logging-event-apply.ts'
 
 function createWorkout(): Workout {
   const repEntry: WorkoutExerciseEntry = {

@@ -1,6 +1,6 @@
-import { storageService } from '../storage-instance.ts'
-import { getExerciseHistory, getPersonalRecord } from '../../domain/history-service.ts'
-import { formatDate, t } from '../../i18n/index.ts'
+import { storageService } from '../../storage-instance.ts'
+import { getExerciseHistory, getPersonalRecord } from '../../../domain/history-service.ts'
+import { formatDate, t } from '../../../i18n/index.ts'
 import styles from './rrr-exercise-history.css?inline'
 
 export class RrrExerciseHistory extends HTMLElement {

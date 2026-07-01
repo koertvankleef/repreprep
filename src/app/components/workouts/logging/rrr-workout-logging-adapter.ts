@@ -1,4 +1,4 @@
-import type { AppData, ExerciseDefinition, SetEntry, Workout } from '../../domain/types.ts'
+import type { AppData, ExerciseDefinition, SetEntry, Workout } from '../../../../domain/types.ts'
 import type { Exercise, TimelineItem } from './rrr-workout-logging-model.ts'
 
 export interface WorkoutLoggingAdapterOptions {

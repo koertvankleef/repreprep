@@ -4,7 +4,7 @@ import { registerRrrButton } from '../design-system/components/rrr-button.ts'
 import { registerRrrListRow } from '../design-system/components/rrr-list-row.ts'
 import { registerRrrSection } from '../design-system/components/rrr-section.ts'
 import { registerRrrSheet } from '../design-system/components/rrr-sheet.ts'
-import '../app/components/rrr-settings.ts'
+import '../app/components/settings/rrr-settings.ts'
 
 beforeAll(() => {
   initLocale('en-US')

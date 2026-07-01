@@ -1,5 +1,5 @@
-import { t } from '../../i18n/index.ts'
-import type { ExerciseKind, SetEntry } from '../../domain/types.ts'
+import { t } from '../../../../i18n/index.ts'
+import type { ExerciseKind, SetEntry } from '../../../../domain/types.ts'
 import styles from './rrr-set-entry.css?inline'
 
 export class RrrSetEntry extends HTMLElement {

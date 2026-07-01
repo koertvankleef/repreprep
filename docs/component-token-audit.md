@@ -14,8 +14,8 @@ Reason: this file is a shared style-string helper layer rather than a component-
 
 Components currently pulling this shared helper in:
 - src/app/rrr-app.ts
-- src/app/components/rrr-exercise-entry.ts
-- src/app/components/rrr-set-entry.ts
+- src/app/components/workouts/editor/rrr-exercise-entry.ts
+- src/app/components/workouts/editor/rrr-set-entry.ts
 
 ### Global document styles
 

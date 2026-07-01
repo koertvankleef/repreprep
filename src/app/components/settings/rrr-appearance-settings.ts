@@ -1,4 +1,4 @@
-import { t } from '../../i18n/index.ts'
+import { t } from '../../../i18n/index.ts'
 import styles from './rrr-appearance-settings.css?inline'
 
 export class RrrAppearanceSettings extends HTMLElement {

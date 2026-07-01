@@ -1,8 +1,8 @@
-import { storageService } from '../storage-instance.ts'
-import { getActiveExercises } from '../../domain/exercise-service.ts'
-import { createRoutineExercise, getActiveRoutineVersion, getRoutine } from '../../domain/routine-service.ts'
-import { t } from '../../i18n/index.ts'
-import type { PlannedSet, RoutineExercise } from '../../domain/types.ts'
+import { storageService } from '../../storage-instance.ts'
+import { getActiveExercises } from '../../../domain/exercise-service.ts'
+import { createRoutineExercise, getActiveRoutineVersion, getRoutine } from '../../../domain/routine-service.ts'
+import { t } from '../../../i18n/index.ts'
+import type { PlannedSet, RoutineExercise } from '../../../domain/types.ts'
 import styles from './rrr-routine-editor.css?inline'
 
 export class RrrRoutineEditor extends HTMLElement {

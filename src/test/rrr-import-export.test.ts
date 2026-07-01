@@ -41,7 +41,7 @@ vi.mock('../foundation/toast.ts', () => ({
 beforeAll(async () => {
   initLocale('en-US')
   registerRrrListRow()
-  await import('../app/components/rrr-import-export.ts')
+  await import('../app/components/settings/rrr-import-export.ts')
 })
 
 beforeEach(() => {

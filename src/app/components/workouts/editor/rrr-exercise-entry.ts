@@ -1,6 +1,6 @@
-import { createTimeSet, createRepsSet } from '../../domain/workout-service.ts'
-import { t } from '../../i18n/index.ts'
-import type { ExerciseDefinition, SetEntry, WorkoutExerciseEntry } from '../../domain/types.ts'
+import { createTimeSet, createRepsSet } from '../../../../domain/workout-service.ts'
+import { t } from '../../../../i18n/index.ts'
+import type { ExerciseDefinition, SetEntry, WorkoutExerciseEntry } from '../../../../domain/types.ts'
 import './rrr-set-entry.ts'
 import styles from './rrr-exercise-entry.css?inline'
 

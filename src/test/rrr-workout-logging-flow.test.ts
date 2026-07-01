@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import '../app/components/rrr-workout-logging-flow.ts'
+import '../app/components/workouts/logging/rrr-workout-logging-flow.ts'
 
 describe('rrr-workout-logging-flow motion invariants', () => {
   beforeAll(() => {

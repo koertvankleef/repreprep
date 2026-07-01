@@ -1,4 +1,4 @@
-import { storageService } from '../storage-instance.ts'
+import { storageService } from '../../../storage-instance.ts'
 import { buildWorkoutLoggingData } from './rrr-workout-logging-adapter.ts'
 import { applyWorkoutLoggingEventToWorkout } from './rrr-workout-logging-event-apply.ts'
 import {

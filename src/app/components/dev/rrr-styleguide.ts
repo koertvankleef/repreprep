@@ -1,5 +1,5 @@
-import { getLocale, t } from '../../i18n/index.ts'
-import { toastService, type ToastType } from '../../foundation/toast.ts'
+import { getLocale, t } from '../../../i18n/index.ts'
+import { toastService, type ToastType } from '../../../foundation/toast.ts'
 import styles from './rrr-styleguide.css?inline'
 
 type PaletteEntry = {

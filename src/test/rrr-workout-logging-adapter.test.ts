@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import type { AppData, Workout } from '../domain/types.ts'
-import { buildWorkoutLoggingData } from '../app/components/rrr-workout-logging-adapter.ts'
+import { buildWorkoutLoggingData } from '../app/components/workouts/logging/rrr-workout-logging-adapter.ts'
 
 function createBaseData(): AppData {
   return {
