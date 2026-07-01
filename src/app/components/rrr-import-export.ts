@@ -5,6 +5,7 @@ import { importFromJson } from '../../import-export/json-import-service.ts'
 import styles from './rrr-import-export.css?inline'
 import { confirmSheet } from '../../utils/sheet-service.ts'
 import { toastService } from '../../foundation/toast.ts'
+import type { RrrListRow } from '../../design-system/components/rrr-list-row.ts'
 
 export class RrrImportExport extends HTMLElement {
   private readonly storageKey = 'repreprep:data'
@@ -13,15 +14,7 @@ export class RrrImportExport extends HTMLElement {
     this.render()
   }
 
-  private async handleImport(): Promise<void> {
-    const input = this.querySelector<HTMLInputElement>('input[type="file"]')
-    const file = input?.files?.[0]
-
-    if (!file) {
-      toastService.danger(t('importExport.status.chooseFile'))
-      return
-    }
-
+  private async handleImport(file: File): Promise<void> {
     const confirmed = await confirmSheet({
       title: t('importExport.dialog.title'),
       message: t('importExport.dialog.message'),
@@ -36,10 +29,6 @@ export class RrrImportExport extends HTMLElement {
       const data = await importFromJson(file)
       storageService.setData(data)
       window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-      
-      if (input) {
-        input.value = ''
-      }
       
       toastService.success(t('importExport.status.importSuccess'))
     } catch (error) {
@@ -65,18 +54,16 @@ export class RrrImportExport extends HTMLElement {
             </rrr-list-row>
         
             <rrr-list-row
-              activation="button"
+              activation="file"
               label="${t('action.import')}"
               description="${t('importExport.helper')}"
-              data-action="import"
+              name="import-file"
+              accept="application/json,.json"
             >
               <rrr-icon slot="leading" name="arrow-export-up"></rrr-icon>
             </rrr-list-row>
 
           </div>
-          <label>
-            <input type="file" accept="application/json,.json" aria-describedby="import-helper" />
-          </label>
         </rrr-section>
       </div>
     `
@@ -90,8 +77,13 @@ export class RrrImportExport extends HTMLElement {
       }
     })
 
-    this.querySelector<HTMLElement>('rrr-list-row[data-action="import"]')?.addEventListener('click', () => {
-      void this.handleImport()
+    this.querySelector<RrrListRow>('rrr-list-row[activation="file"]')?.addEventListener('change', (event) => {
+      const row = event.currentTarget as RrrListRow
+      const file = row.files?.[0]
+      row.clearFileSelection()
+      if (file) {
+        void this.handleImport(file)
+      }
     })
   }
 }

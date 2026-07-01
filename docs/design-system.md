@@ -107,6 +107,25 @@ presentation:
 </div>
 ```
 
+Use `activation="file"` when choosing a local file is itself the row action.
+The row owns a visually hidden native file input, so label activation, keyboard
+focus, and the platform file picker remain native:
+
+```html
+<rrr-list-row
+  activation="file"
+  name="import-file"
+  accept="application/json,.json"
+  label="Import"
+  description="Choose a JSON export file"
+></rrr-list-row>
+```
+
+Listen for the row's bubbling `change` event and read its `files` property.
+Call `clearFileSelection()` after capturing the file when selecting the same
+file again should trigger another change. The `accept`, `name`, `multiple`, and
+`disabled` attributes are forwarded to the native input.
+
 Author labels and descriptions through the element's `label` and `description`
 attributes. Classes such as `.rrr-list-row__label` and
 `.rrr-list-row__description` belong to generated internals and are not an

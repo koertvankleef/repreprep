@@ -52,6 +52,48 @@ describe('list structure primitives', () => {
     expect(rows.every((row) => row.querySelector(':scope > button') !== null)).toBe(true)
   })
 
+  test('integrates a native file picker into an action row', async () => {
+    const row = document.createElement('rrr-list-row') as RrrListRow
+    row.setAttribute('activation', 'file')
+    row.setAttribute('name', 'data-file')
+    row.setAttribute('accept', 'application/json,.json')
+    row.setAttribute('multiple', '')
+    row.setAttribute('label', 'Import')
+    document.body.appendChild(row)
+    await Promise.resolve()
+
+    const input = row.querySelector<HTMLInputElement>('input[type="file"]')
+    const file = new File(['{}'], 'data.json', { type: 'application/json' })
+    const files = {
+      0: file,
+      length: 1,
+      item: (index: number) => index === 0 ? file : null,
+    } as unknown as FileList
+    Object.defineProperty(input, 'files', { configurable: true, value: files })
+    Object.defineProperty(input, 'value', { configurable: true, writable: true, value: 'data.json' })
+    const change = vi.fn()
+    row.addEventListener('change', change)
+
+    input?.dispatchEvent(new Event('change', { bubbles: true }))
+
+    expect(row.querySelector(':scope > label.rrr-list-row__row--file')).not.toBeNull()
+    expect(input?.name).toBe('data-file')
+    expect(input?.accept).toBe('application/json,.json')
+    expect(input?.multiple).toBe(true)
+    expect(row.files?.[0]).toBe(file)
+    expect(change).toHaveBeenCalledOnce()
+
+    row.focus()
+    expect(document.activeElement).toBe(input)
+
+    row.clearFileSelection()
+    expect(input?.value).toBe('')
+
+    row.setAttribute('disabled', '')
+    await Promise.resolve()
+    expect(row.querySelector<HTMLInputElement>('input[type="file"]')?.disabled).toBe(true)
+  })
+
   test('keeps one radio row selected and supports arrow-key selection', async () => {
     document.body.innerHTML = `
       <rrr-list-card role="radiogroup" aria-label="Theme">

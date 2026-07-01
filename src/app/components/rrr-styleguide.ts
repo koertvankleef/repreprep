@@ -524,6 +524,14 @@ export class RrrStyleguide extends HTMLElement {
                   <rrr-icon slot="leading" name="arrow-export-up"></rrr-icon>
                 </rrr-list-row>
                 <rrr-list-row
+                  activation="file"
+                  label="${t('styleguide.listRows.file')}"
+                  description="${t('styleguide.listRows.fileDescription')}"
+                  accept=".json"
+                >
+                  <rrr-icon slot="leading" name="attach"></rrr-icon>
+                </rrr-list-row>
+                <rrr-list-row
                   activation="button"
                   label="${t('styleguide.listRows.disabled')}"
                   disabled

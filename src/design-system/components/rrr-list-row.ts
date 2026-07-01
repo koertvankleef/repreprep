@@ -11,6 +11,7 @@ const rowSlots = new Set<RowSlot>(['leading', 'body', 'trailing'])
 export class RrrListRow extends HTMLElement {
   static observedAttributes = [
     'accessory',
+    'accept',
     'activation',
     'checked',
     'control',
@@ -18,6 +19,7 @@ export class RrrListRow extends HTMLElement {
     'disabled',
     'href',
     'label',
+    'multiple',
     'name',
     'selected',
     'value',
@@ -25,6 +27,7 @@ export class RrrListRow extends HTMLElement {
   ]
 
   private controlElement: HTMLInputElement | null = null
+  private fileInput: HTMLInputElement | null = null
   private controlTabIndex = 0
   private projectedContent: Record<RowSlot, Element[]> | null = null
   private renderQueued = false
@@ -60,6 +63,16 @@ export class RrrListRow extends HTMLElement {
     return this.hasAttribute('disabled')
   }
 
+  get files(): FileList | null {
+    return this.fileInput?.files ?? null
+  }
+
+  clearFileSelection(): void {
+    if (this.fileInput) {
+      this.fileInput.value = ''
+    }
+  }
+
   setControlTabIndex(value: number): void {
     this.controlTabIndex = value
     if (this.controlElement) {
@@ -81,6 +94,11 @@ export class RrrListRow extends HTMLElement {
   }
 
   override focus(options?: FocusOptions): void {
+    if (this.fileInput) {
+      this.fileInput.focus(options)
+      return
+    }
+
     const focusTarget = this.querySelector<HTMLElement>(':scope > .rrr-list-row__row')
     focusTarget?.focus(options)
   }
@@ -144,6 +162,21 @@ export class RrrListRow extends HTMLElement {
           ${content}
         </a>
       `
+    } else if (activation === 'file') {
+      const accept = this.getAttribute('accept')
+      rowMarkup = `
+        <label class="rrr-row rrr-list-row__row rrr-list-row__row--interactive rrr-list-row__row--file">
+          ${content}
+          <input
+            class="rrr-list-row__file-control"
+            type="file"
+            name="${this.escapeAttribute(this.name)}"
+            ${accept !== null ? `accept="${this.escapeAttribute(accept)}"` : ''}
+            ${this.hasAttribute('multiple') ? 'multiple' : ''}
+            ${disabled ? 'disabled' : ''}
+          >
+        </label>
+      `
     } else if (activation === 'button') {
       rowMarkup = `
         <button
@@ -161,11 +194,17 @@ export class RrrListRow extends HTMLElement {
     this.innerHTML = rowMarkup
     this.restoreProjectedContent()
     this.controlElement = this.querySelector<HTMLInputElement>(':scope > .rrr-list-row__row .rrr-list-row__control')
+    this.fileInput = this.querySelector<HTMLInputElement>(':scope > .rrr-list-row__row .rrr-list-row__file-control')
     this.setAttribute('aria-disabled', disabled ? 'true' : 'false')
 
     this.controlElement?.addEventListener('change', (event) => {
       event.stopPropagation()
       this.checked = this.controlElement?.checked ?? false
+      this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    })
+
+    this.fileInput?.addEventListener('change', (event) => {
+      event.stopPropagation()
       this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
     })
 
