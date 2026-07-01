@@ -3,6 +3,7 @@ import { registerRrrSheet, type RrrSheet } from '../design-system/components/rrr
 import { getTopSheetPresentation } from '../foundation/presentation-stack.ts'
 import { toastService } from '../foundation/toast.ts'
 import { confirmSheet, presentSheet } from '../utils/sheet-service.ts'
+import { initLocale } from '../i18n/index.ts'
 
 beforeAll(() => {
   registerRrrSheet()
@@ -23,6 +24,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   document.body.innerHTML = ''
+  initLocale('en-US')
 })
 
 describe('sheet presentation', () => {
@@ -77,6 +79,38 @@ describe('sheet presentation', () => {
     await expect(result).resolves.toBe(false)
 
     expect(document.activeElement).toBe(trigger)
+  })
+
+  test('provides a localized assistive dismiss control', async () => {
+    const result = confirmSheet({
+      title: 'Choose a value',
+      message: 'Select an option.',
+      confirmLabel: 'Confirm',
+    })
+    const dismissButton = document.querySelector<HTMLButtonElement>('.sheet-assistive-dismiss')
+
+    expect(dismissButton?.type).toBe('button')
+    expect(dismissButton?.textContent).toBe('Close')
+
+    dismissButton?.click()
+    await expect(result).resolves.toBe(false)
+  })
+
+  test('omits the assistive dismiss control when the sheet is non-dismissible', async () => {
+    const result = confirmSheet({
+      title: 'Required decision',
+      message: 'This workflow requires confirmation.',
+      confirmLabel: 'Confirm',
+      dismissible: false,
+    })
+    const dialog = document.querySelector<HTMLDialogElement>('rrr-sheet dialog')
+
+    expect(dialog?.querySelector('.sheet-assistive-dismiss')).toBeNull()
+    dialog?.dispatchEvent(new Event('cancel', { cancelable: true }))
+    expect(dialog?.hasAttribute('data-closing')).toBe(false)
+
+    dialog?.querySelector<HTMLElement>('[data-action="confirm"]')?.click()
+    await expect(result).resolves.toBe(true)
   })
 
   test('dismisses after a deliberate downward handle drag', async () => {

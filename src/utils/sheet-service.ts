@@ -3,10 +3,11 @@ import type {
   RrrSheet,
   SheetResult,
 } from '../design-system/components/rrr-sheet.ts'
+import { t } from '../i18n/index.ts'
 
 interface SheetElement extends HTMLElement {
   configureConfirmation(options: ConfirmSheetOptions): void
-  present(options?: { dismissible?: boolean }): Promise<SheetResult>
+  present(options?: { dismissible?: boolean; dismissLabel?: string }): Promise<SheetResult>
 }
 
 const sheetTagName = 'rrr-sheet'
@@ -45,12 +46,18 @@ export function presentSheet(
   options?: { owner?: HTMLElement; dismissible?: boolean },
 ): Promise<SheetResult> {
   getSheetContainer(options?.owner).append(sheet)
-  return sheet.present({ dismissible: options?.dismissible })
+  return sheet.present({
+    dismissible: options?.dismissible,
+    dismissLabel: t('action.close'),
+  })
 }
 
 export async function confirmSheet(options: ConfirmSheetOptions): Promise<boolean> {
   const sheet = document.createElement(sheetTagName) as SheetElement
   sheet.configureConfirmation(options)
   getSheetContainer().append(sheet)
-  return (await sheet.present({ dismissible: options.dismissible })) === 'confirm'
+  return (await sheet.present({
+    dismissible: options.dismissible,
+    dismissLabel: t('action.close'),
+  })) === 'confirm'
 }

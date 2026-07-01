@@ -7,6 +7,10 @@ export const nlNlMessages = {
     value: 'Annuleren',
     context: 'Dismiss current workflow without committing changes',
   },
+  'action.close': {
+    value: 'Sluiten',
+    context: 'Dismiss an overlay without committing changes',
+  },
   'action.save': {
     value: 'Opslaan',
     context: 'Commit the current change in dialogs or forms',

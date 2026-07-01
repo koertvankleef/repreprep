@@ -27,6 +27,7 @@ export class RrrSheet extends HTMLElement {
   private unregisterPresentation: (() => void) | null = null
   private returnFocusTo: HTMLElement | null = null
   private dismissible = true
+  private dismissLabel = ''
   private initialized = false
   private closing = false
   private dragPointerId: number | null = null
@@ -82,12 +83,16 @@ export class RrrSheet extends HTMLElement {
     this.append(heading, description, action)
   }
 
-  present(options?: { dismissible?: boolean }): Promise<SheetResult> {
+  present(options?: { dismissible?: boolean; dismissLabel?: string }): Promise<SheetResult> {
     if (this.resolver) {
       throw new Error('This sheet is already presented')
     }
 
     this.dismissible = options?.dismissible ?? this.dismissible
+    this.dismissLabel = options?.dismissLabel ?? this.dismissLabel
+    if (this.dismissible && !this.dismissLabel.trim()) {
+      throw new Error('A dismissible sheet requires a dismiss label')
+    }
     this.returnFocusTo = getDeepActiveElement() as HTMLElement | null
     this.initialize()
 
@@ -161,6 +166,15 @@ export class RrrSheet extends HTMLElement {
     const content = document.createElement('div')
     content.className = 'sheet-content'
     content.append(...headings, ...descriptions)
+
+    if (this.dismissible) {
+      const dismissButton = document.createElement('button')
+      dismissButton.className = 'sheet-assistive-dismiss'
+      dismissButton.type = 'button'
+      dismissButton.textContent = this.dismissLabel
+      dismissButton.addEventListener('click', () => this.dismiss())
+      panel.append(dismissButton)
+    }
 
     if (bodyNodes.length > 0) {
       const body = document.createElement('div')

@@ -131,6 +131,18 @@ attributes. Classes such as `.rrr-list-row__label` and
 `.rrr-list-row__description` belong to generated internals and are not an
 authoring API.
 
+## Sheets
+
+Present sheets through `presentSheet()` or `confirmSheet()` so they receive the
+localized dismiss label and are mounted in the active presentation layer.
+Dismissible sheets include a native Close button for assistive technology. It
+is visually hidden during pointer interaction and becomes visible when it
+receives keyboard focus, like a skip link. Do not add a duplicate Cancel action
+when dismissing and canceling have the same result.
+
+Non-dismissible sheets omit the Close control and must provide an explicit
+action that completes the workflow.
+
 ## Motion
 
 Motion curves are named for their behavior rather than ranked as primary or

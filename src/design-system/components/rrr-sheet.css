@@ -89,6 +89,41 @@ rrr-sheet .sheet-panel::before {
   box-shadow: var(--rrr-sheet-shadow);
 }
 
+rrr-sheet .sheet-assistive-dismiss {
+  position: absolute;
+  z-index: 2;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+rrr-sheet .sheet-assistive-dismiss:focus,
+rrr-sheet .sheet-assistive-dismiss:focus-visible {
+  inset-block-start: var(--rrr-spacing-s);
+  inset-inline-end: var(--rrr-sheet-padding-inline);
+  inline-size: auto;
+  block-size: auto;
+  min-block-size: var(--rrr-control-min-block-size);
+  margin: 0;
+  padding: 0 var(--rrr-spacing-m);
+  overflow: visible;
+  border: var(--rrr-border-width) solid var(--rrr-color-primary);
+  border-radius: var(--rrr-radius-s);
+  outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
+  outline-offset: var(--global-focus-ring-offset);
+  clip-path: none;
+  background: var(--rrr-surface-raised);
+  color: var(--rrr-color-link);
+  font: inherit;
+  font-weight: var(--rrr-font-weight-medium);
+  white-space: normal;
+}
+
 rrr-sheet .sheet-handle-region {
   display: grid;
   flex: 0 0 auto;

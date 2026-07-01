@@ -7,6 +7,10 @@ export const enUsMessages = {
     value: 'Cancel',
     context: 'Dismiss current workflow without committing changes',
   },
+  'action.close': {
+    value: 'Close',
+    context: 'Dismiss an overlay without committing changes',
+  },
   'action.save': {
     value: 'Save',
     context: 'Commit the current change in dialogs or forms',
