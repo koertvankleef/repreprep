@@ -143,6 +143,23 @@ when dismissing and canceling have the same result.
 Non-dismissible sheets omit the Close control and must provide an explicit
 action that completes the workflow.
 
+## Date fields
+
+Use `rrr-date-field` instead of a native `input[type="date"]` when date
+selection should use the shared sheet presentation. Its `value` remains an ISO
+calendar date (`YYYY-MM-DD`), while the visible value, month names, and wheel
+order follow its `locale`.
+
+The field opens an `rrr-date-picker` with separate day, month, and year
+spinbuttons. Arrow keys and pointer scrolling adjust one wheel at a time. The
+temporary selection is committed and emitted through `input` and `change` only
+when the sheet's Confirm action is used; normal sheet dismissal preserves the
+original value.
+
+Supply localized `picker-title`, `confirm-label`, `dismiss-label`,
+`day-label`, `month-label`, and `year-label` attributes. Use `min` and `max`
+when a workflow needs bounds; otherwise the picker supports years 1900–2100.
+
 ## Motion
 
 Motion curves are named for their behavior rather than ranked as primary or

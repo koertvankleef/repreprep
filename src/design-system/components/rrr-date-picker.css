@@ -1,0 +1,60 @@
+:host {
+  display: block;
+  min-inline-size: 0;
+  --rrr-date-picker-row-height: 2.5rem;
+  --rrr-date-picker-muted-color: var(--rrr-text-muted);
+  --rrr-date-picker-divider-color: var(--rrr-colors-grayscale-50);
+}
+
+.picker {
+  display: flex;
+  justify-content: center;
+  gap: var(--rrr-spacing-s);
+  min-inline-size: 0;
+}
+
+.wheel {
+  display: grid;
+  flex: 1 1 0;
+  grid-template-rows: repeat(3, var(--rrr-date-picker-row-height));
+  min-inline-size: 4rem;
+  max-inline-size: 10rem;
+  border-radius: var(--rrr-radius-s);
+  cursor: ns-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.wheel--month {
+  flex-grow: 1.8;
+}
+
+.wheel:focus-visible {
+  outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
+  outline-offset: var(--global-focus-ring-offset);
+}
+
+.option {
+  display: grid;
+  place-items: center;
+  min-inline-size: 0;
+  padding-inline: var(--rrr-spacing-xs);
+  overflow: hidden;
+  color: var(--rrr-date-picker-muted-color);
+  font-size: var(--rrr-font-size-l);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.option[data-offset] {
+  cursor: pointer;
+}
+
+.option--selected {
+  border-block:
+    var(--rrr-border-width) solid
+    var(--rrr-date-picker-divider-color);
+  color: var(--rrr-color-text);
+  font-weight: var(--rrr-font-weight-medium);
+}

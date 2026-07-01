@@ -1,0 +1,93 @@
+:host {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--rrr-spacing-xs);
+  --rrr-date-field-label-color: var(--rrr-colors-grayscale-90);
+  --rrr-date-field-border-color: var(--rrr-colors-grayscale-40);
+  --rrr-date-field-background: var(--rrr-colors-grayscale-00);
+  --rrr-date-field-color: var(--rrr-colors-grayscale-100);
+  --rrr-date-field-error-color: var(--rrr-colors-context-danger-70);
+}
+
+.label {
+  color: var(--rrr-date-field-label-color);
+  font-weight: var(--rrr-font-weight-semibold);
+}
+
+:host([invalid]) .label {
+  color: var(--rrr-date-field-error-color);
+}
+
+.control {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--rrr-spacing-s);
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: var(--rrr-control-min-block-size);
+  padding-inline: var(--rrr-spacing-l);
+  border: var(--rrr-border-width) solid var(--rrr-date-field-border-color);
+  border-radius: var(--rrr-radius-s);
+  background: var(--rrr-date-field-background);
+  color: var(--rrr-date-field-color);
+  font: inherit;
+  text-align: start;
+  transition: border-color var(--rrr-transition-default), box-shadow var(--rrr-transition-default);
+}
+
+.control:not(:disabled) {
+  cursor: pointer;
+}
+
+.control:not(:disabled):hover {
+  border-color: var(--rrr-colors-activity-indigo-30);
+}
+
+.control:focus-visible {
+  border-color: var(--rrr-colors-activity-indigo-50);
+  outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
+  outline-offset: var(--global-focus-ring-offset);
+  box-shadow: 0 0 0 4px var(--rrr-colors-activity-indigo-10);
+}
+
+.value {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.value[data-empty='true'] {
+  color: var(--rrr-colors-grayscale-60);
+}
+
+.control rrr-icon {
+  flex: 0 0 auto;
+  color: var(--rrr-color-primary);
+  font-size: 1.25rem;
+}
+
+:host([invalid]) .control {
+  border-color: var(--rrr-colors-context-danger-50);
+  background: var(--rrr-colors-context-danger-10);
+}
+
+.control:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  border-color: var(--rrr-colors-grayscale-30);
+  background: var(--rrr-colors-grayscale-30);
+  color: var(--rrr-colors-grayscale-70);
+}
+
+.error {
+  min-block-size: calc(var(--rrr-font-size-xs) * 1.4);
+  margin: 0;
+  color: var(--rrr-date-field-error-color);
+  font-size: var(--rrr-font-size-xs);
+  line-height: 1.4;
+  visibility: hidden;
+}
+
+.error:not(:empty) {
+  visibility: visible;
+}

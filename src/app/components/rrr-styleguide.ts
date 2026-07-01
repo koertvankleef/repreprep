@@ -577,7 +577,19 @@ export class RrrStyleguide extends HTMLElement {
               <div class="showcase-grid">
                 <div class="component-column">
                   <rrr-input label="${t('field.name')}" name="sample-name" placeholder="${t('exercise.form.name.placeholder')}" value="Bench Press"></rrr-input>
-                  <rrr-input label="${t('field.date')}" type="date" name="sample-date" value="2026-06-14"></rrr-input>
+                  <rrr-date-field
+                    label="${t('field.date')}"
+                    name="sample-date"
+                    value="2026-06-14"
+                    locale="${getLocale()}"
+                    picker-title="${t('datePicker.title')}"
+                    confirm-label="${t('action.confirm')}"
+                    dismiss-label="${t('action.close')}"
+                    day-label="${t('datePicker.day')}"
+                    month-label="${t('datePicker.month')}"
+                    year-label="${t('datePicker.year')}"
+                    placeholder="${t('datePicker.placeholder')}"
+                  ></rrr-date-field>
                   <rrr-input label="${t('exercise.search.label')}" type="search" variant="outline" rounded placeholder="${t('exercise.search.placeholder')}" value="bench">
                     <rrr-icon slot="start" name="search"></rrr-icon>
                     <rrr-icon slot="end" name="dismiss-circle"></rrr-icon>

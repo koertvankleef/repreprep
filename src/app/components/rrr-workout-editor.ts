@@ -2,7 +2,7 @@ import { storageService } from '../storage-instance.ts'
 import { getActiveExercises, getExercise } from '../../domain/exercise-service.ts'
 import { createExerciseEntry, createNewWorkout } from '../../domain/workout-service.ts'
 import type { ExerciseDefinition, Workout, WorkoutExerciseEntry } from '../../domain/types.ts'
-import { t } from '../../i18n/index.ts'
+import { getLocale, t } from '../../i18n/index.ts'
 import { todayIso } from '../../utils/date.ts'
 import './rrr-exercise-entry.ts'
 import styles from './rrr-workout-editor.css?inline'
@@ -86,7 +86,7 @@ export class RrrWorkoutEditor extends HTMLElement {
       return
     }
 
-    const dateField = this.querySelector<HTMLInputElement>('rrr-input[name="date"]')
+    const dateField = this.querySelector<HTMLElement & { value: string }>('rrr-date-field[name="date"]')
     const notesField = this.querySelector<HTMLElement & { value: string }>('rrr-textarea[name="notes"]')
 
     this.workout = {
@@ -122,7 +122,7 @@ export class RrrWorkoutEditor extends HTMLElement {
     this.updateWorkoutFields()
 
     if (!this.workout || !this.workout.date.trim()) {
-      const dateField = this.querySelector<HTMLElement>('rrr-input[name="date"]')
+      const dateField = this.querySelector<HTMLElement>('rrr-date-field[name="date"]')
 
       if (dateField) {
         dateField.setAttribute('invalid', '')
@@ -130,7 +130,7 @@ export class RrrWorkoutEditor extends HTMLElement {
 
       this.setStatus(t('workout.validation.dateRequired'), 'error')
       this.render()
-      this.querySelector<HTMLElement>('rrr-input[name="date"]')?.focus()
+      this.querySelector<HTMLElement>('rrr-date-field[name="date"]')?.focus()
       return
     }
 
@@ -201,7 +201,19 @@ export class RrrWorkoutEditor extends HTMLElement {
           </div>
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || defaultStatus}</p>
           <div class="row">
-            <rrr-input label="${t('field.date')}" name="date" type="date"></rrr-input>
+            <rrr-date-field
+              label="${t('field.date')}"
+              name="date"
+              locale="${getLocale()}"
+              picker-title="${t('workout.form.datePickerTitle')}"
+              confirm-label="${t('action.confirm')}"
+              dismiss-label="${t('action.close')}"
+              day-label="${t('datePicker.day')}"
+              month-label="${t('datePicker.month')}"
+              year-label="${t('datePicker.year')}"
+              placeholder="${t('datePicker.placeholder')}"
+              required
+            ></rrr-date-field>
             <rrr-textarea label="${t('workout.form.notes')}" name="notes" rows="3" placeholder="${t('workout.form.notes.placeholder')}"></rrr-textarea>
           </div>
           <div>
@@ -222,7 +234,7 @@ export class RrrWorkoutEditor extends HTMLElement {
       </section>
     `
 
-    const dateField = this.querySelector<HTMLElement>('rrr-input[name="date"]')
+    const dateField = this.querySelector<HTMLElement>('rrr-date-field[name="date"]')
     const notesField = this.querySelector<HTMLElement & { value: string }>('rrr-textarea[name="notes"]')
     const exerciseField = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="exercise"]')
 
@@ -241,7 +253,7 @@ export class RrrWorkoutEditor extends HTMLElement {
 
     this.renderExerciseEntries(activeExercises)
 
-    this.querySelector<HTMLElement>('rrr-input[name="date"]')?.addEventListener('input', () => {
+    this.querySelector<HTMLElement>('rrr-date-field[name="date"]')?.addEventListener('input', () => {
       this.updateWorkoutFields()
     })
 
