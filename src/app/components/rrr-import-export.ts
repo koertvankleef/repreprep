@@ -2,21 +2,14 @@ import { storageService } from '../storage-instance.ts'
 import { t } from '../../i18n/index.ts'
 import { exportToJson } from '../../import-export/json-export-service.ts'
 import { importFromJson } from '../../import-export/json-import-service.ts'
-import { confirmDialog } from '../../utils/dialog-service.ts'
 import styles from './rrr-import-export.css?inline'
+import { confirmSheet } from '../../utils/sheet-service.ts'
+import { toastService } from '../../foundation/toast.ts'
 
 export class RrrImportExport extends HTMLElement {
-  private statusMessage = ''
-  private statusType: 'success' | 'error' | null = null
   private readonly storageKey = 'repreprep:data'
 
   connectedCallback(): void {
-    this.render()
-  }
-
-  private setStatus(message: string, type: 'success' | 'error'): void {
-    this.statusMessage = message
-    this.statusType = type
     this.render()
   }
 
@@ -25,15 +18,14 @@ export class RrrImportExport extends HTMLElement {
     const file = input?.files?.[0]
 
     if (!file) {
-      this.setStatus(t('importExport.status.chooseFile'), 'error')
+      toastService.danger(t('importExport.status.chooseFile'))
       return
     }
 
-    const confirmed = await confirmDialog({
+    const confirmed = await confirmSheet({
       title: t('importExport.dialog.title'),
       message: t('importExport.dialog.message'),
       confirmLabel: t('action.import'),
-      cancelLabel: t('action.cancel'),
     })
 
     if (!confirmed) {
@@ -44,48 +36,61 @@ export class RrrImportExport extends HTMLElement {
       const data = await importFromJson(file)
       storageService.setData(data)
       window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-      this.setStatus(t('importExport.status.importSuccess'), 'success')
+      
       if (input) {
         input.value = ''
       }
+      
+      toastService.success(t('importExport.status.importSuccess'))
     } catch (error) {
       const message = error instanceof Error ? error.message : t('importExport.status.importError')
-      this.setStatus(message, 'error')
+      toastService.danger(message)
     }
   }
 
   private render(): void {
     this.innerHTML = `
       <style>${styles}</style>
-      <section class="page">
-        <div class="rrr-card">
-          <p id="storage-description">${t('importExport.storageDescription')} <code>${this.storageKey}</code>.</p>
-          <div>
-            <rrr-button type="button" data-action="export">${t('importExport.action.export')}</rrr-button>
+      <div class="page">
+      <p>${t('importExport.storageDescription')}.</p>
+        <rrr-section>
+          <div class="rrr-list-card">
+        
+            <rrr-list-row
+              activation="button"
+              label="${t('importExport.action.export')}"
+              data-action="export"
+            >
+              <rrr-icon slot="leading" name="arrow-download"></rrr-icon>
+            </rrr-list-row>
+        
+            <rrr-list-row
+              activation="button"
+              label="${t('action.import')}"
+              description="${t('importExport.helper')}"
+              data-action="import"
+            >
+              <rrr-icon slot="leading" name="arrow-export-up"></rrr-icon>
+            </rrr-list-row>
+
           </div>
           <label>
-            ${t('action.import')}
-            <input type="file" accept="application/json,.json" aria-describedby="import-helper storage-description" />
+            <input type="file" accept="application/json,.json" aria-describedby="import-helper" />
           </label>
-          <p id="import-helper" class="helper-text">${t('importExport.helper')}</p>
-          <div>
-            <rrr-button type="button" data-action="import">${t('action.import')}</rrr-button>
-          </div>
-          ${
-            this.statusType
-              ? `<p class="status-message status-${this.statusType}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage}</p>`
-              : `<p class="status-message" role="status" aria-live="polite" aria-atomic="true">${t('importExport.status.default')}</p>`
-          }
-        </div>
-      </section>
+        </rrr-section>
+      </div>
     `
 
-    this.querySelector<HTMLElement>('rrr-button[data-action="export"]')?.addEventListener('click', () => {
-      exportToJson(storageService.getData())
-      this.setStatus(t('importExport.status.exportStarted'), 'success')
+    this.querySelector<HTMLElement>('rrr-list-row[data-action="export"]')?.addEventListener('click', () => {
+      try {
+        exportToJson(storageService.getData())
+      } catch (error) {
+        const message = error instanceof Error ? error.message : t('importExport.status.exportError')
+        toastService.danger(message)
+      }
     })
 
-    this.querySelector<HTMLElement>('rrr-button[data-action="import"]')?.addEventListener('click', () => {
+    this.querySelector<HTMLElement>('rrr-list-row[data-action="import"]')?.addEventListener('click', () => {
       void this.handleImport()
     })
   }

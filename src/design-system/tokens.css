@@ -36,6 +36,10 @@
   --rrr-colors-activity-indigo-80: oklch(33.17% 0.2019 274.06);
   --rrr-colors-activity-indigo-90: oklch(24.23% 0.1878 272.61);
 
+  --temp1: #F8FAFC;
+  --temp2: #03888d;
+  --temp3: oklch(51.06% 0.2301 276.97);
+
   --rrr-colors-context-danger-10: oklch(97.69% 0.0450 24.00);
   --rrr-colors-context-danger-20: oklch(89.00% 0.0950 23.00);
   --rrr-colors-context-danger-30: oklch(79.80% 0.1450 22.00);

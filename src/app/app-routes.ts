@@ -173,14 +173,7 @@ export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
       surface: 'padded',
       header: 'standard',
       titleKey: 'routineDetail.notFound.title',
-      backHref: '#/routines',
-      endLink: (route) => ({
-        href: route.name === 'routine-detail'
-          ? `#/routines/${encodeURIComponent(route.routineId)}/edit`
-          : '#/routines',
-        icon: 'edit',
-        labelKey: 'routineDetail.action.edit',
-      }),
+      backHref: '#/routines'
     },
   },
   {

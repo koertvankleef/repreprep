@@ -3,9 +3,9 @@ import { getExercise } from '../../domain/exercise-service.ts'
 import { getActiveRoutines } from '../../domain/routine-service.ts'
 import { createWorkoutFromRoutine } from '../../domain/workout-service.ts'
 import { formatDate as formatLocalizedDate, t } from '../../i18n/index.ts'
-import { confirmDialog } from '../../utils/dialog-service.ts'
 import { todayIso } from '../../utils/date.ts'
 import styles from './rrr-workout-list.css?inline'
+import { confirmSheet } from '../../utils/sheet-service.ts'
 
 export class RrrWorkoutList extends HTMLElement {
   private selectedRoutineId: string | null = null
@@ -24,11 +24,11 @@ export class RrrWorkoutList extends HTMLElement {
   }
 
   private async deleteWorkout(id: string): Promise<void> {
-    const confirmed = await confirmDialog({
+    const confirmed = await confirmSheet({
       title: t('workoutList.dialog.delete.title'),
       message: t('workoutList.dialog.delete.message'),
       confirmLabel: t('action.delete'),
-      cancelLabel: t('action.cancel'),
+      confirmTone: 'danger',
     })
 
     if (!confirmed) {
