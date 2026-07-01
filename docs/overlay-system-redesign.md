@@ -45,6 +45,19 @@ topmost sheet's presentation layer. Tooltips remain above every other surface.
 - [ ] Manually verify touch dragging, narrow screens, enlarged text, dark theme,
   and both high-contrast variants.
 
+## Phase 2 — interactive task content
+
+- [x] Add a light-DOM authoring API with `heading`, `description`, `body`, and
+  `actions` content roles.
+- [x] Let authored actions return task-specific string results without teaching
+  the sheet primitive about the task.
+- [x] Retain `confirmSheet()` as the concise confirmation convenience API.
+- [x] Replace Settings' bespoke inline reset panel with one danger action row.
+- [x] Move reset warning, date verification, validation feedback, and the
+  affirmative action into a task-specific sheet.
+- [x] Keep actual data clearing owned by `rrr-app` through the existing
+  `rrr-clear-data-request` event.
+
 ## Later phases
 
 - [ ] Migrate the Today-page workout deletion confirmation.

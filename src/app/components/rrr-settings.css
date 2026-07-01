@@ -5,49 +5,13 @@ rrr-settings {
   max-width: 48rem;
 }
 
-.settings-header {
-  display: block;
-}
-
-.settings-title {
-  margin: 0;
-  font-size: var(--rrr-font-size-xl);
-}
-
-.danger-card-content {
-  display: grid;
-  gap: var(--rrr-spacing-xs);
-  padding: var(--rrr-spacing-m);
-}
-
-.danger-title {
-  margin: 0;
-  color: var(--rrr-colors-context-danger-70);
-}
-
-.danger-copy,
-.danger-warning {
-  margin: 0;
-  color: var(--rrr-colors-grayscale-80);
-}
-
-.danger-warning {
-  color: var(--rrr-colors-context-danger-70);
-}
-
-.danger-actions {
-  padding: 0 var(--rrr-spacing-m) var(--rrr-spacing-m);
-}
-
-.danger-actions rrr-button {
-  width: 100%;
-}
-
-.reset-confirm-panel {
-  display: grid;
-  gap: var(--rrr-spacing-s);
-  padding: var(--rrr-spacing-m);
+.reset-sheet-card {
   min-width: 0;
+}
+
+.reset-sheet-warning {
+  margin: 0;
+  color: var(--rrr-button-fg-danger);
 }
 
 .reset-confirm-input {
@@ -74,14 +38,4 @@ rrr-settings {
   color: var(--rrr-colors-grayscale-70);
 }
 
-.reset-confirm-hint[data-state='ready'] {
-  color: var(--rrr-colors-context-success-70);
-}
-
-.reset-confirm-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--rrr-spacing-s);
-  justify-content: flex-end;
-}
 }

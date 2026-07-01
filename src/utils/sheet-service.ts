@@ -1,7 +1,12 @@
-import type { ConfirmSheetOptions } from '../design-system/components/rrr-sheet.ts'
+import type {
+  ConfirmSheetOptions,
+  RrrSheet,
+  SheetResult,
+} from '../design-system/components/rrr-sheet.ts'
 
 interface SheetElement extends HTMLElement {
-  confirm(options: ConfirmSheetOptions): Promise<boolean>
+  configureConfirmation(options: ConfirmSheetOptions): void
+  present(options?: { dismissible?: boolean }): Promise<SheetResult>
 }
 
 const sheetTagName = 'rrr-sheet'
@@ -26,10 +31,26 @@ function getSheetRoot(): Document | ShadowRoot {
   return appRoot ?? document
 }
 
-export function confirmSheet(options: ConfirmSheetOptions): Promise<boolean> {
+function getSheetContainer(owner?: HTMLElement): HTMLElement | ShadowRoot {
+  if (owner) {
+    return owner
+  }
+
   const root = getSheetRoot()
-  const container = root instanceof Document ? root.body : root
+  return root instanceof Document ? root.body : root
+}
+
+export function presentSheet(
+  sheet: RrrSheet,
+  options?: { owner?: HTMLElement; dismissible?: boolean },
+): Promise<SheetResult> {
+  getSheetContainer(options?.owner).append(sheet)
+  return sheet.present({ dismissible: options?.dismissible })
+}
+
+export async function confirmSheet(options: ConfirmSheetOptions): Promise<boolean> {
   const sheet = document.createElement(sheetTagName) as SheetElement
-  container.append(sheet)
-  return sheet.confirm(options)
+  sheet.configureConfirmation(options)
+  getSheetContainer().append(sheet)
+  return (await sheet.present({ dismissible: options.dismissible })) === 'confirm'
 }

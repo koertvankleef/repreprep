@@ -85,9 +85,8 @@ export const enUsMessages = {
   'app.settings.resetData.description': 'Delete all workouts, routines, exercises, and local app preferences stored in this browser.',
   'app.settings.resetData.warning': 'This action is irreversible.',
   'app.settings.resetData.open': 'Clear all stored data',
-  'app.settings.resetData.prompt': 'Type today\'s date in your local format using digits only ({date}):',
-  'app.settings.resetData.validation': 'Enter exactly 8 digits for today\'s date to enable deletion.',
-  'app.settings.resetData.ready': 'Date verified. You can now clear all data.',
+  'app.settings.resetData.prompt': 'Type today\'s date using 8 digits only ({format}):',
+  'app.settings.resetData.validation': 'This enables deletion.',
   'app.settings.resetData.confirm': 'Delete everything',
   'app.settings.resetData.success': 'All stored app data has been cleared.',
 

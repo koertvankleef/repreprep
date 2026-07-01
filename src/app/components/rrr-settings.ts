@@ -1,73 +1,88 @@
+import type { RrrSheet } from '../../design-system/components/rrr-sheet.ts'
 import { getLocale, t } from '../../i18n/index.ts'
+import { presentSheet } from '../../utils/sheet-service.ts'
 import styles from './rrr-settings.css?inline'
 
 export class RrrSettings extends HTMLElement {
   static observedAttributes = ['styleguide-enabled', 'theme']
-  private resetPanelOpen = false
-  private resetDateInput = ''
-
-  private readonly handleClick = (event: Event): void => {
-    const actionTarget = event
-      .composedPath()
-      .find((node): node is HTMLElement => node instanceof HTMLElement && node.dataset.action !== undefined)
-
-    if (!actionTarget) {
-      return
-    }
-
-    const action = actionTarget.dataset.action
-
-    if (action === 'open-reset-data') {
-      this.resetPanelOpen = true
-      this.resetDateInput = ''
-      this.render()
-      return
-    }
-
-    if (action === 'cancel-reset-data') {
-      this.resetPanelOpen = false
-      this.resetDateInput = ''
-      this.render()
-      return
-    }
-
-    if (action === 'confirm-reset-data' && this.canConfirmReset()) {
-      this.dispatchEvent(new CustomEvent('rrr-clear-data-request', { bubbles: true, composed: true }))
-      this.resetPanelOpen = false
-      this.resetDateInput = ''
-      this.render()
-    }
-  }
-
-  private readonly handleInput = (event: Event): void => {
-    const target = event.target
-    if (!(target instanceof HTMLInputElement) || target.name !== 'reset-date-confirm') {
-      return
-    }
-
-    const digitsOnly = target.value.replace(/\D/g, '').slice(0, 8)
-    if (target.value !== digitsOnly) {
-      target.value = digitsOnly
-    }
-
-    this.resetDateInput = digitsOnly
-    this.syncResetConfirmationState()
-  }
 
   connectedCallback(): void {
-    this.addEventListener('click', this.handleClick)
-    this.addEventListener('input', this.handleInput)
     this.render()
-  }
-
-  disconnectedCallback(): void {
-    this.removeEventListener('click', this.handleClick)
-    this.removeEventListener('input', this.handleInput)
   }
 
   attributeChangedCallback(): void {
     if (!this.isConnected) return
     this.render()
+  }
+
+  private async deleteAppData(): Promise<void> {
+    const sheet = document.createElement('rrr-sheet') as RrrSheet
+    const todayDigits = this.getTodayDigits()
+    const dateFormat = this.getLocalizedDateFormat()
+
+    sheet.innerHTML = `
+      <h3 slot="heading" class="sheet-title">${t('app.settings.resetData.title')}</h3>
+      <p slot="description" class="sheet-message">${t('app.settings.resetData.description')}</p>
+      <div slot="body">
+      <p class="reset-sheet-warning">${t('app.settings.resetData.warning')}</p>
+        <div class="rrr-card reset-sheet-card">
+          <label class="reset-confirm-label" for="reset-date-confirm">${t('app.settings.resetData.prompt', { format: dateFormat })}</label>
+          <input
+            id="reset-date-confirm"
+            class="reset-confirm-input"
+            name="reset-date-confirm"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            spellcheck="false"
+            maxlength="8"
+            placeholder="${dateFormat}"
+            aria-describedby="reset-confirm-hint"
+            autofocus
+          >
+          <p id="reset-confirm-hint" class="reset-confirm-hint">${t('app.settings.resetData.validation')}</p>
+        </div>
+      </div>
+      <rrr-button
+        slot="actions"
+        type="button"
+        tone="danger"
+        data-sheet-result="confirm"
+        disabled
+      >${t('app.settings.resetData.confirm')}</rrr-button>
+    `
+
+    const input = sheet.querySelector<HTMLInputElement>('input[name="reset-date-confirm"]')
+    const hint = sheet.querySelector<HTMLElement>('.reset-confirm-hint')
+    const confirmButton = sheet.querySelector<HTMLElement>('[data-sheet-result="confirm"]')
+
+    const syncConfirmationState = (): void => {
+      if (!input || !hint || !confirmButton) {
+        return
+      }
+
+      const ready = input.value === todayDigits
+      confirmButton.toggleAttribute('disabled', !ready)
+      hint.hidden = ready
+    }
+
+    input?.addEventListener('input', () => {
+      const digitsOnly = input.value.replace(/\D/g, '').slice(0, 8)
+      if (input.value !== digitsOnly) {
+        input.value = digitsOnly
+      }
+      syncConfirmationState()
+    })
+
+    const result = await presentSheet(sheet, { owner: this })
+    if (result !== 'confirm' || input?.value !== todayDigits) {
+      return
+    }
+
+    this.dispatchEvent(new CustomEvent('rrr-clear-data-request', {
+      bubbles: true,
+      composed: true,
+    }))
   }
 
   private getTodayDigits(): string {
@@ -84,29 +99,21 @@ export class RrrSettings extends HTMLElement {
       .join('')
   }
 
-  private getTodayLocalizedDate(): string {
-    return new Intl.DateTimeFormat(getLocale(), {
+  private getLocalizedDateFormat(): string {
+    const parts = new Intl.DateTimeFormat(getLocale(), {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
-    }).format(new Date())
-  }
+    }).formatToParts(new Date())
 
-  private canConfirmReset(): boolean {
-    return this.resetDateInput.length === 8 && this.resetDateInput === this.getTodayDigits()
-  }
-
-  private syncResetConfirmationState(): void {
-    const confirmButton = this.querySelector<HTMLButtonElement>('[data-action="confirm-reset-data"]')
-    if (confirmButton) {
-      confirmButton.disabled = !this.canConfirmReset()
-    }
-
-    const hint = this.querySelector<HTMLElement>('.reset-confirm-hint')
-    if (hint) {
-      hint.textContent = this.canConfirmReset() ? t('app.settings.resetData.ready') : t('app.settings.resetData.validation')
-      hint.dataset.state = this.canConfirmReset() ? 'ready' : 'pending'
-    }
+    return parts
+      .filter((part) => part.type === 'day' || part.type === 'month' || part.type === 'year')
+      .map((part) => {
+        if (part.type === 'day') return 'DD'
+        if (part.type === 'month') return 'MM'
+        return 'YYYY'
+      })
+      .join('')
   }
 
   private render(): void {
@@ -160,44 +167,23 @@ export class RrrSettings extends HTMLElement {
 
         <rrr-section>
           <span slot="heading">${t('app.settings.data')}</span>
-          <div class="rrr-list-card danger-card">
-            <div class="danger-card-content">
-              <h3 class="danger-title">${t('app.settings.resetData.title')}</h3>
-              <p class="danger-copy">${t('app.settings.resetData.description')}</p>
-              <p class="danger-warning">${t('app.settings.resetData.warning')}</p>
-            </div>
-            <div class="danger-actions">
-              <rrr-button type="button" tone="danger" variant="outline" data-action="open-reset-data">${t('app.settings.resetData.open')}</rrr-button>
-            </div>
-            ${this.resetPanelOpen ? `
-              <div class="reset-confirm-panel">
-                <label class="reset-confirm-label" for="reset-date-confirm">${t('app.settings.resetData.prompt', { date: this.getTodayLocalizedDate() })}</label>
-                <input
-                  id="reset-date-confirm"
-                  class="reset-confirm-input"
-                  name="reset-date-confirm"
-                  type="text"
-                  inputmode="numeric"
-                  autocomplete="off"
-                  spellcheck="false"
-                  maxlength="8"
-                  placeholder="${this.getTodayDigits()}"
-                  value="${this.resetDateInput}"
-                  aria-describedby="reset-confirm-hint"
-                >
-                <p id="reset-confirm-hint" class="reset-confirm-hint" data-state="${this.canConfirmReset() ? 'ready' : 'pending'}">${this.canConfirmReset() ? t('app.settings.resetData.ready') : t('app.settings.resetData.validation')}</p>
-                <div class="reset-confirm-actions">
-                  <rrr-button type="button" variant="ghost" data-action="cancel-reset-data">${t('action.cancel')}</rrr-button>
-                  <rrr-button type="button" tone="danger" data-action="confirm-reset-data" ${this.canConfirmReset() ? '' : 'disabled'}>${t('app.settings.resetData.confirm')}</rrr-button>
-                </div>
-              </div>
-            ` : ''}
+          <div class="rrr-list-card">
+            <rrr-list-row
+              activation="button"
+              label="${t('app.settings.resetData.open')}"
+              description="${t('app.settings.resetData.description')}"
+              data-action="delete-app-data"
+              tone="danger"
+            >
+              <rrr-icon slot="leading" name="delete"></rrr-icon>
+            </rrr-list-row>
           </div>
         </rrr-section>
       </div>
     `
 
-    this.syncResetConfirmationState()
+    this.querySelector<HTMLElement>('rrr-list-row[data-action="delete-app-data"]')
+      ?.addEventListener('click', () => void this.deleteAppData())
   }
 }
 

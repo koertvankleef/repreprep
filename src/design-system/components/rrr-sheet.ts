@@ -4,6 +4,7 @@ import { ensureStyleInRoot } from './style-manager.ts'
 import styles from './rrr-sheet.css?inline'
 
 export type SheetTone = 'primary' | 'neutral' | 'accent' | 'info' | 'success' | 'warning' | 'danger'
+export type SheetResult = string | null
 
 export type ConfirmSheetOptions = {
   title: string
@@ -22,10 +23,11 @@ let nextSheetId = 1
 
 export class RrrSheet extends HTMLElement {
   private dialog: HTMLDialogElement | null = null
-  private resolver: ((value: boolean) => void) | null = null
+  private resolver: ((value: SheetResult) => void) | null = null
   private unregisterPresentation: (() => void) | null = null
   private returnFocusTo: HTMLElement | null = null
   private dismissible = true
+  private initialized = false
   private closing = false
   private dragPointerId: number | null = null
   private dragStartY = 0
@@ -46,71 +48,149 @@ export class RrrSheet extends HTMLElement {
     if (this.resolver) {
       const resolver = this.resolver
       this.resolver = null
-      resolver(false)
+      resolver(null)
     }
   }
 
-  confirm(options: ConfirmSheetOptions): Promise<boolean> {
+  configureConfirmation(options: ConfirmSheetOptions): void {
+    if (this.initialized) {
+      throw new Error('Cannot configure a sheet after it has been presented')
+    }
+
     this.dismissible = options.dismissible ?? true
+    this.replaceChildren()
+
+    const heading = document.createElement('h3')
+    heading.slot = 'heading'
+    heading.className = 'sheet-title'
+    heading.textContent = options.title
+
+    const description = document.createElement('p')
+    description.slot = 'description'
+    description.className = 'sheet-message'
+    description.textContent = options.message
+
+    const action = document.createElement('rrr-button')
+    action.slot = 'actions'
+    action.className = 'sheet-action'
+    action.setAttribute('type', 'button')
+    action.setAttribute('tone', options.confirmTone ?? 'primary')
+    action.setAttribute('data-action', 'confirm')
+    action.setAttribute('data-sheet-result', 'confirm')
+    action.textContent = options.confirmLabel
+
+    this.append(heading, description, action)
+  }
+
+  present(options?: { dismissible?: boolean }): Promise<SheetResult> {
+    if (this.resolver) {
+      throw new Error('This sheet is already presented')
+    }
+
+    this.dismissible = options?.dismissible ?? this.dismissible
     this.returnFocusTo = getDeepActiveElement() as HTMLElement | null
-    this.render(options)
+    this.initialize()
 
     const dialog = this.dialog
     if (!dialog) {
-      return Promise.resolve(false)
+      return Promise.resolve(null)
     }
 
     this.unregisterPresentation = registerSheetPresentation({ host: this, dialog })
     dialog.showModal()
-    this.querySelector<HTMLElement>('[data-action="confirm"]')?.focus()
+    this.getInitialFocusTarget()?.focus()
 
-    return new Promise<boolean>((resolve) => {
+    return new Promise<SheetResult>((resolve) => {
       this.resolver = resolve
     })
   }
 
   dismiss(): void {
     if (this.dismissible && getTopSheetPresentation()?.host === this) {
-      this.closeWith(false)
+      this.closeWith(null)
     }
   }
 
-  private render(options: ConfirmSheetOptions): void {
+  close(result: string): void {
+    this.closeWith(result)
+  }
+
+  private initialize(): void {
+    if (this.initialized) {
+      return
+    }
+
+    this.initialized = true
+    const authoredNodes = Array.from(this.children)
+    const headings = authoredNodes.filter((node) => node.getAttribute('slot') === 'heading')
+    const descriptions = authoredNodes.filter((node) => node.getAttribute('slot') === 'description')
+    const bodyNodes = authoredNodes.filter((node) => node.getAttribute('slot') === 'body')
+    const actionNodes = authoredNodes.filter((node) => node.getAttribute('slot') === 'actions')
     const sheetId = nextSheetId++
     const titleId = `rrr-sheet-title-${sheetId}`
-    const messageId = `rrr-sheet-message-${sheetId}`
+    const descriptionId = `rrr-sheet-description-${sheetId}`
 
-    this.innerHTML = `
-      <dialog aria-labelledby="${titleId}" aria-describedby="${messageId}">
-        <div class="sheet-panel" role="document">
-          <div class="sheet-handle-region" data-drag-handle aria-hidden="true">
-            <span class="sheet-handle"></span>
-          </div>
-          <div class="sheet-content">
-            <h3 id="${titleId}" class="sheet-title">${escapeHtml(options.title)}</h3>
-            <p id="${messageId}" class="sheet-message">${escapeHtml(options.message)}</p>
-            <rrr-button
-              class="sheet-action"
-              type="button"
-              tone="${options.confirmTone ?? 'primary'}"
-              data-action="confirm"
-            >${escapeHtml(options.confirmLabel)}</rrr-button>
-          </div>
-        </div>
-      </dialog>
-    `
+    if (headings.length !== 1) {
+      throw new Error('A sheet requires exactly one element with slot="heading"')
+    }
 
-    this.dialog = this.querySelector('dialog')
-    this.dialog?.addEventListener('cancel', this.handleCancel)
-    this.dialog?.addEventListener('click', this.handleBackdropClick)
-    this.querySelector<HTMLElement>('[data-action="confirm"]')
-      ?.addEventListener('click', () => this.closeWith(true))
+    this.replaceChildren()
 
-    const handle = this.querySelector<HTMLElement>('[data-drag-handle]')
-    handle?.addEventListener('pointerdown', this.handlePointerDown)
-    handle?.addEventListener('pointermove', this.handlePointerMove)
-    handle?.addEventListener('pointerup', this.handlePointerUp)
-    handle?.addEventListener('pointercancel', this.handlePointerCancel)
+    const dialog = document.createElement('dialog')
+    if (headings[0]) {
+      headings[0].id ||= titleId
+      dialog.setAttribute('aria-labelledby', headings[0].id)
+    }
+    if (descriptions[0]) {
+      descriptions[0].id ||= descriptionId
+      dialog.setAttribute('aria-describedby', descriptions[0].id)
+    }
+
+    const panel = document.createElement('div')
+    panel.className = 'sheet-panel'
+    panel.setAttribute('role', 'document')
+
+    const handleRegion = document.createElement('div')
+    handleRegion.className = 'sheet-handle-region'
+    handleRegion.setAttribute('data-drag-handle', '')
+    handleRegion.setAttribute('aria-hidden', 'true')
+    const handle = document.createElement('span')
+    handle.className = 'sheet-handle'
+    handleRegion.append(handle)
+
+    const content = document.createElement('div')
+    content.className = 'sheet-content'
+    content.append(...headings, ...descriptions)
+
+    if (bodyNodes.length > 0) {
+      const body = document.createElement('div')
+      body.className = 'sheet-body'
+      body.append(...bodyNodes)
+      content.append(body)
+    }
+
+    if (actionNodes.length > 0) {
+      const actions = document.createElement('div')
+      actions.className = 'sheet-actions'
+      actions.append(...actionNodes)
+      content.append(actions)
+    }
+
+    panel.append(handleRegion, content)
+    dialog.append(panel)
+    this.append(dialog)
+    this.dialog = dialog
+
+    dialog.addEventListener('cancel', this.handleCancel)
+    dialog.addEventListener('click', this.handleDialogClick)
+    handleRegion.addEventListener('pointerdown', this.handlePointerDown)
+    handleRegion.addEventListener('pointermove', this.handlePointerMove)
+    handleRegion.addEventListener('pointerup', this.handlePointerUp)
+    handleRegion.addEventListener('pointercancel', this.handlePointerCancel)
+  }
+
+  private getInitialFocusTarget(): HTMLElement | null {
+    return this.querySelector<HTMLElement>('[autofocus], [data-sheet-result]')
   }
 
   private readonly handleCancel = (event: Event): void => {
@@ -118,10 +198,22 @@ export class RrrSheet extends HTMLElement {
     this.dismiss()
   }
 
-  private readonly handleBackdropClick = (event: MouseEvent): void => {
+  private readonly handleDialogClick = (event: MouseEvent): void => {
     if (event.target === this.dialog) {
       this.dismiss()
+      return
     }
+
+    const resultTarget = event
+      .composedPath()
+      .find((node): node is HTMLElement =>
+        node instanceof HTMLElement && node.dataset.sheetResult !== undefined)
+
+    if (!resultTarget || resultTarget.hasAttribute('disabled') || resultTarget.getAttribute('aria-disabled') === 'true') {
+      return
+    }
+
+    this.closeWith(resultTarget.dataset.sheetResult ?? null)
   }
 
   private readonly handlePointerDown = (event: PointerEvent): void => {
@@ -160,7 +252,7 @@ export class RrrSheet extends HTMLElement {
 
     this.endDrag()
     if (shouldDismiss) {
-      this.closeWith(false)
+      this.closeWith(null)
     }
   }
 
@@ -175,7 +267,7 @@ export class RrrSheet extends HTMLElement {
     this.style.removeProperty('--rrr-sheet-drag-offset')
   }
 
-  private closeWith(result: boolean): void {
+  private closeWith(result: SheetResult): void {
     if (this.closing || !this.dialog) {
       return
     }
@@ -212,10 +304,6 @@ function getDeepActiveElement(): Element | null {
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 export function registerRrrSheet(): void {

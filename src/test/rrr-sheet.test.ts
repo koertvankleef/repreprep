@@ -1,8 +1,8 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
-import { registerRrrSheet } from '../design-system/components/rrr-sheet.ts'
+import { registerRrrSheet, type RrrSheet } from '../design-system/components/rrr-sheet.ts'
 import { getTopSheetPresentation } from '../foundation/presentation-stack.ts'
 import { toastService } from '../foundation/toast.ts'
-import { confirmSheet } from '../utils/sheet-service.ts'
+import { confirmSheet, presentSheet } from '../utils/sheet-service.ts'
 
 beforeAll(() => {
   registerRrrSheet()
@@ -92,6 +92,31 @@ describe('sheet presentation', () => {
     handle?.dispatchEvent(pointerEvent('pointerup', 1, 90))
 
     await expect(result).resolves.toBe(false)
+  })
+
+  test('presents authored heading, body, and action content without replacing it', async () => {
+    const sheet = document.createElement('rrr-sheet') as RrrSheet
+    const heading = document.createElement('h3')
+    heading.slot = 'heading'
+    heading.textContent = 'Interactive task'
+    const body = document.createElement('div')
+    body.slot = 'body'
+    body.innerHTML = '<label>Value <input autofocus></label>'
+    const action = document.createElement('button')
+    action.slot = 'actions'
+    action.dataset.sheetResult = 'saved'
+    action.textContent = 'Save'
+    sheet.append(heading, body, action)
+
+    const result = presentSheet(sheet)
+
+    expect(sheet.querySelector('.sheet-content > h3')).toBe(heading)
+    expect(sheet.querySelector('.sheet-body > [slot="body"]')).toBe(body)
+    expect(sheet.querySelector('.sheet-actions > [slot="actions"]')).toBe(action)
+    expect(document.activeElement).toBe(body.querySelector('input'))
+
+    action.click()
+    await expect(result).resolves.toBe('saved')
   })
 
   test('places toasts inside the top sheet presentation layer', async () => {

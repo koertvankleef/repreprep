@@ -114,10 +114,19 @@ rrr-sheet .sheet-message {
   text-align: center;
 }
 
+rrr-sheet .sheet-body,
+rrr-sheet .sheet-actions {
+  display: grid;
+  gap: var(--rrr-spacing-m);
+  min-inline-size: 0;
+}
+
+rrr-sheet .sheet-actions > [slot='actions'],
 rrr-sheet .sheet-action {
   display: block;
 }
 
+rrr-sheet .sheet-actions > rrr-button[slot='actions'] > button[data-rrr-button-inner],
 rrr-sheet .sheet-action > button[data-rrr-button-inner] {
   inline-size: 100%;
   justify-content: center;

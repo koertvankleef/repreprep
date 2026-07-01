@@ -28,7 +28,7 @@ export const nlNlMessages = {
     context: 'Archive an entity while preserving history',
   },
   'action.remove': {
-    value: 'Wegnemen',
+    value: 'Wissen',
     context: 'Remove an item from current parent collection',
   },
   'action.import': {
@@ -85,9 +85,8 @@ export const nlNlMessages = {
   'app.settings.resetData.description': 'Verwijder alle workouts, routines, oefeningen en lokale appvoorkeuren die in deze browser zijn opgeslagen.',
   'app.settings.resetData.warning': 'Deze actie kan niet ongedaan worden gemaakt.',
   'app.settings.resetData.open': 'Alle opgeslagen gegevens wissen',
-  'app.settings.resetData.prompt': 'Typ de datum van vandaag in jouw lokale notatie met alleen cijfers ({date}):',
-  'app.settings.resetData.validation': 'Vul precies 8 cijfers van de datum van vandaag in om wissen te activeren.',
-  'app.settings.resetData.ready': 'Datum bevestigd. Je kunt nu alle gegevens wissen.',
+  'app.settings.resetData.prompt': 'Typ de datum van vandaag met alleen 8 cijfers ({format}):',
+  'app.settings.resetData.validation': 'Dit activeert verwijderen.',
   'app.settings.resetData.confirm': 'Alles verwijderen',
   'app.settings.resetData.success': 'Alle opgeslagen appgegevens zijn gewist.',
 

@@ -6,8 +6,8 @@
   --rrr-section-heading-font-size: var(--rrr-font-size-s);
   --rrr-section-heading-font-weight: var(--rrr-font-weight-medium);
   --rrr-section-heading-letter-spacing: 0.05em;
-  --rrr-section-description-color: var(--rrr-colors-activity-indigo-90);
-  --rrr-section-description-font-size: var(--rrr-font-size-s);
+  --rrr-section-description-color: var(--rrr-text-muted);
+  --rrr-section-description-font-size: var(--rrr-font-size-m);
 }
 
 .section,
