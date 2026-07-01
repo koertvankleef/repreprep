@@ -112,6 +112,23 @@ attributes. Classes such as `.rrr-list-row__label` and
 `.rrr-list-row__description` belong to generated internals and are not an
 authoring API.
 
+## Motion
+
+Motion curves are named for their behavior rather than ranked as primary or
+secondary:
+
+- `--rrr-easing-decelerate` settles smoothly without overshoot. Use it for
+  exits, position corrections, and spatial movement that should stop quietly.
+- `--rrr-easing-overshoot-subtle` passes its destination slightly before
+  settling. Reserve it for deliberate entrances where the added presence helps
+  communicate arrival.
+
+Components should expose role-based aliases instead of consuming these
+primitives anonymously. For example, sheets use
+`--rrr-sheet-motion-enter-easing` and `--rrr-sheet-motion-exit-easing`. Sheet
+entry uses subtle overshoot; dismissal retains deceleration so it never bounces
+back into view.
+
 ### Value-first property rows
 
 Use a property list when the property schema is predictable and the user

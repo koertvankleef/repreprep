@@ -11,8 +11,9 @@ rrr-sheet {
   --rrr-sheet-padding-block: var(--rrr-spacing-l);
   --rrr-sheet-gap: var(--rrr-spacing-l);
   --rrr-sheet-handle-color: var(--rrr-colors-grayscale-50);
-  --rrr-sheet-motion-duration: 220ms;
-  --rrr-sheet-motion-easing: cubic-bezier(.2, .8, .2, 1);
+  --rrr-sheet-motion-enter-easing: var(--rrr-easing-overshoot-subtle);
+  --rrr-sheet-motion-exit-easing: var(--rrr-easing-decelerate);
+  --rrr-sheet-overshoot-cover: 1rem;
   --rrr-sheet-drag-offset: 0px;
 }
 
@@ -42,15 +43,16 @@ rrr-sheet dialog[data-dragging] .sheet-panel {
 
 rrr-sheet dialog[data-closing] .sheet-panel {
   transform: translateY(100%);
+  transition-timing-function: var(--rrr-sheet-motion-exit-easing);
 }
 
 rrr-sheet dialog::backdrop {
   background: var(--rrr-sheet-backdrop);
   opacity: 1;
   transition:
-    opacity var(--rrr-sheet-motion-duration) ease,
-    display var(--rrr-sheet-motion-duration) allow-discrete,
-    overlay var(--rrr-sheet-motion-duration) allow-discrete;
+    opacity var(--rrr-duration-long) var(--rrr-sheet-motion-exit-easing),
+    display var(--rrr-duration-long) allow-discrete,
+    overlay var(--rrr-duration-long) allow-discrete;
 
   @starting-style {
     opacity: 0;
@@ -62,15 +64,29 @@ rrr-sheet dialog[data-closing]::backdrop {
 }
 
 rrr-sheet .sheet-panel {
+  position: relative;
+  isolation: isolate;
   display: flex;
   max-height: var(--rrr-sheet-max-height);
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   border-radius: var(--rrr-sheet-radius) var(--rrr-sheet-radius) 0 0;
+  background: transparent;
+  transform: translateY(var(--rrr-sheet-drag-offset));
+  transition: transform var(--rrr-duration-long) var(--rrr-sheet-motion-enter-easing);
+}
+
+rrr-sheet .sheet-panel::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset:
+    0
+    0
+    calc(0rem - var(--rrr-sheet-overshoot-cover));
+  border-radius: inherit;
   background: var(--rrr-sheet-background);
   box-shadow: var(--rrr-sheet-shadow);
-  transform: translateY(var(--rrr-sheet-drag-offset));
-  transition: transform var(--rrr-sheet-motion-duration) var(--rrr-sheet-motion-easing);
 }
 
 rrr-sheet .sheet-handle-region {
@@ -96,6 +112,7 @@ rrr-sheet .sheet-handle {
 rrr-sheet .sheet-content {
   display: grid;
   gap: var(--rrr-sheet-gap);
+  min-block-size: 0;
   padding:
     var(--rrr-spacing-s)
     var(--rrr-sheet-padding-inline)
@@ -134,6 +151,6 @@ rrr-sheet .sheet-action > button[data-rrr-button-inner] {
 
 @media (prefers-reduced-motion: reduce) {
   rrr-sheet {
-    --rrr-sheet-motion-duration: 1ms;
+    --rrr-duration-long: 1ms;
   }
 }
