@@ -30,7 +30,13 @@ describe('json-export-service', () => {
     const base = createDefaultData()
     const exerciseId = base.exercises[0]?.id ?? ''
     const data = createRoutine(base, 'Upper Body', [
-      { id: 're-1', exerciseId, plannedSets: [{ kind: 'reps', targetReps: 8, targetWeightKg: 40 }] },
+      {
+        id: 're-1',
+        exerciseId,
+        transitionBeforeOverrideSeconds: null,
+        restSeconds: 20,
+        plannedSets: [{ id: 'ps-1', kind: 'reps', targetReps: 8, targetWeightKg: 40 }],
+      },
     ])
     const json = formatExportData(data)
     const parsed: unknown = JSON.parse(json)

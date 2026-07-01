@@ -1,8 +1,60 @@
-import type { AppData, Routine, RoutineExercise, RoutineVersion } from './types.ts'
+import type {
+  AppData,
+  RepsPlannedSet,
+  Routine,
+  RoutineExercise,
+  RoutineVersion,
+  TimePlannedSet,
+} from './types.ts'
 import { generateId } from '../utils/id.ts'
 
 const DEFAULT_REST_SECONDS = 20
 const DEFAULT_TRANSITION_SECONDS = 10
+
+export type RoutineFlowItem =
+  | { kind: 'exercise'; exercise: RoutineExercise }
+  | {
+      kind: 'transition'
+      seconds: number
+      beforeExerciseId: string
+      inherited: boolean
+    }
+
+function normalizeRoutineExercises(exercises: RoutineExercise[]): RoutineExercise[] {
+  return exercises.map((exercise, index) => ({
+    ...exercise,
+    transitionBeforeOverrideSeconds: index === 0
+      ? null
+      : exercise.transitionBeforeOverrideSeconds === null
+        ? null
+        : Math.max(0, exercise.transitionBeforeOverrideSeconds),
+    restSeconds: Math.max(0, exercise.restSeconds),
+    plannedSets: exercise.plannedSets.map((set) => ({ ...set })),
+  }))
+}
+
+export function buildRoutineFlow(version: RoutineVersion): RoutineFlowItem[] {
+  const defaultTransitionSeconds = Math.max(0, version.transitionSeconds)
+  const flow: RoutineFlowItem[] = []
+
+  version.exercises.forEach((exercise, index) => {
+    if (index > 0) {
+      const overrideSeconds = exercise.transitionBeforeOverrideSeconds
+      flow.push({
+        kind: 'transition',
+        seconds: overrideSeconds === null
+          ? defaultTransitionSeconds
+          : Math.max(0, overrideSeconds),
+        beforeExerciseId: exercise.id,
+        inherited: overrideSeconds === null,
+      })
+    }
+
+    flow.push({ kind: 'exercise', exercise })
+  })
+
+  return flow
+}
 
 export function getRoutine(data: AppData, id: string): Routine | undefined {
   return data.routines.find((r) => r.id === id)
@@ -37,7 +89,7 @@ export function createRoutine(data: AppData, name: string, exercises: RoutineExe
     previousVersionId: null,
     createdAt: timestamp,
     transitionSeconds: Math.max(0, transitionSeconds),
-    exercises,
+    exercises: normalizeRoutineExercises(exercises),
   }
 
   const routine: Routine = {
@@ -72,7 +124,7 @@ export function editRoutine(data: AppData, routineId: string, name: string, exer
     previousVersionId: routine.activeVersionId,
     createdAt: timestamp,
     transitionSeconds: Math.max(0, transitionSeconds),
-    exercises,
+    exercises: normalizeRoutineExercises(exercises),
   }
 
   const updatedRoutine: Routine = {
@@ -125,7 +177,28 @@ export function createRoutineExercise(exerciseId: string): RoutineExercise {
   return {
     id: generateId(),
     exerciseId,
+    transitionBeforeOverrideSeconds: null,
     restSeconds: DEFAULT_REST_SECONDS,
     plannedSets: [],
+  }
+}
+
+export function createRepsPlannedSet(
+  targetReps: number | null = null,
+  targetWeightKg: number | null = null,
+): RepsPlannedSet {
+  return {
+    id: generateId(),
+    kind: 'reps',
+    targetReps,
+    targetWeightKg,
+  }
+}
+
+export function createTimePlannedSet(targetSeconds: number | null = null): TimePlannedSet {
+  return {
+    id: generateId(),
+    kind: 'time',
+    targetSeconds,
   }
 }

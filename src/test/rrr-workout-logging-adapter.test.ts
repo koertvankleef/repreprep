@@ -4,7 +4,7 @@ import { buildWorkoutLoggingData } from '../app/components/workouts/logging/rrr-
 
 function createBaseData(): AppData {
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     exercises: [
       {
         id: 'ex-reps',
@@ -59,6 +59,7 @@ function createWorkout(): Workout {
       {
         id: 'entry-1',
         exerciseId: 'ex-reps',
+        transitionBeforeSeconds: 0,
         restSeconds: 33,
         notes: '',
         sets: [
@@ -69,6 +70,7 @@ function createWorkout(): Workout {
       {
         id: 'entry-2',
         exerciseId: 'ex-time',
+        transitionBeforeSeconds: 12,
         restSeconds: 5,
         notes: '',
         sets: [{ id: 'set-3', kind: 'time', seconds: 30, notes: '' }],
@@ -90,6 +92,7 @@ describe('rrr-workout-logging-adapter', () => {
         loggingType: 'reps',
         totalSets: 2,
         restSeconds: 33,
+        transitionBeforeSeconds: 0,
         previousPerformance: '10 reps @ 14kg',
         suggestedReps: 12,
       },
@@ -98,6 +101,7 @@ describe('rrr-workout-logging-adapter', () => {
         loggingType: 'time',
         totalSets: 1,
         restSeconds: 5,
+        transitionBeforeSeconds: 12,
         previousPerformance: '30 sec',
         targetDurationSeconds: 30,
       },
@@ -130,13 +134,34 @@ describe('rrr-workout-logging-adapter', () => {
     expect(result.timeline[3]).toEqual({ kind: 'transition', exerciseIndex: 0, durationSeconds: 12 })
   })
 
+  test('uses the destination workout exercise transition snapshot', () => {
+    const data = createBaseData()
+    const workout = createWorkout()
+    workout.exercises[1] = {
+      ...workout.exercises[1]!,
+      transitionBeforeSeconds: 27,
+    }
+
+    const result = buildWorkoutLoggingData(data, workout)
+
+    expect(result.timeline[3]).toEqual({
+      kind: 'transition',
+      exerciseIndex: 0,
+      durationSeconds: 27,
+    })
+  })
+
   test('uses option-based timing defaults when workout timing metadata is missing', () => {
     const data = createBaseData()
     const workout = createWorkout()
     const withoutTiming: Workout = {
       ...workout,
       transitionSeconds: undefined,
-      exercises: workout.exercises.map((entry) => ({ ...entry, restSeconds: undefined })),
+      exercises: workout.exercises.map((entry) => ({
+        ...entry,
+        transitionBeforeSeconds: undefined,
+        restSeconds: undefined,
+      })),
     }
 
     const result = buildWorkoutLoggingData(data, withoutTiming, {

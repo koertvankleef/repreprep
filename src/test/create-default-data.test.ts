@@ -7,7 +7,7 @@ describe('createDefaultData', () => {
     const data = createDefaultData()
     const byName = new Map(data.exercises.map((exercise) => [exercise.name, exercise.kind]))
 
-    expect(data.schemaVersion).toBe(4)
+    expect(data.schemaVersion).toBe(5)
     expect(data.exercises).toHaveLength(exerciseCatalog.length)
     expect(byName.get('Pushups')).toBe('reps')
     expect(byName.get('Plank')).toBe('time')

@@ -3,6 +3,7 @@ export type Exercise = {
   loggingType: 'reps' | 'time'
   totalSets: number
   restSeconds: number
+  transitionBeforeSeconds?: number
   previousPerformance: string
   suggestedReps?: number
   targetDurationSeconds?: number
@@ -168,7 +169,12 @@ export function buildTimeline(exercises: Exercise[], exerciseTransitionSeconds: 
     }
 
     if (exerciseIndex < exercises.length - 1) {
-      timeline.push({ kind: 'transition', exerciseIndex, durationSeconds: safeTransitionSeconds })
+      const nextExercise = exercises[exerciseIndex + 1]
+      timeline.push({
+        kind: 'transition',
+        exerciseIndex,
+        durationSeconds: Math.max(0, nextExercise?.transitionBeforeSeconds ?? safeTransitionSeconds),
+      })
     }
   })
 

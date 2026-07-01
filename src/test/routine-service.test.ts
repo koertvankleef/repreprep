@@ -2,8 +2,11 @@ import { describe, expect, test } from 'vitest'
 import { createDefaultData } from '../domain/create-default-data.ts'
 import {
   archiveRoutine,
+  buildRoutineFlow,
+  createRepsPlannedSet,
   createRoutine,
   createRoutineExercise,
+  createTimePlannedSet,
   editRoutine,
   getActiveRoutineVersion,
   getActiveRoutines,
@@ -17,8 +20,9 @@ function makeExercise(exerciseId: string): RoutineExercise {
   return {
     id: 're-1',
     exerciseId,
+    transitionBeforeOverrideSeconds: null,
     restSeconds: 25,
-    plannedSets: [{ kind: 'reps', targetReps: 10, targetWeightKg: null }],
+    plannedSets: [{ id: 'ps-1', kind: 'reps', targetReps: 10, targetWeightKg: null }],
   }
 }
 
@@ -140,9 +144,72 @@ describe('routine-service', () => {
     const exercise = createRoutineExercise('exercise-123')
 
     expect(exercise.exerciseId).toBe('exercise-123')
+    expect(exercise.transitionBeforeOverrideSeconds).toBeNull()
     expect(exercise.restSeconds).toBe(20)
     expect(exercise.plannedSets).toEqual([])
     expect(typeof exercise.id).toBe('string')
+  })
+
+  test('planned-set factories assign stable IDs', () => {
+    const repsSet = createRepsPlannedSet(8, 40)
+    const timeSet = createTimePlannedSet(45)
+
+    expect(repsSet.id).not.toBe('')
+    expect(timeSet.id).not.toBe('')
+    expect(repsSet.id).not.toBe(timeSet.id)
+  })
+
+  test('routine versions normalize transition overrides around the first exercise', () => {
+    const data = createDefaultData()
+    const firstExerciseId = data.exercises[0]?.id ?? ''
+    const secondExerciseId = data.exercises[1]?.id ?? ''
+    const first = {
+      ...makeExercise(firstExerciseId),
+      id: 're-first',
+      transitionBeforeOverrideSeconds: 45,
+    }
+    const second = {
+      ...makeExercise(secondExerciseId),
+      id: 're-second',
+      transitionBeforeOverrideSeconds: -10,
+    }
+    const updated = createRoutine(data, 'Timing', [first, second])
+    const routine = updated.routines.find((candidate) => candidate.name === 'Timing')
+    const version = routine ? getActiveRoutineVersion(updated, routine.id) : undefined
+
+    expect(version?.exercises[0]?.transitionBeforeOverrideSeconds).toBeNull()
+    expect(version?.exercises[1]?.transitionBeforeOverrideSeconds).toBe(0)
+  })
+
+  test('buildRoutineFlow derives inherited and overridden transition gutters', () => {
+    const data = createDefaultData()
+    const exerciseIds = data.exercises.slice(0, 3).map((exercise) => exercise.id)
+    const exercises = exerciseIds.map((exerciseId, index) => ({
+      ...makeExercise(exerciseId),
+      id: `re-${index + 1}`,
+      transitionBeforeOverrideSeconds: index === 2 ? 35 : null,
+    }))
+    const updated = createRoutine(data, 'Flow', exercises, 12)
+    const routine = updated.routines.find((candidate) => candidate.name === 'Flow')
+    const version = routine ? getActiveRoutineVersion(updated, routine.id) : undefined
+
+    expect(version ? buildRoutineFlow(version) : []).toEqual([
+      { kind: 'exercise', exercise: version?.exercises[0] },
+      {
+        kind: 'transition',
+        seconds: 12,
+        beforeExerciseId: 're-2',
+        inherited: true,
+      },
+      { kind: 'exercise', exercise: version?.exercises[1] },
+      {
+        kind: 'transition',
+        seconds: 35,
+        beforeExerciseId: 're-3',
+        inherited: false,
+      },
+      { kind: 'exercise', exercise: version?.exercises[2] },
+    ])
   })
 
   test('default data includes a Full Body routine', () => {

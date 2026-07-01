@@ -21,7 +21,7 @@ describe('migration', () => {
     const result = migrateRawToAppData(v1Data)
 
     expect(result).not.toBeNull()
-    expect(result?.schemaVersion).toBe(4)
+    expect(result?.schemaVersion).toBe(5)
     expect(result?.routines).toEqual([])
     expect(result?.routineVersions).toEqual([])
     expect(result?.exercises).toEqual([])
@@ -65,7 +65,7 @@ describe('migration', () => {
     const result = migrateRawToAppData(data)
 
     expect(result).not.toBeNull()
-    expect(result?.schemaVersion).toBe(4)
+    expect(result?.schemaVersion).toBe(5)
     expect(result?.routines).toHaveLength(data.routines.length)
   })
 
@@ -82,8 +82,55 @@ describe('migration', () => {
     }
     const result = migrateRawToAppData(v3Data)
 
-    expect(result?.schemaVersion).toBe(4)
+    expect(result?.schemaVersion).toBe(5)
     expect(result?.exercises.find((item) => item.id === 'pushups')?.createdByUser).toBe(false)
+  })
+
+  test('migrates v4 routine timing, planned-set IDs, and workout timing snapshots', () => {
+    const current = createDefaultData()
+    const routineVersion = current.routineVersions[0]
+
+    expect(routineVersion).toBeDefined()
+    if (!routineVersion) {
+      return
+    }
+
+    const v4Data = {
+      ...current,
+      schemaVersion: 4,
+      routineVersions: [{
+        ...routineVersion,
+        transitionSeconds: undefined,
+        exercises: routineVersion.exercises.map((exercise) => ({
+          id: exercise.id,
+          exerciseId: exercise.exerciseId,
+          plannedSets: exercise.plannedSets.map(({ id: _id, ...set }) => set),
+        })),
+      }],
+      workouts: [{
+        id: 'workout-1',
+        date: '2026-07-01',
+        notes: '',
+        exercises: [
+          { id: 'entry-1', exerciseId: 'pushups', sets: [], notes: '' },
+          { id: 'entry-2', exerciseId: 'plank', sets: [], notes: '' },
+        ],
+        createdAt: '2026-07-01T10:00:00.000Z',
+        updatedAt: '2026-07-01T10:00:00.000Z',
+      }],
+    }
+
+    const result = migrateRawToAppData(v4Data)
+    const migratedVersion = result?.routineVersions[0]
+
+    expect(result?.schemaVersion).toBe(5)
+    expect(migratedVersion?.transitionSeconds).toBe(10)
+    expect(migratedVersion?.exercises[0]?.transitionBeforeOverrideSeconds).toBeNull()
+    expect(migratedVersion?.exercises[0]?.restSeconds).toBe(20)
+    expect(migratedVersion?.exercises[0]?.plannedSets.every((set) => set.id.length > 0)).toBe(true)
+    expect(result?.workouts[0]?.transitionSeconds).toBe(10)
+    expect(result?.workouts[0]?.exercises[0]?.transitionBeforeSeconds).toBe(0)
+    expect(result?.workouts[0]?.exercises[1]?.transitionBeforeSeconds).toBe(10)
   })
 
   test('isValidAppData returns false for v1 data without routines', () => {

@@ -8,10 +8,11 @@ function makeRoutineExercise(exerciseId: string): RoutineExercise {
   return {
     id: `re-${exerciseId}`,
     exerciseId,
+    transitionBeforeOverrideSeconds: null,
     restSeconds: 35,
     plannedSets: [
-      { kind: 'reps', targetReps: 8, targetWeightKg: 40 },
-      { kind: 'reps', targetReps: 10, targetWeightKg: null },
+      { id: `ps-${exerciseId}-1`, kind: 'reps', targetReps: 8, targetWeightKg: 40 },
+      { id: `ps-${exerciseId}-2`, kind: 'reps', targetReps: 10, targetWeightKg: null },
     ],
   }
 }
@@ -62,6 +63,25 @@ describe('createWorkoutFromRoutine', () => {
     expect(workout?.routineVersionId).toBe(routine?.activeVersionId)
   })
 
+  test('freezes destination exercise transition overrides into the workout', () => {
+    const data = createDefaultData()
+    const firstExerciseId = data.exercises[0]?.id ?? ''
+    const secondExerciseId = data.exercises[1]?.id ?? ''
+    const first = { ...makeRoutineExercise(firstExerciseId), id: 're-first' }
+    const second = {
+      ...makeRoutineExercise(secondExerciseId),
+      id: 're-second',
+      transitionBeforeOverrideSeconds: 42,
+    }
+    const withRoutine = createRoutine(data, 'Timing', [first, second], 10)
+    const routine = withRoutine.routines.find((candidate) => candidate.name === 'Timing')
+    const workout = createWorkoutFromRoutine(withRoutine, routine?.id ?? '', '2026-07-02')
+
+    expect(workout?.exercises[0]?.transitionBeforeSeconds).toBe(0)
+    expect(workout?.exercises[1]?.transitionBeforeSeconds).toBe(42)
+    expect(workout?.transitionSeconds).toBe(10)
+  })
+
   test('prefills sets from planned sets', () => {
     const data = createDefaultData()
     const exerciseId = data.exercises[0]?.id ?? ''
@@ -86,7 +106,13 @@ describe('createWorkoutFromRoutine', () => {
     const plankExercise = data.exercises.find((e) => e.kind === 'time')
     const plankId = plankExercise?.id ?? ''
     const exercises: RoutineExercise[] = [
-      { id: 're-1', exerciseId: plankId, plannedSets: [{ kind: 'time', targetSeconds: 45 }] },
+      {
+        id: 're-1',
+        exerciseId: plankId,
+        transitionBeforeOverrideSeconds: null,
+        restSeconds: 20,
+        plannedSets: [{ id: 'ps-1', kind: 'time', targetSeconds: 45 }],
+      },
     ]
     const withRoutine = createRoutine(data, 'Core', exercises)
     const routine = withRoutine.routines.find((r) => r.name === 'Core')

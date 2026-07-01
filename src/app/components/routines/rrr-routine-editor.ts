@@ -1,6 +1,12 @@
 import { storageService } from '../../storage-instance.ts'
 import { getActiveExercises } from '../../../domain/exercise-service.ts'
-import { createRoutineExercise, getActiveRoutineVersion, getRoutine } from '../../../domain/routine-service.ts'
+import {
+  createRepsPlannedSet,
+  createRoutineExercise,
+  createTimePlannedSet,
+  getActiveRoutineVersion,
+  getRoutine,
+} from '../../../domain/routine-service.ts'
 import { t } from '../../../i18n/index.ts'
 import type { PlannedSet, RoutineExercise } from '../../../domain/types.ts'
 import { escapeHtml } from '../../render-helpers.ts'
@@ -181,6 +187,7 @@ export class RrrRoutineEditor extends HTMLElement {
           )
 
           return {
+            id: set.id,
             kind: 'reps' as const,
             targetReps: repsInput?.value ? Number(repsInput.value) : null,
             targetWeightKg: weightInput?.value ? Number(weightInput.value) : null,
@@ -192,6 +199,7 @@ export class RrrRoutineEditor extends HTMLElement {
         )
 
         return {
+          id: set.id,
           kind: 'time' as const,
           targetSeconds: secondsInput?.value ? Number(secondsInput.value) : null,
         }
@@ -266,8 +274,8 @@ export class RrrRoutineEditor extends HTMLElement {
     const kind = exerciseDef?.kind ?? 'reps'
     const newSet: PlannedSet =
       kind === 'time'
-        ? { kind: 'time', targetSeconds: null }
-        : { kind: 'reps', targetReps: null, targetWeightKg: null }
+        ? createTimePlannedSet()
+        : createRepsPlannedSet()
 
     this.exercises = this.exercises.map((e) =>
       e.id === routineExerciseId ? { ...e, plannedSets: [...e.plannedSets, newSet] } : e,

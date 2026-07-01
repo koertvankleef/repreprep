@@ -36,16 +36,17 @@ export function createDefaultData(): AppData {
     }
 
     const plannedSets: PlannedSet[] = getExerciseKind(exercise) === 'time'
-      ? [{ kind: 'time', targetSeconds: 30 }]
+      ? [{ id: generateId(), kind: 'time', targetSeconds: 30 }]
       : [
-          { kind: 'reps', targetReps: 10, targetWeightKg: null },
-          { kind: 'reps', targetReps: 10, targetWeightKg: null },
+          { id: generateId(), kind: 'reps', targetReps: 10, targetWeightKg: null },
+          { id: generateId(), kind: 'reps', targetReps: 10, targetWeightKg: null },
         ]
 
     return {
       id: generateId(),
       exerciseId: exercise.id,
       plannedSets,
+      transitionBeforeOverrideSeconds: null,
       restSeconds: DEFAULT_REST_SECONDS,
     }
   })
@@ -69,7 +70,7 @@ export function createDefaultData(): AppData {
   }
 
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     exercises,
     workouts: [],
     routines: [routine],

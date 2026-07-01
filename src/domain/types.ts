@@ -111,7 +111,7 @@ export interface RoutineVersion {
   routineId: string
   previousVersionId: string | null
   createdAt: string
-  transitionSeconds?: number
+  transitionSeconds: number
   exercises: RoutineExercise[]
 }
 
@@ -119,19 +119,22 @@ export interface RoutineExercise {
   id: string
   exerciseId: string
   plannedSets: PlannedSet[]
-  restSeconds?: number
+  transitionBeforeOverrideSeconds: number | null
+  restSeconds: number
   notes?: string
 }
 
 export type PlannedSet = RepsPlannedSet | TimePlannedSet
 
 export interface RepsPlannedSet {
+  id: string
   kind: 'reps'
   targetReps: number | null
   targetWeightKg: number | null
 }
 
 export interface TimePlannedSet {
+  id: string
   kind: 'time'
   targetSeconds: number | null
 }
@@ -140,6 +143,7 @@ export interface WorkoutExerciseEntry {
   id: string
   exerciseId: string
   sets: SetEntry[]
+  transitionBeforeSeconds?: number
   restSeconds?: number
   notes: string
 }

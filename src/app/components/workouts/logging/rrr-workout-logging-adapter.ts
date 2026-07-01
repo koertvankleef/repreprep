@@ -40,7 +40,14 @@ export function buildWorkoutLoggingData(
           ?? DEFAULT_REST_SECONDS,
       )
 
-      return mapExerciseEntry(data.exercises, entry.exerciseId, entry.sets, resolvedRestSeconds, options)
+      return mapExerciseEntry(
+        data.exercises,
+        entry.exerciseId,
+        entry.sets,
+        resolvedRestSeconds,
+        entry.transitionBeforeSeconds,
+        options,
+      )
     })
 
   return {
@@ -55,6 +62,7 @@ function mapExerciseEntry(
   exerciseId: string,
   sets: SetEntry[],
   restSeconds: number,
+  transitionBeforeSeconds: number | undefined,
   options: WorkoutLoggingAdapterOptions,
 ): Exercise {
   const definition = definitions.find((entry) => entry.id === exerciseId)
@@ -72,6 +80,7 @@ function mapExerciseEntry(
       loggingType: 'time',
       totalSets: sets.length,
       restSeconds,
+      ...(transitionBeforeSeconds === undefined ? {} : { transitionBeforeSeconds }),
       previousPerformance,
       targetDurationSeconds: inferFirstTargetDuration(sets),
     }
@@ -82,6 +91,7 @@ function mapExerciseEntry(
     loggingType: 'reps',
     totalSets: sets.length,
     restSeconds,
+    ...(transitionBeforeSeconds === undefined ? {} : { transitionBeforeSeconds }),
     previousPerformance,
     suggestedReps: inferFirstSuggestedReps(sets),
   }

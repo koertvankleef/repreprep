@@ -1,7 +1,7 @@
 # Routine Editing Redesign — Draft Implementation Tracker
 
-Status: draft for review and discussion. No item in this document is an
-implementation commitment until its open decisions are resolved.
+Status: draft implementation tracker. The MVP product decisions below are
+agreed; unchecked implementation details remain open for review.
 
 ## Intended outcome
 
@@ -14,6 +14,24 @@ Replace the single dense routine editor with a sequence-oriented experience:
 - Rows support an end-to-start swipe gesture for deletion on touch layouts.
 - Pointer, keyboard, screen-reader, and reduced-motion experiences retain all
   essential functionality.
+
+## Agreed MVP decisions
+
+- Persist an ordered exercise array and derive transition/rest gutters.
+- Existing routine edits auto-save at meaningful interaction boundaries.
+- New routine creation retains a distinct confirmation interaction.
+- Do not show page-level Save/Cancel actions for existing routine editing.
+- Do not implement Undo for the MVP.
+- Swipe deletion commits immediately when released beyond its armed threshold,
+  without confirmation.
+- Reordering commits immediately on drop.
+- Transition overrides belong to the destination exercise.
+- Changing the routine transition default immediately updates every gutter that
+  still inherits it.
+- Set rest remains one shared value for all sets in a routine exercise.
+- Reordering starts only from an explicit drag handle; do not add long-press
+  row dragging.
+- Planned sets require stable IDs before reorder, delete, motion, or focus work.
 
 ## Working terminology
 
@@ -76,20 +94,26 @@ interface RoutineVersion {
 interface RoutineExercise {
   id: string
   exerciseId: string
-  transitionBeforeSeconds: number | null
+  transitionBeforeOverrideSeconds: number | null
   restSeconds: number
   plannedSets: PlannedSet[]
 }
 ```
 
 `RoutineVersion.transitionSeconds` is the default. A
-`transitionBeforeSeconds` value of `null` inherits that default. An explicit
-`0` means no transition.
+`transitionBeforeOverrideSeconds` value of `null` inherits that default. An
+explicit `0` means no transition.
 
 The override belongs to the destination exercise because the motivating
 question is how much preparation that exercise needs. When an exercise is
 reordered, its preparation time moves with it. The first exercise's transition
-is ignored in presentation and execution.
+is normalised to `null` and is not exposed in presentation or execution.
+
+The persisted values must preserve the distinction between inherited (`null`),
+none (`0`), and custom duration. The UI does not need to present those as three
+permanent choice rows. The exact compact editor remains a design detail, but it
+must allow a user to restore the routine default and enter zero or a custom
+duration.
 
 The resulting persisted array remains difficult to corrupt, while a derived
 flow makes the actual workout sequence explicit to renderers and the logging
@@ -115,20 +139,21 @@ exercise C
 
 Persisting exercise and transition nodes in one array would make the flow
 literal in storage, but would also permit invalid states such as two adjacent
-transitions or a trailing transition. Keep this alternative open for review;
-the current recommendation is to persist the constrained exercise array and
-derive the alternating flow.
+transitions or a trailing transition. This is outside the MVP. Reconsider it
+only if the app later supports genuinely independent flow nodes such as
+warm-ups, instruction cards, circuits, cooldowns, or conditional steps.
 
 ### Planned-set identity
 
 Planned sets currently have no stable IDs. Reordering, swipe deletion, focus
 restoration, and motion all require identity independent of array index.
 
-- [ ] Add an `id` to every planned-set variant.
-- [ ] Increment the storage schema version.
-- [ ] Migrate existing planned sets by assigning IDs while preserving order and
+- [x] Add an `id` to every planned-set variant.
+- [x] Increment the storage schema version.
+- [x] Migrate existing planned sets by assigning IDs while preserving order and
       values.
-- [ ] Stop using array indexes as interaction identity.
+- [x] Stop using array indexes as persisted identity. Positional labels may
+      continue to use indexes.
 
 ### Set-rest model
 
@@ -137,8 +162,10 @@ for every gap between planned sets. Set-rest gutters are derived and do not
 store individual overrides.
 
 Changing the page-level rest duration updates every rendered set gutter. If a
-gutter itself is interactive, its accessible name must make the shared scope
-clear: “Edit rest between all sets,” not “Edit this rest.”
+set-rest gutter becomes interactive in a later iteration, its accessible name
+must make the shared scope clear: “Edit rest between all sets,” not “Edit this
+rest.” For the MVP, set-rest gutters are display-only and editing happens at
+page level.
 
 ## Sequence and gutter design-system work
 
@@ -182,7 +209,7 @@ Pointer behavior:
 - [ ] Animate neighboring rows into their prospective positions.
 - [ ] Keep the dragged row and its stable ID as the reorder unit.
 - [ ] Recalculate derived gutters from the prospective order.
-- [ ] Emit the final ordered IDs; let the containing page update domain data.
+- [ ] Emit the final ordered IDs and commit the new order immediately on drop.
 
 Keyboard behavior:
 
@@ -192,9 +219,8 @@ Keyboard behavior:
       a polite live region.
 - [ ] Restore focus to the moved row's handle after rendering.
 
-Open reorder questions:
+Open reorder presentation questions:
 
-- [ ] Should reordering save immediately on drop or mark the page dirty?
 - [ ] Should gutters remain visible during a drag or temporarily collapse?
 - [ ] Should the first and last positions expose special drop affordances?
 
@@ -223,8 +249,8 @@ does not remove the row or mutate routine data.
    delete icon.
 3. **Armed:** crossing the commit threshold changes the icon and background to
    the danger treatment.
-4. **Commit:** releasing while armed emits the action event and completes the
-   row exit.
+4. **Commit:** releasing while armed emits the action event, immediately
+   deletes the item, and completes the row exit.
 5. **Cancel:** releasing before the threshold returns the row to its closed
    position.
 
@@ -267,8 +293,7 @@ cannot be the only way to delete:
 - [ ] Reveal that action when it receives keyboard focus.
 - [ ] Expose the same localized action to screen readers on touch layouts.
 - [ ] Provide a keyboard-operable deletion path without requiring a gesture.
-- [ ] Decide whether committed deletion is followed by Undo, confirmation, or
-      immediate persistence.
+- [ ] Commit deletion immediately without confirmation or Undo.
 - [ ] Ensure reduced-motion mode removes simulated physics without removing
       state feedback.
 
@@ -282,30 +307,44 @@ cannot be the only way to delete:
 
 ## Save and versioning decision
 
-The current immutable routine-version model creates a new version when a
-routine is saved. Gesture-driven editing raises a product and storage decision:
+Existing routine editing auto-saves. There is no cross-page draft and no
+page-level Save/Cancel interaction. “Immediate” means committing at a meaningful
+interaction boundary, not persisting every keystroke:
 
-- Immediate reorder/delete commits can create many routine versions.
-- A page-level draft avoids version churn but requires draft state to survive
-  navigation into the routine-exercise editor.
-- A temporary in-memory draft is lost on reload.
-- A persisted draft requires its own lifecycle, migration, and recovery UX.
+- rename or duration sheet: Confirm;
+- reorder: drop;
+- swipe delete: armed release;
+- ordinary field: change/blur, unless the field uses a sheet;
+- add exercise or set: completion of its add interaction.
 
-- [ ] Decide the save boundary before wiring gestures to storage.
-- [ ] Decide whether an Undo operation restores data by creating another
-      version or by replacing an uncommitted draft.
-- [ ] Document what happens when the app closes with a dirty routine draft.
+New routine creation is different: it retains a confirmation interaction that
+creates the routine.
+
+For the MVP, the existing immutable version model may append one internal
+routine version per completed interaction. This keeps workout-history
+references correct and is acceptable at the expected data scale. Versioning
+remains an implementation detail and is not exposed as edit management.
+
+Undo is intentionally outside the MVP. Reorder and swipe deletion are
+low-stakes operations; the swipe interaction warns before commitment by
+revealing a neutral action and changing to the danger treatment only after the
+commit threshold is crossed.
+
+Because edits are committed at interaction boundaries, closing the app does not
+leave a dirty routine draft.
 
 ## Suggested implementation order
 
 ### Phase 0 — Resolve model and interaction contracts
 
-- [ ] Choose constrained exercise-array versus explicit alternating-flow
+- [x] Choose constrained exercise-array rather than explicit alternating-flow
       persistence.
-- [ ] Choose immediate commits versus a cross-page routine draft.
-- [ ] Agree on destination-owned transition overrides.
-- [ ] Define the swipe commit and deletion recovery behavior.
-- [ ] Define stable planned-set IDs and migration.
+- [x] Choose immediate commits rather than a cross-page routine draft.
+- [x] Agree on destination-owned transition overrides.
+- [x] Define swipe deletion as threshold-committed, immediate, and without Undo
+      or confirmation.
+- [x] Require stable planned-set IDs and migration before sequence interaction
+      work.
 
 ### Phase 1 — Static sequence primitives
 
@@ -327,11 +366,11 @@ routine is saved. Gesture-driven editing raises a product and storage decision:
 - [ ] Render shared rest gutters.
 - [ ] Add the page-level shared rest editor.
 - [ ] Add and edit planned sets.
-- [ ] Confirm the routine-exercise edit according to the chosen save boundary.
+- [ ] Auto-save routine-exercise changes at their interaction boundaries.
 
 ### Phase 4 — Reordering
 
-- [ ] Add stable set IDs and migration first.
+- [x] Add stable set IDs and migration first.
 - [ ] Implement handle-based pointer sorting.
 - [ ] Implement keyboard sorting and announcements.
 - [ ] Integrate exercise reordering.
@@ -343,6 +382,7 @@ routine is saved. Gesture-driven editing raises a product and storage decision:
 - [ ] Add explicit desktop actions and non-gesture accessible actions.
 - [ ] Integrate routine-exercise deletion.
 - [ ] Integrate planned-set deletion.
+- [ ] Verify armed release deletes immediately without confirmation or Undo.
 - [ ] Test touch scrolling, hybrid devices, pointer cancellation, and reduced
       motion.
 
@@ -358,12 +398,12 @@ routine is saved. Gesture-driven editing raises a product and storage decision:
 - [ ] Narrow touch viewport: scroll, swipe preview, swipe commit, drag, cancel.
 - [ ] Desktop pointer: visible actions, drag handle, row navigation.
 - [ ] Hybrid device: touch and mouse behavior coexist.
-- [ ] Keyboard only: navigate, edit, reorder, delete, cancel, and recover.
+- [ ] Keyboard only: navigate, edit, reorder, delete, and cancel gestures.
 - [ ] Screen reader: sequence position, gutter meaning, drag announcements, and
       deletion action are understandable.
 - [ ] Reduced motion: all operations remain legible without travel animations.
 - [ ] RTL: logical swipe direction and sequence layout remain correct.
-- [ ] Data migration: existing routines and planned sets preserve values and
+- [x] Data migration: existing routines and planned sets preserve values and
       order.
-- [ ] Workout logging: derived routine flow produces the intended transition
+- [x] Workout logging: derived routine flow produces the intended transition
       and rest timing.
