@@ -76,7 +76,7 @@ describe('Import and export file row', () => {
     })
     expect(mocks.confirmSheet).toHaveBeenCalledOnce()
     expect(mocks.setData).toHaveBeenCalledWith(importedData)
-    expect(mocks.success).toHaveBeenCalledWith('Import completed successfully')
+    expect(mocks.success).toHaveBeenCalledWith('Import completed')
     expect(input?.value).toBe('')
   })
 })

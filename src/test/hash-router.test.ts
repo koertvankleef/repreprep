@@ -108,11 +108,7 @@ test('app route metadata defines route-specific header links', () => {
     icon: 'add',
     labelKey: 'routineList.new',
   })
-  expect(getAppRouteEndLink({ name: 'routine-detail', routineId: 'routine 1' })).toEqual({
-    href: '#/routines/routine%201/edit',
-    icon: 'edit',
-    labelKey: 'routineDetail.action.edit',
-  })
+  expect(getAppRouteEndLink({ name: 'routine-detail', routineId: 'routine 1' })).toBeUndefined()
   expect(getAppRouteBackHref({ name: 'routine-edit', routineId: 'routine 1' }))
     .toBe('#/routines/routine%201')
 })

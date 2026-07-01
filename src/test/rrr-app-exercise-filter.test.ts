@@ -160,7 +160,7 @@ describe('rrr-app exercise filters', () => {
     expect(getNavLabels()).toEqual(['Today', 'Routines', 'Exercises', 'History'])
   })
 
-  it('renders routine details with an Edit header link', async () => {
+  it('renders routine details with an Edit action row', async () => {
     const { storageService } = await import('../app/storage-instance.ts')
     const routineId = storageService.getData().routines[0]?.id ?? ''
     window.location.hash = `#/routines/${routineId}`
@@ -169,15 +169,16 @@ describe('rrr-app exercise filters', () => {
     await Promise.resolve()
 
     expect(app.shadowRoot?.querySelector('rrr-routine-detail')).toBeTruthy()
-    expect(
-      app.shadowRoot?.querySelector<HTMLAnchorElement>(
-        `a.header-action[href="#/routines/${routineId}/edit"]`,
-      ),
-    ).toBeTruthy()
-    const startAction = app.shadowRoot
-      ?.querySelector('rrr-routine-detail')
+    const detail = app.shadowRoot?.querySelector('rrr-routine-detail')
+    const editAction = detail
+      ?.querySelector<HTMLElement>('rrr-list-row[data-action="edit-workout"]')
+    const startAction = detail
       ?.querySelector<HTMLElement>('rrr-list-row[data-action="start-workout"]')
 
+    expect(app.shadowRoot?.querySelector('a.header-action')).toBeNull()
+    expect(editAction?.getAttribute('activation')).toBe('button')
+    editAction?.querySelector<HTMLButtonElement>(':scope > button')?.click()
+    expect(window.location.hash).toBe(`#/routines/${routineId}/edit`)
     expect(startAction?.getAttribute('activation')).toBe('button')
     expect(startAction?.querySelector(':scope > button')).toBeTruthy()
   })
