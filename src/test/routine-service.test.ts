@@ -9,6 +9,7 @@ import {
   getActiveRoutines,
   getRoutine,
   getRoutineVersion,
+  renameRoutine,
 } from '../domain/routine-service.ts'
 import type { RoutineExercise } from '../domain/types.ts'
 
@@ -92,6 +93,23 @@ describe('routine-service', () => {
     const oldVersion = getRoutineVersion(edited, originalVersionId)
     expect(oldVersion).toBeDefined()
     expect(oldVersion?.exercises).toHaveLength(1)
+  })
+
+  test('renameRoutine changes only the routine metadata', () => {
+    const data = createDefaultData()
+    const routine = data.routines[0]
+
+    expect(routine).toBeDefined()
+    if (!routine) {
+      return
+    }
+
+    const renamed = renameRoutine(data, routine.id, 'Renamed routine')
+    const updatedRoutine = getRoutine(renamed, routine.id)
+
+    expect(updatedRoutine?.name).toBe('Renamed routine')
+    expect(updatedRoutine?.activeVersionId).toBe(routine.activeVersionId)
+    expect(renamed.routineVersions).toEqual(data.routineVersions)
   })
 
   test('editRoutine returns unchanged data when routine not found', () => {

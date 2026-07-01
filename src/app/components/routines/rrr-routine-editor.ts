@@ -1,8 +1,10 @@
 import { storageService } from '../../storage-instance.ts'
+import type { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
 import { getActiveExercises } from '../../../domain/exercise-service.ts'
 import { createRoutineExercise, getActiveRoutineVersion, getRoutine } from '../../../domain/routine-service.ts'
 import { t } from '../../../i18n/index.ts'
 import type { PlannedSet, RoutineExercise } from '../../../domain/types.ts'
+import { presentSheet } from '../../../utils/sheet-service.ts'
 import styles from './rrr-routine-editor.css?inline'
 
 export class RrrRoutineEditor extends HTMLElement {
@@ -14,6 +16,7 @@ export class RrrRoutineEditor extends HTMLElement {
   private transitionSeconds = RrrRoutineEditor.defaultTransitionSeconds
   private exercises: RoutineExercise[] = []
   private listenersBound = false
+  private renameSheetActive = false
   private statusMessage = ''
   private statusType: 'error' | 'success' | null = null
 
@@ -66,6 +69,59 @@ export class RrrRoutineEditor extends HTMLElement {
   private setStatus(message: string, type: 'error' | 'success'): void {
     this.statusMessage = message
     this.statusType = type
+  }
+
+  async openRenameSheet(): Promise<boolean> {
+    const routineId = this.routineIdValue
+    const routine = routineId ? getRoutine(storageService.getData(), routineId) : undefined
+
+    if (!routine || this.renameSheetActive) {
+      return false
+    }
+
+    const sheet = document.createElement('rrr-sheet') as RrrSheet
+    const heading = document.createElement('h3')
+    heading.slot = 'heading'
+    heading.className = 'sheet-title'
+    heading.textContent = t('routineEditor.dialog.rename.title')
+
+    const nameInput = document.createElement('rrr-input') as HTMLElement & { value: string }
+    nameInput.slot = 'body'
+    nameInput.setAttribute('autofocus', '')
+    nameInput.setAttribute('label', t('routineEditor.dialog.rename.label'))
+    nameInput.setAttribute('required', '')
+    nameInput.value = routine.name
+
+    const confirmButton = document.createElement('rrr-button')
+    confirmButton.slot = 'actions'
+    confirmButton.setAttribute('type', 'button')
+    confirmButton.setAttribute('data-sheet-result', 'confirm')
+    confirmButton.textContent = t('action.confirm')
+
+    const syncConfirmation = (): void => {
+      confirmButton.toggleAttribute('disabled', !nameInput.value.trim())
+    }
+    nameInput.addEventListener('input', syncConfirmation)
+    syncConfirmation()
+
+    sheet.append(heading, nameInput, confirmButton)
+    this.renameSheetActive = true
+
+    try {
+      const result = await presentSheet(sheet)
+      const name = nameInput.value.trim()
+
+      if (result !== 'confirm' || !name || name === routine.name) {
+        return false
+      }
+
+      storageService.renameRoutine(routine.id, name)
+      this.name = name
+      window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+      return true
+    } finally {
+      this.renameSheetActive = false
+    }
   }
 
   private bindListeners(): void {
@@ -411,7 +467,7 @@ export class RrrRoutineEditor extends HTMLElement {
         <div class="rrr-card">
           <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('routineEditor.status.default')}</p>
           <div class="row">
-            <rrr-input label="${t('field.name')}" name="routine-name" placeholder="${t('routineEditor.field.name.placeholder')}"></rrr-input>
+            ${isEditing ? '' : `<rrr-input label="${t('field.name')}" name="routine-name" placeholder="${t('routineEditor.field.name.placeholder')}"></rrr-input>`}
             <label>
               ${t('routineEditor.field.transitionSeconds')}
               <input type="number" min="0" step="1" name="routine-transition-seconds" value="${this.transitionSeconds}" />

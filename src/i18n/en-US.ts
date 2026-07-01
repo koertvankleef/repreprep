@@ -372,6 +372,7 @@ export const enUsMessages = {
   'message.routine.exerciseCount.one': '{count} exercise',
   'message.routine.exerciseCount.other': '{count} exercises',
 
+  'routineDetail.actions': 'Actions',
   'routineDetail.notFound.title': 'Routine not found',
   'routineDetail.notFound.description': 'This routine is unavailable or has been removed.',
   'routineDetail.action.edit': 'Edit routine',
@@ -417,7 +418,10 @@ export const enUsMessages = {
   'routineEditor.action.addSet': 'Add Set',
   'routineEditor.action.addSetAria': 'Add set to {name}',
   'routineEditor.action.removeSetAria': 'Remove set {index} from {name}',
+  'routineEditor.action.rename': 'Rename routine',
   'routineEditor.action.save': 'Save Routine',
+  'routineEditor.dialog.rename.title': 'Rename routine',
+  'routineEditor.dialog.rename.label': 'Routine name',
 
   'importExport.title': 'Import & Export',
   'importExport.storageDescription': 'Your data is always stored on this device in browser storage.',

@@ -495,7 +495,12 @@ nav {
   block-size: var(--rrr-control-min-block-size);
   border: var(--rrr-border-width) solid transparent;
   border-radius: var(--rrr-radius-s);
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
   color: var(--rrr-color-contrast);
+  font: inherit;
+  cursor: pointer;
   text-decoration: none;
   transition: background var(--rrr-transition-default), transform var(--rrr-transition-default);
 }

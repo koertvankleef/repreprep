@@ -157,34 +157,34 @@ export class RrrRoutineDetail extends HTMLElement {
           }
         </rrr-section>
 
-        <div class="rrr-list-card">
-          <rrr-list-row
-            activation="button"
-            label="${t('routineDetail.action.start')}"
-            data-action="start-workout"
-          >
-            <rrr-icon slot="leading" name="play"></rrr-icon>
-          </rrr-list-row>
-        </div>
-
-        <div class="rrr-list-card">
-          <rrr-list-row
-            activation="button"
-            label="${t('routineDetail.action.edit')}"
-            data-action="edit-workout"
-            accessory="value-chevron"
-          >
-            <rrr-icon slot="leading" name="edit"></rrr-icon>
-          </rrr-list-row>
-          <rrr-list-row
-            activation="button"
-            label="${t('action.delete')}"
-            data-action="delete-routine"
-            tone="danger"
-          >
-            <rrr-icon slot="leading" name="delete"></rrr-icon>
-          </rrr-list-row>
-        </div>
+        <rrr-section>
+          <span slot="heading">${t('routineDetail.actions')}</span>
+          <div class="rrr-list-card">
+            <rrr-list-row
+              activation="button"
+              label="${t('routineDetail.action.start')}"
+              data-action="start-workout"
+            >
+              <rrr-icon slot="leading" name="play"></rrr-icon>
+            </rrr-list-row>
+            <rrr-list-row
+              activation="button"
+              label="${t('action.edit')}"
+              data-action="edit-workout"
+              accessory="value-chevron"
+            >
+              <rrr-icon slot="leading" name="edit"></rrr-icon>
+            </rrr-list-row>
+            <rrr-list-row
+              activation="button"
+              label="${t('action.delete')}"
+              data-action="delete-routine"
+              tone="danger"
+            >
+              <rrr-icon slot="leading" name="delete"></rrr-icon>
+            </rrr-list-row>
+          </div>
+        </rrr-section>
       </section>
     `
 

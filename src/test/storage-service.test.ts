@@ -75,4 +75,23 @@ describe('WorkoutStorageService', () => {
 
     expect(service.getData().workouts[0]).toEqual(workout)
   })
+
+  test('renameRoutine saves the new name without creating a routine version', () => {
+    const adapter = new MockAdapter(createDefaultData())
+    const service = new WorkoutStorageService(adapter)
+    const routine = service.getData().routines[0]
+
+    expect(routine).toBeDefined()
+    if (!routine) {
+      return
+    }
+
+    const versionCount = service.getData().routineVersions.length
+    service.renameRoutine(routine.id, 'Renamed routine')
+
+    expect(service.getData().routines[0]?.name).toBe('Renamed routine')
+    expect(service.getData().routines[0]?.activeVersionId).toBe(routine.activeVersionId)
+    expect(service.getData().routineVersions).toHaveLength(versionCount)
+    expect(adapter.saved?.routines[0]?.name).toBe('Renamed routine')
+  })
 })

@@ -77,6 +77,11 @@ type ExerciseCatalogueElement = HTMLElement & {
   setSearchAndFilters?: (searchQuery: string, filters: ExerciseFilters) => void
 }
 
+type RoutineEditorElement = HTMLElement & {
+  routineId: string | null
+  openRenameSheet(): Promise<boolean>
+}
+
 const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
 const primaryNavigationItems: ReadonlyArray<{
   routeName: AppNavId
@@ -86,7 +91,7 @@ const primaryNavigationItems: ReadonlyArray<{
 }> = [
   { routeName: 'workouts', href: '#/workouts', labelKey: 'app.nav.today', iconName: 'calendar-date' },
   { routeName: 'routines', href: '#/routines', labelKey: 'app.nav.routines', iconName: 'clipboard' },
-  { routeName: 'exercises', href: '#/exercises', labelKey: 'app.nav.exercises', iconName: 'compose' },
+  { routeName: 'exercises', href: '#/exercises', labelKey: 'app.nav.exercises', iconName: 'library' },
   { routeName: 'history', href: '#/history', labelKey: 'app.nav.history', iconName: 'data-trending' },
 ]
 
@@ -207,6 +212,11 @@ export class RrrApp extends HTMLElement {
       return
     }
 
+    if (action === 'rename-routine') {
+      void this.renameCurrentRoutine()
+      return
+    }
+
     if (action === 'toggle-exercise-filters') {
       this.exerciseFiltersOpen = !this.exerciseFiltersOpen
       this.render()
@@ -310,6 +320,20 @@ export class RrrApp extends HTMLElement {
     }
 
     this.render()
+  }
+
+  private async renameCurrentRoutine(): Promise<void> {
+    if (this.route.name !== 'routine-edit') {
+      return
+    }
+
+    const editor = this.currentRouteView?.tagName.toLowerCase() === 'rrr-routine-editor'
+      ? this.currentRouteView as RoutineEditorElement
+      : null
+
+    if (await editor?.openRenameSheet()) {
+      this.updateShellState(this.route)
+    }
   }
 
   connectedCallback(): void {
@@ -581,7 +605,7 @@ export class RrrApp extends HTMLElement {
     }
 
     if (route.name === 'routine-edit') {
-      const editor = document.createElement('rrr-routine-editor') as HTMLElement & { routineId: string | null }
+      const editor = document.createElement('rrr-routine-editor') as RoutineEditorElement
       editor.routineId = route.routineId
       return editor
     }
@@ -836,6 +860,20 @@ export class RrrApp extends HTMLElement {
     `
   }
 
+  private renderRoutineRenameButton(): string {
+    const label = escapeHtml(t('routineEditor.action.rename'))
+
+    return `
+      <button
+        type="button"
+        class="header-icon-link header-action"
+        data-action="rename-routine"
+        aria-label="${label}"
+        title="${label}"
+      ><rrr-icon name="rename"></rrr-icon></button>
+    `
+  }
+
   private createRouteHeader(route: AppRoute): RouteHeader {
     if (getAppRouteMeta(route).header === 'exercise-catalogue') {
       return this.createExerciseCatalogueHeader()
@@ -854,9 +892,11 @@ export class RrrApp extends HTMLElement {
           labelKey: 'app.settings.back',
         }, 'header-back')
       : '<span class="app-header-spacer" aria-hidden="true"></span>'
-    const actionContent = endLink
-      ? this.renderHeaderLink(endLink, 'header-action')
-      : '<span class="app-header-spacer" aria-hidden="true"></span>'
+    const actionContent = route.name === 'routine-edit'
+      ? this.renderRoutineRenameButton()
+      : endLink
+        ? this.renderHeaderLink(endLink, 'header-action')
+        : '<span class="app-header-spacer" aria-hidden="true"></span>'
 
     return {
       className: 'app-header-primary-standard',

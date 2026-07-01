@@ -89,6 +89,23 @@ export function editRoutine(data: AppData, routineId: string, name: string, exer
   }
 }
 
+export function renameRoutine(data: AppData, routineId: string, name: string): AppData {
+  const routine = getRoutine(data, routineId)
+
+  if (!routine) {
+    return data
+  }
+
+  return {
+    ...data,
+    routines: data.routines.map((candidate) =>
+      candidate.id === routineId
+        ? { ...candidate, name, updatedAt: new Date().toISOString() }
+        : candidate,
+    ),
+  }
+}
+
 export function archiveRoutine(data: AppData, id: string): AppData {
   const routine = getRoutine(data, id)
 

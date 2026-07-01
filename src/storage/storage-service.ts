@@ -7,7 +7,13 @@ import {
   updateExercise,
 } from '../domain/exercise-service.ts'
 import { addWorkout, deleteWorkout as removeWorkout, getWorkout, updateWorkout } from '../domain/workout-service.ts'
-import { archiveRoutine as archiveRoutineRecord, editRoutine as editRoutineRecord, getRoutine, createRoutine as createRoutineRecord } from '../domain/routine-service.ts'
+import {
+  archiveRoutine as archiveRoutineRecord,
+  createRoutine as createRoutineRecord,
+  editRoutine as editRoutineRecord,
+  getRoutine,
+  renameRoutine as renameRoutineRecord,
+} from '../domain/routine-service.ts'
 import { DomainError } from '../domain/errors.ts'
 import type { AppData, ExerciseDefinition, Routine, RoutineExercise, Workout } from '../domain/types.ts'
 
@@ -91,6 +97,11 @@ export class WorkoutStorageService {
     }
 
     return created
+  }
+
+  renameRoutine(id: string, name: string): void {
+    this.current = renameRoutineRecord(this.current, id, name)
+    this.adapter.save(this.current)
   }
 
   archiveRoutine(id: string): void {

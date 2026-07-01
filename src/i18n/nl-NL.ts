@@ -372,6 +372,7 @@ export const nlNlMessages = {
   'message.routine.exerciseCount.one': '{count} oefening',
   'message.routine.exerciseCount.other': '{count} oefeningen',
 
+  'routineDetail.actions': 'Acties',
   'routineDetail.notFound.title': 'Routine niet gevonden',
   'routineDetail.notFound.description': 'Deze routine is niet beschikbaar of is verwijderd.',
   'routineDetail.action.edit': 'Routine bewerken',
@@ -417,7 +418,10 @@ export const nlNlMessages = {
   'routineEditor.action.addSet': 'Set toevoegen',
   'routineEditor.action.addSetAria': 'Voeg set toe aan {name}',
   'routineEditor.action.removeSetAria': 'Verwijder set {index} van {name}',
+  'routineEditor.action.rename': 'Routine hernoemen',
   'routineEditor.action.save': 'Routine opslaan',
+  'routineEditor.dialog.rename.title': 'Routine hernoemen',
+  'routineEditor.dialog.rename.label': 'Naam van routine',
 
   'importExport.title': 'Import & Export',
   'importExport.storageDescription': 'Je gegevens worden altijd op dit apparaat opgeslagen in de browseropslag.',
