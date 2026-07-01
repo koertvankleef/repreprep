@@ -1,6 +1,8 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { initLocale } from '../i18n/index.ts'
 import { registerRrrListRow } from '../design-system/components/rrr-list-row.ts'
+import { registerRrrSequence } from '../design-system/components/rrr-sequence.ts'
+import { registerRrrSequenceGutter } from '../design-system/components/rrr-sequence-gutter.ts'
 import { registerRrrSheet } from '../design-system/components/rrr-sheet.ts'
 import { registerRrrSection } from '../design-system/components/rrr-section.ts'
 import { storageService } from '../app/storage-instance.ts'
@@ -11,6 +13,8 @@ beforeAll(() => {
   initLocale('en-US')
   registerRrrSheet()
   registerRrrListRow()
+  registerRrrSequence()
+  registerRrrSequenceGutter()
   registerRrrSection()
 
   Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
@@ -67,14 +71,19 @@ describe('value-first property lists', () => {
     await Promise.resolve()
 
     const propertyList = detail.querySelector<HTMLDListElement>('dl.rrr-property-list')
-    const exerciseList = detail.querySelector<HTMLDivElement>('.rrr-list-card')
+    const exerciseSequence = detail.querySelector<HTMLElement>('rrr-sequence')
+    const firstExerciseRow = exerciseSequence?.querySelector<HTMLElement>('rrr-list-row')
     const actionRow = detail.querySelector<HTMLElement>('rrr-list-row[data-action="start-workout"]')
     const sections = detail.querySelectorAll('rrr-section')
 
     expect(propertyList).not.toBeNull()
     expectSemanticPropertyRows(propertyList!)
     expect(propertyList?.querySelector('rrr-list-row')).toBeNull()
-    expect(exerciseList?.querySelector('rrr-list-row')).not.toBeNull()
+    expect(firstExerciseRow?.getAttribute('href')).toMatch(
+      new RegExp(`^#/routines/${encodeURIComponent(routine.id)}/exercises/`),
+    )
+    expect(firstExerciseRow?.getAttribute('accessory')).toBe('chevron')
+    expect(exerciseSequence?.querySelector('rrr-sequence-gutter')).not.toBeNull()
     expect(actionRow?.getAttribute('activation')).toBe('button')
     expect(actionRow?.querySelector(':scope > button')).not.toBeNull()
     expect(actionRow?.querySelector('rrr-icon[slot="leading"][name="play"]')).not.toBeNull()

@@ -450,6 +450,11 @@ export class RrrApp extends HTMLElement {
       return a.routineId === b.routineId
     }
 
+    if (a.name === 'routine-exercise' && b.name === 'routine-exercise') {
+      return a.routineId === b.routineId
+        && a.routineExerciseId === b.routineExerciseId
+    }
+
     if (a.name === 'routine-edit' && b.name === 'routine-edit') {
       return a.routineId === b.routineId
     }
@@ -607,6 +612,16 @@ export class RrrApp extends HTMLElement {
       const detail = document.createElement('rrr-routine-detail') as HTMLElement & { routineId: string | null }
       detail.routineId = route.routineId
       return detail
+    }
+
+    if (route.name === 'routine-exercise') {
+      const editor = document.createElement('rrr-routine-exercise-editor') as HTMLElement & {
+        routineId: string | null
+        routineExerciseId: string | null
+      }
+      editor.routineId = route.routineId
+      editor.routineExerciseId = route.routineExerciseId
+      return editor
     }
 
     if (route.name === 'routine-edit') {
@@ -825,6 +840,22 @@ export class RrrApp extends HTMLElement {
   }
 
   private getHeaderTitle(route: AppRoute): string {
+    if (route.name === 'routine-exercise') {
+      const data = storageService.getData()
+      const routine = data.routines.find((candidate) => candidate.id === route.routineId)
+      const version = routine
+        ? data.routineVersions.find((candidate) => candidate.id === routine.activeVersionId)
+        : undefined
+      const routineExercise = version?.exercises.find(
+        (candidate) => candidate.id === route.routineExerciseId,
+      )
+      const exerciseName = routineExercise
+        ? data.exercises.find((candidate) => candidate.id === routineExercise.exerciseId)?.name
+        : undefined
+
+      return exerciseName ?? t(getAppRouteMeta(route).titleKey)
+    }
+
     if (route.name === 'routine-detail' || route.name === 'routine-edit') {
       const routineName = storageService
         .getData()

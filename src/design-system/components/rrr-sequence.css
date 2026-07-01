@@ -3,9 +3,12 @@ rrr-sequence {
   --rrr-sequence-row-border-color: var(--rrr-border-subtle);
   --rrr-sequence-row-border-radius: var(--rrr-radius-l);
   --rrr-sequence-gutter-min-block-size: var(--rrr-sizes-grid-5);
-  --rrr-sequence-gutter-line-color: var(--rrr-border-subtle);
-  --rrr-sequence-gutter-background: var(--rrr-surface-base);
-  --rrr-sequence-gutter-color: var(--rrr-text-muted);
+  --rrr-sequence-gutter-background: color-mix(
+    in oklab,
+    var(--rrr-surface-raised) 82%,
+    var(--rrr-color-accent) 18%
+  );
+  --rrr-sequence-gutter-color: var(--rrr-color-accent);
   display: grid;
   min-inline-size: 0;
 }
@@ -23,17 +26,11 @@ rrr-sequence-gutter {
   align-items: center;
   justify-content: center;
   min-block-size: var(--rrr-sequence-gutter-min-block-size);
+  overflow: hidden;
+  background: var(--rrr-sequence-gutter-background);
   color: var(--rrr-sequence-gutter-color);
   text-align: center;
-}
-
-rrr-sequence-gutter::before {
-  content: '';
-  position: absolute;
-  inset-block: 0;
-  inset-inline-start: 50%;
-  border-inline-start: var(--rrr-border-width) solid var(--rrr-sequence-gutter-line-color);
-  translate: -50% 0;
+  margin: 0 var(--rrr-spacing-xl);
 }
 
 .rrr-sequence-gutter__content {
@@ -44,12 +41,11 @@ rrr-sequence-gutter::before {
   gap: var(--rrr-spacing-xs);
   max-inline-size: calc(100% - (2 * var(--rrr-spacing-m)));
   padding: var(--rrr-spacing-2xs) var(--rrr-spacing-s);
-  background: var(--rrr-sequence-gutter-background);
   line-height: 1.2;
 }
 
 .rrr-sequence-gutter__label {
-  color: var(--rrr-color-text);
+  color: var(--rrr-sequence-gutter-color);
   font-size: var(--rrr-font-size-s);
   font-weight: var(--rrr-font-weight-medium);
 }
@@ -65,7 +61,7 @@ rrr-sequence-gutter::before {
 }
 
 @media (forced-colors: active) {
-  rrr-sequence-gutter::before {
-    border-color: CanvasText;
+  rrr-sequence-gutter {
+    border: var(--rrr-border-width) solid CanvasText;
   }
 }

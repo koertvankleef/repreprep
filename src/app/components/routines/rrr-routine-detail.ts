@@ -3,10 +3,15 @@ import { getRoutineSummary } from '../../../domain/routine-summary-service.ts'
 import { createWorkoutFromRoutine } from '../../../domain/workout-service.ts'
 import { toastService } from '../../../foundation/toast.ts'
 import { t, tPlural } from '../../../i18n/index.ts'
-import type { RoutineExercise } from '../../../domain/types.ts'
+import type { RoutineExercise, RoutineVersion } from '../../../domain/types.ts'
 import { todayIso } from '../../../utils/date.ts'
 import { confirmSheet, presentSheet } from '../../../utils/sheet-service.ts'
-import { getActiveRoutineVersion, getRoutine } from '../../../domain/routine-service.ts'
+import {
+  buildRoutineFlow,
+  getActiveRoutineVersion,
+  getRoutine,
+  type RoutineFlowItem,
+} from '../../../domain/routine-service.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
 import {
   escapeHtml,
@@ -172,7 +177,7 @@ export class RrrRoutineDetail extends HTMLElement {
     window.location.hash = '#/routines'
   }
 
-  private renderExerciseRow(routineExercise: RoutineExercise): string {
+  private renderExerciseRow(routineId: string, routineExercise: RoutineExercise): string {
     const exercise = storageService
       .getData()
       .exercises.find((candidate) => candidate.id === routineExercise.exerciseId)
@@ -183,8 +188,47 @@ export class RrrRoutineDetail extends HTMLElement {
       <rrr-list-row
         label="${escapeHtml(exerciseName)}"
         description="${escapeHtml(tPlural('routineDetail.setCount', setCount))}"
+        href="#/routines/${encodeURIComponent(routineId)}/exercises/${encodeURIComponent(routineExercise.id)}"
+        accessory="chevron"
       ></rrr-list-row>
     `
+  }
+
+  private renderTransitionGutter(
+    transition: Extract<RoutineFlowItem, { kind: 'transition' }>,
+    version: RoutineVersion,
+  ): string {
+    const destination = version.exercises.find(
+      (exercise) => exercise.id === transition.beforeExerciseId,
+    )
+    const destinationName = storageService
+      .getData()
+      .exercises.find((exercise) => exercise.id === destination?.exerciseId)?.name
+      ?? t('routineDetail.exercises.unknown')
+    const duration = tPlural('routineDetail.transition.duration', transition.seconds)
+    const source = transition.inherited
+      ? t('routineDetail.transition.default')
+      : t('routineDetail.transition.custom')
+
+    return `
+      <rrr-sequence-gutter
+        label="${escapeHtml(duration)}"
+        description="${escapeHtml(source)}"
+        aria-label="${escapeHtml(t('routineDetail.transition.aria', {
+          duration,
+          exercise: destinationName,
+          source,
+        }))}"
+      ></rrr-sequence-gutter>
+    `
+  }
+
+  private renderRoutineFlow(routineId: string, version: RoutineVersion): string {
+    return buildRoutineFlow(version)
+      .map((item) => item.kind === 'exercise'
+        ? this.renderExerciseRow(routineId, item.exercise)
+        : this.renderTransitionGutter(item, version))
+      .join('')
   }
 
   private render(): void {
@@ -193,7 +237,7 @@ export class RrrRoutineDetail extends HTMLElement {
       ? getRoutineSummary(storageService.getData(), routineId)
       : null
 
-    if (!summary) {
+    if (!routineId || !summary) {
       this.innerHTML = `
         <section class="page">
           <p>${t('routineDetail.notFound.description')}</p>
@@ -229,9 +273,9 @@ export class RrrRoutineDetail extends HTMLElement {
           ${
             exerciseCount > 0
               ? `
-                <div class="rrr-list-card">
-                  ${summary.version?.exercises.map((exercise) => this.renderExerciseRow(exercise)).join('') ?? ''}
-                </div>
+                <rrr-sequence aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
+                  ${summary.version ? this.renderRoutineFlow(routineId, summary.version) : ''}
+                </rrr-sequence>
               `
               : `<p>${t('routineDetail.exercises.empty')}</p>`
           }

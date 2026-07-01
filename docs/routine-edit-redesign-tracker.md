@@ -354,16 +354,16 @@ leave a dirty routine draft.
 
 ### Phase 2 — Routine detail sequence
 
-- [ ] Render existing routine exercises as navigable sequence rows.
-- [ ] Render default and overridden transition gutters.
+- [x] Render existing routine exercises as navigable sequence rows.
+- [x] Render default and overridden transition gutters.
 - [ ] Add the page-level default transition editor.
 - [ ] Add the per-gutter transition override editor.
-- [ ] Add routine-exercise routes and back-navigation behavior.
+- [x] Add routine-exercise routes and back-navigation behavior.
 
 ### Phase 3 — Routine-exercise editor
 
-- [ ] Render planned sets as sequence rows.
-- [ ] Render shared rest gutters.
+- [x] Render planned sets as sequence rows.
+- [x] Render shared rest gutters.
 - [ ] Add the page-level shared rest editor.
 - [ ] Add and edit planned sets.
 - [ ] Auto-save routine-exercise changes at their interaction boundaries.
