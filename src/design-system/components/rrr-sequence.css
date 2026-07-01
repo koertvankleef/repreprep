@@ -1,0 +1,71 @@
+rrr-sequence {
+  --rrr-sequence-row-background: var(--rrr-surface-raised);
+  --rrr-sequence-row-border-color: var(--rrr-border-subtle);
+  --rrr-sequence-row-border-radius: var(--rrr-radius-l);
+  --rrr-sequence-gutter-min-block-size: var(--rrr-sizes-grid-5);
+  --rrr-sequence-gutter-line-color: var(--rrr-border-subtle);
+  --rrr-sequence-gutter-background: var(--rrr-surface-base);
+  --rrr-sequence-gutter-color: var(--rrr-text-muted);
+  display: grid;
+  min-inline-size: 0;
+}
+
+rrr-sequence > :where(rrr-list-row, [data-sequence-item]) {
+  overflow: hidden;
+  border: var(--rrr-border-width) solid var(--rrr-sequence-row-border-color);
+  border-radius: var(--rrr-sequence-row-border-radius);
+  background: var(--rrr-sequence-row-background);
+}
+
+rrr-sequence-gutter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--rrr-sequence-gutter-min-block-size);
+  color: var(--rrr-sequence-gutter-color);
+  text-align: center;
+}
+
+rrr-sequence-gutter::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 50%;
+  border-inline-start: var(--rrr-border-width) solid var(--rrr-sequence-gutter-line-color);
+  translate: -50% 0;
+}
+
+.rrr-sequence-gutter__content {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--rrr-spacing-xs);
+  max-inline-size: calc(100% - (2 * var(--rrr-spacing-m)));
+  padding: var(--rrr-spacing-2xs) var(--rrr-spacing-s);
+  background: var(--rrr-sequence-gutter-background);
+  line-height: 1.2;
+}
+
+.rrr-sequence-gutter__label {
+  color: var(--rrr-color-text);
+  font-size: var(--rrr-font-size-s);
+  font-weight: var(--rrr-font-weight-medium);
+}
+
+.rrr-sequence-gutter__description {
+  color: var(--rrr-sequence-gutter-color);
+  font-size: var(--rrr-font-size-xs);
+}
+
+.rrr-sequence-gutter__description::before {
+  content: '·';
+  margin-inline-end: var(--rrr-spacing-xs);
+}
+
+@media (forced-colors: active) {
+  rrr-sequence-gutter::before {
+    border-color: CanvasText;
+  }
+}

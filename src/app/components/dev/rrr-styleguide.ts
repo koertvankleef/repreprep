@@ -328,6 +328,12 @@ export class RrrStyleguide extends HTMLElement {
   }
 
   private render(): void {
+    const twentySeconds = t('styleguide.sequences.seconds', { count: 20 })
+    const fortyFiveSeconds = t('styleguide.sequences.seconds', { count: 45 })
+    const setOne = t('styleguide.sequences.set.one')
+    const setTwo = t('styleguide.sequences.set.two')
+    const setThree = t('styleguide.sequences.set.three')
+
     this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
@@ -566,6 +572,90 @@ export class RrrStyleguide extends HTMLElement {
                     <dd>${t('styleguide.listRows.propertyDefaultUnitValue')}</dd>
                   </div>
                 </dl>
+              </div>
+            </div>
+          </rrr-section>
+
+          <rrr-section>
+            <span slot="heading">${t('styleguide.section.sequences')}</span>
+            <span slot="description">${t('styleguide.sequences.description')}</span>
+            <div class="sequence-showcase">
+              <div class="showcase-block">
+                <h3>${t('styleguide.sequences.routineHeading')}</h3>
+                <p class="sample-text">${t('styleguide.sequences.routineDescription')}</p>
+                <rrr-sequence aria-label="${t('styleguide.sequences.routineAria')}">
+                  <rrr-list-row
+                    href="#/settings/styleguide"
+                    label="${t('styleguide.sequences.exercise.pushups')}"
+                    description="${t('styleguide.sequences.exercise.sets.three')}"
+                    accessory="chevron"
+                  ></rrr-list-row>
+                  <rrr-sequence-gutter
+                    label="${twentySeconds}"
+                    description="${t('styleguide.sequences.default')}"
+                    aria-label="${t('styleguide.sequences.transitionAria', {
+                      duration: twentySeconds,
+                      exercise: t('styleguide.sequences.exercise.rows'),
+                    })}"
+                  ></rrr-sequence-gutter>
+                  <rrr-list-row
+                    href="#/settings/styleguide"
+                    label="${t('styleguide.sequences.exercise.rows')}"
+                    description="${t('styleguide.sequences.exercise.sets.three')}"
+                    accessory="chevron"
+                  ></rrr-list-row>
+                  <rrr-sequence-gutter
+                    label="${fortyFiveSeconds}"
+                    aria-label="${t('styleguide.sequences.transitionAria', {
+                      duration: fortyFiveSeconds,
+                      exercise: t('styleguide.sequences.exercise.lunges'),
+                    })}"
+                  ></rrr-sequence-gutter>
+                  <rrr-list-row
+                    href="#/settings/styleguide"
+                    label="${t('styleguide.sequences.exercise.lunges')}"
+                    description="${t('styleguide.sequences.exercise.sets.two')}"
+                    accessory="chevron"
+                  ></rrr-list-row>
+                </rrr-sequence>
+              </div>
+
+              <div class="showcase-block">
+                <h3>${t('styleguide.sequences.setHeading')}</h3>
+                <p class="sample-text">${t('styleguide.sequences.setDescription')}</p>
+                <rrr-sequence aria-label="${t('styleguide.sequences.setAria')}">
+                  <rrr-list-row
+                    label="${setOne}"
+                    value-text="${t('styleguide.sequences.set.value')}"
+                    accessory="value"
+                  ></rrr-list-row>
+                  <rrr-sequence-gutter
+                    label="${twentySeconds}"
+                    aria-label="${t('styleguide.sequences.restAria', {
+                      duration: twentySeconds,
+                      from: setOne,
+                      to: setTwo,
+                    })}"
+                  ></rrr-sequence-gutter>
+                  <rrr-list-row
+                    label="${setTwo}"
+                    value-text="${t('styleguide.sequences.set.value')}"
+                    accessory="value"
+                  ></rrr-list-row>
+                  <rrr-sequence-gutter
+                    label="${twentySeconds}"
+                    aria-label="${t('styleguide.sequences.restAria', {
+                      duration: twentySeconds,
+                      from: setTwo,
+                      to: setThree,
+                    })}"
+                  ></rrr-sequence-gutter>
+                  <rrr-list-row
+                    label="${setThree}"
+                    value-text="${t('styleguide.sequences.set.value')}"
+                    accessory="value"
+                  ></rrr-list-row>
+                </rrr-sequence>
               </div>
             </div>
           </rrr-section>

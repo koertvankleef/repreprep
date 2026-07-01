@@ -185,14 +185,14 @@ Candidate responsibilities:
 
 Initial gutter requirements:
 
-- [ ] Display a localized duration such as “20 seconds.”
-- [ ] Distinguish an inherited routine default from a per-exercise override
+- [x] Display a localized duration such as “20 seconds.”
+- [x] Distinguish an inherited routine default from a per-exercise override
       without adding visual noise.
 - [ ] Support static and interactive variants.
-- [ ] Provide an accessible label that identifies the relationship, for
+- [x] Provide an accessible label that identifies the relationship, for
       example “20 seconds preparation before Squat.”
 - [ ] Collapse or reposition predictably while an adjacent row is dragged.
-- [ ] Add static routine and set examples to the Styleguide before product
+- [x] Add static routine and set examples to the Styleguide before product
       integration.
 
 ## Reordering
@@ -348,9 +348,9 @@ leave a dirty routine draft.
 
 ### Phase 1 — Static sequence primitives
 
-- [ ] Implement and document static sequence and gutter presentation.
-- [ ] Add routine-transition and set-rest Styleguide examples.
-- [ ] Add localization and accessibility tests.
+- [x] Implement and document static sequence and gutter presentation.
+- [x] Add routine-transition and set-rest Styleguide examples.
+- [x] Add localization and accessibility tests.
 
 ### Phase 2 — Routine detail sequence
 

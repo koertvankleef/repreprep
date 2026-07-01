@@ -9,6 +9,8 @@ import { registerRrrIcon } from './rrr-icon.ts'
 import { registerRrrListCard } from './rrr-list-card.ts'
 import { registerRrrListRow } from './rrr-list-row.ts'
 import { registerRrrSection } from './rrr-section.ts'
+import { registerRrrSequence } from './rrr-sequence.ts'
+import { registerRrrSequenceGutter } from './rrr-sequence-gutter.ts'
 import { registerRrrSelect } from './rrr-select.ts'
 import { registerRrrSheet } from './rrr-sheet.ts'
 import { registerRrrTextarea } from './rrr-textarea.ts'
@@ -25,6 +27,8 @@ export function registerDesignSystemComponents(): void {
   registerRrrDateField()
   registerRrrIcon()
   registerRrrSection()
+  registerRrrSequence()
+  registerRrrSequenceGutter()
   registerRrrListCard()
   registerRrrListRow()
   registerRrrSheet()

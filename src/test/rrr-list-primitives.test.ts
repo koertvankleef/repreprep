@@ -3,6 +3,8 @@ import { initLocale } from '../i18n/index.ts'
 import { registerRrrListCard } from '../design-system/components/rrr-list-card.ts'
 import { registerRrrListRow, type RrrListRow } from '../design-system/components/rrr-list-row.ts'
 import { registerRrrSection } from '../design-system/components/rrr-section.ts'
+import { registerRrrSequence } from '../design-system/components/rrr-sequence.ts'
+import { registerRrrSequenceGutter } from '../design-system/components/rrr-sequence-gutter.ts'
 import '../app/components/settings/rrr-appearance-settings.ts'
 import '../app/components/settings/rrr-language-settings.ts'
 import '../app/components/settings/rrr-settings.ts'
@@ -12,6 +14,8 @@ beforeAll(() => {
   registerRrrSection()
   registerRrrListCard()
   registerRrrListRow()
+  registerRrrSequence()
+  registerRrrSequenceGutter()
 })
 
 beforeEach(() => {
@@ -19,6 +23,35 @@ beforeEach(() => {
 })
 
 describe('list structure primitives', () => {
+  test('gives sequence rows and meaningful gutters list semantics', async () => {
+    document.body.innerHTML = `
+      <rrr-sequence aria-label="Routine flow">
+        <rrr-list-row label="Push-ups"></rrr-list-row>
+        <rrr-sequence-gutter
+          label="20 seconds"
+          description="Routine default"
+          aria-label="20 seconds preparation before Row"
+        ></rrr-sequence-gutter>
+        <rrr-list-row label="Row"></rrr-list-row>
+      </rrr-sequence>
+    `
+    await Promise.resolve()
+
+    const sequence = document.querySelector('rrr-sequence')
+    const gutter = sequence?.querySelector('rrr-sequence-gutter')
+
+    expect(sequence?.getAttribute('role')).toBe('list')
+    expect(Array.from(sequence?.children ?? []).map((child) => child.getAttribute('role')))
+      .toEqual(['listitem', 'listitem', 'listitem'])
+    expect(gutter?.querySelector('.rrr-sequence-gutter__label')?.textContent).toBe('20 seconds')
+    expect(gutter?.querySelector('.rrr-sequence-gutter__description')?.textContent).toBe('Routine default')
+
+    gutter?.setAttribute('label', '<strong>45 seconds</strong>')
+
+    expect(gutter?.querySelector('strong')).toBeNull()
+    expect(gutter?.querySelector('.rrr-sequence-gutter__label')?.textContent).toBe('<strong>45 seconds</strong>')
+  })
+
   test('renders navigation and action rows as honest light-DOM interactive elements', async () => {
     document.body.innerHTML = `
       <div class="rrr-list-card">

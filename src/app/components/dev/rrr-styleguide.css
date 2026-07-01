@@ -184,6 +184,11 @@
   gap: var(--rrr-spacing-l);
 }
 
+.sequence-showcase {
+  display: grid;
+  gap: var(--rrr-spacing-xl);
+}
+
 .scale-preview.elevation {
   inline-size: 2.5rem;
   border-radius: var(--rrr-radius-s);
@@ -196,6 +201,10 @@
   }
 
   .scale-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sequence-showcase {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 

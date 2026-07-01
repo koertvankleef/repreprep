@@ -47,6 +47,44 @@ collection, or when independent controls would create invalid nested
 interactions. Bespoke layouts may still reuse `.rrr-card` when a flat padded
 surface is appropriate.
 
+## Sequences and meaningful gutters
+
+Use `rrr-sequence` when identity-first rows form an order and the interval
+between adjacent rows carries user-facing meaning. Direct `rrr-list-row` and
+`rrr-sequence-gutter` children receive list/listitem semantics while remaining
+in light DOM.
+
+```html
+<rrr-sequence aria-label="Routine exercise sequence">
+  <rrr-list-row
+    href="#/routines/1/exercises/a"
+    label="Push-ups"
+    description="3 planned sets"
+    accessory="chevron"
+  ></rrr-list-row>
+  <rrr-sequence-gutter
+    label="20 seconds"
+    description="Routine default"
+    aria-label="20 seconds preparation before One-arm dumbbell row"
+  ></rrr-sequence-gutter>
+  <rrr-list-row
+    href="#/routines/1/exercises/b"
+    label="One-arm dumbbell row"
+    description="3 planned sets"
+    accessory="chevron"
+  ></rrr-list-row>
+</rrr-sequence>
+```
+
+The visible gutter label states the duration. Use `description` for concise
+supporting provenance such as an inherited default. Supply a relational
+`aria-label` that identifies what the interval precedes or separates.
+
+Do not use a sequence merely to add space between cards. A gutter represents
+derived domain information. Routine transition gutters may become interactive;
+shared set-rest gutters remain static unless their action clearly communicates
+that it changes every rest interval for the exercise.
+
 ## Row hierarchy follows the reading task
 
 Choose a row pattern by asking what the user needs to find first. Do not choose
