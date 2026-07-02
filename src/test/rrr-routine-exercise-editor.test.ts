@@ -40,7 +40,8 @@ describe('routine exercise editor', () => {
 
     expect(rows).toHaveLength(routineExercise.plannedSets.length)
     expect(gutters).toHaveLength(routineExercise.plannedSets.length - 1)
-    expect(gutters?.[0]?.getAttribute('label')).toBe(`${routineExercise.restSeconds} seconds rest`)
+    expect(gutters?.[0]?.getAttribute('value')).toBe(String(routineExercise.restSeconds))
+    expect(gutters?.[0]?.getAttribute('unit')).toBe('s')
     expect(gutters?.[0]?.getAttribute('aria-label')).toContain('between set 1 and set 2')
   })
 

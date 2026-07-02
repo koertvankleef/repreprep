@@ -25,9 +25,12 @@ export class RrrInput extends HTMLElement {
     'error-text',
     'invalid',
     'label',
+    'max',
+    'min',
     'name',
     'placeholder',
     'required',
+    'step',
     'type',
     'value',
   ]
@@ -107,6 +110,9 @@ export class RrrInput extends HTMLElement {
     this.input.name = this.getAttribute('name') ?? ''
     this.input.placeholder = this.getAttribute('placeholder') ?? ''
     this.input.required = this.hasAttribute('required')
+    this.reflectOptionalAttribute('min')
+    this.reflectOptionalAttribute('max')
+    this.reflectOptionalAttribute('step')
 
     const labelText = this.getAttribute('label') ?? ''
     this.label.textContent = labelText
@@ -133,6 +139,16 @@ export class RrrInput extends HTMLElement {
 
     reflectDisabled(this, this.input)
     this.syncError()
+  }
+
+  private reflectOptionalAttribute(name: 'min' | 'max' | 'step'): void {
+    const value = this.getAttribute(name)
+    if (value === null) {
+      this.input.removeAttribute(name)
+      return
+    }
+
+    this.input.setAttribute(name, value)
   }
 
   private syncError(): void {

@@ -63,9 +63,11 @@ in light DOM.
     accessory="chevron"
   ></rrr-list-row>
   <rrr-sequence-gutter
-    label="45 seconds"
+    activation="button"
+    value="45"
+    unit="s"
     description="Custom"
-    aria-label="45 seconds custom preparation before One-arm dumbbell row"
+    action-label="Edit 45 seconds custom preparation before One-arm dumbbell row"
   ></rrr-sequence-gutter>
   <rrr-list-row
     href="#/routines/1/exercises/b"
@@ -76,12 +78,16 @@ in light DOM.
 </rrr-sequence>
 ```
 
-The visible gutter label states the duration. Omit `description` for the normal
-inherited value; use it only to identify an override. Supply a relational
-`aria-label` that identifies what the interval precedes or separates.
+The visible gutter measurement is always authored through separate `value` and
+`unit` attributes, allowing the value to carry stronger emphasis. Omit
+`description` for the normal inherited value; use it only to identify an
+override. Supply a relational
+`aria-label` that identifies what a static interval precedes or separates.
+For an editable gutter, set `activation="button"` and provide the full action
+through `action-label`.
 
 Do not use a sequence merely to add space between cards. A gutter represents
-derived domain information. Routine transition gutters may become interactive;
+derived domain information. Routine transition gutters can be interactive;
 shared set-rest gutters remain static unless their action clearly communicates
 that it changes every rest interval for the exercise.
 

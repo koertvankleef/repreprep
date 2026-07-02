@@ -66,11 +66,12 @@ export class RrrRoutineExerciseEditor extends HTMLElement {
           return [row]
         }
 
-        const duration = tPlural('routineExercise.rest.duration', restSeconds)
+        const duration = tPlural('routineExercise.rest.durationLong', restSeconds)
         const gutter = `
           <rrr-sequence-gutter
             icon="water-bottle"
-            label="${escapeHtml(duration)}"
+            value="${restSeconds}"
+            unit="s"
             aria-label="${escapeHtml(t('routineExercise.rest.aria', {
               duration,
               from: index + 1,

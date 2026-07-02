@@ -1,7 +1,15 @@
 import { defineCustomElementOnce } from './shared.ts'
 
 export class RrrSequenceGutter extends HTMLElement {
-  static observedAttributes = ['description', 'label']
+  static observedAttributes = [
+    'action-label',
+    'activation',
+    'description',
+    'disabled',
+    'icon',
+    'unit',
+    'value',
+  ]
 
   connectedCallback(): void {
     this.render()
@@ -14,21 +22,38 @@ export class RrrSequenceGutter extends HTMLElement {
   }
 
   private render(): void {
-    const label = this.getAttribute('label') ?? ''
+    const value = this.getAttribute('value') ?? ''
+    const unit = this.getAttribute('unit') ?? ''
     const description = this.getAttribute('description') ?? ''
     const iconName = this.getAttribute('icon') ?? ''
-
-    this.innerHTML = `
+    const interactive = this.getAttribute('activation') === 'button'
+    const content = `
       <span class="rrr-sequence-gutter__content">
         ${iconName
-          ? `<rrr-icon name="${iconName}" class="rrr-sequence-gutter__icon"></rrr-icon>`
-          : ''}        
-        <span class="rrr-sequence-gutter__label">${escapeHtml(label)}</span>
+          ? `<rrr-icon name="${escapeHtml(iconName)}" class="rrr-sequence-gutter__icon"></rrr-icon>`
+          : ''}
+        <span class="rrr-sequence-gutter__measurement">
+          <span class="rrr-sequence-gutter__value">${escapeHtml(value)}</span>
+          <span class="rrr-sequence-gutter__unit">${escapeHtml(unit)}</span>
+        </span>
         ${description
           ? `<span class="rrr-sequence-gutter__description">${escapeHtml(description)}</span>`
           : ''}
       </span>
     `
+
+    this.innerHTML = interactive
+      ? `
+        <button
+          type="button"
+          class="rrr-sequence-gutter__control"
+          aria-label="${escapeHtml(
+            this.getAttribute('action-label') || `${value} ${unit}`.trim(),
+          )}"
+          ${this.hasAttribute('disabled') ? 'disabled' : ''}
+        >${content}</button>
+      `
+      : content
   }
 }
 

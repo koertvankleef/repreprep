@@ -356,8 +356,8 @@ leave a dirty routine draft.
 
 - [x] Render existing routine exercises as navigable sequence rows.
 - [x] Render default and overridden transition gutters.
-- [ ] Add the page-level default transition editor.
-- [ ] Add the per-gutter transition override editor.
+- [x] Add the page-level default transition editor.
+- [x] Add the per-gutter transition override editor.
 - [x] Add routine-exercise routes and back-navigation behavior.
 
 ### Phase 3 — Routine-exercise editor

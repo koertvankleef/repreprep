@@ -222,7 +222,7 @@ describe('rrr-app exercise filters', () => {
       detail: { language: 'en-US' },
     }))
 
-    expect(getNavLabels()).toEqual(['Today', 'Routines', 'Exercises', 'History'])
+    expect(getNavLabels()).toEqual(['Today', 'Routines', 'Exercises library', 'History'])
   })
 
   it('renders routine details with an Edit action row', async () => {

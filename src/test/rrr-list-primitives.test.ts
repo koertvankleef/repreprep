@@ -28,7 +28,8 @@ describe('list structure primitives', () => {
       <rrr-sequence aria-label="Routine flow">
         <rrr-list-row label="Push-ups"></rrr-list-row>
         <rrr-sequence-gutter
-          label="20 seconds"
+          value="20"
+          unit="seconds"
           description="Custom"
           aria-label="20 seconds preparation before Row"
         ></rrr-sequence-gutter>
@@ -43,13 +44,35 @@ describe('list structure primitives', () => {
     expect(sequence?.getAttribute('role')).toBe('list')
     expect(Array.from(sequence?.children ?? []).map((child) => child.getAttribute('role')))
       .toEqual(['listitem', 'listitem', 'listitem'])
-    expect(gutter?.querySelector('.rrr-sequence-gutter__label')?.textContent).toBe('20 seconds')
+    expect(gutter?.querySelector('.rrr-sequence-gutter__value')?.textContent).toBe('20')
+    expect(gutter?.querySelector('.rrr-sequence-gutter__unit')?.textContent).toBe('seconds')
     expect(gutter?.querySelector('.rrr-sequence-gutter__description')?.textContent).toBe('Custom')
 
-    gutter?.setAttribute('label', '<strong>45 seconds</strong>')
+    gutter?.setAttribute('value', '<strong>45</strong>')
 
     expect(gutter?.querySelector('strong')).toBeNull()
-    expect(gutter?.querySelector('.rrr-sequence-gutter__label')?.textContent).toBe('<strong>45 seconds</strong>')
+    expect(gutter?.querySelector('.rrr-sequence-gutter__value')?.textContent).toBe('<strong>45</strong>')
+  })
+
+  test('renders an editable gutter as a labelled native button', async () => {
+    document.body.innerHTML = `
+      <rrr-sequence-gutter
+        activation="button"
+        value="45"
+        unit="s"
+        description="Custom"
+        action-label="Edit 45 seconds custom preparation before Row"
+      ></rrr-sequence-gutter>
+    `
+    await Promise.resolve()
+
+    const gutter = document.querySelector('rrr-sequence-gutter')
+    const button = gutter?.querySelector<HTMLButtonElement>(':scope > button')
+
+    expect(button?.getAttribute('aria-label'))
+      .toBe('Edit 45 seconds custom preparation before Row')
+    expect(button?.querySelector('.rrr-sequence-gutter__description')?.textContent)
+      .toBe('Custom')
   })
 
   test('renders navigation and action rows as honest light-DOM interactive elements', async () => {

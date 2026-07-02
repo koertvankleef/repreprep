@@ -115,7 +115,105 @@ describe('value-first property lists', () => {
 
     expect(gutters[0]?.getAttribute('description')).toBe('Custom')
     expect(gutters[1]?.hasAttribute('description')).toBe(false)
-    expect(gutters[1]?.getAttribute('aria-label')).not.toContain('default')
+    expect(gutters[1]?.getAttribute('action-label')).not.toContain('default')
+  })
+
+  test('edits the routine transition default and saves a new active version', async () => {
+    const routine = storageService.getData().routines[0]!
+    const previousVersionId = routine.activeVersionId
+    const detail = new RrrRoutineDetail()
+    detail.routineId = routine.id
+    document.body.append(detail)
+    await Promise.resolve()
+
+    detail
+      .querySelector<HTMLButtonElement>(
+        'rrr-list-row[data-action="edit-transition-default"] > button',
+      )
+      ?.click()
+
+    const input = document.querySelector<HTMLElement & { value: string }>(
+      'rrr-sheet rrr-input[name="seconds"]',
+    )
+    input!.value = '30'
+    input?.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    document.querySelector<HTMLElement>('rrr-sheet [data-sheet-result="confirm"]')?.click()
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    const updatedRoutine = storageService
+      .getData()
+      .routines.find(({ id }) => id === routine.id)!
+    const updatedVersion = storageService
+      .getData()
+      .routineVersions.find(({ id }) => id === updatedRoutine.activeVersionId)!
+
+    expect(updatedRoutine.activeVersionId).not.toBe(previousVersionId)
+    expect(updatedVersion.transitionSeconds).toBe(30)
+    expect(detail.querySelector(
+      'rrr-list-row[data-action="edit-transition-default"]',
+    )?.getAttribute('value-text')).toBe('30 s')
+  })
+
+  test('edits a transition gutter with a custom override and restores the default', async () => {
+    const routine = storageService.getData().routines[0]!
+    const detail = new RrrRoutineDetail()
+    detail.routineId = routine.id
+    document.body.append(detail)
+    await Promise.resolve()
+
+    detail
+      .querySelector<HTMLButtonElement>('rrr-sequence-gutter > button')
+      ?.click()
+    await Promise.resolve()
+
+    const customMode = document.querySelector<HTMLElement & { checked: boolean }>(
+      'rrr-sheet rrr-list-row[data-transition-mode="custom"]',
+    )
+    customMode!.checked = true
+    customMode?.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+
+    const input = document.querySelector<HTMLElement & { value: string }>(
+      'rrr-sheet rrr-input[name="seconds"]',
+    )
+    input!.value = '45'
+    input?.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    document.querySelector<HTMLElement>('rrr-sheet [data-sheet-result="confirm"]')?.click()
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    const updatedRoutine = storageService
+      .getData()
+      .routines.find(({ id }) => id === routine.id)!
+    const updatedVersion = storageService
+      .getData()
+      .routineVersions.find(({ id }) => id === updatedRoutine.activeVersionId)!
+
+    expect(updatedVersion.exercises[1]?.transitionBeforeOverrideSeconds).toBe(45)
+    expect(detail.querySelector('rrr-sequence-gutter')?.getAttribute('value')).toBe('45')
+    expect(detail.querySelector('rrr-sequence-gutter')?.getAttribute('unit')).toBe('s')
+    expect(detail.querySelector('rrr-sequence-gutter')?.getAttribute('description')).toBe('Custom')
+
+    detail
+      .querySelector<HTMLButtonElement>('rrr-sequence-gutter > button')
+      ?.click()
+    await Promise.resolve()
+
+    const defaultMode = document.querySelector<HTMLElement & { checked: boolean }>(
+      'rrr-sheet rrr-list-row[data-transition-mode="default"]',
+    )
+    defaultMode!.checked = true
+    defaultMode?.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    document.querySelector<HTMLElement>('rrr-sheet [data-sheet-result="confirm"]')?.click()
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    const restoredRoutine = storageService
+      .getData()
+      .routines.find(({ id }) => id === routine.id)!
+    const restoredVersion = storageService
+      .getData()
+      .routineVersions.find(({ id }) => id === restoredRoutine.activeVersionId)!
+
+    expect(restoredVersion.exercises[1]?.transitionBeforeOverrideSeconds).toBeNull()
+    expect(detail.querySelector('rrr-sequence-gutter')?.hasAttribute('description')).toBe(false)
   })
 
   test('starts an active workout from the bottom action row', async () => {

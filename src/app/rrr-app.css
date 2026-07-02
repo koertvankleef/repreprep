@@ -507,7 +507,9 @@ nav {
 
 .header-icon-link:hover,
 .header-icon-link:active {
+  border-color: transparent;
   background: color-mix(in oklab, var(--rrr-color-contrast), transparent 85%);
+  box-shadow: none;
   color: var(--rrr-color-contrast);
 }
 

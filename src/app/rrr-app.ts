@@ -95,7 +95,7 @@ const primaryNavigationItems: ReadonlyArray<{
   iconName: string
 }> = [
   { routeName: 'workouts', href: '#/workouts', labelKey: 'app.nav.today', iconName: 'calendar-date' },
-  { routeName: 'routines', href: '#/routines', labelKey: 'app.nav.routines', iconName: 'clipboard' },
+  { routeName: 'routines', href: '#/routines', labelKey: 'app.nav.routines', iconName: 'clipboard-task-list-ltr' },
   { routeName: 'exercises', href: '#/exercises', labelKey: 'app.nav.exercises', iconName: 'library' },
   { routeName: 'history', href: '#/history', labelKey: 'app.nav.history', iconName: 'data-trending' },
 ]

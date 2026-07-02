@@ -591,7 +591,8 @@ export class RrrStyleguide extends HTMLElement {
                     accessory="chevron"
                   ></rrr-list-row>
                   <rrr-sequence-gutter
-                    label="${twentySeconds}"
+                    value="20"
+                    unit="s"
                     aria-label="${t('styleguide.sequences.transitionAria', {
                       duration: twentySeconds,
                       exercise: t('styleguide.sequences.exercise.rows'),
@@ -604,7 +605,8 @@ export class RrrStyleguide extends HTMLElement {
                     accessory="chevron"
                   ></rrr-list-row>
                   <rrr-sequence-gutter
-                    label="${fortyFiveSeconds}"
+                    value="45"
+                    unit="s"
                     description="${t('styleguide.sequences.custom')}"
                     aria-label="${t('styleguide.sequences.transitionAria', {
                       duration: fortyFiveSeconds,
@@ -630,7 +632,8 @@ export class RrrStyleguide extends HTMLElement {
                     accessory="value"
                   ></rrr-list-row>
                   <rrr-sequence-gutter
-                    label="${twentySeconds}"
+                    value="20"
+                    unit="s"
                     aria-label="${t('styleguide.sequences.restAria', {
                       duration: twentySeconds,
                       from: setOne,
@@ -643,7 +646,8 @@ export class RrrStyleguide extends HTMLElement {
                     accessory="value"
                   ></rrr-list-row>
                   <rrr-sequence-gutter
-                    label="${twentySeconds}"
+                    value="20"
+                    unit="s"
                     aria-label="${t('styleguide.sequences.restAria', {
                       duration: twentySeconds,
                       from: setTwo,
