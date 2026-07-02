@@ -1,4 +1,5 @@
 import { defineCustomElementOnce } from './shared.ts'
+import { registerRrrMeasurement } from './rrr-measurement.ts'
 
 export class RrrSequenceGutter extends HTMLElement {
   static observedAttributes = [
@@ -32,10 +33,10 @@ export class RrrSequenceGutter extends HTMLElement {
         ${iconName
           ? `<rrr-icon name="${escapeHtml(iconName)}" class="rrr-sequence-gutter__icon"></rrr-icon>`
           : ''}
-        <span class="rrr-sequence-gutter__measurement">
-          <span class="rrr-sequence-gutter__value">${escapeHtml(value)}</span>
-          <span class="rrr-sequence-gutter__unit">${escapeHtml(unit)}</span>
-        </span>
+        <rrr-measurement
+          value="${escapeHtml(value)}"
+          unit="${escapeHtml(unit)}"
+        ></rrr-measurement>
         ${description
           ? `<span class="rrr-sequence-gutter__description">${escapeHtml(description)}</span>`
           : ''}
@@ -62,5 +63,6 @@ function escapeHtml(text: string): string {
 }
 
 export function registerRrrSequenceGutter(): void {
+  registerRrrMeasurement()
   defineCustomElementOnce('rrr-sequence-gutter', RrrSequenceGutter)
 }

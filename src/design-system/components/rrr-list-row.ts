@@ -2,11 +2,11 @@ import { defineCustomElementOnce } from './shared.ts'
 
 type RowControl = 'radio' | 'checkbox' | 'switch'
 type RowAccessory = 'none' | 'chevron' | 'value' | 'value-chevron' | 'badge' | 'custom'
-type RowSlot = 'leading' | 'body' | 'trailing'
+type RowSlot = 'leading' | 'label' | 'body' | 'trailing'
 
 const rowControls = new Set<RowControl>(['radio', 'checkbox', 'switch'])
 const rowAccessories = new Set<RowAccessory>(['none', 'chevron', 'value', 'value-chevron', 'badge', 'custom'])
-const rowSlots = new Set<RowSlot>(['leading', 'body', 'trailing'])
+const rowSlots = new Set<RowSlot>(['leading', 'label', 'body', 'trailing'])
 
 export class RrrListRow extends HTMLElement {
   static observedAttributes = [
@@ -214,7 +214,9 @@ export class RrrListRow extends HTMLElement {
   }
 
   private renderContent(): string {
-    const label = this.escapeHtml(this.getAttribute('label') ?? '')
+    const label = this.hasProjectedContent('label')
+      ? '<span class="rrr-list-row__label" data-row-slot="label"></span>'
+      : `<span class="rrr-list-row__label">${this.escapeHtml(this.getAttribute('label') ?? '')}</span>`
     const description = this.getAttribute('description')
     const body = this.hasProjectedContent('body')
       ? '<span class="rrr-list-row__body" data-row-slot="body"></span>'
@@ -224,7 +226,7 @@ export class RrrListRow extends HTMLElement {
       : ''
     const content = `
       <span class="rrr-list-row__content">
-        <span class="rrr-list-row__label">${label}</span>
+        ${label}
         ${description ? `<span class="rrr-list-row__description">${this.escapeHtml(description)}</span>` : ''}
         ${body}
       </span>
@@ -273,6 +275,7 @@ export class RrrListRow extends HTMLElement {
   private captureProjectedContent(): Record<RowSlot, Element[]> {
     const projectedContent: Record<RowSlot, Element[]> = {
       leading: [],
+      label: [],
       body: [],
       trailing: [],
     }

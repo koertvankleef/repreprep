@@ -8,6 +8,7 @@ import { registerRrrInput } from './rrr-input.ts'
 import { registerRrrIcon } from './rrr-icon.ts'
 import { registerRrrListCard } from './rrr-list-card.ts'
 import { registerRrrListRow } from './rrr-list-row.ts'
+import { registerRrrMeasurement } from './rrr-measurement.ts'
 import { registerRrrSection } from './rrr-section.ts'
 import { registerRrrSequence } from './rrr-sequence.ts'
 import { registerRrrSequenceGutter } from './rrr-sequence-gutter.ts'
@@ -26,6 +27,7 @@ export function registerDesignSystemComponents(): void {
   registerRrrDatePicker()
   registerRrrDateField()
   registerRrrIcon()
+  registerRrrMeasurement()
   registerRrrSection()
   registerRrrSequence()
   registerRrrSequenceGutter()

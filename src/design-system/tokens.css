@@ -198,7 +198,7 @@
   --rrr-border-subtle: var(--rrr-colors-grayscale-30);
   --rrr-text-muted: var(--rrr-colors-grayscale-70);
 
-  --rrr-color-heading: var(--rrr-colors-serene-mint-80);
+  --rrr-color-heading: var(--rrr-colors-serene-mint-70);
   --rrr-list-row-icon-color: var(--rrr-color-primary-deep);
 
   --rrr-font-family: 'Exo 2', system-ui, -apple-system, sans-serif;
@@ -237,7 +237,7 @@
   --rrr-depth-2-shadow: 0 2px 4px #00000066, 0 1px 2px #0000004d;
   --rrr-depth-3-shadow: 0 4px 10px #0000007d, 0 2px 6px #00000052;
 
-  --rrr-color-heading: var(--rrr-colors-serene-mint-30);
+  --rrr-color-heading: var(--rrr-colors-serene-mint-40);
   --rrr-list-row-icon-color: var(--rrr-colors-serene-mint-40);
 }
 

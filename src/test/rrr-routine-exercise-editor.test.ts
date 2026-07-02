@@ -52,12 +52,21 @@ describe('routine exercise editor', () => {
     const sequence = editor.querySelector('rrr-sequence')
     const rows = sequence?.querySelectorAll('rrr-list-row')
     const gutters = sequence?.querySelectorAll('rrr-sequence-gutter')
+    const flowSection = Array.from(editor.querySelectorAll('rrr-section')).find(
+      (section) => section.querySelector('[slot="heading"]')?.textContent === 'Flow',
+    )
 
     expect(rows).toHaveLength(routineExercise.plannedSets.length)
     expect(gutters).toHaveLength(routineExercise.plannedSets.length - 1)
+    expect(flowSection?.querySelector('rrr-list-row[data-action="edit-rest"]')).not.toBeNull()
+    expect(flowSection?.querySelector('rrr-sequence')).toBe(sequence)
     expect(gutters?.[0]?.getAttribute('value')).toBe(String(routineExercise.restSeconds))
     expect(gutters?.[0]?.getAttribute('unit')).toBe('s')
     expect(gutters?.[0]?.getAttribute('aria-label')).toContain('between set 1 and set 2')
+    expect(rows?.[0]?.hasAttribute('label')).toBe(false)
+    expect(rows?.[0]?.querySelector('rrr-measurement')).not.toBeNull()
+    expect(rows?.[0]?.querySelector(':scope > button .sr-only')?.textContent)
+      .toMatch(/^First set, /)
   })
 
   test('renders a not-found state when the sequence entry is unavailable', () => {
@@ -125,6 +134,7 @@ describe('routine exercise editor', () => {
     editor
       .querySelector<HTMLButtonElement>(`rrr-list-row[data-set-id="${originalSet.id}"] > button`)
       ?.click()
+    expect(document.querySelector('rrr-sheet [slot="heading"]')?.textContent).toBe('First set')
     const repsInput = document.querySelector<HTMLElement & { value: string }>(
       'rrr-sheet rrr-input[name="target-reps"]',
     )

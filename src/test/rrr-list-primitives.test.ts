@@ -44,14 +44,14 @@ describe('list structure primitives', () => {
     expect(sequence?.getAttribute('role')).toBe('list')
     expect(Array.from(sequence?.children ?? []).map((child) => child.getAttribute('role')))
       .toEqual(['listitem', 'listitem', 'listitem'])
-    expect(gutter?.querySelector('.rrr-sequence-gutter__value')?.textContent).toBe('20')
-    expect(gutter?.querySelector('.rrr-sequence-gutter__unit')?.textContent).toBe('seconds')
+    expect(gutter?.querySelector('.rrr-measurement__value')?.textContent).toBe('20')
+    expect(gutter?.querySelector('.rrr-measurement__unit')?.textContent).toBe('seconds')
     expect(gutter?.querySelector('.rrr-sequence-gutter__description')?.textContent).toBe('Custom')
 
     gutter?.setAttribute('value', '<strong>45</strong>')
 
     expect(gutter?.querySelector('strong')).toBeNull()
-    expect(gutter?.querySelector('.rrr-sequence-gutter__value')?.textContent).toBe('<strong>45</strong>')
+    expect(gutter?.querySelector('.rrr-measurement__value')?.textContent).toBe('<strong>45</strong>')
   })
 
   test('renders an editable gutter as a labelled native button', async () => {
@@ -263,6 +263,40 @@ describe('list structure primitives', () => {
 
     expect(row?.querySelector('.rrr-list-row__leading > [slot="leading"]')?.hasAttribute('data-leading')).toBe(true)
     expect(row?.querySelector('.rrr-list-row__trailing > [slot="trailing"]')?.hasAttribute('data-trailing')).toBe(true)
+  })
+
+  test('supports a structured label without changing the label attribute API', async () => {
+    document.body.innerHTML = `
+      <rrr-list-row
+        activation="button"
+        label="Fallback label"
+      >
+        <span slot="label">
+          <span class="sr-only">First set, 10 reps, 6 kilograms</span>
+          <span aria-hidden="true">
+            <rrr-measurement value="10" unit="reps"></rrr-measurement>
+            <span>&middot;</span>
+            <rrr-measurement value="6" unit="kg"></rrr-measurement>
+          </span>
+        </span>
+      </rrr-list-row>
+    `
+    await Promise.resolve()
+
+    const row = document.querySelector<RrrListRow>('rrr-list-row')
+    const button = row?.querySelector<HTMLButtonElement>(':scope > button')
+    const label = row?.querySelector('.rrr-list-row__label')
+
+    expect(label?.textContent).toContain('10')
+    expect(label?.textContent).not.toContain('Fallback label')
+    expect(label?.querySelectorAll('rrr-measurement')).toHaveLength(2)
+    expect(button?.querySelector('.sr-only')?.textContent)
+      .toBe('First set, 10 reps, 6 kilograms')
+
+    row?.setAttribute('description', 'Updated')
+    await Promise.resolve()
+
+    expect(row?.querySelector('.rrr-list-row__label [slot="label"]')).not.toBeNull()
   })
 
   test('hides an empty section header and reveals slotted section copy', async () => {

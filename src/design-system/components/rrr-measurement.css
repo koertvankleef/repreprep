@@ -1,0 +1,22 @@
+rrr-measurement {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--rrr-spacing-2xs);
+  min-inline-size: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.rrr-measurement__value,
+.rrr-measurement__unit {
+  color: inherit;
+  font-size: inherit;
+}
+
+.rrr-measurement__value {
+  font-weight: var(--rrr-font-weight-semibold);
+}
+
+.rrr-measurement__unit {
+  font-weight: var(--rrr-font-weight-medium);
+}

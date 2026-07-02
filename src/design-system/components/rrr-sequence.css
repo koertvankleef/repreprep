@@ -3,7 +3,7 @@ rrr-sequence {
   --rrr-sequence-row-border-color: var(--rrr-border-subtle);
   --rrr-sequence-row-border-radius: var(--rrr-radius-l);
   --rrr-sequence-gutter-min-block-size: var(--rrr-sizes-grid-4);
-  --rrr-sequence-gutter-color: var(--rrr-color-primary);
+  --rrr-sequence-gutter-color: var(--rrr-color-primary-deep);
   display: grid;
   min-inline-size: 0;
 }
@@ -87,24 +87,9 @@ rrr-sequence-gutter[activation='button'] {
   margin-left: calc(var(--rrr-spacing-xs) * -2);
 }
 
-.rrr-sequence-gutter__measurement {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--rrr-spacing-2xs);
-}
-
-.rrr-sequence-gutter__value,
-.rrr-sequence-gutter__unit {
+rrr-sequence-gutter rrr-measurement {
   color: var(--rrr-sequence-gutter-color);
   font-size: var(--rrr-font-size-s);
-}
-
-.rrr-sequence-gutter__value {
-  font-weight: var(--rrr-font-weight-semibold);
-}
-
-.rrr-sequence-gutter__unit {
-  font-weight: var(--rrr-font-weight-medium);
 }
 
 .rrr-sequence-gutter__description {

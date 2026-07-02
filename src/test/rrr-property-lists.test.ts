@@ -75,6 +75,9 @@ describe('value-first property lists', () => {
     const firstExerciseRow = exerciseSequence?.querySelector<HTMLElement>('rrr-list-row')
     const actionRow = detail.querySelector<HTMLElement>('rrr-list-row[data-action="start-workout"]')
     const sections = detail.querySelectorAll('rrr-section')
+    const flowSection = Array.from(sections).find(
+      (section) => section.querySelector('[slot="heading"]')?.textContent === 'Flow',
+    )
 
     expect(propertyList).not.toBeNull()
     expectSemanticPropertyRows(propertyList!)
@@ -84,6 +87,10 @@ describe('value-first property lists', () => {
     )
     expect(firstExerciseRow?.getAttribute('accessory')).toBe('chevron')
     expect(exerciseSequence?.querySelector('rrr-sequence-gutter')).not.toBeNull()
+    expect(flowSection?.querySelector(
+      'rrr-list-row[data-action="edit-transition-default"]',
+    )).not.toBeNull()
+    expect(flowSection?.querySelector('rrr-sequence')).toBe(exerciseSequence)
     expect(actionRow?.getAttribute('activation')).toBe('button')
     expect(actionRow?.querySelector(':scope > button')).not.toBeNull()
     expect(actionRow?.querySelector('rrr-icon[slot="leading"][name="play"]')).not.toBeNull()

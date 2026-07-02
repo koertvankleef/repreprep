@@ -12,12 +12,13 @@ import type {
   RoutineExercise,
   RoutineVersion,
 } from '../../../domain/types.ts'
-import { t, tPlural } from '../../../i18n/index.ts'
+import { formatNumber, t, tPlural } from '../../../i18n/index.ts'
 import { escapeHtml } from '../../render-helpers.ts'
 import {
   promptExerciseRestSeconds,
   promptPlannedSet,
 } from './routine-exercise-sheets.ts'
+import { formatSetPosition } from './routine-exercise-presentation.ts'
 
 type RoutineExerciseContext = {
   routine: Routine
@@ -75,11 +76,11 @@ export class RrrRoutineExerciseEditor extends HTMLElement {
     window.removeEventListener('rrr-data-changed', this.handleDataChanged)
   }
 
-  private renderSetDescription(set: PlannedSet): string {
+  private renderSetAccessibleTarget(set: PlannedSet): string {
     if (set.kind === 'time') {
       return set.targetSeconds === null
         ? t('routineExercise.set.noTarget')
-        : tPlural('routineExercise.set.seconds', set.targetSeconds)
+        : tPlural('routineExercise.set.secondsLong', set.targetSeconds)
     }
 
     const targets: string[] = []
@@ -97,17 +98,62 @@ export class RrrRoutineExerciseEditor extends HTMLElement {
       : t('routineExercise.set.noTarget')
   }
 
+  private renderMeasurement(value: number, unit: string): string {
+    return `
+      <rrr-measurement
+        value="${escapeHtml(formatNumber(value))}"
+        unit="${escapeHtml(unit)}"
+      ></rrr-measurement>
+    `
+  }
+
+  private renderSetTarget(set: PlannedSet): string {
+    if (set.kind === 'time') {
+      return set.targetSeconds === null
+        ? escapeHtml(t('routineExercise.set.noTarget'))
+        : this.renderMeasurement(set.targetSeconds, t('routineExercise.set.unit.seconds'))
+    }
+
+    const targets: string[] = []
+
+    if (set.targetReps !== null) {
+      targets.push(this.renderMeasurement(
+        set.targetReps,
+        tPlural('routineExercise.set.unit.reps', set.targetReps),
+      ))
+    }
+
+    if (set.targetWeightKg !== null) {
+      targets.push(this.renderMeasurement(
+        set.targetWeightKg,
+        t('routineExercise.set.unit.weight'),
+      ))
+    }
+
+    return targets.length > 0
+      ? targets.join(` <span aria-hidden="true">${escapeHtml(t('routineExercise.set.targetSeparator'))}</span> `)
+      : escapeHtml(t('routineExercise.set.noTarget'))
+  }
+
   private renderSets(sets: PlannedSet[], restSeconds: number): string {
     return sets
       .flatMap((set, index) => {
+        const setPosition = formatSetPosition(index + 1)
+        const accessibleLabel = t('routineExercise.set.aria', {
+          position: setPosition,
+          target: this.renderSetAccessibleTarget(set),
+        })
         const row = `
           <rrr-list-row
             activation="button"
-            label="${escapeHtml(t('routineExercise.set.label', { index: index + 1 }))}"
-            description="${escapeHtml(this.renderSetDescription(set))}"
             accessory="chevron"
             data-set-id="${escapeHtml(set.id)}"
-          ></rrr-list-row>
+          >
+            <span slot="label">
+              <span class="sr-only">${escapeHtml(accessibleLabel)}</span>
+              <span aria-hidden="true">${this.renderSetTarget(set)}</span>
+            </span>
+          </rrr-list-row>
         `
 
         if (index === sets.length - 1) {
@@ -283,7 +329,7 @@ export class RrrRoutineExerciseEditor extends HTMLElement {
         ${routineExercise.notes ? `<p>${escapeHtml(routineExercise.notes)}</p>` : ''}
 
         <rrr-section>
-          <span slot="heading">${escapeHtml(t('routineExercise.section.timing'))}</span>
+          <span slot="heading">${escapeHtml(t('routineExercise.section.flow'))}</span>
           <div class="rrr-list-card">
             <rrr-list-row
               activation="button"
@@ -298,10 +344,6 @@ export class RrrRoutineExerciseEditor extends HTMLElement {
               <rrr-icon slot="leading" name="timer"></rrr-icon>
             </rrr-list-row>
           </div>
-        </rrr-section>
-
-        <rrr-section>
-          <span slot="heading">${escapeHtml(t('routineExercise.section.sets'))}</span>
           ${
             routineExercise.plannedSets.length > 0
               ? `

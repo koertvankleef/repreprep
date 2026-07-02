@@ -91,6 +91,15 @@ derived domain information. Routine transition gutters can be interactive;
 shared set-rest gutters remain static unless their action clearly communicates
 that it changes every rest interval for the exercise.
 
+Use the same value/unit treatment outside a gutter with `rrr-measurement`:
+
+```html
+<rrr-measurement value="10" unit="reps"></rrr-measurement>
+```
+
+The value is semibold and the unit medium; surrounding content controls the
+measurement's size and color.
+
 ## Row hierarchy follows the reading task
 
 Choose a row pattern by asking what the user needs to find first. Do not choose
@@ -170,8 +179,28 @@ Call `clearFileSelection()` after capturing the file when selecting the same
 file again should trigger another change. The `accept`, `name`, `multiple`, and
 `disabled` attributes are forwarded to the native input.
 
-Author labels and descriptions through the element's `label` and `description`
-attributes. Classes such as `.rrr-list-row__label` and
+Author ordinary labels and descriptions through the element's `label` and
+`description` attributes. When a label needs structured content, provide a
+single element with `slot="label"`; it takes visual precedence over the
+`label` attribute without changing existing rows:
+
+```html
+<rrr-list-row
+  activation="button"
+  accessory="chevron"
+>
+  <span slot="label">
+    <span class="sr-only">First set, 10 reps, 6 kilograms</span>
+    <span aria-hidden="true">
+      <rrr-measurement value="10" unit="reps"></rrr-measurement>
+      <span>·</span>
+      <rrr-measurement value="6" unit="kg"></rrr-measurement>
+    </span>
+  </span>
+</rrr-list-row>
+```
+
+Classes such as `.rrr-list-row__label` and
 `.rrr-list-row__description` belong to generated internals and are not an
 authoring API.
 

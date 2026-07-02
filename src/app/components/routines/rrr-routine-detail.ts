@@ -382,7 +382,7 @@ export class RrrRoutineDetail extends HTMLElement {
         </rrr-section>
 
         <rrr-section>
-          <span slot="heading">${t('routineDetail.section.timing')}</span>
+          <span slot="heading">${t('routineDetail.section.flow')}</span>
           <div class="rrr-list-card">
             <rrr-list-row
               activation="button"
@@ -397,10 +397,6 @@ export class RrrRoutineDetail extends HTMLElement {
               <rrr-icon slot="leading" name="timer"></rrr-icon>
             </rrr-list-row>
           </div>
-        </rrr-section>
-
-        <rrr-section>
-          <span slot="heading">${t('routineDetail.section.exercises')}</span>
           ${
             exerciseCount > 0
               ? `

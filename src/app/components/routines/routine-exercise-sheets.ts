@@ -3,6 +3,7 @@ import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
 import type { PlannedSet, RepsPlannedSet, TimePlannedSet } from '../../../domain/types.ts'
 import { t } from '../../../i18n/index.ts'
 import { presentSheet } from '../../../utils/sheet-service.ts'
+import { formatSetPosition } from './routine-exercise-presentation.ts'
 
 function createSheet(title: string, description?: string): RrrSheet {
   const sheet = document.createElement('rrr-sheet') as RrrSheet
@@ -116,7 +117,7 @@ export async function promptPlannedSet(options: {
   const sheet = createSheet(
     adding
       ? t('routineExercise.set.sheet.addTitle')
-      : t('routineExercise.set.sheet.editTitle', { index: setNumber }),
+      : formatSetPosition(setNumber),
     exerciseName,
   )
   const confirmButton = createConfirmButton()

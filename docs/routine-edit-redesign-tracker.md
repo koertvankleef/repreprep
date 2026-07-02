@@ -49,8 +49,8 @@ Replace the single dense routine editor with a sequence-oriented experience:
 
 ### Routine detail
 
-- Shows the routine overview and ordered exercise sequence.
-- Shows the routine's default transition duration.
+- Shows the routine overview and a Flow section containing its default
+  transition duration and ordered exercise sequence.
 - Renders a transition gutter between adjacent exercise rows.
 - Exercise rows use a chevron and navigate to the routine-exercise editor.
 - Provides the add-exercise entry point.
@@ -67,8 +67,8 @@ Proposed route:
 
 - Edits one occurrence of an exercise within a routine, not the global exercise
   catalogue entry.
-- Shows the ordered planned-set sequence.
-- Shows the shared rest duration between adjacent set rows.
+- Shows a Flow section containing the shared rest duration and ordered
+  planned-set sequence.
 - Provides a page-level place to edit that shared rest duration.
 - Provides add, reorder, and delete behavior for planned sets.
 - May provide a secondary link to the global exercise detail page.
@@ -366,6 +366,8 @@ leave a dirty routine draft.
 - [x] Render shared rest gutters.
 - [x] Add the page-level shared rest editor.
 - [x] Add and edit planned sets.
+- [x] Use compact value/unit labels for sets while retaining ordinal names in
+  edit sheets and accessible row text.
 - [x] Auto-save routine-exercise changes at their interaction boundaries.
 
 ### Phase 4 — Reordering
