@@ -14,8 +14,8 @@ hierarchy; it does not change the visual treatment.
 
 ```html
 <rrr-section>
-  <span slot="heading">Exercises</span>
-  <span slot="description">Exercises included in this routine.</span>
+  <span slot="heading">Flow</span>
+  <span slot="description">Exercises and preparation time.</span>
   <!-- section content -->
 </rrr-section>
 ```
@@ -57,10 +57,9 @@ in light DOM.
 ```html
 <rrr-sequence aria-label="Routine exercise sequence">
   <rrr-list-row
-    href="#/routines/1/exercises/a"
+    activation="button"
     label="Push-ups"
-    description="3 planned sets"
-    accessory="chevron"
+    description="3 sets"
   ></rrr-list-row>
   <rrr-sequence-gutter
     activation="button"
@@ -70,10 +69,9 @@ in light DOM.
     action-label="Edit 45 seconds custom preparation before One-arm dumbbell row"
   ></rrr-sequence-gutter>
   <rrr-list-row
-    href="#/routines/1/exercises/b"
+    activation="button"
     label="One-arm dumbbell row"
-    description="3 planned sets"
-    accessory="chevron"
+    description="3 sets"
   ></rrr-list-row>
 </rrr-sequence>
 ```
@@ -87,9 +85,9 @@ For an editable gutter, set `activation="button"` and provide the full action
 through `action-label`.
 
 Do not use a sequence merely to add space between cards. A gutter represents
-derived domain information. Routine transition gutters can be interactive;
-shared set-rest gutters remain static unless their action clearly communicates
-that it changes every rest interval for the exercise.
+derived domain information. Routine transition gutters can be interactive.
+Scheduled rest between sets is edited as one routine-exercise value rather than
+as individually actionable gutters.
 
 Use the same value/unit treatment outside a gutter with `rrr-measurement`:
 
@@ -126,6 +124,11 @@ other metadata support that identity.
 
 Settings choices, navigation entries, routines, and exercises within a routine
 are identity-first even when some of them are not interactive.
+
+Use a chevron only when a row navigates to another page. A row that opens a
+sheet uses `activation="button"` without a chevron; the native button behavior,
+interactive color, and focus treatment communicate activation without implying
+navigation.
 
 Navigation and action rows use the icon accent color for their primary label to
 reinforce that they activate something. Selection controls and static rows keep
@@ -187,10 +190,9 @@ single element with `slot="label"`; it takes visual precedence over the
 ```html
 <rrr-list-row
   activation="button"
-  accessory="chevron"
 >
   <span slot="label">
-    <span class="sr-only">First set, 10 reps, 6 kilograms</span>
+    <span class="sr-only">Edit logged set: 10 reps, 6 kilograms</span>
     <span aria-hidden="true">
       <rrr-measurement value="10" unit="reps"></rrr-measurement>
       <span>·</span>
@@ -199,6 +201,9 @@ single element with `slot="label"`; it takes visual precedence over the
   </span>
 </rrr-list-row>
 ```
+
+This structured example represents actual workout data, not values persisted as
+routine targets.
 
 Classes such as `.rrr-list-row__label` and
 `.rrr-list-row__description` belong to generated internals and are not an

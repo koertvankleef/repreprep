@@ -17,6 +17,11 @@ This document should guide product and design decisions, but it should not be tr
 
 The app should be a **routine-first strength and workout consistency app**.
 
+It should behave primarily as a fast, frictionless workout logbook. It may
+support good decisions through clear history and structure, but it should not
+require users to maintain explicit progression targets or behave like a
+coaching/programming system.
+
 It should not primarily be:
 
 * A bodybuilding app.
@@ -54,7 +59,8 @@ The app should assume that active workout use is a low-patience, high-friction c
 
 ## 2.3 Maintain and adjust routines over time
 
-Some users will want to edit routines, change exercise order, add alternatives, or refine targets.
+Some users will want to edit routines, change exercise order, add alternatives,
+or refine set counts and scheduled timing.
 
 This should be supported without making workout execution feel complicated.
 
@@ -70,49 +76,49 @@ The app should treat history, data ownership, export, backup, and readability as
 
 # 3. Core Conceptual Model
 
-The app should use a clear conceptual hierarchy.
+The app should distinguish reusable definitions, routine structure, and
+historical execution:
 
 ```text
-Routine
-  → Workout Session
-    → Exercise
-      → Set
-        → Logged Performance
+Exercise definition
+  → Routine exercise
+    → Workout exercise
+      → Logged set
 ```
 
-## 3.1 Routine
+## 3.1 Exercise
 
-A routine is the user’s reusable plan.
+An exercise is a reusable catalogue movement, such as push-up, dumbbell row,
+overhead press, squat, plank, or Romanian deadlift.
 
-It contains exercises, order, targets, and possibly notes or preferences.
+The same exercise may occur in multiple routines, or more than once in one
+routine.
 
-A routine is not the same thing as a completed workout.
+## 3.2 Routine and routine exercise
 
-## 3.2 Workout Session
+A routine is the user’s reusable structure. It owns exercise order and default
+transition timing.
+
+A routine exercise is one stable occurrence within that structure. It owns its
+set count, scheduled rest, optional transition override, and possibly notes. It
+does not own rep, weight, or duration targets.
+
+## 3.3 Workout session and workout exercise
 
 A workout session is one execution of a routine.
 
-It records what actually happened.
+A workout exercise records what actually happened for one routine-exercise
+occurrence. It owns the actual logged sets and preserves the scheduled timing
+used for that execution.
 
-Past sessions should remain historically accurate even if the routine changes later.
+Past sessions remain historically accurate even when the routine changes
+later.
 
-## 3.3 Exercise
+## 3.4 Logged set and performance
 
-An exercise is a reusable movement, such as push-up, dumbbell row, overhead press, squat, plank, or Romanian deadlift.
+A logged set is one actual unit of work within a workout exercise.
 
-Exercises may appear in multiple routines.
-
-## 3.4 Set
-
-A set is one unit of work within an exercise.
-
-A set may have planned targets and completed results.
-
-## 3.5 Logged Performance
-
-Logged performance is what the user actually did.
-
-This may include:
+Logged performance may include:
 
 * Reps.
 * Weight.
@@ -242,9 +248,24 @@ Useful examples include:
 * Recent personal best.
 * Whether the user skipped or modified the exercise last time.
 
+Previous performance and starting values are related but not identical. The app
+must not silently turn every completed workout into the next recommendation.
+For each routine, the user may explicitly select one completed workout as the
+source of starting values, or select none.
+
+When a source is selected:
+
+* It remains selected until the user replaces or clears it.
+* Completing another workout does not replace it automatically.
+* The same routine-exercise occurrence receives its corresponding values.
+* Missing source values fall back to zero rather than another workout.
+* The user can change the selected source later from workout history.
+
 ## Decision rule
 
-During workout logging, previous performance should be treated as primary context, not as a buried history feature.
+During workout logging, previous performance should be treated as primary
+context, not as a buried history feature. Reusing it as input requires explicit
+user intent.
 
 ---
 
@@ -295,8 +316,8 @@ They may:
 * Add exercises.
 * Remove exercises.
 * Reorder exercises.
-* Change target reps.
-* Change target sets.
+* Change set counts.
+* Change scheduled rest or transition timing.
 * Substitute exercises.
 * Rename routines.
 * Return to old routines.
@@ -313,9 +334,12 @@ Routine edits should affect future sessions, not rewrite past sessions.
 The data model should distinguish between:
 
 * Current routine structure.
+* Stable routine-exercise occurrences.
 * Historical workout sessions.
+* Workout-exercise executions.
 * Exercise definitions.
 * Logged results.
+* The selected prefill-source relationship.
 
 ## Decision rule
 
@@ -349,7 +373,7 @@ Prefer language like:
 * “Bodyweight version.”
 * “Lower-intensity option.”
 * “Build from here.”
-* “Adjust target.”
+* “Adjust value.”
 * “Use this variation.”
 
 ## Decision rule
@@ -569,7 +593,8 @@ The app should provide:
 * Sensible defaults.
 * Starter routines.
 * Pre-filled names where helpful.
-* Suggested exercise targets.
+* Simple routine structure with editable set counts and timing.
+* Explicit reuse of values from a completed workout.
 * Easy later editing.
 * Clear next actions.
 
@@ -611,7 +636,8 @@ The app’s tone should be:
 * “Continue routine.”
 * “Last time.”
 * “Next set.”
-* “Adjust target.”
+* “Adjust value.”
+* “Use these values next time.”
 * “Logged.”
 * “Build consistency.”
 * “Good form.”
@@ -713,6 +739,7 @@ A strong first version should probably include:
 * Log sets, reps, and weight.
 * See previous performance.
 * Complete workout.
+* Choose whether a completed workout supplies next time’s starting values.
 * Review simple workout history.
 * Handle skipped or adjusted exercises.
 * Basic exercise guidance.
@@ -743,8 +770,9 @@ Choose routine
   → Start workout
     → Log performance
       → Complete workout
-        → Review progress
-          → Return next time
+        → Optionally use these values next time
+          → Review progress
+            → Return next time
 ```
 
 ---
@@ -845,7 +873,9 @@ These assumptions should remain visible:
 7. Users benefit from default routines rather than blank-state setup.
 8. Routine editing and workout logging should be separate UX contexts.
 9. Progress should be framed around consistency and performance before body metrics.
-10. The app should be inclusive by default, not by adding separate gendered modes.
+10. Users understand and value explicitly selecting a previous workout as
+    future starting values.
+11. The app should be inclusive by default, not by adding separate gendered modes.
 
 ---
 
