@@ -146,7 +146,6 @@ export class RrrRoutineExerciseEditor extends HTMLElement {
         const row = `
           <rrr-list-row
             activation="button"
-            accessory="chevron"
             data-set-id="${escapeHtml(set.id)}"
           >
             <span slot="label">
@@ -330,39 +329,41 @@ export class RrrRoutineExerciseEditor extends HTMLElement {
 
         <rrr-section>
           <span slot="heading">${escapeHtml(t('routineExercise.section.flow'))}</span>
-          <div class="rrr-list-card">
-            <rrr-list-row
-              activation="button"
-              label="${escapeHtml(t('routineExercise.rest.label'))}"
-              value-text="${escapeHtml(tPlural(
-                'routineExercise.rest.duration',
-                routineExercise.restSeconds,
-              ))}"
-              accessory="value-chevron"
-              data-action="edit-rest"
-            >
-              <rrr-icon slot="leading" name="timer"></rrr-icon>
-            </rrr-list-row>
-          </div>
-          ${
-            routineExercise.plannedSets.length > 0
-              ? `
-                <rrr-sequence aria-label="${escapeHtml(t('routineExercise.sets.sequenceAria', {
-                  exercise: exercise.name,
-                }))}">
-                  ${this.renderSets(routineExercise.plannedSets, routineExercise.restSeconds)}
-                </rrr-sequence>
-              `
-              : `<p>${escapeHtml(t('routineExercise.sets.empty'))}</p>`
-          }
-          <div class="rrr-list-card">
-            <rrr-list-row
-              activation="button"
-              label="${escapeHtml(t('routineExercise.set.action.add'))}"
-              data-action="add-set"
-            >
-              <rrr-icon slot="leading" name="add"></rrr-icon>
-            </rrr-list-row>
+          <div class="rrr-card">
+            <div class="rrr-list-card">
+              <rrr-list-row
+                activation="button"
+                label="${escapeHtml(t('routineExercise.rest.label'))}"
+                value-text="${escapeHtml(tPlural(
+                  'routineExercise.rest.duration',
+                  routineExercise.restSeconds,
+                ))}"
+                accessory="value"
+                data-action="edit-rest"
+              >
+                <rrr-icon slot="leading" name="timer"></rrr-icon>
+              </rrr-list-row>
+            </div>
+            ${
+              routineExercise.plannedSets.length > 0
+                ? `
+                  <rrr-sequence aria-label="${escapeHtml(t('routineExercise.sets.sequenceAria', {
+                    exercise: exercise.name,
+                  }))}">
+                    ${this.renderSets(routineExercise.plannedSets, routineExercise.restSeconds)}
+                  </rrr-sequence>
+                `
+                : `<p>${escapeHtml(t('routineExercise.sets.empty'))}</p>`
+            }
+            <div class="rrr-list-card">
+              <rrr-list-row
+                activation="button"
+                label="${escapeHtml(t('routineExercise.set.action.add'))}"
+                data-action="add-set"
+              >
+                <rrr-icon slot="leading" name="add"></rrr-icon>
+              </rrr-list-row>
+            </div>
           </div>
         </rrr-section>
       </section>

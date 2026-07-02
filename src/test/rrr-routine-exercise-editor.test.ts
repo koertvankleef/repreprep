@@ -55,15 +55,23 @@ describe('routine exercise editor', () => {
     const flowSection = Array.from(editor.querySelectorAll('rrr-section')).find(
       (section) => section.querySelector('[slot="heading"]')?.textContent === 'Flow',
     )
+    const flowCard = flowSection?.querySelector<HTMLElement>(':scope > .rrr-card')
+    const timingCard = flowCard?.querySelector<HTMLElement>(':scope > .rrr-list-card')
 
     expect(rows).toHaveLength(routineExercise.plannedSets.length)
     expect(gutters).toHaveLength(routineExercise.plannedSets.length - 1)
-    expect(flowSection?.querySelector('rrr-list-row[data-action="edit-rest"]')).not.toBeNull()
-    expect(flowSection?.querySelector('rrr-sequence')).toBe(sequence)
+    expect(timingCard?.querySelector(
+      'rrr-list-row[data-action="edit-rest"]',
+    )?.getAttribute('accessory')).toBe('value')
+    expect(flowCard?.querySelector(':scope > rrr-sequence')).toBe(sequence)
+    expect(flowCard?.querySelector(
+      ':scope > .rrr-list-card rrr-list-row[data-action="add-set"]',
+    )).not.toBeNull()
     expect(gutters?.[0]?.getAttribute('value')).toBe(String(routineExercise.restSeconds))
     expect(gutters?.[0]?.getAttribute('unit')).toBe('s')
     expect(gutters?.[0]?.getAttribute('aria-label')).toContain('between set 1 and set 2')
     expect(rows?.[0]?.hasAttribute('label')).toBe(false)
+    expect(rows?.[0]?.getAttribute('accessory')).toBeNull()
     expect(rows?.[0]?.querySelector('rrr-measurement')).not.toBeNull()
     expect(rows?.[0]?.querySelector(':scope > button .sr-only')?.textContent)
       .toMatch(/^First set, /)

@@ -26,10 +26,6 @@ rrr-sequence-gutter {
   text-align: center;
 }
 
-rrr-sequence-gutter[activation='button'] {
-  min-block-size: var(--rrr-control-min-block-size);
-}
-
 .rrr-sequence-gutter__control {
   display: flex;
   align-items: center;

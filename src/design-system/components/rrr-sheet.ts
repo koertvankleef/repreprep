@@ -103,7 +103,8 @@ export class RrrSheet extends HTMLElement {
 
     this.unregisterPresentation = registerSheetPresentation({ host: this, dialog })
     dialog.showModal()
-    this.getInitialFocusTarget()?.focus()
+    this.focusInitialTarget()
+    queueMicrotask(() => this.focusInitialTarget())
 
     return new Promise<SheetResult>((resolve) => {
       this.resolver = resolve
@@ -205,6 +206,12 @@ export class RrrSheet extends HTMLElement {
 
   private getInitialFocusTarget(): HTMLElement | null {
     return this.querySelector<HTMLElement>('[autofocus], [data-sheet-result]')
+  }
+
+  private focusInitialTarget(): void {
+    if (!this.closing) {
+      this.getInitialFocusTarget()?.focus()
+    }
   }
 
   private readonly handleCancel = (event: Event): void => {

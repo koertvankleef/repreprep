@@ -378,34 +378,40 @@ export class RrrRoutineDetail extends HTMLElement {
               label: t('routineDetail.muscles.label'),
               textValue: primaryMuscles,
             })}
+            ${renderPropertyRow({
+              label: t('routineDetail.lastStarted.label'),
+              textValue: lastStarted,
+            })}
           </dl>
         </rrr-section>
 
         <rrr-section>
           <span slot="heading">${t('routineDetail.section.flow')}</span>
-          <div class="rrr-list-card">
-            <rrr-list-row
-              activation="button"
-              label="${t('routineDetail.transition.defaultLabel')}"
-              value-text="${escapeHtml(tPlural(
-                'routineDetail.transition.duration',
-                summary.version?.transitionSeconds ?? 0,
-              ))}"
-              accessory="value-chevron"
-              data-action="edit-transition-default"
-            >
-              <rrr-icon slot="leading" name="timer"></rrr-icon>
-            </rrr-list-row>
+          <div class="rrr-card">
+            <div class="rrr-list-card">
+              <rrr-list-row
+                activation="button"
+                label="${t('routineDetail.transition.defaultLabel')}"
+                value-text="${escapeHtml(tPlural(
+                  'routineDetail.transition.duration',
+                  summary.version?.transitionSeconds ?? 0,
+                ))}"
+                accessory="value"
+                data-action="edit-transition-default"
+              >
+                <rrr-icon slot="leading" name="timer"></rrr-icon>
+              </rrr-list-row>
+            </div>
+            ${
+              exerciseCount > 0
+                ? `
+                  <rrr-sequence aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
+                    ${summary.version ? this.renderRoutineFlow(routineId, summary.version) : ''}
+                  </rrr-sequence>
+                `
+                : `<p>${t('routineDetail.exercises.empty')}</p>`
+            }
           </div>
-          ${
-            exerciseCount > 0
-              ? `
-                <rrr-sequence aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
-                  ${summary.version ? this.renderRoutineFlow(routineId, summary.version) : ''}
-                </rrr-sequence>
-              `
-              : `<p>${t('routineDetail.exercises.empty')}</p>`
-          }
         </rrr-section>
 
         <rrr-section>
@@ -437,19 +443,6 @@ export class RrrRoutineDetail extends HTMLElement {
           </div>
         </rrr-section>
 
-        <rrr-section>
-          <span slot="heading">Data</span>
-          <dl class="rrr-property-list">
-            ${renderPropertyRow({
-              label: t('routineDetail.exercises.label'),
-              textValue: tPlural('message.routine.exerciseCount', exerciseCount),
-            })}
-            ${renderPropertyRow({
-              label: t('routineDetail.lastStarted.label'),
-              textValue: lastStarted,
-            })}
-          </dl>
-        </rrr-section>
       </section>
     `
 

@@ -403,7 +403,6 @@ export const nlNlMessages = {
   'routineDetail.dialog.delete.message': 'Dit kan niet ongedaan worden gemaakt. Bestaande workoutgeschiedenis blijft behouden.',
   'routineDetail.section.overview': 'Overzicht',
   'routineDetail.section.flow': 'Verloop',
-  'routineDetail.exercises.label': 'Oefeningen',
   'routineDetail.exercises.empty': 'Er zijn nog geen oefeningen aan deze routine toegevoegd.',
   'routineDetail.exercises.unknown': 'Onbekende oefening',
   'routineDetail.muscles.label': 'Primaire spieren',

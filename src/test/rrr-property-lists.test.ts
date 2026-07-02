@@ -78,19 +78,26 @@ describe('value-first property lists', () => {
     const flowSection = Array.from(sections).find(
       (section) => section.querySelector('[slot="heading"]')?.textContent === 'Flow',
     )
+    const flowCard = flowSection?.querySelector<HTMLElement>(':scope > .rrr-card')
+    const timingCard = flowCard?.querySelector<HTMLElement>(':scope > .rrr-list-card')
 
     expect(propertyList).not.toBeNull()
     expectSemanticPropertyRows(propertyList!)
     expect(propertyList?.querySelector('rrr-list-row')).toBeNull()
+    expect(Array.from(propertyList?.querySelectorAll('dt') ?? [])
+      .map((label) => label.textContent)).toContain('Last started')
+    expect(Array.from(sections)
+      .some((section) => section.querySelector('[slot="heading"]')?.textContent === 'Data'))
+      .toBe(false)
     expect(firstExerciseRow?.getAttribute('href')).toMatch(
       new RegExp(`^#/routines/${encodeURIComponent(routine.id)}/exercises/`),
     )
     expect(firstExerciseRow?.getAttribute('accessory')).toBe('chevron')
     expect(exerciseSequence?.querySelector('rrr-sequence-gutter')).not.toBeNull()
-    expect(flowSection?.querySelector(
+    expect(timingCard?.querySelector(
       'rrr-list-row[data-action="edit-transition-default"]',
-    )).not.toBeNull()
-    expect(flowSection?.querySelector('rrr-sequence')).toBe(exerciseSequence)
+    )?.getAttribute('accessory')).toBe('value')
+    expect(flowCard?.querySelector(':scope > rrr-sequence')).toBe(exerciseSequence)
     expect(actionRow?.getAttribute('activation')).toBe('button')
     expect(actionRow?.querySelector(':scope > button')).not.toBeNull()
     expect(actionRow?.querySelector('rrr-icon[slot="leading"][name="play"]')).not.toBeNull()
@@ -173,9 +180,17 @@ describe('value-first property lists', () => {
       ?.click()
     await Promise.resolve()
 
+    const dismissButton = document.querySelector<HTMLButtonElement>(
+      'rrr-sheet .sheet-assistive-dismiss',
+    )
+    const selectedModeInput = document.querySelector<HTMLInputElement>(
+      'rrr-sheet rrr-list-row[autofocus] input',
+    )
     const customMode = document.querySelector<HTMLElement & { checked: boolean }>(
       'rrr-sheet rrr-list-row[data-transition-mode="custom"]',
     )
+    expect(document.activeElement).toBe(selectedModeInput)
+    expect(document.activeElement).not.toBe(dismissButton)
     customMode!.checked = true
     customMode?.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
 

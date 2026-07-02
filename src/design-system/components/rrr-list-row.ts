@@ -99,6 +99,11 @@ export class RrrListRow extends HTMLElement {
       return
     }
 
+    if (this.controlElement) {
+      this.controlElement.focus(options)
+      return
+    }
+
     const focusTarget = this.querySelector<HTMLElement>(':scope > .rrr-list-row__row')
     focusTarget?.focus(options)
   }

@@ -403,7 +403,6 @@ export const enUsMessages = {
   'routineDetail.dialog.delete.message': 'This cannot be undone. Existing workout history will be preserved.',
   'routineDetail.section.overview': 'Overview',
   'routineDetail.section.flow': 'Flow',
-  'routineDetail.exercises.label': 'Exercises',
   'routineDetail.exercises.empty': 'No exercises have been added to this routine.',
   'routineDetail.exercises.unknown': 'Unknown exercise',
   'routineDetail.muscles.label': 'Primary muscles',
