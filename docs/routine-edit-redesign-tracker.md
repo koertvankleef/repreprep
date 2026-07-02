@@ -364,9 +364,9 @@ leave a dirty routine draft.
 
 - [x] Render planned sets as sequence rows.
 - [x] Render shared rest gutters.
-- [ ] Add the page-level shared rest editor.
-- [ ] Add and edit planned sets.
-- [ ] Auto-save routine-exercise changes at their interaction boundaries.
+- [x] Add the page-level shared rest editor.
+- [x] Add and edit planned sets.
+- [x] Auto-save routine-exercise changes at their interaction boundaries.
 
 ### Phase 4 — Reordering
 
