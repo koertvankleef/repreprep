@@ -1,4 +1,3 @@
-import './rrr-app.ts'
 import './components/workouts/rrr-workout-list.ts'
 import './components/workouts/editor/rrr-workout-editor.ts'
 import './components/workouts/editor/rrr-exercise-entry.ts'
@@ -17,6 +16,7 @@ import './components/settings/rrr-language-settings.ts'
 import './components/dev/rrr-styleguide.ts'
 import './components/workouts/logging/rrr-workout-logging-flow.ts'
 import './components/workouts/logging/rrr-workout-logging.ts'
+import './rrr-app.ts'
 
 export function registerAppComponents(): void {
   // Side-effect imports above register custom elements once.
