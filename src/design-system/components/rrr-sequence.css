@@ -2,13 +2,14 @@ rrr-sequence {
   --rrr-sequence-row-background: var(--rrr-surface-raised);
   --rrr-sequence-row-border-color: var(--rrr-border-subtle);
   --rrr-sequence-row-border-radius: var(--rrr-radius-l);
-  --rrr-sequence-gutter-min-block-size: var(--rrr-sizes-grid-5);
-  --rrr-sequence-gutter-background: color-mix(
+  --rrr-sequence-gutter-min-block-size: var(--rrr-sizes-grid-4);
+  --rrr-sequence-gutter-background: linear-gradient(to bottom, color-mix(
     in oklab,
-    var(--rrr-surface-raised) 82%,
-    var(--rrr-color-accent) 18%
-  );
-  --rrr-sequence-gutter-color: var(--rrr-color-accent);
+    var(--rrr-surface-raised) 80%,
+    var(--rrr-color-primary) 20%
+  ), transparent);
+  --rrr-sequence-gutter-color: var(--rrr-color-primary);
+  --notch-size: var(--rrr-sizes-grid-3);
   display: grid;
   min-inline-size: 0;
 }
@@ -30,7 +31,33 @@ rrr-sequence-gutter {
   background: var(--rrr-sequence-gutter-background);
   color: var(--rrr-sequence-gutter-color);
   text-align: center;
-  margin: 0 var(--rrr-spacing-xl);
+  border-radius: 12px;
+
+  -webkit-mask:
+    radial-gradient(
+      circle var(--notch-size) at left 50%,
+      transparent 98%,
+      black 100%
+    ),
+    radial-gradient(
+      circle var(--notch-size) at right 50%,
+      transparent 98%,
+      black 100%
+    );
+  -webkit-mask-composite: destination-in;
+
+  mask:
+    radial-gradient(
+      circle var(--notch-size) at left 50%,
+      transparent 98%,
+      black 100%
+    ),
+    radial-gradient(
+      circle var(--notch-size) at right 50%,
+      transparent 98%,
+      black 100%
+    );
+  mask-composite: intersect;
 }
 
 .rrr-sequence-gutter__content {
