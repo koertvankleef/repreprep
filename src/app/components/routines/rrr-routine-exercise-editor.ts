@@ -69,6 +69,7 @@ export class RrrRoutineExerciseEditor extends HTMLElement {
         const duration = tPlural('routineExercise.rest.duration', restSeconds)
         const gutter = `
           <rrr-sequence-gutter
+            icon="water-bottle"
             label="${escapeHtml(duration)}"
             aria-label="${escapeHtml(t('routineExercise.rest.aria', {
               duration,

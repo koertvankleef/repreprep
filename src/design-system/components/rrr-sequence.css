@@ -30,11 +30,16 @@ rrr-sequence-gutter {
   position: relative;
   z-index: 1;
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--rrr-spacing-xs);
   max-inline-size: calc(100% - (2 * var(--rrr-spacing-m)));
   padding: var(--rrr-spacing-2xs) var(--rrr-spacing-s);
   line-height: 1.2;
+}
+
+.rrr-sequence-gutter__icon {
+  margin-right: var(--rrr-spacing-xs);
+  margin-left: calc(var(--rrr-spacing-xs) * -2);
 }
 
 .rrr-sequence-gutter__label {

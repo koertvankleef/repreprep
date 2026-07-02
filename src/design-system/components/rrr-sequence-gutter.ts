@@ -16,9 +16,13 @@ export class RrrSequenceGutter extends HTMLElement {
   private render(): void {
     const label = this.getAttribute('label') ?? ''
     const description = this.getAttribute('description') ?? ''
+    const iconName = this.getAttribute('icon') ?? ''
 
     this.innerHTML = `
       <span class="rrr-sequence-gutter__content">
+        ${iconName
+          ? `<rrr-icon name="${iconName}" class="rrr-sequence-gutter__icon"></rrr-icon>`
+          : ''}        
         <span class="rrr-sequence-gutter__label">${escapeHtml(label)}</span>
         ${description
           ? `<span class="rrr-sequence-gutter__description">${escapeHtml(description)}</span>`

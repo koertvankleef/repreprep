@@ -592,7 +592,6 @@ export class RrrStyleguide extends HTMLElement {
                   ></rrr-list-row>
                   <rrr-sequence-gutter
                     label="${twentySeconds}"
-                    description="${t('styleguide.sequences.default')}"
                     aria-label="${t('styleguide.sequences.transitionAria', {
                       duration: twentySeconds,
                       exercise: t('styleguide.sequences.exercise.rows'),
@@ -606,6 +605,7 @@ export class RrrStyleguide extends HTMLElement {
                   ></rrr-list-row>
                   <rrr-sequence-gutter
                     label="${fortyFiveSeconds}"
+                    description="${t('styleguide.sequences.custom')}"
                     aria-label="${t('styleguide.sequences.transitionAria', {
                       duration: fortyFiveSeconds,
                       exercise: t('styleguide.sequences.exercise.lunges'),

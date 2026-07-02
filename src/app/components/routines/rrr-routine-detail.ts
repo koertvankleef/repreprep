@@ -206,19 +206,25 @@ export class RrrRoutineDetail extends HTMLElement {
       .exercises.find((exercise) => exercise.id === destination?.exerciseId)?.name
       ?? t('routineDetail.exercises.unknown')
     const duration = tPlural('routineDetail.transition.duration', transition.seconds)
-    const source = transition.inherited
-      ? t('routineDetail.transition.default')
+    const customDescription = transition.inherited
+      ? ''
       : t('routineDetail.transition.custom')
+    const ariaLabel = transition.inherited
+      ? t('routineDetail.transition.aria', {
+          duration,
+          exercise: destinationName,
+        })
+      : t('routineDetail.transition.customAria', {
+          duration,
+          exercise: destinationName,
+        })
 
     return `
       <rrr-sequence-gutter
+        icon="water-bottle"
         label="${escapeHtml(duration)}"
-        description="${escapeHtml(source)}"
-        aria-label="${escapeHtml(t('routineDetail.transition.aria', {
-          duration,
-          exercise: destinationName,
-          source,
-        }))}"
+        ${customDescription ? `description="${escapeHtml(customDescription)}"` : ''}
+        aria-label="${escapeHtml(ariaLabel)}"
       ></rrr-sequence-gutter>
     `
   }

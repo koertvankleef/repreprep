@@ -90,6 +90,34 @@ describe('value-first property lists', () => {
     expect(detail.querySelector('rrr-button[data-action="start-workout"]')).toBeNull()
   })
 
+  test('only labels transition gutters that override the routine default', async () => {
+    const data = storageService.getData()
+    const routine = data.routines[0]!
+    const version = data.routineVersions.find(({ id }) => id === routine.activeVersionId)!
+    storageService.setData({
+      ...data,
+      routineVersions: data.routineVersions.map((candidate) => candidate.id === version.id
+        ? {
+            ...candidate,
+            exercises: candidate.exercises.map((exercise, index) => index === 1
+              ? { ...exercise, transitionBeforeOverrideSeconds: 45 }
+              : exercise),
+          }
+        : candidate),
+    })
+
+    const detail = new RrrRoutineDetail()
+    detail.routineId = routine.id
+    document.body.append(detail)
+    await Promise.resolve()
+
+    const gutters = detail.querySelectorAll('rrr-sequence-gutter')
+
+    expect(gutters[0]?.getAttribute('description')).toBe('Custom')
+    expect(gutters[1]?.hasAttribute('description')).toBe(false)
+    expect(gutters[1]?.getAttribute('aria-label')).not.toContain('default')
+  })
+
   test('starts an active workout from the bottom action row', async () => {
     const routine = storageService.getData().routines[0]!
     const initialWorkoutCount = storageService.getData().workouts.length

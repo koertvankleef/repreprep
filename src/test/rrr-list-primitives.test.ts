@@ -29,7 +29,7 @@ describe('list structure primitives', () => {
         <rrr-list-row label="Push-ups"></rrr-list-row>
         <rrr-sequence-gutter
           label="20 seconds"
-          description="Routine default"
+          description="Custom"
           aria-label="20 seconds preparation before Row"
         ></rrr-sequence-gutter>
         <rrr-list-row label="Row"></rrr-list-row>
@@ -44,7 +44,7 @@ describe('list structure primitives', () => {
     expect(Array.from(sequence?.children ?? []).map((child) => child.getAttribute('role')))
       .toEqual(['listitem', 'listitem', 'listitem'])
     expect(gutter?.querySelector('.rrr-sequence-gutter__label')?.textContent).toBe('20 seconds')
-    expect(gutter?.querySelector('.rrr-sequence-gutter__description')?.textContent).toBe('Routine default')
+    expect(gutter?.querySelector('.rrr-sequence-gutter__description')?.textContent).toBe('Custom')
 
     gutter?.setAttribute('label', '<strong>45 seconds</strong>')
 

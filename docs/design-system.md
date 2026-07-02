@@ -63,9 +63,9 @@ in light DOM.
     accessory="chevron"
   ></rrr-list-row>
   <rrr-sequence-gutter
-    label="20 seconds"
-    description="Routine default"
-    aria-label="20 seconds preparation before One-arm dumbbell row"
+    label="45 seconds"
+    description="Custom"
+    aria-label="45 seconds custom preparation before One-arm dumbbell row"
   ></rrr-sequence-gutter>
   <rrr-list-row
     href="#/routines/1/exercises/b"
@@ -76,8 +76,8 @@ in light DOM.
 </rrr-sequence>
 ```
 
-The visible gutter label states the duration. Use `description` for concise
-supporting provenance such as an inherited default. Supply a relational
+The visible gutter label states the duration. Omit `description` for the normal
+inherited value; use it only to identify an override. Supply a relational
 `aria-label` that identifies what the interval precedes or separates.
 
 Do not use a sequence merely to add space between cards. A gutter represents
