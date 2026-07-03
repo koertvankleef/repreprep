@@ -1,119 +1,44 @@
 import type {
   AppData,
-  TimeSetEntry,
   ExerciseDefinition,
-  ExerciseKind,
   MeasurementProfile,
-  PlannedSet,
   RepsSetEntry,
   Routine,
   RoutineExercise,
   RoutineVersion,
   SetEntry,
+  TimeSetEntry,
   Workout,
   WorkoutExerciseEntry,
 } from '../domain/types.ts'
-import { exerciseCatalog } from '../exercise-library/exercises.ts'
 import {
   equipmentValues,
   exerciseCategories,
-  getExerciseDefaultUnit,
   measurementProfileKey,
   measurementTypes,
   muscleValues,
 } from '../domain/exercise-metadata.ts'
-import { generateId } from '../utils/id.ts'
 
-const catalogExerciseIds = new Set<string>(exerciseCatalog.map((exercise) => exercise.id))
-const DEFAULT_REST_SECONDS = 20
-const DEFAULT_TRANSITION_SECONDS = 10
+export const APP_DATA_SCHEMA_VERSION = 6
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
-}
-
-function isValidRepsSet(obj: unknown): obj is RepsSetEntry {
-  if (!isRecord(obj)) {
-    return false
-  }
-
-  return (
-    typeof obj.id === 'string' &&
-    obj.kind === 'reps' &&
-    typeof obj.reps === 'number' &&
-    (typeof obj.weightKg === 'number' || obj.weightKg === null) &&
-    typeof obj.notes === 'string'
-  )
-}
-
-function isValidTimeSet(obj: unknown): obj is TimeSetEntry {
-  if (!isRecord(obj)) {
-    return false
-  }
-
-  return (
-    typeof obj.id === 'string' &&
-    obj.kind === 'time' &&
-    typeof obj.seconds === 'number' &&
-    typeof obj.notes === 'string'
-  )
-}
-
-function isValidSetEntry(obj: unknown): obj is SetEntry {
-  return isValidRepsSet(obj) || isValidTimeSet(obj)
-}
-
-function isValidWorkoutExerciseEntry(obj: unknown): obj is WorkoutExerciseEntry {
-  if (!isRecord(obj)) {
-    return false
-  }
-
-  return (
-    typeof obj.id === 'string' &&
-    typeof obj.exerciseId === 'string' &&
-    Array.isArray(obj.sets) &&
-    obj.sets.every((set) => isValidSetEntry(set)) &&
-    typeof obj.transitionBeforeSeconds === 'number' &&
-    typeof obj.restSeconds === 'number' &&
-    typeof obj.notes === 'string'
-  )
-}
-
-export function isValidExercise(obj: unknown): obj is ExerciseDefinition {
-  if (!isRecord(obj)) {
-    return false
-  }
-
-  return (
-    typeof obj.id === 'string' &&
-    typeof obj.name === 'string' &&
-    isStringArray(obj.aliases) &&
-    typeof obj.description === 'string' &&
-    isKnownStringArray(obj.categories, exerciseCategories) &&
-    isKnownStringArray(obj.equipment, equipmentValues) &&
-    isKnownStringArray(obj.primaryMuscles, muscleValues) &&
-    isKnownStringArray(obj.secondaryMuscles, muscleValues) &&
-    isValidMeasurementProfiles(obj.measurementProfiles) &&
-    typeof obj.createdByUser === 'boolean' &&
-    (obj.kind === 'reps' || obj.kind === 'time') &&
-    (typeof obj.defaultUnit === 'string' || obj.defaultUnit === null) &&
-    typeof obj.archived === 'boolean' &&
-    typeof obj.createdAt === 'string' &&
-    typeof obj.updatedAt === 'string'
-  )
 }
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string')
 }
 
-function isKnownStringArray<T extends string>(value: unknown, allowedValues: readonly T[]): value is T[] {
+function isKnownStringArray<T extends string>(
+  value: unknown,
+  allowedValues: readonly T[],
+): value is T[] {
   const allowed = new Set<string>(allowedValues)
 
   return isStringArray(value) && value.every((item) => allowed.has(item))
 }
 
-function isValidMeasurementProfiles(value: unknown): boolean {
+function isValidMeasurementProfiles(value: unknown): value is MeasurementProfile[] {
   if (!Array.isArray(value) || value.length === 0) {
     return false
   }
@@ -126,14 +51,16 @@ function isValidMeasurementProfiles(value: unknown): boolean {
       return false
     }
 
-    const types = profile.filter((item): item is typeof measurementTypes[number] => typeof item === 'string' && allowed.has(item))
+    const types = profile.filter(
+      (item): item is typeof measurementTypes[number] =>
+        typeof item === 'string' && allowed.has(item),
+    )
 
     if (types.length !== profile.length || new Set(types).size !== types.length) {
       return false
     }
 
     const key = measurementProfileKey(types)
-
     if (profileKeys.has(key)) {
       return false
     }
@@ -143,303 +70,128 @@ function isValidMeasurementProfiles(value: unknown): boolean {
   })
 }
 
-function isLegacyExercise(obj: unknown): obj is {
-  id: string
-  name: string
-  kind: ExerciseKind
-  defaultUnit: string | null
-  archived: boolean
-  createdAt: string
-  updatedAt: string
-} {
+export function isValidExercise(obj: unknown): obj is ExerciseDefinition {
   if (!isRecord(obj)) {
     return false
   }
 
   return (
-    typeof obj.id === 'string' &&
-    typeof obj.name === 'string' &&
-    (obj.kind === 'reps' || obj.kind === 'time') &&
-    (typeof obj.defaultUnit === 'string' || obj.defaultUnit === null) &&
-    typeof obj.archived === 'boolean' &&
-    typeof obj.createdAt === 'string' &&
-    typeof obj.updatedAt === 'string'
+    typeof obj.id === 'string'
+    && typeof obj.name === 'string'
+    && isStringArray(obj.aliases)
+    && typeof obj.description === 'string'
+    && isKnownStringArray(obj.categories, exerciseCategories)
+    && isKnownStringArray(obj.equipment, equipmentValues)
+    && isKnownStringArray(obj.primaryMuscles, muscleValues)
+    && isKnownStringArray(obj.secondaryMuscles, muscleValues)
+    && isValidMeasurementProfiles(obj.measurementProfiles)
+    && typeof obj.createdByUser === 'boolean'
+    && (obj.kind === 'reps' || obj.kind === 'time')
+    && (typeof obj.defaultUnit === 'string' || obj.defaultUnit === null)
+    && typeof obj.archived === 'boolean'
+    && typeof obj.createdAt === 'string'
+    && typeof obj.updatedAt === 'string'
   )
 }
 
-function migrateExerciseRecord(exercise: unknown): unknown {
-  if (isValidExercise(exercise)) {
-    return exercise
-  }
-
-  if (!isLegacyExercise(exercise)) {
-    return exercise
-  }
-
-  const measurementProfiles: MeasurementProfile[] = exercise.kind === 'time' ? [['time']] : [['reps', 'weight']]
-
-  return {
-    id: exercise.id,
-    name: exercise.name,
-    aliases: [],
-    description: '',
-    categories: ['strength'],
-    equipment: ['other'],
-    primaryMuscles: [],
-    secondaryMuscles: [],
-    measurementProfiles,
-    createdByUser: true,
-    kind: exercise.kind,
-    defaultUnit: exercise.defaultUnit ?? getExerciseDefaultUnit({ measurementProfiles }),
-    archived: exercise.archived,
-    createdAt: exercise.createdAt,
-    updatedAt: exercise.updatedAt,
-  }
+function isValidRepsSet(obj: unknown): obj is RepsSetEntry {
+  return isRecord(obj)
+    && typeof obj.id === 'string'
+    && obj.kind === 'reps'
+    && typeof obj.reps === 'number'
+    && (typeof obj.weightKg === 'number' || obj.weightKg === null)
+    && typeof obj.notes === 'string'
 }
 
-function migrateExerciseOwnership(exercise: unknown): unknown {
-  if (!isRecord(exercise) || typeof exercise.id !== 'string') {
-    return exercise
-  }
-
-  if (typeof exercise.createdByUser === 'boolean') {
-    return exercise
-  }
-
-  return {
-    ...exercise,
-    createdByUser: !catalogExerciseIds.has(exercise.id),
-  }
+function isValidTimeSet(obj: unknown): obj is TimeSetEntry {
+  return isRecord(obj)
+    && typeof obj.id === 'string'
+    && obj.kind === 'time'
+    && typeof obj.seconds === 'number'
+    && typeof obj.notes === 'string'
 }
 
-function migratePlannedSet(plannedSet: unknown): unknown {
-  if (!isRecord(plannedSet)) {
-    return plannedSet
-  }
-
-  return {
-    ...plannedSet,
-    id: typeof plannedSet.id === 'string' ? plannedSet.id : generateId(),
-  }
+function isValidSetEntry(obj: unknown): obj is SetEntry {
+  return isValidRepsSet(obj) || isValidTimeSet(obj)
 }
 
-function migrateRoutineExercise(exercise: unknown, index: number): unknown {
-  if (!isRecord(exercise)) {
-    return exercise
-  }
-
-  return {
-    ...exercise,
-    transitionBeforeOverrideSeconds: index === 0
-      ? null
-      : typeof exercise.transitionBeforeOverrideSeconds === 'number'
-        ? Math.max(0, exercise.transitionBeforeOverrideSeconds)
-        : null,
-    restSeconds: typeof exercise.restSeconds === 'number'
-      ? Math.max(0, exercise.restSeconds)
-      : DEFAULT_REST_SECONDS,
-    plannedSets: Array.isArray(exercise.plannedSets)
-      ? exercise.plannedSets.map((set) => migratePlannedSet(set))
-      : exercise.plannedSets,
-  }
-}
-
-function migrateRoutineVersion(version: unknown): unknown {
-  if (!isRecord(version)) {
-    return version
-  }
-
-  return {
-    ...version,
-    transitionSeconds: typeof version.transitionSeconds === 'number'
-      ? Math.max(0, version.transitionSeconds)
-      : DEFAULT_TRANSITION_SECONDS,
-    exercises: Array.isArray(version.exercises)
-      ? version.exercises.map((exercise, index) => migrateRoutineExercise(exercise, index))
-      : version.exercises,
-  }
-}
-
-function migrateWorkout(workout: unknown): unknown {
-  if (!isRecord(workout)) {
-    return workout
-  }
-
-  const transitionSeconds = typeof workout.transitionSeconds === 'number'
-    ? Math.max(0, workout.transitionSeconds)
-    : DEFAULT_TRANSITION_SECONDS
-
-  return {
-    ...workout,
-    transitionSeconds,
-    exercises: Array.isArray(workout.exercises)
-      ? workout.exercises.map((entry, index) => isRecord(entry)
-        ? {
-            ...entry,
-            transitionBeforeSeconds: index === 0 ? 0 : transitionSeconds,
-            restSeconds: typeof entry.restSeconds === 'number'
-              ? Math.max(0, entry.restSeconds)
-              : DEFAULT_REST_SECONDS,
-          }
-        : entry)
-      : workout.exercises,
-  }
-}
-
-export function migrateRawAppData(parsed: Record<string, unknown>): Record<string, unknown> {
-  let candidate: Record<string, unknown> = parsed
-
-  if (parsed.schemaVersion === 1) {
-    candidate = {
-      ...parsed,
-      schemaVersion: 2,
-      routines: Array.isArray(parsed.routines) ? parsed.routines : [],
-      routineVersions: Array.isArray(parsed.routineVersions) ? parsed.routineVersions : [],
-    }
-  }
-
-  if (candidate.schemaVersion === 2) {
-    candidate = {
-      ...candidate,
-      schemaVersion: 3,
-      exercises: Array.isArray(candidate.exercises)
-        ? candidate.exercises.map((exercise) => migrateExerciseRecord(exercise))
-        : candidate.exercises,
-    }
-  }
-
-  if (candidate.schemaVersion === 3) {
-    candidate = {
-      ...candidate,
-      schemaVersion: 4,
-      exercises: Array.isArray(candidate.exercises)
-        ? candidate.exercises.map((exercise) => migrateExerciseOwnership(exercise))
-        : candidate.exercises,
-    }
-  }
-
-  if (candidate.schemaVersion === 4) {
-    candidate = {
-      ...candidate,
-      schemaVersion: 5,
-      workouts: Array.isArray(candidate.workouts)
-        ? candidate.workouts.map((workout) => migrateWorkout(workout))
-        : candidate.workouts,
-      routineVersions: Array.isArray(candidate.routineVersions)
-        ? candidate.routineVersions.map((version) => migrateRoutineVersion(version))
-        : candidate.routineVersions,
-    }
-  }
-
-  return candidate
+function isValidWorkoutExerciseEntry(obj: unknown): obj is WorkoutExerciseEntry {
+  return isRecord(obj)
+    && typeof obj.id === 'string'
+    && typeof obj.exerciseId === 'string'
+    && (obj.routineExerciseId === undefined || typeof obj.routineExerciseId === 'string')
+    && Array.isArray(obj.sets)
+    && obj.sets.every((set) => isValidSetEntry(set))
+    && (obj.transitionBeforeSeconds === undefined || typeof obj.transitionBeforeSeconds === 'number')
+    && (obj.restSeconds === undefined || typeof obj.restSeconds === 'number')
+    && typeof obj.notes === 'string'
 }
 
 export function isValidWorkout(obj: unknown): obj is Workout {
-  if (!isRecord(obj)) {
-    return false
-  }
-
-  return (
-    typeof obj.id === 'string' &&
-    typeof obj.date === 'string' &&
-    typeof obj.notes === 'string' &&
-    Array.isArray(obj.exercises) &&
-    obj.exercises.every((entry) => isValidWorkoutExerciseEntry(entry)) &&
-    (obj.transitionSeconds === undefined || typeof obj.transitionSeconds === 'number') &&
-    typeof obj.createdAt === 'string' &&
-    typeof obj.updatedAt === 'string' &&
-    (obj.routineId === undefined || typeof obj.routineId === 'string') &&
-    (obj.routineVersionId === undefined || typeof obj.routineVersionId === 'string')
-  )
-}
-
-function isValidPlannedSet(obj: unknown): obj is PlannedSet {
-  if (!isRecord(obj)) {
-    return false
-  }
-
-  if (obj.kind === 'reps') {
-    return (
-      typeof obj.id === 'string' &&
-      (typeof obj.targetReps === 'number' || obj.targetReps === null) &&
-      (typeof obj.targetWeightKg === 'number' || obj.targetWeightKg === null)
-    )
-  }
-
-  if (obj.kind === 'time') {
-    return (
-      typeof obj.id === 'string' &&
-      (typeof obj.targetSeconds === 'number' || obj.targetSeconds === null)
-    )
-  }
-
-  return false
+  return isRecord(obj)
+    && typeof obj.id === 'string'
+    && typeof obj.date === 'string'
+    && typeof obj.notes === 'string'
+    && Array.isArray(obj.exercises)
+    && obj.exercises.every((entry) => isValidWorkoutExerciseEntry(entry))
+    && (obj.transitionSeconds === undefined || typeof obj.transitionSeconds === 'number')
+    && typeof obj.createdAt === 'string'
+    && typeof obj.updatedAt === 'string'
+    && (obj.routineId === undefined || typeof obj.routineId === 'string')
+    && (obj.routineVersionId === undefined || typeof obj.routineVersionId === 'string')
 }
 
 function isValidRoutineExercise(obj: unknown): obj is RoutineExercise {
-  if (!isRecord(obj)) {
-    return false
-  }
-
-  return (
-    typeof obj.id === 'string' &&
-    typeof obj.exerciseId === 'string' &&
-    (typeof obj.transitionBeforeOverrideSeconds === 'number' || obj.transitionBeforeOverrideSeconds === null) &&
-    Array.isArray(obj.plannedSets) &&
-    obj.plannedSets.every((ps) => isValidPlannedSet(ps)) &&
-    typeof obj.restSeconds === 'number' &&
-    (obj.notes === undefined || typeof obj.notes === 'string')
-  )
+  return isRecord(obj)
+    && typeof obj.id === 'string'
+    && typeof obj.exerciseId === 'string'
+    && Number.isInteger(obj.setCount)
+    && (obj.setCount as number) >= 1
+    && (
+      typeof obj.transitionBeforeOverrideSeconds === 'number'
+      || obj.transitionBeforeOverrideSeconds === null
+    )
+    && typeof obj.restSeconds === 'number'
+    && (obj.notes === undefined || typeof obj.notes === 'string')
 }
 
 function isValidRoutineVersion(obj: unknown): obj is RoutineVersion {
-  if (!isRecord(obj)) {
-    return false
-  }
-
-  return (
-    typeof obj.id === 'string' &&
-    typeof obj.routineId === 'string' &&
-    (typeof obj.previousVersionId === 'string' || obj.previousVersionId === null) &&
-    typeof obj.createdAt === 'string' &&
-    typeof obj.transitionSeconds === 'number' &&
-    Array.isArray(obj.exercises) &&
-    obj.exercises.every((re) => isValidRoutineExercise(re))
-  )
+  return isRecord(obj)
+    && typeof obj.id === 'string'
+    && typeof obj.routineId === 'string'
+    && (typeof obj.previousVersionId === 'string' || obj.previousVersionId === null)
+    && typeof obj.createdAt === 'string'
+    && typeof obj.transitionSeconds === 'number'
+    && Array.isArray(obj.exercises)
+    && obj.exercises.every((exercise) => isValidRoutineExercise(exercise))
 }
 
 function isValidRoutine(obj: unknown): obj is Routine {
-  if (!isRecord(obj)) {
-    return false
-  }
-
-  return (
-    typeof obj.id === 'string' &&
-    typeof obj.name === 'string' &&
-    typeof obj.activeVersionId === 'string' &&
-    typeof obj.archived === 'boolean' &&
-    typeof obj.createdAt === 'string' &&
-    typeof obj.updatedAt === 'string' &&
-    (obj.description === undefined || typeof obj.description === 'string')
-  )
+  return isRecord(obj)
+    && typeof obj.id === 'string'
+    && typeof obj.name === 'string'
+    && typeof obj.activeVersionId === 'string'
+    && (
+      typeof obj.prefillSourceWorkoutId === 'string'
+      || obj.prefillSourceWorkoutId === null
+    )
+    && typeof obj.archived === 'boolean'
+    && typeof obj.createdAt === 'string'
+    && typeof obj.updatedAt === 'string'
+    && (obj.description === undefined || typeof obj.description === 'string')
 }
 
 export function isValidAppData(data: unknown): data is AppData {
-  if (!isRecord(data)) {
-    return false
-  }
-
-  return (
-    data.schemaVersion === 5 &&
-    Array.isArray(data.exercises) &&
-    data.exercises.every((exercise) => isValidExercise(exercise)) &&
-    Array.isArray(data.workouts) &&
-    data.workouts.every((workout) => isValidWorkout(workout)) &&
-    Array.isArray(data.routines) &&
-    data.routines.every((routine) => isValidRoutine(routine)) &&
-    Array.isArray(data.routineVersions) &&
-    data.routineVersions.every((version) => isValidRoutineVersion(version))
-  )
+  return isRecord(data)
+    && data.schemaVersion === APP_DATA_SCHEMA_VERSION
+    && Array.isArray(data.exercises)
+    && data.exercises.every((exercise) => isValidExercise(exercise))
+    && Array.isArray(data.workouts)
+    && data.workouts.every((workout) => isValidWorkout(workout))
+    && Array.isArray(data.routines)
+    && data.routines.every((routine) => isValidRoutine(routine))
+    && Array.isArray(data.routineVersions)
+    && data.routineVersions.every((version) => isValidRoutineVersion(version))
 }
 
 export async function importFromJson(file: File): Promise<AppData> {
@@ -464,11 +216,9 @@ export async function importFromJson(file: File): Promise<AppData> {
     throw new Error('Imported data must include a workouts array')
   }
 
-  const candidate = migrateRawAppData(parsed)
-
-  if (!isValidAppData(candidate)) {
+  if (!isValidAppData(parsed)) {
     throw new Error('Imported data is not in the expected AppData format')
   }
 
-  return candidate
+  return parsed
 }

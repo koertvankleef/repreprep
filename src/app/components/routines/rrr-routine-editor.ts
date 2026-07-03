@@ -1,14 +1,12 @@
 import { storageService } from '../../storage-instance.ts'
 import { getActiveExercises } from '../../../domain/exercise-service.ts'
 import {
-  createRepsPlannedSet,
   createRoutineExercise,
-  createTimePlannedSet,
   getActiveRoutineVersion,
   getRoutine,
 } from '../../../domain/routine-service.ts'
 import { t } from '../../../i18n/index.ts'
-import type { PlannedSet, RoutineExercise } from '../../../domain/types.ts'
+import type { RoutineExercise } from '../../../domain/types.ts'
 import { escapeHtml } from '../../render-helpers.ts'
 import styles from './rrr-routine-editor.css?inline'
 
@@ -127,27 +125,6 @@ export class RrrRoutineEditor extends HTMLElement {
         return
       }
 
-      if (action === 'add-set') {
-        const id = actionTarget.dataset.id
-
-        if (id) {
-          this.addPlannedSet(id)
-        }
-
-        return
-      }
-
-      if (action === 'remove-set') {
-        const exerciseId = actionTarget.dataset.exerciseId
-        const setIndex = actionTarget.dataset.setIndex
-
-        if (exerciseId && setIndex !== undefined) {
-          this.removePlannedSet(exerciseId, Number(setIndex))
-        }
-
-        return
-      }
-
       if (action === 'save') {
         this.save()
         return
@@ -177,40 +154,19 @@ export class RrrRoutineEditor extends HTMLElement {
         `input[data-exercise-id="${exercise.id}"][data-field="rest-seconds"]`,
       )
       const restValue = restInput?.valueAsNumber
-      const sets = exercise.plannedSets.map((set, index) => {
-        if (set.kind === 'reps') {
-          const repsInput = this.querySelector<HTMLInputElement>(
-            `input[data-exercise-id="${exercise.id}"][data-set-index="${index}"][data-field="reps"]`,
-          )
-          const weightInput = this.querySelector<HTMLInputElement>(
-            `input[data-exercise-id="${exercise.id}"][data-set-index="${index}"][data-field="weight"]`,
-          )
-
-          return {
-            id: set.id,
-            kind: 'reps' as const,
-            targetReps: repsInput?.value ? Number(repsInput.value) : null,
-            targetWeightKg: weightInput?.value ? Number(weightInput.value) : null,
-          }
-        }
-
-        const secondsInput = this.querySelector<HTMLInputElement>(
-          `input[data-exercise-id="${exercise.id}"][data-set-index="${index}"][data-field="seconds"]`,
-        )
-
-        return {
-          id: set.id,
-          kind: 'time' as const,
-          targetSeconds: secondsInput?.value ? Number(secondsInput.value) : null,
-        }
-      })
+      const setCountInput = this.querySelector<HTMLInputElement>(
+        `input[data-exercise-id="${exercise.id}"][data-field="set-count"]`,
+      )
+      const setCountValue = setCountInput?.valueAsNumber
 
       return {
         ...exercise,
         restSeconds: Number.isFinite(restValue)
           ? Math.max(0, Math.trunc(restValue ?? RrrRoutineEditor.defaultRestSeconds))
           : Math.max(0, exercise.restSeconds ?? RrrRoutineEditor.defaultRestSeconds),
-        plannedSets: sets,
+        setCount: Number.isFinite(setCountValue)
+          ? Math.max(1, Math.trunc(setCountValue ?? 1))
+          : Math.max(1, exercise.setCount),
       }
     })
   }
@@ -261,35 +217,6 @@ export class RrrRoutineEditor extends HTMLElement {
     updated[next] = temp
 
     this.exercises = updated
-    this.render()
-  }
-
-  private addPlannedSet(routineExerciseId: string): void {
-    this.readFields()
-    const data = storageService.getData()
-    const routineExercise = this.exercises.find((exercise) => exercise.id === routineExerciseId)
-    const exerciseDef = routineExercise
-      ? data.exercises.find((exercise) => exercise.id === routineExercise.exerciseId)
-      : undefined
-    const kind = exerciseDef?.kind ?? 'reps'
-    const newSet: PlannedSet =
-      kind === 'time'
-        ? createTimePlannedSet()
-        : createRepsPlannedSet()
-
-    this.exercises = this.exercises.map((e) =>
-      e.id === routineExerciseId ? { ...e, plannedSets: [...e.plannedSets, newSet] } : e,
-    )
-    this.render()
-  }
-
-  private removePlannedSet(exerciseId: string, setIndex: number): void {
-    this.readFields()
-    this.exercises = this.exercises.map((e) =>
-      e.id === exerciseId
-        ? { ...e, plannedSets: e.plannedSets.filter((_, i) => i !== setIndex) }
-        : e,
-    )
     this.render()
   }
 
@@ -344,47 +271,6 @@ export class RrrRoutineEditor extends HTMLElement {
             const isFirst = index === 0
             const isLast = index === this.exercises.length - 1
 
-            const setsHtml = routineExercise.plannedSets.length === 0
-              ? `<p>${t('routineEditor.sets.empty')}</p>`
-              : routineExercise.plannedSets
-                  .map((set, setIndex) => {
-                    if (set.kind === 'reps') {
-                      return `
-                        <div class="planned-set">
-                          <span>${t('routineEditor.set.label', { index: setIndex + 1 })}</span>
-                          <label>${t('routineEditor.field.targetReps')} <input type="number" min="0" placeholder="${t('routineEditor.field.targetReps.placeholder')}"
-                            data-exercise-id="${routineExercise.id}"
-                            data-set-index="${setIndex}"
-                            data-field="reps"
-                            value="${set.targetReps ?? ''}" /></label>
-                          <label>${t('routineEditor.field.targetWeight')} <input type="number" min="0" step="0.5" placeholder="${t('routineEditor.field.targetWeight.placeholder')}"
-                            data-exercise-id="${routineExercise.id}"
-                            data-set-index="${setIndex}"
-                            data-field="weight"
-                            value="${set.targetWeightKg ?? ''}" /></label>
-                          <rrr-button type="button" variant="ghost" tone="danger" data-action="remove-set"
-                            data-exercise-id="${routineExercise.id}"
-                            data-set-index="${setIndex}" aria-label="${escapeHtml(t('routineEditor.action.removeSetAria', { index: setIndex + 1, name: exerciseName }))}"><rrr-icon name="delete"></rrr-icon></rrr-button>
-                        </div>
-                      `
-                    }
-
-                    return `
-                      <div class="planned-set">
-                        <span>${t('routineEditor.set.label', { index: setIndex + 1 })}</span>
-                        <label>${t('routineEditor.field.targetSeconds')} <input type="number" min="0" placeholder="${t('routineEditor.field.targetSeconds.placeholder')}"
-                          data-exercise-id="${routineExercise.id}"
-                          data-set-index="${setIndex}"
-                          data-field="seconds"
-                          value="${set.targetSeconds ?? ''}" /></label>
-                        <rrr-button type="button" variant="ghost" tone="danger" data-action="remove-set"
-                          data-exercise-id="${routineExercise.id}"
-                          data-set-index="${setIndex}" aria-label="${escapeHtml(t('routineEditor.action.removeSetAria', { index: setIndex + 1, name: exerciseName }))}"><rrr-icon name="delete"></rrr-icon></rrr-button>
-                      </div>
-                    `
-                  })
-                  .join('')
-
             return `
               <section class="exercise-item" aria-labelledby="${exerciseHeadingId}">
                 <div class="exercise-header">
@@ -398,16 +284,19 @@ export class RrrRoutineEditor extends HTMLElement {
                   </div>
                 </div>
                 <label>
+                  ${t('routineExercise.setCount.label')}
+                  <input type="number" min="1" step="1"
+                    data-exercise-id="${routineExercise.id}"
+                    data-field="set-count"
+                    value="${Math.max(1, routineExercise.setCount)}" />
+                </label>
+                <label>
                   ${t('routineEditor.field.restSeconds')}
                   <input type="number" min="0" step="1"
                     data-exercise-id="${routineExercise.id}"
                     data-field="rest-seconds"
                     value="${Math.max(0, routineExercise.restSeconds ?? RrrRoutineEditor.defaultRestSeconds)}" />
                 </label>
-                <div class="planned-sets">${setsHtml}</div>
-                <div>
-                  <rrr-button type="button" data-action="add-set" data-id="${routineExercise.id}" aria-label="${escapeHtml(t('routineEditor.action.addSetAria', { name: exerciseName }))}">${t('routineEditor.action.addSet')}</rrr-button>
-                </div>
               </section>
             `
           })

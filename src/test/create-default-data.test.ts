@@ -7,7 +7,7 @@ describe('createDefaultData', () => {
     const data = createDefaultData()
     const byName = new Map(data.exercises.map((exercise) => [exercise.name, exercise.kind]))
 
-    expect(data.schemaVersion).toBe(5)
+    expect(data.schemaVersion).toBe(6)
     expect(data.exercises).toHaveLength(exerciseCatalog.length)
     expect(byName.get('Pushups')).toBe('reps')
     expect(byName.get('Plank')).toBe('time')
@@ -31,6 +31,8 @@ describe('createDefaultData', () => {
     expect(version?.exercises).toHaveLength(7)
     expect(version?.transitionSeconds).toBe(10)
     expect(version?.exercises.every((exercise) => exercise.restSeconds === 20)).toBe(true)
+    expect(version?.exercises.every((exercise) => exercise.setCount > 0)).toBe(true)
+    expect(data.routines[0]?.prefillSourceWorkoutId).toBeNull()
   })
 
   test('default routine version exercises reference valid exercise ids', () => {

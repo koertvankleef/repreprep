@@ -3,10 +3,8 @@ import { createDefaultData } from '../domain/create-default-data.ts'
 import {
   archiveRoutine,
   buildRoutineFlow,
-  createRepsPlannedSet,
   createRoutine,
   createRoutineExercise,
-  createTimePlannedSet,
   editRoutine,
   getActiveRoutineVersion,
   getActiveRoutines,
@@ -22,7 +20,7 @@ function makeExercise(exerciseId: string): RoutineExercise {
     exerciseId,
     transitionBeforeOverrideSeconds: null,
     restSeconds: 25,
-    plannedSets: [{ id: 'ps-1', kind: 'reps', targetReps: 10, targetWeightKg: null }],
+    setCount: 3,
   }
 }
 
@@ -40,6 +38,7 @@ describe('routine-service', () => {
     expect(routine).toBeDefined()
     expect(routine?.name).toBe('Upper Body')
     expect(routine?.archived).toBe(false)
+    expect(routine?.prefillSourceWorkoutId).toBeNull()
   })
 
   test('createRoutine creates a version with exercises', () => {
@@ -140,23 +139,14 @@ describe('routine-service', () => {
     expect(result).toBe(data)
   })
 
-  test('createRoutineExercise creates exercise with empty planned sets', () => {
+  test('createRoutineExercise creates an exercise with one set', () => {
     const exercise = createRoutineExercise('exercise-123')
 
     expect(exercise.exerciseId).toBe('exercise-123')
     expect(exercise.transitionBeforeOverrideSeconds).toBeNull()
     expect(exercise.restSeconds).toBe(20)
-    expect(exercise.plannedSets).toEqual([])
+    expect(exercise.setCount).toBe(1)
     expect(typeof exercise.id).toBe('string')
-  })
-
-  test('planned-set factories assign stable IDs', () => {
-    const repsSet = createRepsPlannedSet(8, 40)
-    const timeSet = createTimePlannedSet(45)
-
-    expect(repsSet.id).not.toBe('')
-    expect(timeSet.id).not.toBe('')
-    expect(repsSet.id).not.toBe(timeSet.id)
   })
 
   test('routine versions normalize transition overrides around the first exercise', () => {
@@ -179,6 +169,19 @@ describe('routine-service', () => {
 
     expect(version?.exercises[0]?.transitionBeforeOverrideSeconds).toBeNull()
     expect(version?.exercises[1]?.transitionBeforeOverrideSeconds).toBe(0)
+  })
+
+  test('routine versions normalize set count to at least one', () => {
+    const data = createDefaultData()
+    const exerciseId = data.exercises[0]?.id ?? ''
+    const updated = createRoutine(data, 'Minimum sets', [{
+      ...makeExercise(exerciseId),
+      setCount: 0,
+    }])
+    const routine = updated.routines.find(({ name }) => name === 'Minimum sets')
+    const version = routine ? getActiveRoutineVersion(updated, routine.id) : undefined
+
+    expect(version?.exercises[0]?.setCount).toBe(1)
   })
 
   test('buildRoutineFlow derives inherited and overridden transition gutters', () => {

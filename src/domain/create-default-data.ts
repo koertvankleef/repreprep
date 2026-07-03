@@ -1,4 +1,4 @@
-import type { AppData, ExerciseDefinition, PlannedSet, Routine, RoutineExercise, RoutineVersion } from './types.ts'
+import type { AppData, Routine, RoutineExercise, RoutineVersion } from './types.ts'
 import { exerciseCatalog } from '../exercise-library/exercises.ts'
 import { getExerciseKind, toExerciseDefinition } from './exercise-metadata.ts'
 import { generateId as generateUniqueId } from '../utils/id.ts'
@@ -35,17 +35,10 @@ export function createDefaultData(): AppData {
       return []
     }
 
-    const plannedSets: PlannedSet[] = getExerciseKind(exercise) === 'time'
-      ? [{ id: generateId(), kind: 'time', targetSeconds: 30 }]
-      : [
-          { id: generateId(), kind: 'reps', targetReps: 10, targetWeightKg: null },
-          { id: generateId(), kind: 'reps', targetReps: 10, targetWeightKg: null },
-        ]
-
     return {
       id: generateId(),
       exerciseId: exercise.id,
-      plannedSets,
+      setCount: getExerciseKind(exercise) === 'time' ? 1 : 2,
       transitionBeforeOverrideSeconds: null,
       restSeconds: DEFAULT_REST_SECONDS,
     }
@@ -64,13 +57,14 @@ export function createDefaultData(): AppData {
     id: routineId,
     name: 'Full Body',
     activeVersionId: versionId,
+    prefillSourceWorkoutId: null,
     archived: false,
     createdAt: timestamp,
     updatedAt: timestamp,
   }
 
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     exercises,
     workouts: [],
     routines: [routine],

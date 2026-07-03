@@ -111,11 +111,6 @@ test('app route metadata defines route-specific header links', () => {
   expect(getAppRouteEndLink({ name: 'routine-detail', routineId: 'routine 1' })).toBeUndefined()
   expect(getAppRouteBackHref({ name: 'routine-edit', routineId: 'routine 1' }))
     .toBe('#/routines/routine%201')
-  expect(getAppRouteBackHref({
-    name: 'routine-exercise',
-    routineId: 'routine 1',
-    routineExerciseId: 'entry 1',
-  })).toBe('#/routines/routine%201')
 })
 
 test('app routes separate routine details from routine editing', () => {
@@ -123,6 +118,5 @@ test('app routes separate routine details from routine editing', () => {
     .toBe('/routines/:routineId')
   expect(appRoutes.find((route) => route.id === 'routine-edit')?.pattern)
     .toBe('/routines/:routineId/edit')
-  expect(appRoutes.find((route) => route.id === 'routine-exercise')?.pattern)
-    .toBe('/routines/:routineId/exercises/:routineExerciseId')
+  expect(appRoutes.some((route) => route.id === 'routine-exercise')).toBe(false)
 })

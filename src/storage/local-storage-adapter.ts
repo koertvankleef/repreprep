@@ -1,6 +1,6 @@
 import type { AppData } from '../domain/types.ts'
 import type { StorageAdapter } from './storage-service.ts'
-import { isValidAppData, migrateRawAppData } from '../import-export/json-import-service.ts'
+import { isValidAppData } from '../import-export/json-import-service.ts'
 
 const storageKey = 'repreprep:data'
 
@@ -13,13 +13,11 @@ export function migrateRawToAppData(parsed: unknown): AppData | null {
     return null
   }
 
-  const candidate = migrateRawAppData(parsed)
-
-  if (!isValidAppData(candidate)) {
+  if (!isValidAppData(parsed)) {
     return null
   }
 
-  return candidate
+  return parsed
 }
 
 export class LocalStorageAdapter implements StorageAdapter {

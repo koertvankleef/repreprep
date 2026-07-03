@@ -11,6 +11,12 @@ No persons have been interviewed to gather data. These principles are **syntheti
 
 This document should guide product and design decisions, but it should not be treated as validated user research. If real user feedback later contradicts any principle here, the feedback should take priority.
 
+The app is still in pre-release development and has no users. Until that
+changes, prefer a clean product and data model over backward compatibility with
+obsolete development schemas. Incompatible local test/development data may be
+reset rather than migrated. This policy must be revisited before the first
+supported release or real user data.
+
 ---
 
 # 1. Core Product Direction
@@ -260,6 +266,11 @@ When a source is selected:
 * The same routine-exercise occurrence receives its corresponding values.
 * Missing source values fall back to zero rather than another workout.
 * The user can change the selected source later from workout history.
+
+For the MVP, a rep-based set without a selected source value begins at zero
+reps with no weight. A later version may define a sensible default rep count on
+each exercise definition. It should not invent a default weight: leaving load
+empty is valid and safer than implying one universal starting point.
 
 ## Decision rule
 

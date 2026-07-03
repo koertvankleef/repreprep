@@ -30,6 +30,8 @@ programming app.
   source unchanged.
 - With no selected source, or no matching source value, the active workout
   receives its current zero-value fallback.
+- For the MVP, rep-based sets start at `0` reps and `null` weight when no
+  selected source value exists. Do not invent a default weight.
 - Prefill matching is routine-specific. The same exercise in another routine
   is not an equivalent source.
 - Existing routine edits auto-save at meaningful interaction boundaries.
@@ -43,6 +45,8 @@ programming app.
 - Transition overrides belong to the destination routine exercise.
 - Set rest remains one shared scheduled value for every set in a routine
   exercise.
+- A routine exercise always has at least one set. Zero sets is not a valid
+  routine-exercise state; remove the exercise instead.
 
 ## Working terminology
 
@@ -66,8 +70,8 @@ copy. “Use for next workout” describes the action more directly.
 
 ## Conceptual and persisted model
 
-The exact field migration remains implementation work, but the destination
-shape is:
+The current development schema can be replaced directly; the destination shape
+is:
 
 ```ts
 interface Routine {
@@ -141,24 +145,32 @@ When starting a routine:
 6. Never fall back to a different completed workout.
 7. Generate fresh workout-entry and set IDs; do not reuse historical IDs.
 
+After the MVP, exercise definitions may provide a sane default rep count for
+the no-source case. This is an exercise-level fallback, not a routine target.
+Weight remains empty because a safe or useful default load cannot be inferred
+generically.
+
 Selecting another completed workout replaces the pointer. Clearing the choice
 sets it to `null`. Deleting the selected workout also clears it.
 
-## Data migration
+## Pre-release data policy
 
-- [ ] Increment the storage schema version.
-- [ ] Convert each `plannedSets` array to `setCount: plannedSets.length`.
-- [ ] Preserve routine-exercise IDs, order, notes, rest, and transition
-      overrides.
-- [ ] Intentionally discard planned-set target values and planned-set IDs.
-- [ ] Add `prefillSourceWorkoutId: null` to existing routines; do not infer
-      consent from historical data.
-- [ ] Add `routineExerciseId` to historical workout exercises where it can be
-      inferred safely from `routineVersionId` and sequence position.
-- [ ] Leave an unmatched historical workout exercise unlinked rather than
-      guessing across duplicate exercise definitions.
-- [ ] Preserve all historical workout results unchanged.
-- [ ] Cover import/export and migration of older schema versions.
+There are no users and no production data to preserve. This redesign does not
+require backward compatibility with the target/planned-set schema.
+
+- [x] Replace the development schema directly.
+- [x] Reset incompatible local development data instead of migrating it.
+- [x] Update default data, fixtures, import/export validation, and tests to the
+      new shape.
+- [x] Do not support importing exports from the discarded development schema.
+- [x] Remove obsolete migration code when it exists only for unreleased schema
+      versions.
+- [x] Start every routine with `prefillSourceWorkoutId: null`.
+- [x] Create `routineExerciseId` links for newly created workouts; do not build
+      inference machinery solely for old development workouts.
+
+Once real users or an explicitly supported release exist, schema changes must
+adopt a compatibility and migration policy before shipping.
 
 ## Information architecture
 
@@ -203,7 +215,7 @@ Routine detail may become the jump pad for executions of that routine.
 - Offer “View all” when the recent list is intentionally limited.
 - Allow a completed workout to become or stop being the prefill source.
 
-This section can follow the core model and routine editing migration; it does
+This section can follow the core model and routine editing replacement; it does
 not block removal of targets.
 
 ### Workout completion
@@ -249,7 +261,7 @@ Current reusable foundations:
 - [x] Separate measurement value/unit presentation.
 - [x] Localized relational accessible labels.
 - [x] Routine-transition Styleguide examples.
-- [ ] Update or remove obsolete planned-set/rest-gutter Styleguide examples.
+- [x] Update or remove obsolete planned-set/rest-gutter Styleguide examples.
 
 Only navigational rows receive chevrons. Sheet-opening routine-exercise rows use
 native button activation without a navigation accessory.
@@ -353,18 +365,18 @@ structural routine version.
 - [x] Replace the routine-exercise subpage direction with a sheet.
 - [x] Retain routine-exercise reorder and swipe deletion.
 
-### Phase 1 — Domain model and migration
+### Phase 1 — Domain model reset
 
-- [ ] Add `Routine.prefillSourceWorkoutId`.
-- [ ] Replace `RoutineExercise.plannedSets` with `setCount`.
-- [ ] Add source `routineExerciseId` linkage to workout exercises.
-- [ ] Implement and test schema migration.
-- [ ] Update import/export fixtures and validators.
-- [ ] Update default data and domain service tests.
+- [x] Add `Routine.prefillSourceWorkoutId`.
+- [x] Replace `RoutineExercise.plannedSets` with `setCount`.
+- [x] Add source `routineExerciseId` linkage to workout exercises.
+- [x] Replace the development schema and reset incompatible local data.
+- [x] Update import/export fixtures and validators.
+- [x] Update default data and domain service tests.
 
 ### Phase 2 — Workout creation and prefill selection
 
-- [ ] Build zero-value workout sets from `setCount`.
+- [x] Build zero-value workout sets from `setCount`.
 - [ ] Copy values only from the selected source workout.
 - [ ] Match by routine-exercise identity and set ordinal.
 - [ ] Implement select, replace, clear, and source-deletion behavior.
@@ -372,12 +384,12 @@ structural routine version.
 
 ### Phase 3 — Routine-detail editing
 
-- [ ] Convert exercise links to sheet-opening button rows without chevrons.
-- [ ] Implement set-count/rest routine-exercise sheet.
+- [x] Convert exercise links to sheet-opening button rows without chevrons.
+- [x] Implement set-count/rest routine-exercise sheet.
 - [ ] Include the non-gesture Delete exercise action.
-- [ ] Remove routine-exercise routes, page, translations, and tests.
-- [ ] Update add-exercise behavior for the new model.
-- [ ] Retire target/planned-set controls from the legacy editor.
+- [x] Remove routine-exercise routes, page, translations, and tests.
+- [x] Update add-exercise behavior for the new model.
+- [x] Retire target/planned-set controls from the legacy editor.
 - [ ] Preserve coherent confirmed new-routine creation.
 
 ### Phase 4 — Workout completion and history
@@ -405,16 +417,26 @@ structural routine version.
 
 ### Phase 7 — Cleanup
 
-- [ ] Remove obsolete planned-set components, helpers, styles, and tests.
-- [ ] Remove obsolete target language from all locales and documentation.
-- [ ] Update Styleguide examples.
-- [ ] Re-run architecture, accessibility, import/export, and migration audits.
+- [x] Remove obsolete planned-set components, helpers, styles, and tests.
+- [x] Remove obsolete target language from all locales and documentation.
+- [x] Update Styleguide examples.
+- [ ] Re-run architecture, accessibility, import/export, and schema audits.
+
+### Deferred — Exercise-level starting defaults
+
+- [ ] Define and validate a default rep count for every rep-based exercise.
+- [ ] Use that value only when the selected source workout has no matching
+      value.
+- [ ] Keep weight empty unless the user or a selected workout supplies it.
+- [ ] Keep these defaults on exercise definitions, not routine exercises.
+- [ ] Decide timed-exercise fallback behavior separately.
 
 ## Verification matrix
 
-- [ ] Migration: set counts and routine timing survive; target values are
-      intentionally discarded.
-- [ ] Historical workouts retain every logged result.
+- [x] Fresh/default data uses set counts and contains no routine targets.
+- [x] Incompatible unreleased data resets predictably.
+- [x] Newly created workouts retain every logged result.
+- [x] No-source MVP workouts use `0` reps and `null` weight.
 - [ ] No selected source produces zero-value starting sets.
 - [ ] Selected source values copy only within the same routine occurrence.
 - [ ] New, removed, reordered, and duplicate exercises match safely.

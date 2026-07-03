@@ -89,10 +89,9 @@ describe('value-first property lists', () => {
     expect(Array.from(sections)
       .some((section) => section.querySelector('[slot="heading"]')?.textContent === 'Data'))
       .toBe(false)
-    expect(firstExerciseRow?.getAttribute('href')).toMatch(
-      new RegExp(`^#/routines/${encodeURIComponent(routine.id)}/exercises/`),
-    )
-    expect(firstExerciseRow?.getAttribute('accessory')).toBe('chevron')
+    expect(firstExerciseRow?.getAttribute('activation')).toBe('button')
+    expect(firstExerciseRow?.hasAttribute('href')).toBe(false)
+    expect(firstExerciseRow?.hasAttribute('accessory')).toBe(false)
     expect(exerciseSequence?.querySelector('rrr-sequence-gutter')).not.toBeNull()
     expect(timingCard?.querySelector(
       'rrr-list-row[data-action="edit-transition-default"]',
@@ -130,6 +129,70 @@ describe('value-first property lists', () => {
     expect(gutters[0]?.getAttribute('description')).toBe('Custom')
     expect(gutters[1]?.hasAttribute('description')).toBe(false)
     expect(gutters[1]?.getAttribute('action-label')).not.toContain('default')
+  })
+
+  test('edits routine-exercise set count and rest in a sheet', async () => {
+    const data = storageService.getData()
+    const routine = data.routines[0]!
+    const previousVersionId = routine.activeVersionId
+    const version = data.routineVersions.find(({ id }) => id === previousVersionId)!
+    const routineExercise = version.exercises[0]!
+    const detail = new RrrRoutineDetail()
+    detail.routineId = routine.id
+    document.body.append(detail)
+    await Promise.resolve()
+
+    detail.querySelector<HTMLButtonElement>(
+      `rrr-list-row[data-routine-exercise-id="${routineExercise.id}"] > button`,
+    )?.click()
+    const setCountInput = document.querySelector<HTMLElement & { value: string }>(
+      'rrr-sheet rrr-input[name="set-count"]',
+    )
+    const restInput = document.querySelector<HTMLElement & { value: string }>(
+      'rrr-sheet rrr-input[name="rest-seconds"]',
+    )
+    const confirmButton = document.querySelector<HTMLElement>(
+      'rrr-sheet [data-sheet-result="confirm"]',
+    )
+
+    setCountInput!.value = ''
+    restInput!.value = ''
+    setCountInput?.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    restInput?.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    expect(confirmButton?.hasAttribute('disabled')).toBe(true)
+
+    setCountInput!.value = '0'
+    restInput!.value = '0'
+    setCountInput?.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    restInput?.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    expect(confirmButton?.hasAttribute('disabled')).toBe(true)
+
+    setCountInput!.value = '4'
+    setCountInput?.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    expect(confirmButton?.hasAttribute('disabled')).toBe(false)
+
+    restInput!.value = ''
+    restInput?.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    expect(confirmButton?.hasAttribute('disabled')).toBe(true)
+
+    restInput!.value = '30'
+    restInput?.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    expect(confirmButton?.hasAttribute('disabled')).toBe(false)
+    confirmButton?.click()
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    const updatedRoutine = storageService.getData().routines.find(
+      ({ id }) => id === routine.id,
+    )!
+    const updatedVersion = storageService.getData().routineVersions.find(
+      ({ id }) => id === updatedRoutine.activeVersionId,
+    )!
+    const updatedExercise = updatedVersion.exercises.find(
+      ({ id }) => id === routineExercise.id,
+    )
+
+    expect(updatedRoutine.activeVersionId).not.toBe(previousVersionId)
+    expect(updatedExercise).toMatchObject({ setCount: 4, restSeconds: 30 })
   })
 
   test('edits the routine transition default and saves a new active version', async () => {

@@ -1,7 +1,6 @@
 import type {
   AppData,
   TimeSetEntry,
-  PlannedSet,
   RepsSetEntry,
   SetEntry,
   Workout,
@@ -120,14 +119,6 @@ export function createTimeSet(seconds: number): TimeSetEntry {
   }
 }
 
-function createSetFromPlannedSet(plannedSet: PlannedSet): SetEntry {
-  if (plannedSet.kind === 'reps') {
-    return createRepsSet(plannedSet.targetReps ?? 0, plannedSet.targetWeightKg)
-  }
-
-  return createTimeSet(plannedSet.targetSeconds ?? 0)
-}
-
 export function createWorkoutFromRoutine(data: AppData, routineId: string, date: string): Workout | null {
   const routine = data.routines.find((r) => r.id === routineId)
 
@@ -144,16 +135,27 @@ export function createWorkoutFromRoutine(data: AppData, routineId: string, date:
   const timestamp = new Date().toISOString()
 
   const defaultTransitionSeconds = Math.max(0, version.transitionSeconds)
-  const exercises: WorkoutExerciseEntry[] = version.exercises.map((re, index) => ({
-    id: generateId(),
-    exerciseId: re.exerciseId,
-    sets: re.plannedSets.map((ps) => createSetFromPlannedSet(ps)),
-    transitionBeforeSeconds: index === 0
-      ? 0
-      : Math.max(0, re.transitionBeforeOverrideSeconds ?? defaultTransitionSeconds),
-    restSeconds: Math.max(0, re.restSeconds),
-    notes: re.notes ?? '',
-  }))
+  const exercises: WorkoutExerciseEntry[] = version.exercises.map((re, index) => {
+    const exercise = data.exercises.find((candidate) => candidate.id === re.exerciseId)
+    const sets = Array.from(
+      { length: Math.max(0, Math.floor(re.setCount)) },
+      () => exercise?.kind === 'time'
+        ? createTimeSet(0)
+        : createRepsSet(0, null),
+    )
+
+    return {
+      id: generateId(),
+      exerciseId: re.exerciseId,
+      routineExerciseId: re.id,
+      sets,
+      transitionBeforeSeconds: index === 0
+        ? 0
+        : Math.max(0, re.transitionBeforeOverrideSeconds ?? defaultTransitionSeconds),
+      restSeconds: Math.max(0, re.restSeconds),
+      notes: re.notes ?? '',
+    }
+  })
 
   return {
     id: generateId(),

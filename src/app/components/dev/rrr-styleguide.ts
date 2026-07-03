@@ -585,10 +585,9 @@ export class RrrStyleguide extends HTMLElement {
                 <p class="sample-text">${t('styleguide.sequences.routineDescription')}</p>
                 <rrr-sequence aria-label="${t('styleguide.sequences.routineAria')}">
                   <rrr-list-row
-                    href="#/settings/styleguide"
+                    activation="button"
                     label="${t('styleguide.sequences.exercise.pushups')}"
                     description="${t('styleguide.sequences.exercise.sets.three')}"
-                    accessory="chevron"
                   ></rrr-list-row>
                   <rrr-sequence-gutter
                     value="20"
@@ -599,10 +598,9 @@ export class RrrStyleguide extends HTMLElement {
                     })}"
                   ></rrr-sequence-gutter>
                   <rrr-list-row
-                    href="#/settings/styleguide"
+                    activation="button"
                     label="${t('styleguide.sequences.exercise.rows')}"
                     description="${t('styleguide.sequences.exercise.sets.three')}"
-                    accessory="chevron"
                   ></rrr-list-row>
                   <rrr-sequence-gutter
                     value="45"
@@ -614,10 +612,9 @@ export class RrrStyleguide extends HTMLElement {
                     })}"
                   ></rrr-sequence-gutter>
                   <rrr-list-row
-                    href="#/settings/styleguide"
+                    activation="button"
                     label="${t('styleguide.sequences.exercise.lunges')}"
                     description="${t('styleguide.sequences.exercise.sets.two')}"
-                    accessory="chevron"
                   ></rrr-list-row>
                 </rrr-sequence>
               </div>

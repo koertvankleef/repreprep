@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { isValidAppData } from '../import-export/json-import-service.ts'
+import { createDefaultData } from '../domain/create-default-data.ts'
 
 describe('json-import-service', () => {
   test('isValidAppData returns false for null', () => {
@@ -31,6 +32,21 @@ describe('json-import-service', () => {
   })
 
   test('isValidAppData returns true for valid minimal current AppData', () => {
-    expect(isValidAppData({ schemaVersion: 5, exercises: [], workouts: [], routines: [], routineVersions: [] })).toBe(true)
+    expect(isValidAppData({ schemaVersion: 6, exercises: [], workouts: [], routines: [], routineVersions: [] })).toBe(true)
+  })
+
+  test('isValidAppData rejects a routine exercise with zero sets', () => {
+    const data = createDefaultData()
+    const version = data.routineVersions[0]!
+    const invalid = {
+      ...data,
+      routineVersions: [{
+        ...version,
+        exercises: version.exercises.map((exercise, index) =>
+          index === 0 ? { ...exercise, setCount: 0 } : exercise),
+      }],
+    }
+
+    expect(isValidAppData(invalid)).toBe(false)
   })
 })

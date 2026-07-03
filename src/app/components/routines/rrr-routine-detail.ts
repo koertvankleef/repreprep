@@ -23,6 +23,7 @@ import {
   promptRoutineTransitionDefault,
   promptTransitionOverride,
 } from './routine-timing-sheets.ts'
+import { promptRoutineExerciseSettings } from './routine-exercise-sheets.ts'
 
 export class RrrRoutineDetail extends HTMLElement {
   private routineIdValue: string | null = null
@@ -182,19 +183,18 @@ export class RrrRoutineDetail extends HTMLElement {
     window.location.hash = '#/routines'
   }
 
-  private renderExerciseRow(routineId: string, routineExercise: RoutineExercise): string {
+  private renderExerciseRow(routineExercise: RoutineExercise): string {
     const exercise = storageService
       .getData()
       .exercises.find((candidate) => candidate.id === routineExercise.exerciseId)
     const exerciseName = exercise?.name ?? t('routineDetail.exercises.unknown')
-    const setCount = routineExercise.plannedSets.length
 
     return `
       <rrr-list-row
+        activation="button"
         label="${escapeHtml(exerciseName)}"
-        description="${escapeHtml(tPlural('routineDetail.setCount', setCount))}"
-        href="#/routines/${encodeURIComponent(routineId)}/exercises/${encodeURIComponent(routineExercise.id)}"
-        accessory="chevron"
+        description="${escapeHtml(tPlural('routineDetail.setCount', routineExercise.setCount))}"
+        data-routine-exercise-id="${escapeHtml(routineExercise.id)}"
       ></rrr-list-row>
     `
   }
@@ -240,10 +240,10 @@ export class RrrRoutineDetail extends HTMLElement {
     `
   }
 
-  private renderRoutineFlow(routineId: string, version: RoutineVersion): string {
+  private renderRoutineFlow(version: RoutineVersion): string {
     return buildRoutineFlow(version)
       .map((item) => item.kind === 'exercise'
-        ? this.renderExerciseRow(routineId, item.exercise)
+        ? this.renderExerciseRow(item.exercise)
         : this.renderTransitionGutter(item, version))
       .join('')
   }
@@ -294,6 +294,52 @@ export class RrrRoutineDetail extends HTMLElement {
       if (latest) {
         this.saveRoutineVersion(latest.routine, latest.version, {
           transitionSeconds: seconds,
+        })
+      }
+    } finally {
+      this.timingSheetActive = false
+    }
+  }
+
+  private async editRoutineExercise(routineExerciseId: string): Promise<void> {
+    const current = this.getCurrentRoutineVersion()
+    const routineExercise = current?.version.exercises.find(
+      (exercise) => exercise.id === routineExerciseId,
+    )
+    const exerciseName = routineExercise
+      ? storageService.getData().exercises.find(
+          (exercise) => exercise.id === routineExercise.exerciseId,
+        )?.name
+      : undefined
+    if (!current || !routineExercise || !exerciseName || this.timingSheetActive) {
+      return
+    }
+
+    this.timingSheetActive = true
+    try {
+      const settings = await promptRoutineExerciseSettings({
+        exerciseName,
+        setCount: routineExercise.setCount,
+        restSeconds: routineExercise.restSeconds,
+      })
+      if (
+        !settings
+        || (
+          settings.setCount === routineExercise.setCount
+          && settings.restSeconds === routineExercise.restSeconds
+        )
+      ) {
+        return
+      }
+
+      const latest = this.getCurrentRoutineVersion()
+      if (latest) {
+        this.saveRoutineVersion(latest.routine, latest.version, {
+          exercises: latest.version.exercises.map((exercise) =>
+            exercise.id === routineExerciseId
+              ? { ...exercise, ...settings }
+              : exercise,
+          ),
         })
       }
     } finally {
@@ -406,7 +452,7 @@ export class RrrRoutineDetail extends HTMLElement {
               exerciseCount > 0
                 ? `
                   <rrr-sequence aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
-                    ${summary.version ? this.renderRoutineFlow(routineId, summary.version) : ''}
+                    ${summary.version ? this.renderRoutineFlow(summary.version) : ''}
                   </rrr-sequence>
                 `
                 : `<p>${t('routineDetail.exercises.empty')}</p>`
@@ -460,6 +506,15 @@ export class RrrRoutineDetail extends HTMLElement {
           const beforeExerciseId = gutter.dataset.beforeExerciseId
           if (beforeExerciseId) {
             void this.editTransitionOverride(beforeExerciseId)
+          }
+        })
+      })
+    this.querySelectorAll<HTMLElement>('rrr-list-row[data-routine-exercise-id]')
+      .forEach((row) => {
+        row.addEventListener('click', () => {
+          const routineExerciseId = row.dataset.routineExerciseId
+          if (routineExerciseId) {
+            void this.editRoutineExercise(routineExerciseId)
           }
         })
       })

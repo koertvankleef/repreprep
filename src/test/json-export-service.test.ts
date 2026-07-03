@@ -35,7 +35,7 @@ describe('json-export-service', () => {
         exerciseId,
         transitionBeforeOverrideSeconds: null,
         restSeconds: 20,
-        plannedSets: [{ id: 'ps-1', kind: 'reps', targetReps: 8, targetWeightKg: 40 }],
+        setCount: 2,
       },
     ])
     const json = formatExportData(data)

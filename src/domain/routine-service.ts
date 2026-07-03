@@ -1,10 +1,8 @@
 import type {
   AppData,
-  RepsPlannedSet,
   Routine,
   RoutineExercise,
   RoutineVersion,
-  TimePlannedSet,
 } from './types.ts'
 import { generateId } from '../utils/id.ts'
 
@@ -29,7 +27,7 @@ function normalizeRoutineExercises(exercises: RoutineExercise[]): RoutineExercis
         ? null
         : Math.max(0, exercise.transitionBeforeOverrideSeconds),
     restSeconds: Math.max(0, exercise.restSeconds),
-    plannedSets: exercise.plannedSets.map((set) => ({ ...set })),
+    setCount: Math.max(1, Math.floor(exercise.setCount)),
   }))
 }
 
@@ -96,6 +94,7 @@ export function createRoutine(data: AppData, name: string, exercises: RoutineExe
     id: routineId,
     name,
     activeVersionId: versionId,
+    prefillSourceWorkoutId: null,
     archived: false,
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -179,26 +178,6 @@ export function createRoutineExercise(exerciseId: string): RoutineExercise {
     exerciseId,
     transitionBeforeOverrideSeconds: null,
     restSeconds: DEFAULT_REST_SECONDS,
-    plannedSets: [],
-  }
-}
-
-export function createRepsPlannedSet(
-  targetReps: number | null = null,
-  targetWeightKg: number | null = null,
-): RepsPlannedSet {
-  return {
-    id: generateId(),
-    kind: 'reps',
-    targetReps,
-    targetWeightKg,
-  }
-}
-
-export function createTimePlannedSet(targetSeconds: number | null = null): TimePlannedSet {
-  return {
-    id: generateId(),
-    kind: 'time',
-    targetSeconds,
+    setCount: 1,
   }
 }

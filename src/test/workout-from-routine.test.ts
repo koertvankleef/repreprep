@@ -10,10 +10,7 @@ function makeRoutineExercise(exerciseId: string): RoutineExercise {
     exerciseId,
     transitionBeforeOverrideSeconds: null,
     restSeconds: 35,
-    plannedSets: [
-      { id: `ps-${exerciseId}-1`, kind: 'reps', targetReps: 8, targetWeightKg: 40 },
-      { id: `ps-${exerciseId}-2`, kind: 'reps', targetReps: 10, targetWeightKg: null },
-    ],
+    setCount: 2,
   }
 }
 
@@ -37,6 +34,7 @@ describe('createWorkoutFromRoutine', () => {
     expect(workout?.date).toBe('2026-06-14')
     expect(workout?.exercises).toHaveLength(1)
     expect(workout?.exercises[0]?.exerciseId).toBe(exerciseId)
+    expect(workout?.exercises[0]?.routineExerciseId).toBe(`re-${exerciseId}`)
     expect(workout?.transitionSeconds).toBe(10)
     expect(workout?.exercises[0]?.restSeconds).toBe(35)
   })
@@ -82,7 +80,7 @@ describe('createWorkoutFromRoutine', () => {
     expect(workout?.transitionSeconds).toBe(10)
   })
 
-  test('prefills sets from planned sets', () => {
+  test('creates zero-value rep sets from the routine set count', () => {
     const data = createDefaultData()
     const exerciseId = data.exercises[0]?.id ?? ''
     const withRoutine = createRoutine(data, 'Upper Body', [makeRoutineExercise(exerciseId)])
@@ -96,12 +94,12 @@ describe('createWorkoutFromRoutine', () => {
 
     const firstSet = entry?.sets[0]
     if (firstSet?.kind === 'reps') {
-      expect(firstSet.reps).toBe(8)
-      expect(firstSet.weightKg).toBe(40)
+      expect(firstSet.reps).toBe(0)
+      expect(firstSet.weightKg).toBeNull()
     }
   })
 
-  test('prefills duration sets from planned duration sets', () => {
+  test('creates zero-value duration sets from the routine set count', () => {
     const data = createDefaultData()
     const plankExercise = data.exercises.find((e) => e.kind === 'time')
     const plankId = plankExercise?.id ?? ''
@@ -111,7 +109,7 @@ describe('createWorkoutFromRoutine', () => {
         exerciseId: plankId,
         transitionBeforeOverrideSeconds: null,
         restSeconds: 20,
-        plannedSets: [{ id: 'ps-1', kind: 'time', targetSeconds: 45 }],
+        setCount: 1,
       },
     ]
     const withRoutine = createRoutine(data, 'Core', exercises)
@@ -123,7 +121,7 @@ describe('createWorkoutFromRoutine', () => {
 
     expect(firstSet?.kind).toBe('time')
     if (firstSet?.kind === 'time') {
-      expect(firstSet.seconds).toBe(45)
+      expect(firstSet.seconds).toBe(0)
     }
   })
 
