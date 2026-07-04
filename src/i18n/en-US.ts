@@ -431,6 +431,11 @@ export const enUsMessages = {
   'routineDetail.transition.overrideSheet.none': 'No transition',
   'routineDetail.transition.overrideSheet.custom': 'Custom duration',
 
+  'numberStepper.decrement': 'Decrease {label}',
+  'numberStepper.increment': 'Increase {label}',
+  'styleguide.numberStepper.buttonOnlyHelper': 'This example only allows stepping with the buttons.',
+  'styleguide.numberStepper.decimalHelper': 'This example accepts localized decimal values.',
+
   'routineExercise.sheet.heading': 'Edit {exercise}',
   'routineExercise.setCount.label': 'Number of sets',
   'routineExercise.rest.sheet.seconds': 'Seconds of rest between sets',

@@ -9,8 +9,33 @@ import { storageService } from '../app/storage-instance.ts'
 import { RrrExerciseDetail } from '../app/components/exercises/rrr-exercise-detail.ts'
 import { RrrRoutineDetail } from '../app/components/routines/rrr-routine-detail.ts'
 
-beforeAll(() => {
+beforeAll(async () => {
+  if (!('replaceSync' in CSSStyleSheet.prototype)) {
+    Object.defineProperty(CSSStyleSheet.prototype, 'replaceSync', {
+      configurable: true,
+      value: () => {},
+    })
+  }
+  const adoptedStyleSheets = new WeakMap<Document | ShadowRoot, CSSStyleSheet[]>()
+  const descriptor = {
+    configurable: true,
+    get(this: Document | ShadowRoot): CSSStyleSheet[] {
+      return adoptedStyleSheets.get(this) ?? []
+    },
+    set(this: Document | ShadowRoot, value: CSSStyleSheet[]): void {
+      adoptedStyleSheets.set(this, value)
+    },
+  }
+  if (!('adoptedStyleSheets' in Document.prototype)) {
+    Object.defineProperty(Document.prototype, 'adoptedStyleSheets', descriptor)
+  }
+  if (!('adoptedStyleSheets' in ShadowRoot.prototype)) {
+    Object.defineProperty(ShadowRoot.prototype, 'adoptedStyleSheets', descriptor)
+  }
+
+  const { registerRrrNumberStepper } = await import('../design-system/components/rrr-number-stepper.ts')
   initLocale('en-US')
+  registerRrrNumberStepper()
   registerRrrSheet()
   registerRrrListRow()
   registerRrrSequence()
@@ -146,10 +171,10 @@ describe('value-first property lists', () => {
       `rrr-list-row[data-routine-exercise-id="${routineExercise.id}"] > button`,
     )?.click()
     const setCountInput = document.querySelector<HTMLElement & { value: string }>(
-      'rrr-sheet rrr-input[name="set-count"]',
+      'rrr-sheet rrr-number-stepper[name="set-count"]',
     )
     const restInput = document.querySelector<HTMLElement & { value: string }>(
-      'rrr-sheet rrr-input[name="rest-seconds"]',
+      'rrr-sheet rrr-number-stepper[name="rest-seconds"]',
     )
     const confirmButton = document.querySelector<HTMLElement>(
       'rrr-sheet [data-sheet-result="confirm"]',

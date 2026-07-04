@@ -9,6 +9,7 @@ import { registerRrrIcon } from './rrr-icon.ts'
 import { registerRrrListCard } from './rrr-list-card.ts'
 import { registerRrrListRow } from './rrr-list-row.ts'
 import { registerRrrMeasurement } from './rrr-measurement.ts'
+import { registerRrrNumberStepper } from './rrr-number-stepper.ts'
 import { registerRrrSection } from './rrr-section.ts'
 import { registerRrrSequence } from './rrr-sequence.ts'
 import { registerRrrSequenceGutter } from './rrr-sequence-gutter.ts'
@@ -28,6 +29,7 @@ export function registerDesignSystemComponents(): void {
   registerRrrDateField()
   registerRrrIcon()
   registerRrrMeasurement()
+  registerRrrNumberStepper()
   registerRrrSection()
   registerRrrSequence()
   registerRrrSequenceGutter()

@@ -221,6 +221,44 @@ when dismissing and canceling have the same result.
 Non-dismissible sheets omit the Close control and must provide an explicit
 action that completes the workflow.
 
+## Number steppers
+
+Use `rrr-number-stepper` when a numeric value is most naturally adjusted in
+small increments. It remains intrinsically sized so its decrement and increment
+buttons stay close to the value, including inside otherwise full-width sheet
+forms.
+
+The component stores its `value`, `min`, `max`, and `step` attributes as
+locale-independent numbers with a dot decimal separator. Its visible value and
+direct input follow the supplied `locale` (or the document language). It is a
+form-associated custom element: `name`, `required`, constraints, form reset,
+and disabled fieldsets use native form behavior.
+
+```html
+<rrr-number-stepper
+  label="Number of sets"
+  name="set-count"
+  value="3"
+  min="1"
+  step="1"
+  size="2"
+  locale="en-US"
+  button-only
+  decrement-label="Decrease number of sets"
+  increment-label="Increase number of sets"
+></rrr-number-stepper>
+```
+
+`button-only` prevents direct typing while keeping the numeric value focusable
+and available to assistive technology. Without it, localized floating-point
+input is supported. `size` controls visible character capacity without imposing
+a validation maximum. When omitted, a finite `max` determines the capacity;
+otherwise the component uses a small fallback.
+
+Supply localized decrement and increment labels. Use `helper-text` for normal
+guidance and `invalid` with `error-text` when a workflow needs to report an
+invalid value.
+
 ## Date fields
 
 Use `rrr-date-field` instead of a native `input[type="date"]` when date

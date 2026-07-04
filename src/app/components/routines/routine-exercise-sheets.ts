@@ -1,6 +1,6 @@
-import type { RrrInput } from '../../../design-system/components/rrr-input.ts'
+import type { RrrNumberStepper } from '../../../design-system/components/rrr-number-stepper.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
-import { t } from '../../../i18n/index.ts'
+import { getLocale, t } from '../../../i18n/index.ts'
 import { presentSheet } from '../../../utils/sheet-service.ts'
 
 export type RoutineExerciseSettings = {
@@ -8,31 +8,36 @@ export type RoutineExerciseSettings = {
   restSeconds: number
 }
 
-function createNumberInput(options: {
+function createNumberStepper(options: {
   name: string
   label: string
   value: number
   min: number
+  size: number
   autofocus?: boolean
-}): RrrInput {
-  const input = document.createElement('rrr-input') as RrrInput
-  input.slot = 'body'
-  input.setAttribute('type', 'number')
-  input.setAttribute('name', options.name)
-  input.setAttribute('label', options.label)
-  input.setAttribute('min', String(options.min))
-  input.setAttribute('step', '1')
-  input.toggleAttribute('autofocus', options.autofocus ?? false)
-  input.value = String(options.value)
-  return input
+}): RrrNumberStepper {
+  const stepper = document.createElement('rrr-number-stepper') as RrrNumberStepper
+  stepper.slot = 'body'
+  stepper.setAttribute('name', options.name)
+  stepper.setAttribute('label', options.label)
+  stepper.setAttribute('min', String(options.min))
+  stepper.setAttribute('step', '1')
+  stepper.setAttribute('size', String(options.size))
+  stepper.setAttribute('locale', getLocale())
+  stepper.setAttribute('button-only', '')
+  stepper.setAttribute('decrement-label', t('numberStepper.decrement', { label: options.label }))
+  stepper.setAttribute('increment-label', t('numberStepper.increment', { label: options.label }))
+  stepper.toggleAttribute('autofocus', options.autofocus ?? false)
+  stepper.value = options.value
+  return stepper
 }
 
-function parseRequiredInteger(input: RrrInput, min: number): number | undefined {
-  if (!input.value.trim()) {
+function parseRequiredInteger(stepper: RrrNumberStepper, min: number): number | undefined {
+  if (!stepper.value.trim()) {
     return undefined
   }
 
-  const value = Number(input.value)
+  const value = stepper.valueAsNumber
   return Number.isInteger(value) && value >= min ? value : undefined
 }
 
@@ -47,18 +52,20 @@ export async function promptRoutineExerciseSettings(options: {
   heading.className = 'sheet-title'
   heading.textContent = t('routineExercise.sheet.heading', { exercise: options.exerciseName })
 
-  const setCountInput = createNumberInput({
+  const setCountInput = createNumberStepper({
     name: 'set-count',
     label: t('routineExercise.setCount.label'),
     value: options.setCount,
     min: 1,
+    size: 2,
     autofocus: true,
   })
-  const restInput = createNumberInput({
+  const restInput = createNumberStepper({
     name: 'rest-seconds',
     label: t('routineExercise.rest.sheet.seconds'),
     value: options.restSeconds,
     min: 0,
+    size: 3,
   })
   const confirmButton = document.createElement('rrr-button')
   confirmButton.slot = 'actions'

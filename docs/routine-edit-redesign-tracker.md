@@ -386,6 +386,7 @@ structural routine version.
 
 - [x] Convert exercise links to sheet-opening button rows without chevrons.
 - [x] Implement set-count/rest routine-exercise sheet.
+- [x] Use a localized, button-only number stepper for set count and rest.
 - [ ] Include the non-gesture Delete exercise action.
 - [x] Remove routine-exercise routes, page, translations, and tests.
 - [x] Update add-exercise behavior for the new model.

@@ -1,0 +1,170 @@
+:host {
+  display: grid;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  gap: var(--rrr-number-stepper-gap);
+  color: var(--rrr-color-text);
+
+  --rrr-number-stepper-gap: var(--rrr-spacing-xs);
+  --rrr-number-stepper-label-color: var(--rrr-colors-grayscale-90);
+  --rrr-number-stepper-label-font-weight: var(--rrr-font-weight-semibold);
+  --rrr-number-stepper-control-gap: var(--rrr-spacing-s);
+  --rrr-number-stepper-input-padding-inline: var(--rrr-spacing-s);
+  --rrr-number-stepper-border-color: var(--rrr-colors-grayscale-40);
+  --rrr-number-stepper-radius: var(--rrr-radius-s);
+  --rrr-number-stepper-background: var(--rrr-surface-raised);
+  --rrr-number-stepper-color: var(--rrr-colors-grayscale-100);
+  --rrr-number-stepper-transition: var(--rrr-transition-default);
+  --rrr-number-stepper-hover-border-color: var(--rrr-colors-activity-indigo-30);
+  --rrr-number-stepper-focus-border-color: var(--rrr-colors-activity-indigo-50);
+  --rrr-number-stepper-focus-shadow: 0 0 0 4px var(--rrr-colors-activity-indigo-10);
+  --rrr-number-stepper-invalid-border-color: var(--rrr-colors-context-danger-50);
+  --rrr-number-stepper-invalid-background: var(--rrr-colors-context-danger-10);
+  --rrr-number-stepper-invalid-focus-shadow: 0 0 0 4px var(--rrr-colors-context-danger-10);
+  --rrr-number-stepper-error-color: var(--rrr-colors-context-danger-70);
+  --rrr-number-stepper-message-color: var(--rrr-text-muted);
+  --rrr-number-stepper-message-min-block-size: calc(var(--rrr-font-size-xs) * 1.4);
+  --rrr-number-stepper-button-border-color: var(--rrr-button-fg);
+  --rrr-number-stepper-button-background: var(--rrr-surface-raised);
+  --rrr-number-stepper-button-color: var(--rrr-button-fg);
+  --rrr-number-stepper-button-hover-background:
+    color-mix(in oklab, var(--rrr-color-primary-mix), var(--rrr-surface-raised) 85%);
+  --rrr-number-stepper-disabled-border-color: var(--rrr-colors-grayscale-30);
+  --rrr-number-stepper-disabled-background: var(--rrr-colors-grayscale-30);
+  --rrr-number-stepper-disabled-color: var(--rrr-colors-grayscale-70);
+}
+
+label {
+  color: var(--rrr-number-stepper-label-color);
+  font-weight: var(--rrr-number-stepper-label-font-weight);
+}
+
+:host([invalid]) label {
+  color: var(--rrr-number-stepper-error-color);
+}
+
+.control {
+  display: inline-grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  gap: var(--rrr-number-stepper-control-gap);
+  inline-size: fit-content;
+  max-inline-size: 100%;
+}
+
+input,
+button {
+  box-sizing: border-box;
+  min-block-size: var(--rrr-control-min-block-size);
+  font: inherit;
+}
+
+input {
+  inline-size: calc(
+    (var(--rrr-number-stepper-field-size, 3) * 1ch)
+    + (2 * var(--rrr-number-stepper-input-padding-inline))
+    + (2 * var(--rrr-border-width))
+  );
+  min-inline-size: 0;
+  padding: var(--rrr-spacing-s) var(--rrr-number-stepper-input-padding-inline);
+  border: var(--rrr-border-width) solid var(--rrr-number-stepper-border-color);
+  border-radius: var(--rrr-number-stepper-radius);
+  background: var(--rrr-number-stepper-background);
+  color: var(--rrr-number-stepper-color);
+  text-align: center;
+  transition:
+    border-color var(--rrr-number-stepper-transition),
+    box-shadow var(--rrr-number-stepper-transition),
+    background var(--rrr-number-stepper-transition);
+}
+
+input:hover:not(:disabled) {
+  border-color: var(--rrr-number-stepper-hover-border-color);
+}
+
+input:focus-visible {
+  border-color: var(--rrr-number-stepper-focus-border-color);
+  outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
+  outline-offset: var(--global-focus-ring-offset);
+  box-shadow: var(--rrr-number-stepper-focus-shadow);
+}
+
+.step-button {
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--rrr-control-min-block-size);
+  padding: 0;
+  border: var(--rrr-border-width) solid var(--rrr-number-stepper-button-border-color);
+  border-radius: 50%;
+  background: var(--rrr-number-stepper-button-background);
+  color: var(--rrr-number-stepper-button-color);
+  box-shadow: var(--rrr-shadow-button);
+  cursor: pointer;
+  transition:
+    background var(--rrr-number-stepper-transition),
+    border-color var(--rrr-number-stepper-transition),
+    box-shadow var(--rrr-number-stepper-transition),
+    transform var(--rrr-number-stepper-transition);
+}
+
+.step-button:hover:not(:disabled),
+.step-button:active:not(:disabled) {
+  background: var(--rrr-number-stepper-button-hover-background);
+  box-shadow: var(--rrr-depth-2-shadow);
+}
+
+.step-button:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: var(--rrr-depth-1-shadow);
+}
+
+.step-button:focus-visible {
+  outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
+  outline-offset: var(--global-focus-ring-offset);
+}
+
+.step-button rrr-icon {
+  font-size: 1.25rem;
+}
+
+:host([invalid]) input {
+  border-color: var(--rrr-number-stepper-invalid-border-color);
+  background: var(--rrr-number-stepper-invalid-background);
+}
+
+:host([invalid]) input:focus-visible {
+  box-shadow: var(--rrr-number-stepper-invalid-focus-shadow);
+}
+
+input:disabled,
+.step-button:disabled {
+  cursor: not-allowed;
+  opacity: .6;
+  border-color: var(--rrr-number-stepper-disabled-border-color);
+  background: var(--rrr-number-stepper-disabled-background);
+  color: var(--rrr-number-stepper-disabled-color);
+  box-shadow: none;
+}
+
+.message {
+  min-block-size: var(--rrr-number-stepper-message-min-block-size);
+  margin: 0;
+  color: var(--rrr-number-stepper-message-color);
+  font-size: var(--rrr-font-size-xs);
+  line-height: 1.4;
+  visibility: hidden;
+}
+
+.message:not(:empty) {
+  visibility: visible;
+}
+
+.message--error {
+  color: var(--rrr-number-stepper-error-color);
+}
+
+@media (forced-colors: active) {
+  .step-button {
+    border-color: ButtonText;
+  }
+}

@@ -431,6 +431,11 @@ export const nlNlMessages = {
   'routineDetail.transition.overrideSheet.none': 'Geen overgang',
   'routineDetail.transition.overrideSheet.custom': 'Aangepaste duur',
 
+  'numberStepper.decrement': 'Verlaag {label}',
+  'numberStepper.increment': 'Verhoog {label}',
+  'styleguide.numberStepper.buttonOnlyHelper': 'In dit voorbeeld kan de waarde alleen met de knoppen worden aangepast.',
+  'styleguide.numberStepper.decimalHelper': 'In dit voorbeeld kunnen gelokaliseerde decimale waarden worden ingevoerd.',
+
   'routineExercise.sheet.heading': '{exercise} bewerken',
   'routineExercise.setCount.label': 'Aantal sets',
   'routineExercise.rest.sheet.seconds': 'Seconden rust tussen sets',

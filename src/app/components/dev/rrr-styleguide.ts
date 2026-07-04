@@ -667,6 +667,19 @@ export class RrrStyleguide extends HTMLElement {
               <div class="showcase-grid">
                 <div class="component-column">
                   <rrr-input label="${t('field.name')}" name="sample-name" placeholder="${t('exercise.form.name.placeholder')}" value="Bench Press"></rrr-input>
+                  <rrr-number-stepper
+                    label="${t('routineExercise.setCount.label')}"
+                    name="sample-set-count"
+                    value="3"
+                    min="1"
+                    step="1"
+                    size="2"
+                    locale="${getLocale()}"
+                    button-only
+                    helper-text="${t('styleguide.numberStepper.buttonOnlyHelper')}"
+                    decrement-label="${t('numberStepper.decrement', { label: t('routineExercise.setCount.label') })}"
+                    increment-label="${t('numberStepper.increment', { label: t('routineExercise.setCount.label') })}"
+                  ></rrr-number-stepper>
                   <rrr-date-field
                     label="${t('field.date')}"
                     name="sample-date"
@@ -691,6 +704,18 @@ export class RrrStyleguide extends HTMLElement {
                   <rrr-textarea label="${t('workout.form.notes')}" name="sample-notes" rows="3" placeholder="${t('workout.form.notes.placeholder')}" value="Focus on controlled tempo and full range of motion."></rrr-textarea>
                 </div>
                 <div class="component-column">
+                  <rrr-number-stepper
+                    label="${t('setEntry.field.weightKg')}"
+                    name="sample-weight"
+                    value="2.5"
+                    min="0"
+                    max="100"
+                    step="0.5"
+                    locale="${getLocale()}"
+                    helper-text="${t('styleguide.numberStepper.decimalHelper')}"
+                    decrement-label="${t('numberStepper.decrement', { label: t('setEntry.field.weightKg') })}"
+                    increment-label="${t('numberStepper.increment', { label: t('setEntry.field.weightKg') })}"
+                  ></rrr-number-stepper>
                   <rrr-input label="${t('styleguide.invalidExample')}" invalid error-text="${t('dialog.validation.required')}" value=""></rrr-input>
                   <rrr-input label="${t('styleguide.disabledExample')}" disabled value="${t('action.save')}"></rrr-input>
                   <rrr-select label="${t('styleguide.disabledExample')}" name="sample-kind-disabled" value="time" disabled>
