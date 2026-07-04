@@ -133,6 +133,7 @@ export function renderRoutineFlowControls(options: {
       <rrr-list-row
         activation="button"
         label="${t('routineDetail.transition.defaultLabel')}"
+        description="${t('routineDetail.transition.defaultDescription')}"
         value-text="${escapeHtml(tPlural(
           'routineDetail.transition.duration',
           options.transitionSeconds,

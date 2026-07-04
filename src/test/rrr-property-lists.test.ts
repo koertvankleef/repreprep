@@ -125,6 +125,9 @@ describe('value-first property lists', () => {
     expect(timingCard?.querySelector(
       'rrr-list-row[data-action="edit-transition-default"]',
     )?.getAttribute('accessory')).toBe('value')
+    expect(timingCard?.querySelector(
+      'rrr-list-row[data-action="edit-transition-default"]',
+    )?.getAttribute('description')).toBe('Default time between exercises')
     expect(timingRows[0]?.dataset.action).toBe('add-routine-exercise')
     expect(timingRows[1]?.dataset.action).toBe('edit-transition-default')
     expect(flowCard?.querySelector(':scope > rrr-sequence')).toBe(exerciseSequence)
