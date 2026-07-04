@@ -88,7 +88,6 @@
   --rrr-color-primary-deep: var(--rrr-colors-serene-mint-70);
   /* use mix as: color-mix(in oklab, var(--rrr-color-primary-mix), transparent 85%) */
   --rrr-color-primary-mix: var(--rrr-colors-serene-mint-mix);
-  --rrr-color-primary-translucent-bg: color-mix(in oklab, var(--rrr-color-primary-mix), transparent 85%);
   --rrr-color-contrast: var(--rrr-colors-grayscale-00);
   --rrr-color-contrast-negative: var(--rrr-colors-grayscale-100);
   --rrr-color-accent: var(--rrr-colors-activity-indigo-60);

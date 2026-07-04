@@ -27,45 +27,38 @@
   --rrr-input-error-color: var(--rrr-colors-context-danger-70);
   --rrr-input-error-min-block-size: calc(var(--rrr-font-size-xs) * 1.4);
 
-  --_accent-bg: var(--rrr-color-primary);
-  --_accent-bg-hover: var(--rrr-colors-activity-indigo-70);
-  --_interactive-fg: var(--rrr-input-fg, var(--rrr-color-primary));
+  --_accent-mix: var(--rrr-color-primary-mix);
+  --_interactive-fg: var(--rrr-input-fg, var(--rrr-button-fg));
 }
 
 :host([tone='neutral']) {
-  --_accent-bg: var(--rrr-input-neutral-bg, var(--rrr-color-text));
-  --_accent-bg-hover: var(--rrr-input-neutral-bg-hover, color-mix(in oklab, var(--rrr-color-text), var(--rrr-surface-base) 16%));
+  --_accent-mix: var(--rrr-color-neutral-mix);
   --_interactive-fg: var(--rrr-input-neutral-fg, var(--rrr-color-text));
 }
 
 :host([tone='accent']) {
-  --_accent-bg: var(--rrr-colors-serene-mint-60);
-  --_accent-bg-hover: var(--rrr-colors-serene-mint-70);
-  --_interactive-fg: var(--rrr-input-fg-accent, var(--rrr-colors-serene-mint-70));
+  --_accent-mix: var(--rrr-color-accent-mix);
+  --_interactive-fg: var(--rrr-input-fg-accent, var(--rrr-button-fg-accent));
 }
 
 :host([tone='info']) {
-  --_accent-bg: var(--rrr-colors-context-info-60);
-  --_accent-bg-hover: var(--rrr-colors-context-info-70);
-  --_interactive-fg: var(--rrr-input-fg-info, var(--rrr-colors-context-info-70));
+  --_accent-mix: var(--rrr-colors-context-info-mix);
+  --_interactive-fg: var(--rrr-input-fg-info, var(--rrr-button-fg-info));
 }
 
 :host([tone='success']) {
-  --_accent-bg: var(--rrr-colors-context-success-60);
-  --_accent-bg-hover: var(--rrr-colors-context-success-70);
-  --_interactive-fg: var(--rrr-input-fg-success, var(--rrr-colors-context-success-70));
+  --_accent-mix: var(--rrr-colors-context-success-mix);
+  --_interactive-fg: var(--rrr-input-fg-success, var(--rrr-button-fg-success));
 }
 
 :host([tone='warning']) {
-  --_accent-bg: var(--rrr-colors-context-warning-60);
-  --_accent-bg-hover: var(--rrr-colors-context-warning-70);
-  --_interactive-fg: var(--rrr-input-fg-warning, var(--rrr-colors-context-warning-70));
+  --_accent-mix: var(--rrr-colors-context-warning-mix);
+  --_interactive-fg: var(--rrr-input-fg-warning, var(--rrr-button-fg-warning));
 }
 
 :host([tone='danger']) {
-  --_accent-bg: var(--rrr-colors-context-danger-60);
-  --_accent-bg-hover: var(--rrr-colors-context-danger-70);
-  --_interactive-fg: var(--rrr-input-fg-danger, var(--rrr-colors-context-danger-70));
+  --_accent-mix: var(--rrr-colors-context-danger-mix);
+  --_interactive-fg: var(--rrr-input-fg-danger, var(--rrr-button-fg-danger));
 }
 
 label {
@@ -157,7 +150,7 @@ input::placeholder {
 }
 
 :host([variant='outline']:not([disabled])) .control:hover {
-  background: color-mix(in oklab, var(--_accent-bg), transparent 86%);
+  background: color-mix(in oklab, var(--_accent-mix), var(--rrr-surface-raised) 85%);
   border-color: var(--_interactive-fg);
 }
 

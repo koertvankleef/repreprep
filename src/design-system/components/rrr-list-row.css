@@ -11,11 +11,9 @@ rrr-list-row {
   --rrr-list-row-tone-success-color: var(--rrr-button-fg-success);
   --rrr-list-row-tone-warning-color: var(--rrr-button-fg-warning);
   --rrr-list-row-tone-danger-color: var(--rrr-button-fg-danger);
-  /* needs to be separated into fg bg using the mix color for hover? */
   --rrr-list-row-tone-color: var(--rrr-list-row-tone-primary-color);
-  /* --rrr-list-row-tone-color: var(--rrr-color-primary-mix); */
-
-  --rrr-list-row-background-hover: color-mix(in oklab, var(--rrr-list-row-tone-color), transparent 85%);
+  --rrr-list-row-tone-mix-color: var(--rrr-color-primary-mix);
+  --rrr-list-row-background-hover: color-mix(in oklab, var(--rrr-list-row-tone-mix-color), var(--rrr-surface-raised) 85%);
   --rrr-list-row-min-block-size: var(--rrr-sizes-grid-7);
   --rrr-list-row-padding-block: var(--rrr-spacing-m);
   --rrr-list-row-padding-inline: var(--rrr-spacing-m);
@@ -31,31 +29,38 @@ rrr-list-row {
 }
 
 rrr-list-row[tone='primary'] {
-  --rrr-list-row-tone-color: var(--rrr-color-primary-mix);
+  --rrr-list-row-tone-color: var(--rrr-list-row-tone-primary-color);
+  --rrr-list-row-tone-mix-color: var(--rrr-color-primary-mix);
 }
 
 rrr-list-row[tone='neutral'] {
   --rrr-list-row-tone-color: var(--rrr-list-row-tone-neutral-color);
+  --rrr-list-row-tone-mix-color: var(--rrr-color-neutral-mix);
 }
 
 rrr-list-row[tone='accent'] {
   --rrr-list-row-tone-color: var(--rrr-list-row-tone-accent-color);
+  --rrr-list-row-tone-mix-color: var(--rrr-color-accent-mix);
 }
 
 rrr-list-row[tone='info'] {
   --rrr-list-row-tone-color: var(--rrr-list-row-tone-info-color);
+  --rrr-list-row-tone-mix-color: var(--rrr-colors-context-info-mix);
 }
 
 rrr-list-row[tone='success'] {
   --rrr-list-row-tone-color: var(--rrr-list-row-tone-success-color);
+  --rrr-list-row-tone-mix-color: var(--rrr-colors-context-success-mix);
 }
 
 rrr-list-row[tone='warning'] {
   --rrr-list-row-tone-color: var(--rrr-list-row-tone-warning-color);
+  --rrr-list-row-tone-mix-color: var(--rrr-colors-context-warning-mix);
 }
 
 rrr-list-row[tone='danger'] {
   --rrr-list-row-tone-color: var(--rrr-list-row-tone-danger-color);
+  --rrr-list-row-tone-mix-color: var(--rrr-colors-context-danger-mix);
 }
 
 .rrr-list-row__row {
@@ -82,7 +87,7 @@ rrr-list-row:not([disabled]) .rrr-list-row__row--interactive:hover,
 rrr-list-row:not([disabled]) .rrr-list-row__row--interactive:active,
 rrr-list-row:not([disabled]) .rrr-list-row__row--control:hover,
 rrr-list-row:not([disabled]) .rrr-list-row__row--control:active {
-  background: color-mix(in oklab, var(--rrr-color-primary-mix), var(--rrr-surface-raised) 85%);
+  background: var(--rrr-list-row-background-hover);
   color: var(--rrr-list-row-color);
   box-shadow: none;
   transform: none;
