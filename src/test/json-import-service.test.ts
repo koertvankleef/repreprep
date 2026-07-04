@@ -32,7 +32,7 @@ describe('json-import-service', () => {
   })
 
   test('isValidAppData returns true for valid minimal current AppData', () => {
-    expect(isValidAppData({ schemaVersion: 6, exercises: [], workouts: [], routines: [], routineVersions: [] })).toBe(true)
+    expect(isValidAppData({ schemaVersion: 7, exercises: [], workouts: [], routines: [], routineVersions: [] })).toBe(true)
   })
 
   test('isValidAppData rejects a routine exercise with zero sets', () => {
@@ -48,5 +48,23 @@ describe('json-import-service', () => {
     }
 
     expect(isValidAppData(invalid)).toBe(false)
+  })
+
+  test('isValidAppData requires persisted workout completion state', () => {
+    const data = createDefaultData()
+    const invalidWorkout = {
+      id: 'workout-1',
+      date: '2026-07-04',
+      notes: '',
+      exercises: [],
+      createdAt: '2026-07-04T10:00:00.000Z',
+      updatedAt: '2026-07-04T10:00:00.000Z',
+    }
+
+    expect(isValidAppData({ ...data, workouts: [invalidWorkout] })).toBe(false)
+    expect(isValidAppData({
+      ...data,
+      workouts: [{ ...invalidWorkout, completedAt: null }],
+    })).toBe(true)
   })
 })

@@ -38,14 +38,54 @@ export function deleteWorkout(data: AppData, id: string): AppData {
     return data
   }
 
+  const timestamp = new Date().toISOString()
+
   return {
     ...data,
     workouts,
+    routines: data.routines.map((routine) =>
+      routine.prefillSourceWorkoutId === id
+        ? { ...routine, prefillSourceWorkoutId: null, updatedAt: timestamp }
+        : routine,
+    ),
   }
 }
 
 export function getWorkout(data: AppData, id: string): Workout | undefined {
   return data.workouts.find((workout) => workout.id === id)
+}
+
+export function completeWorkout(
+  data: AppData,
+  id: string,
+  useAsPrefill: boolean,
+): AppData {
+  const workout = getWorkout(data, id)
+
+  if (!workout) {
+    return data
+  }
+
+  const timestamp = new Date().toISOString()
+  const completedWorkout = {
+    ...workout,
+    completedAt: workout.completedAt ?? timestamp,
+    updatedAt: timestamp,
+  }
+
+  return {
+    ...data,
+    workouts: data.workouts.map((candidate) =>
+      candidate.id === id ? completedWorkout : candidate,
+    ),
+    routines: useAsPrefill && workout.routineId
+      ? data.routines.map((routine) =>
+          routine.id === workout.routineId
+            ? { ...routine, prefillSourceWorkoutId: id, updatedAt: timestamp }
+            : routine,
+        )
+      : data.routines,
+  }
 }
 
 export function createNewWorkout(date: string, notes = ''): Workout {
@@ -56,6 +96,7 @@ export function createNewWorkout(date: string, notes = ''): Workout {
     date,
     notes,
     exercises: [],
+    completedAt: null,
     createdAt: timestamp,
     updatedAt: timestamp,
   }
@@ -135,13 +176,15 @@ export function createWorkoutFromRoutine(data: AppData, routineId: string, date:
   const timestamp = new Date().toISOString()
 
   const defaultTransitionSeconds = Math.max(0, version.transitionSeconds)
+  const prefillSource = resolvePrefillSource(data, routine.id, routine.prefillSourceWorkoutId)
   const exercises: WorkoutExerciseEntry[] = version.exercises.map((re, index) => {
     const exercise = data.exercises.find((candidate) => candidate.id === re.exerciseId)
+    const sourceExercise = prefillSource?.exercises.find(
+      (candidate) => candidate.routineExerciseId === re.id,
+    )
     const sets = Array.from(
       { length: Math.max(0, Math.floor(re.setCount)) },
-      () => exercise?.kind === 'time'
-        ? createTimeSet(0)
-        : createRepsSet(0, null),
+      (_, setIndex) => createPrefilledSet(exercise?.kind, sourceExercise?.sets[setIndex]),
     )
 
     return {
@@ -163,9 +206,38 @@ export function createWorkoutFromRoutine(data: AppData, routineId: string, date:
     notes: '',
     exercises,
     transitionSeconds: defaultTransitionSeconds,
+    completedAt: null,
     createdAt: timestamp,
     updatedAt: timestamp,
     routineId,
     routineVersionId: version.id,
   }
+}
+
+function resolvePrefillSource(
+  data: AppData,
+  routineId: string,
+  sourceWorkoutId: string | null,
+): Workout | undefined {
+  if (!sourceWorkoutId) {
+    return undefined
+  }
+
+  const source = data.workouts.find((workout) => workout.id === sourceWorkoutId)
+  return source?.routineId === routineId && source.completedAt !== null ? source : undefined
+}
+
+function createPrefilledSet(
+  exerciseKind: 'reps' | 'time' | undefined,
+  sourceSet: SetEntry | undefined,
+): SetEntry {
+  if (exerciseKind === 'time') {
+    return sourceSet?.kind === 'time'
+      ? createTimeSet(Math.max(0, sourceSet.seconds))
+      : createTimeSet(0)
+  }
+
+  return sourceSet?.kind === 'reps'
+    ? createRepsSet(Math.max(0, sourceSet.reps), sourceSet.weightKg)
+    : createRepsSet(0, null)
 }

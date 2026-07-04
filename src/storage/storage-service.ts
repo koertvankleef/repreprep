@@ -6,13 +6,20 @@ import {
   mergeExerciseCatalog,
   updateExercise,
 } from '../domain/exercise-service.ts'
-import { addWorkout, deleteWorkout as removeWorkout, getWorkout, updateWorkout } from '../domain/workout-service.ts'
+import {
+  addWorkout,
+  completeWorkout as completeWorkoutRecord,
+  deleteWorkout as removeWorkout,
+  getWorkout,
+  updateWorkout,
+} from '../domain/workout-service.ts'
 import {
   archiveRoutine as archiveRoutineRecord,
   createRoutine as createRoutineRecord,
   editRoutine as editRoutineRecord,
   getRoutine,
   renameRoutine as renameRoutineRecord,
+  setRoutinePrefillSource as setRoutinePrefillSourceRecord,
 } from '../domain/routine-service.ts'
 import { DomainError } from '../domain/errors.ts'
 import type { AppData, ExerciseDefinition, Routine, RoutineExercise, Workout } from '../domain/types.ts'
@@ -61,6 +68,11 @@ export class WorkoutStorageService {
     this.adapter.save(this.current)
   }
 
+  completeWorkout(id: string, useAsPrefill: boolean): void {
+    this.current = completeWorkoutRecord(this.current, id, useAsPrefill)
+    this.adapter.save(this.current)
+  }
+
   saveExercise(exercise: ExerciseDefinition): void {
     this.current = getExercise(this.current, exercise.id)
       ? updateExercise(this.current, exercise)
@@ -101,6 +113,11 @@ export class WorkoutStorageService {
 
   renameRoutine(id: string, name: string): void {
     this.current = renameRoutineRecord(this.current, id, name)
+    this.adapter.save(this.current)
+  }
+
+  setRoutinePrefillSource(routineId: string, workoutId: string | null): void {
+    this.current = setRoutinePrefillSourceRecord(this.current, routineId, workoutId)
     this.adapter.save(this.current)
   }
 

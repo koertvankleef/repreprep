@@ -66,6 +66,23 @@ describe('WorkoutStorageService', () => {
     expect(service.getData().workouts).toHaveLength(0)
   })
 
+  test('completeWorkout persists completion and the prefill choice', () => {
+    const adapter = new MockAdapter(createDefaultData())
+    const service = new WorkoutStorageService(adapter)
+    const routine = service.getData().routines[0]!
+    const workout = {
+      ...createNewWorkout('2026-06-13'),
+      routineId: routine.id,
+    }
+    service.saveWorkout(workout)
+
+    service.completeWorkout(workout.id, true)
+
+    expect(service.getData().workouts[0]?.completedAt).toEqual(expect.any(String))
+    expect(service.getData().routines[0]?.prefillSourceWorkoutId).toBe(workout.id)
+    expect(adapter.saved?.workouts[0]?.completedAt).toEqual(expect.any(String))
+  })
+
   test('getData returns updated data after saveWorkout', () => {
     const adapter = new MockAdapter(createDefaultData())
     const service = new WorkoutStorageService(adapter)
@@ -93,5 +110,24 @@ describe('WorkoutStorageService', () => {
     expect(service.getData().routines[0]?.activeVersionId).toBe(routine.activeVersionId)
     expect(service.getData().routineVersions).toHaveLength(versionCount)
     expect(adapter.saved?.routines[0]?.name).toBe('Renamed routine')
+  })
+
+  test('sets and clears a routine prefill source', () => {
+    const adapter = new MockAdapter(createDefaultData())
+    const service = new WorkoutStorageService(adapter)
+    const routine = service.getData().routines[0]!
+    const workout = {
+      ...createNewWorkout('2026-06-13'),
+      routineId: routine.id,
+      completedAt: '2026-06-13T12:00:00.000Z',
+    }
+    service.saveWorkout(workout)
+
+    service.setRoutinePrefillSource(routine.id, workout.id)
+    expect(service.getData().routines[0]?.prefillSourceWorkoutId).toBe(workout.id)
+
+    service.setRoutinePrefillSource(routine.id, null)
+    expect(service.getData().routines[0]?.prefillSourceWorkoutId).toBeNull()
+    expect(adapter.saved?.routines[0]?.prefillSourceWorkoutId).toBeNull()
   })
 })

@@ -24,6 +24,7 @@ function createWorkout(): Workout {
     id: 'workout-1',
     date: '2026-06-18',
     notes: '',
+    completedAt: null,
     createdAt: '2026-06-18T10:00:00.000Z',
     updatedAt: '2026-06-18T10:00:00.000Z',
     exercises: [repEntry, timeEntry],

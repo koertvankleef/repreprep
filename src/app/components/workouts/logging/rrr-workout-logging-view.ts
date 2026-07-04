@@ -172,7 +172,8 @@ export function renderWorkoutLoggingMarkup(state: WorkoutLoggingViewState, style
               <div class="hint">Logged sets: ${state.completedSetCount}</div>
               <div class="hint">Your logged values were saved during the flow.</div>
               <div class="actions">
-                <rrr-button type="button" tone="accent" data-action="finish-workout">Review Workout</rrr-button>
+                <rrr-button type="button" tone="accent" data-action="finish-and-use">Finish + use</rrr-button>
+                <rrr-button type="button" variant="outline" data-action="finish-without-use">Finish don't use</rrr-button>
               </div>
             </section>
           `

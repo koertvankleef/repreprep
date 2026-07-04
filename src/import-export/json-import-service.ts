@@ -19,7 +19,7 @@ import {
   muscleValues,
 } from '../domain/exercise-metadata.ts'
 
-export const APP_DATA_SCHEMA_VERSION = 6
+export const APP_DATA_SCHEMA_VERSION = 7
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -135,6 +135,7 @@ export function isValidWorkout(obj: unknown): obj is Workout {
     && Array.isArray(obj.exercises)
     && obj.exercises.every((entry) => isValidWorkoutExerciseEntry(entry))
     && (obj.transitionSeconds === undefined || typeof obj.transitionSeconds === 'number')
+    && (typeof obj.completedAt === 'string' || obj.completedAt === null)
     && typeof obj.createdAt === 'string'
     && typeof obj.updatedAt === 'string'
     && (obj.routineId === undefined || typeof obj.routineId === 'string')

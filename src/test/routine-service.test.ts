@@ -11,7 +11,9 @@ import {
   getRoutine,
   getRoutineVersion,
   renameRoutine,
+  setRoutinePrefillSource,
 } from '../domain/routine-service.ts'
+import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
 import type { RoutineExercise } from '../domain/types.ts'
 
 function makeExercise(exerciseId: string): RoutineExercise {
@@ -113,6 +115,60 @@ describe('routine-service', () => {
     expect(updatedRoutine?.name).toBe('Renamed routine')
     expect(updatedRoutine?.activeVersionId).toBe(routine.activeVersionId)
     expect(renamed.routineVersions).toEqual(data.routineVersions)
+  })
+
+  test('selects, replaces, and clears a prefill source without creating a routine version', () => {
+    const data = createDefaultData()
+    const routine = data.routines[0]!
+    const firstWorkout = {
+      ...createWorkoutFromRoutine(data, routine.id, '2026-06-01')!,
+      completedAt: '2026-06-01T12:00:00.000Z',
+    }
+    const secondWorkout = {
+      ...createWorkoutFromRoutine(data, routine.id, '2026-06-02')!,
+      completedAt: '2026-06-02T12:00:00.000Z',
+    }
+    const withWorkouts = {
+      ...data,
+      workouts: [firstWorkout, secondWorkout],
+    }
+    const versionCount = withWorkouts.routineVersions.length
+
+    const selected = setRoutinePrefillSource(withWorkouts, routine.id, firstWorkout.id)
+    const replaced = setRoutinePrefillSource(selected, routine.id, secondWorkout.id)
+    const cleared = setRoutinePrefillSource(replaced, routine.id, null)
+
+    expect(getRoutine(selected, routine.id)?.prefillSourceWorkoutId).toBe(firstWorkout.id)
+    expect(getRoutine(replaced, routine.id)?.prefillSourceWorkoutId).toBe(secondWorkout.id)
+    expect(getRoutine(cleared, routine.id)?.prefillSourceWorkoutId).toBeNull()
+    expect(cleared.routineVersions).toHaveLength(versionCount)
+  })
+
+  test('rejects a prefill source that does not belong to the routine', () => {
+    const data = createDefaultData()
+    const routine = data.routines[0]!
+    const withOtherRoutine = createRoutine(data, 'Other routine', [])
+    const otherRoutine = withOtherRoutine.routines.find(({ name }) => name === 'Other routine')!
+    const otherWorkout = createWorkoutFromRoutine(withOtherRoutine, otherRoutine.id, '2026-06-01')!
+    const withWorkout = {
+      ...withOtherRoutine,
+      workouts: [otherWorkout],
+    }
+
+    expect(setRoutinePrefillSource(withWorkout, routine.id, otherWorkout.id)).toBe(withWorkout)
+    expect(setRoutinePrefillSource(withWorkout, routine.id, 'missing')).toBe(withWorkout)
+  })
+
+  test('rejects an unfinished workout as a prefill source', () => {
+    const data = createDefaultData()
+    const routine = data.routines[0]!
+    const workout = createWorkoutFromRoutine(data, routine.id, '2026-06-01')!
+    const withWorkout = {
+      ...data,
+      workouts: [workout],
+    }
+
+    expect(setRoutinePrefillSource(withWorkout, routine.id, workout.id)).toBe(withWorkout)
   })
 
   test('editRoutine returns unchanged data when routine not found', () => {

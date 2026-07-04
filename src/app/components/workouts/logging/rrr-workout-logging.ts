@@ -33,11 +33,15 @@ export class RrrWorkoutLogging extends HTMLElement {
     resetWorkoutLoggingModel()
   }
 
-  private readonly handleWorkoutFlowFinished = (): void => {
+  private readonly handleWorkoutFlowFinished = (
+    event: CustomEvent<{ useAsPrefill: boolean }>,
+  ): void => {
     if (!this.workoutIdValue) {
       return
     }
 
+    storageService.completeWorkout(this.workoutIdValue, event.detail.useAsPrefill)
+    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
     window.location.hash = `#/workouts/${this.workoutIdValue}`
   }
 

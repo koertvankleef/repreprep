@@ -157,6 +157,36 @@ export function renameRoutine(data: AppData, routineId: string, name: string): A
   }
 }
 
+export function setRoutinePrefillSource(
+  data: AppData,
+  routineId: string,
+  workoutId: string | null,
+): AppData {
+  const routine = getRoutine(data, routineId)
+
+  if (!routine || routine.prefillSourceWorkoutId === workoutId) {
+    return data
+  }
+
+  if (workoutId !== null) {
+    const workout = data.workouts.find((candidate) => candidate.id === workoutId)
+    if (!workout || workout.routineId !== routineId || workout.completedAt === null) {
+      return data
+    }
+  }
+
+  const timestamp = new Date().toISOString()
+
+  return {
+    ...data,
+    routines: data.routines.map((candidate) =>
+      candidate.id === routineId
+        ? { ...candidate, prefillSourceWorkoutId: workoutId, updatedAt: timestamp }
+        : candidate,
+    ),
+  }
+}
+
 export function archiveRoutine(data: AppData, id: string): AppData {
   const routine = getRoutine(data, id)
 

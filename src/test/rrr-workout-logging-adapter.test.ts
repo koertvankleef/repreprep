@@ -4,7 +4,7 @@ import { buildWorkoutLoggingData } from '../app/components/workouts/logging/rrr-
 
 function createBaseData(): AppData {
   return {
-    schemaVersion: 6,
+    schemaVersion: 7,
     exercises: [
       {
         id: 'ex-reps',
@@ -53,6 +53,7 @@ function createWorkout(): Workout {
     date: '2026-06-18',
     notes: '',
     transitionSeconds: 12,
+    completedAt: null,
     createdAt: '2026-06-18T10:00:00.000Z',
     updatedAt: '2026-06-18T10:00:00.000Z',
     exercises: [

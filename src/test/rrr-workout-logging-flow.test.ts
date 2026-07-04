@@ -124,7 +124,7 @@ describe('rrr-workout-logging-flow motion invariants', () => {
     component.clearTimers()
   })
 
-  it('renders completion as active and emits finish event for handoff', () => {
+  it('renders completion actions and emits each prefill choice for handoff', () => {
     const element = document.createElement('rrr-workout-logging-flow') as HTMLElement & Record<string, unknown>
     document.body.appendChild(element)
 
@@ -133,8 +133,10 @@ describe('rrr-workout-logging-flow motion invariants', () => {
       render: () => void
     }
 
-    const finishedSpy = vi.fn()
-    element.addEventListener('rrr-workout-flow-finished', finishedSpy)
+    const finishedDetails: unknown[] = []
+    element.addEventListener('rrr-workout-flow-finished', (event) => {
+      finishedDetails.push((event as CustomEvent).detail)
+    })
 
     component.stage = 'workout-complete'
     component.render()
@@ -143,9 +145,17 @@ describe('rrr-workout-logging-flow motion invariants', () => {
     expect(completionCard).toBeTruthy()
     expect(completionCard?.dataset.state).toBe('active')
 
-    const finishButton = completionCard?.querySelector<HTMLElement>('rrr-button[data-action="finish-workout"]')
-    expect(finishButton).toBeTruthy()
-    finishButton?.click()
-    expect(finishedSpy).toHaveBeenCalledTimes(1)
+    const finishAndUse = completionCard?.querySelector<HTMLElement>('rrr-button[data-action="finish-and-use"]')
+    const finishWithoutUse = completionCard?.querySelector<HTMLElement>('rrr-button[data-action="finish-without-use"]')
+    expect(finishAndUse?.textContent).toBe('Finish + use')
+    expect(finishWithoutUse?.textContent).toBe("Finish don't use")
+
+    finishAndUse?.click()
+    finishWithoutUse?.click()
+
+    expect(finishedDetails).toEqual([
+      { useAsPrefill: true },
+      { useAsPrefill: false },
+    ])
   })
 })

@@ -98,6 +98,15 @@ interface RoutineExercise {
   notes?: string
 }
 
+interface Workout {
+  id: string
+  routineId?: string
+  routineVersionId?: string
+  completedAt: string | null
+  exercises: WorkoutExerciseEntry[]
+  // workout metadata
+}
+
 interface WorkoutExerciseEntry {
   id: string
   exerciseId: string
@@ -220,12 +229,13 @@ not block removal of targets.
 
 ### Workout completion
 
-The completion/review experience provides an explicit “Use these values next
-time” choice. Whether that choice starts checked or unchecked remains an IxD
-decision to validate.
+The eventual completion/review experience provides an explicit “Use these
+values next time” choice, selected by default. Until the active-workout
+redesign, two separate actions expose that decision directly.
 
 - Selecting it replaces the routine's current prefill source with this workout.
 - Leaving it unselected preserves the existing source.
+- Both choices mark the workout as completed.
 - Completion and prefill selection must not rewrite historical results or the
   routine version.
 
@@ -377,10 +387,10 @@ structural routine version.
 ### Phase 2 — Workout creation and prefill selection
 
 - [x] Build zero-value workout sets from `setCount`.
-- [ ] Copy values only from the selected source workout.
-- [ ] Match by routine-exercise identity and set ordinal.
-- [ ] Implement select, replace, clear, and source-deletion behavior.
-- [ ] Verify workouts remain independent historical snapshots.
+- [x] Copy values only from the selected source workout.
+- [x] Match by routine-exercise identity and set ordinal.
+- [x] Implement select, replace, clear, and source-deletion behavior.
+- [x] Verify workouts remain independent historical snapshots.
 
 ### Phase 3 — Routine-detail editing
 
@@ -395,8 +405,12 @@ structural routine version.
 
 ### Phase 4 — Workout completion and history
 
-- [ ] Decide and test the default state of the completion choice.
-- [ ] Add “Use these values next time” to workout completion/review.
+- [x] Persist workout completion state so only completed workouts can be
+      offered as prefill sources.
+- [x] Temporarily expose separate “Finish + use” and “Finish don't use”
+      actions at the end of active workout logging.
+- [ ] Replace the temporary actions during the active-workout redesign with a
+      refined completion choice that defaults to using the finished values.
 - [ ] Show selected-source state on workout detail/edit.
 - [ ] Allow selecting any completed workout belonging to the routine.
 - [ ] Add a clear/no-prefill action.
@@ -438,11 +452,11 @@ structural routine version.
 - [x] Incompatible unreleased data resets predictably.
 - [x] Newly created workouts retain every logged result.
 - [x] No-source MVP workouts use `0` reps and `null` weight.
-- [ ] No selected source produces zero-value starting sets.
-- [ ] Selected source values copy only within the same routine occurrence.
-- [ ] New, removed, reordered, and duplicate exercises match safely.
-- [ ] Changing or clearing the source affects only future workouts.
-- [ ] Selecting a source does not create a routine version.
+- [x] No selected source produces zero-value starting sets.
+- [x] Selected source values copy only within the same routine occurrence.
+- [x] New, removed, reordered, and duplicate exercises match safely.
+- [x] Changing or clearing the source affects only future workouts.
+- [x] Selecting a source does not create a routine version.
 - [ ] Narrow touch viewport: scroll, sheet edit, swipe preview/commit, drag.
 - [ ] Desktop pointer: sheet edit, explicit delete, drag handle.
 - [ ] Keyboard: edit, reorder, select source, clear source, and delete.

@@ -11,7 +11,7 @@ describe('pre-release schema reset', () => {
 
   test('rejects an obsolete development schema instead of migrating it', () => {
     const current = createDefaultData()
-    const obsolete = { ...current, schemaVersion: 5 }
+    const obsolete = { ...current, schemaVersion: 6 }
 
     expect(migrateRawToAppData(obsolete)).toBeNull()
     expect(isValidAppData(obsolete)).toBe(false)

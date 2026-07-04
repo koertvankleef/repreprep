@@ -10,6 +10,7 @@ function createLinkedWorkout(routineId: string, createdAt: string): Workout {
     date: createdAt.slice(0, 10),
     notes: '',
     exercises: [],
+    completedAt: null,
     createdAt,
     updatedAt: createdAt,
     routineId,

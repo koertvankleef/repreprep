@@ -64,7 +64,7 @@ export function createDefaultData(): AppData {
   }
 
   return {
-    schemaVersion: 6,
+    schemaVersion: 7,
     exercises,
     workouts: [],
     routines: [routine],

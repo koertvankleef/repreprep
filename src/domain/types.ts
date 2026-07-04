@@ -90,6 +90,7 @@ export interface Workout {
   notes: string
   exercises: WorkoutExerciseEntry[]
   transitionSeconds?: number
+  completedAt: string | null
   createdAt: string
   updatedAt: string
   routineId?: string

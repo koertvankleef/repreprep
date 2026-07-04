@@ -146,11 +146,14 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
       return
     }
 
-    if (action === 'finish-workout') {
+    if (action === 'finish-and-use' || action === 'finish-without-use') {
       this.dispatchEvent(
-        new CustomEvent('rrr-workout-flow-finished', {
+        new CustomEvent<{ useAsPrefill: boolean }>('rrr-workout-flow-finished', {
           bubbles: true,
           composed: true,
+          detail: {
+            useAsPrefill: action === 'finish-and-use',
+          },
         }),
       )
     }
