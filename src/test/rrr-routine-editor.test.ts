@@ -49,7 +49,7 @@ beforeEach(() => {
   window.location.hash = '#/routines/new'
 })
 
-describe('rrr-routine-editor new routine confirmation', () => {
+describe('rrr-routine-editor creation', () => {
   test('shows only one empty-state message and no cancel action when no exercises exist', async () => {
     const editor = new RrrRoutineEditor()
     document.body.append(editor)
@@ -60,43 +60,21 @@ describe('rrr-routine-editor new routine confirmation', () => {
 
     expect(emptyMentions).toHaveLength(1)
     expect(editor.querySelector('[data-action="back"]')).toBeNull()
-    expect(editor.querySelector('rrr-list-row[data-action="save"]')).not.toBeNull()
+    expect(editor.querySelector('rrr-list-row[data-action="create-routine"]')).not.toBeNull()
+    expect(editor.querySelector(
+      'rrr-list-row[data-action="create-routine"]',
+    )?.getAttribute('label')).toBe('Create routine')
   })
 
-  test('does not create a new routine when creation confirmation is dismissed', async () => {
+  test('creates a new routine directly from the explicit create action', async () => {
     const initialCount = storageService.getData().routines.length
     const editor = new RrrRoutineEditor()
     document.body.append(editor)
     await Promise.resolve()
 
-    editor.querySelector<HTMLElement>('[data-action="save"]')?.click()
-    await Promise.resolve()
+    editor.querySelector<HTMLElement>('[data-action="create-routine"]')?.click()
 
-    expect(document.querySelector('rrr-sheet')).not.toBeNull()
-    expect(storageService.getData().routines).toHaveLength(initialCount)
-
-    document.querySelector<HTMLElement>('rrr-sheet .sheet-assistive-dismiss')?.click()
-    await new Promise((resolve) => window.setTimeout(resolve, 240))
-
-    expect(storageService.getData().routines).toHaveLength(initialCount)
-    expect(window.location.hash).toBe('#/routines/new')
-  })
-
-  test('creates a new routine only after confirmation', async () => {
-    const initialCount = storageService.getData().routines.length
-    const editor = new RrrRoutineEditor()
-    document.body.append(editor)
-    await Promise.resolve()
-
-    editor.querySelector<HTMLElement>('[data-action="save"]')?.click()
-    await Promise.resolve()
-
-    expect(document.querySelector('rrr-sheet')).not.toBeNull()
-    expect(storageService.getData().routines).toHaveLength(initialCount)
-
-    document.querySelector<HTMLElement>('rrr-sheet [data-action="confirm"]')?.click()
-    await new Promise((resolve) => window.setTimeout(resolve, 240))
-
+    expect(document.querySelector('rrr-sheet')).toBeNull()
     expect(storageService.getData().routines).toHaveLength(initialCount + 1)
     const created = storageService.getData().routines.at(-1)
     expect(created?.name).toMatch(new RegExp(`^${natoPrefixPattern} [A-Za-z]+(?: \\d+)?$`))
@@ -121,10 +99,7 @@ describe('rrr-routine-editor new routine confirmation', () => {
     await renamePromise
     await new Promise((resolve) => window.setTimeout(resolve, 240))
 
-    editor.querySelector<HTMLElement>('[data-action="save"]')?.click()
-    await Promise.resolve()
-    document.querySelector<HTMLElement>('rrr-sheet [data-action="confirm"]')?.click()
-    await new Promise((resolve) => window.setTimeout(resolve, 240))
+    editor.querySelector<HTMLElement>('[data-action="create-routine"]')?.click()
 
     expect(storageService.getData().routines).toHaveLength(initialCount + 1)
     const created = storageService.getData().routines.at(-1)

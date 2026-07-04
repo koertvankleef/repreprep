@@ -117,8 +117,9 @@ row's own button. Supply `data-sort-label` for announcements.
 
 The controller emits `rrr-sequence-sort-status` for lifted, moved, dropped,
 and cancelled states, and `rrr-sequence-reorder` with the committed ordered
-IDs. Consumers own localized announcements and domain persistence. Gutters
-collapse during sorting and are re-derived from domain data after commit.
+IDs. Consumers own localized announcements and domain persistence. Gutter
+content collapses during sorting while an equivalent grid gap preserves the
+sequence rhythm; gutters are re-derived from domain data after commit.
 
 Use the same value/unit treatment outside a gutter with `rrr-measurement`:
 

@@ -462,12 +462,9 @@ export const enUsMessages = {
   'routineEditor.exercises.empty': 'No exercises added yet.',
   'routineEditor.exercises.unknown': 'Unknown exercise',
   'routineEditor.action.rename': 'Rename routine',
-  'routineEditor.action.save': 'Save Routine',
+  'routineEditor.action.create': 'Create routine',
   'routineEditor.dialog.rename.title': 'Rename routine',
   'routineEditor.dialog.rename.label': 'Routine name (optional)',
-  'routineEditor.dialog.create.title': 'Create routine?',
-  'routineEditor.dialog.create.message': 'Create "{name}" now? You can continue editing it afterward.',
-  'routineEditor.dialog.create.confirm': 'Create routine',
 
   'importExport.title': 'Import & Export',
   'importExport.storageDescription': 'Your data is always stored on this device in browser storage.',

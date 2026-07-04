@@ -35,7 +35,8 @@ programming app.
 - Prefill matching is routine-specific. The same exercise in another routine
   is not an equivalent source.
 - Existing routine edits auto-save at meaningful interaction boundaries.
-- New routine creation retains a distinct confirmation interaction.
+- New routine creation commits from its explicit Create routine action without
+  a second confirmation.
 - Do not implement Undo for the MVP.
 - Reordering commits immediately on drop.
 - Swipe deletion commits immediately when released beyond its armed threshold,
@@ -307,7 +308,8 @@ Keyboard behavior:
 
 Presentation:
 
-- [x] Temporarily collapse gutters while sorting.
+- [x] Temporarily collapse gutter content while preserving its spacing during
+      sorting.
 - [x] Use the same positional movement at first/last without special drop
       affordances for the MVP.
 
@@ -372,7 +374,8 @@ Existing routine edits auto-save at meaningful interaction boundaries:
 - add exercise: completion of its selection flow.
 
 There is no cross-page routine draft or page-level Save/Cancel interaction.
-New routine creation retains its own final confirmation.
+New routine creation uses its explicit Create routine action as the final
+commit boundary; it does not ask for the same decision again in a sheet.
 
 The internal immutable routine-version model may append one version per
 completed interaction. Selecting a prefill source is routine metadata, not a
@@ -414,7 +417,7 @@ structural routine version.
 - [x] Remove routine-exercise routes, page, translations, and tests.
 - [x] Update add-exercise behavior for the new model.
 - [x] Retire target/planned-set controls from the legacy editor.
-- [x] Preserve coherent confirmed new-routine creation.
+- [x] Make the explicit Create routine action the single creation confirmation.
 - [x] Remove the dedicated existing-routine edit page and route.
 
 ### Phase 5 — Routine-exercise reordering

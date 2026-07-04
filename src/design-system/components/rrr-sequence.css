@@ -63,6 +63,10 @@ rrr-sequence[data-sorting] > rrr-sequence-gutter {
   display: none;
 }
 
+rrr-sequence[data-sorting] {
+  row-gap: var(--rrr-sequence-gutter-min-block-size);
+}
+
 rrr-sequence[data-sorting] > [data-sort-id] {
   transition: opacity var(--rrr-transition-default);
 }

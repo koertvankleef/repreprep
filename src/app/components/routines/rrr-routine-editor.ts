@@ -86,7 +86,7 @@ export class RrrRoutineEditor extends HTMLElement {
   private transitionSeconds = RrrRoutineEditor.defaultTransitionSeconds
   private exercises: RoutineExercise[] = []
   private listenersBound = false
-  private createConfirmActive = false
+  private creationCommitted = false
   private renameSheetActive = false
   private timingSheetActive = false
 
@@ -236,8 +236,8 @@ export class RrrRoutineEditor extends HTMLElement {
         return
       }
 
-      if (action === 'save') {
-        void this.save()
+    if (action === 'create-routine') {
+      this.createRoutine()
         return
       }
 
@@ -456,37 +456,29 @@ export class RrrRoutineEditor extends HTMLElement {
     return this.name.trim() || this.getSuggestedRoutineName(storageService.getData())
   }
 
-  private async save(): Promise<void> {
+  private createRoutine(): void {
     const resolvedName = this.name.trim() || this.getSuggestedRoutineName(storageService.getData())
     this.name = resolvedName
 
-    if (this.createConfirmActive) {
+    if (this.creationCommitted) {
       return
     }
 
-    this.createConfirmActive = true
+    this.creationCommitted = true
     try {
-      const confirmed = await confirmSheet({
-        title: t('routineEditor.dialog.create.title'),
-        message: t('routineEditor.dialog.create.message', { name: resolvedName }),
-        confirmLabel: t('routineEditor.dialog.create.confirm'),
-      })
-      if (!confirmed) {
-        return
-      }
-    } finally {
-      this.createConfirmActive = false
+      const saved = storageService.saveRoutine(
+        null,
+        resolvedName,
+        this.exercises,
+        this.transitionSeconds,
+      )
+
+      window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+      window.location.hash = `#/routines/${encodeURIComponent(saved.id)}`
+    } catch (error) {
+      this.creationCommitted = false
+      throw error
     }
-
-    const saved = storageService.saveRoutine(
-      null,
-      resolvedName,
-      this.exercises,
-      this.transitionSeconds,
-    )
-
-    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    window.location.hash = `#/routines/${encodeURIComponent(saved.id)}`
   }
 
   private render(): void {
@@ -532,8 +524,8 @@ export class RrrRoutineEditor extends HTMLElement {
           <div class="rrr-list-card">
             <rrr-list-row
               activation="button"
-              label="${t('routineEditor.action.save')}"
-              data-action="save"
+              label="${t('routineEditor.action.create')}"
+              data-action="create-routine"
             ></rrr-list-row>
           </div>
         </rrr-section>

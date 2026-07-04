@@ -462,12 +462,9 @@ export const nlNlMessages = {
   'routineEditor.exercises.empty': 'Nog geen oefeningen toegevoegd.',
   'routineEditor.exercises.unknown': 'Onbekende oefening',
   'routineEditor.action.rename': 'Routine hernoemen',
-  'routineEditor.action.save': 'Routine opslaan',
+  'routineEditor.action.create': 'Routine aanmaken',
   'routineEditor.dialog.rename.title': 'Routine hernoemen',
   'routineEditor.dialog.rename.label': 'Naam van routine (optioneel)',
-  'routineEditor.dialog.create.title': 'Routine aanmaken?',
-  'routineEditor.dialog.create.message': '"{name}" nu aanmaken? Je kunt daarna verder bewerken.',
-  'routineEditor.dialog.create.confirm': 'Routine aanmaken',
 
   'importExport.title': 'Import & Export',
   'importExport.storageDescription': 'Je gegevens worden altijd op dit apparaat opgeslagen in de browseropslag.',
