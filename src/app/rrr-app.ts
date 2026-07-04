@@ -212,6 +212,14 @@ export class RrrApp extends HTMLElement {
 
     const action = actionTarget.dataset.action
 
+    if (action === 'navigate') {
+      const href = actionTarget.dataset.href
+      if (href) {
+        window.location.hash = href
+      }
+      return
+    }
+
     if (action === 'install-app') {
       void this.promptInstall()
       return
@@ -395,22 +403,29 @@ export class RrrApp extends HTMLElement {
     return import.meta.env.DEV || this.installAvailable
   }
 
-  private renderNavLink(routeName: AppNavId, href: string, label: string, iconName: string): string {
+  private renderNavButton(routeName: AppNavId, href: string, label: string, iconName: string): string {
     const isActive = getAppRouteMeta(this.route).nav === routeName
-    const activeClass = isActive ? 'nav-link active' : 'nav-link'
+    const activeClass = isActive ? 'nav-button active' : 'nav-button'
     const ariaCurrent = isActive ? ' aria-current="page"' : ''
 
     return `
-      <a class="${activeClass}" data-route-name="${routeName}" href="${href}"${ariaCurrent}>
+      <button
+        type="button"
+        class="${activeClass}"
+        data-action="navigate"
+        data-href="${href}"
+        data-route-name="${routeName}"
+        ${ariaCurrent}
+      >
         <rrr-icon name="${iconName}"></rrr-icon>
         <span>${label}</span>
-      </a>
+      </button>
     `
   }
 
   private renderPrimaryNav(): string {
     return primaryNavigationItems
-      .map((item) => this.renderNavLink(item.routeName, item.href, t(item.labelKey), item.iconName))
+      .map((item) => this.renderNavButton(item.routeName, item.href, t(item.labelKey), item.iconName))
       .join('')
   }
 
@@ -650,24 +665,26 @@ export class RrrApp extends HTMLElement {
       this.mountRouteHeader(appHeader, header, transition)
     }
 
-    const links = this.shadowRoot?.querySelectorAll<HTMLAnchorElement>('.primary-nav .nav-link[data-route-name]')
-    links?.forEach((link) => {
-      const routeName = link.dataset.routeName as AppNavId | undefined
+    const navButtons = this.shadowRoot?.querySelectorAll<HTMLButtonElement>(
+      '.primary-nav .nav-button[data-route-name]',
+    )
+    navButtons?.forEach((button) => {
+      const routeName = button.dataset.routeName as AppNavId | undefined
       if (!routeName) {
         return
       }
 
       const isActive = getAppRouteMeta(route).nav === routeName
-      link.classList.toggle('active', isActive)
+      button.classList.toggle('active', isActive)
       const item = primaryNavigationItems.find((candidate) => candidate.routeName === routeName)
-      const label = link.querySelector<HTMLElement>('span')
+      const label = button.querySelector<HTMLElement>('span')
       if (item && label) {
         label.textContent = t(item.labelKey)
       }
       if (isActive) {
-        link.setAttribute('aria-current', 'page')
+        button.setAttribute('aria-current', 'page')
       } else {
-        link.removeAttribute('aria-current')
+        button.removeAttribute('aria-current')
       }
     })
 
@@ -854,16 +871,18 @@ export class RrrApp extends HTMLElement {
     return t(getAppRouteMeta(route).titleKey)
   }
 
-  private renderHeaderLink(link: AppHeaderLink, className: string): string {
+  private renderHeaderButton(link: AppHeaderLink, className: string): string {
     const label = escapeHtml(t(link.labelKey))
 
     return `
-      <a
-        class="header-icon-link ${className}"
-        href="${escapeHtml(link.href)}"
+      <button
+        type="button"
+        class="header-icon-button ${className}"
+        data-action="navigate"
+        data-href="${escapeHtml(link.href)}"
         aria-label="${label}"
         title="${label}"
-      ><rrr-icon name="${escapeHtml(link.icon)}"></rrr-icon></a>
+      ><rrr-icon name="${escapeHtml(link.icon)}"></rrr-icon></button>
     `
   }
 
@@ -873,7 +892,7 @@ export class RrrApp extends HTMLElement {
     return `
       <button
         type="button"
-        class="header-icon-link header-action"
+        class="header-icon-button header-action"
         data-action="rename-routine"
         aria-label="${label}"
         title="${label}"
@@ -893,7 +912,7 @@ export class RrrApp extends HTMLElement {
     const backHref = getAppRouteBackHref(route)
     const endLink = getAppRouteEndLink(route)
     const backContent = backHref
-      ? this.renderHeaderLink({
+      ? this.renderHeaderButton({
           href: backHref,
           icon: 'arrow-left',
           labelKey: 'app.settings.back',
@@ -905,7 +924,7 @@ export class RrrApp extends HTMLElement {
     )
       ? this.renderRoutineRenameButton()
       : endLink
-        ? this.renderHeaderLink(endLink, 'header-action')
+        ? this.renderHeaderButton(endLink, 'header-action')
         : '<span class="app-header-spacer" aria-hidden="true"></span>'
 
     return {

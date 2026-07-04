@@ -472,14 +472,18 @@ export class RrrStyleguide extends HTMLElement {
 
               <div class="rrr-list-card">
                 <rrr-list-row
-                  href="#/settings"
+                  activation="button"
+                  data-action="navigate"
+                  data-href="#/settings"
                   label="${t('styleguide.listRows.navigation')}"
                   accessory="chevron"
                 >
                   <rrr-icon slot="leading" name="settings"></rrr-icon>
                 </rrr-list-row>
                 <rrr-list-row
-                  href="#/settings"
+                  activation="button"
+                  data-action="navigate"
+                  data-href="#/settings"
                   label="${t('styleguide.listRows.currentValue')}"
                   value-text="${t('app.theme.dark')}"
                   accessory="value-chevron"

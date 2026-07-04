@@ -561,7 +561,9 @@ describe('settings structure', () => {
     const sections = Array.from(settings.querySelectorAll('rrr-section'))
     const styleguideSection = sections[0]
 
-    expect(styleguideSection?.querySelector('rrr-list-row[href="#/settings/styleguide"]')).not.toBeNull()
+    expect(styleguideSection?.querySelector(
+      'rrr-list-row[data-action="navigate"][data-href="#/settings/styleguide"]',
+    )).not.toBeNull()
     expect(styleguideSection?.querySelector('[slot="heading"]')).toBeNull()
   })
 
@@ -573,9 +575,13 @@ describe('settings structure', () => {
       .find((section) => section.querySelector('[slot="heading"]')?.textContent === 'Data')
     const rows = Array.from(dataSection?.querySelectorAll<RrrListRow>('rrr-list-row') ?? [])
 
-    expect(rows[0]?.getAttribute('href')).toBe('#/settings/import-export')
+    expect(rows[0]?.getAttribute('activation')).toBe('button')
+    expect(rows[0]?.dataset.action).toBe('navigate')
+    expect(rows[0]?.dataset.href).toBe('#/settings/import-export')
     expect(rows[1]?.dataset.action).toBe('delete-app-data')
-    expect(settings.querySelector('rrr-list-row[href="#/settings/styleguide"]')).toBeNull()
+    expect(settings.querySelector(
+      'rrr-list-row[data-href="#/settings/styleguide"]',
+    )).toBeNull()
   })
 
   test('links to the appearance subpage and shows the current theme', () => {
@@ -583,8 +589,11 @@ describe('settings structure', () => {
     settings.setAttribute('theme', 'dark')
     document.body.appendChild(settings)
 
-    const appearanceRow = settings.querySelector<RrrListRow>('rrr-list-row[href="#/settings/appearance"]')
+    const appearanceRow = settings.querySelector<RrrListRow>(
+      'rrr-list-row[data-href="#/settings/appearance"]',
+    )
 
+    expect(appearanceRow?.getAttribute('activation')).toBe('button')
     expect(appearanceRow?.getAttribute('value-text')).toBe('Dark')
     expect(appearanceRow?.getAttribute('accessory')).toBe('value-chevron')
   })
@@ -594,8 +603,11 @@ describe('settings structure', () => {
     settings.setAttribute('language', 'nl-NL')
     document.body.appendChild(settings)
 
-    const languageRow = settings.querySelector<RrrListRow>('rrr-list-row[href="#/settings/language"]')
+    const languageRow = settings.querySelector<RrrListRow>(
+      'rrr-list-row[data-href="#/settings/language"]',
+    )
 
+    expect(languageRow?.getAttribute('activation')).toBe('button')
     expect(languageRow?.getAttribute('value-text')).toBe('Dutch')
     expect(languageRow?.getAttribute('accessory')).toBe('value-chevron')
   })

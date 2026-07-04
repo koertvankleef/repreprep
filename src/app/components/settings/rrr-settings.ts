@@ -138,7 +138,9 @@ export class RrrSettings extends HTMLElement {
           <rrr-section>
             <div class="rrr-list-card">
               <rrr-list-row
-                href="#/settings/styleguide"
+                activation="button"
+                data-action="navigate"
+                data-href="#/settings/styleguide"
                 label="${t('app.settings.styleguide')}"
                 accessory="chevron"
               >
@@ -152,7 +154,9 @@ export class RrrSettings extends HTMLElement {
           <span slot="heading">${t('app.settings.display')}</span>
           <div class="rrr-list-card">
             <rrr-list-row
-              href="#/settings/appearance"
+              activation="button"
+              data-action="navigate"
+              data-href="#/settings/appearance"
               label="${t('app.settings.appearance')}"
               description="${t('app.settings.appearanceDescription')}"
               value-text="${themeLabel}"
@@ -161,7 +165,9 @@ export class RrrSettings extends HTMLElement {
               <rrr-icon slot="leading" name="color"></rrr-icon>
             </rrr-list-row>
             <rrr-list-row
-              href="#/settings/language"
+              activation="button"
+              data-action="navigate"
+              data-href="#/settings/language"
               label="${t('app.settings.language')}"
               value-text="${languageLabel}"
               accessory="value-chevron"
@@ -175,7 +181,9 @@ export class RrrSettings extends HTMLElement {
           <span slot="heading">${t('app.settings.data')}</span>
           <div class="rrr-list-card">
             <rrr-list-row
-              href="#/settings/import-export"
+              activation="button"
+              data-action="navigate"
+              data-href="#/settings/import-export"
               label="${t('app.settings.importExport')}"
               accessory="chevron"
             >

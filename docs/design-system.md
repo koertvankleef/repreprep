@@ -144,7 +144,9 @@ other metadata support that identity.
 ```html
 <div class="rrr-list-card">
   <rrr-list-row
-    href="#/routines/full-body"
+    activation="button"
+    data-action="navigate"
+    data-href="#/routines/full-body"
     label="Full Body"
     description="6 exercises"
     accessory="chevron"
@@ -156,6 +158,10 @@ other metadata support that identity.
 
 Settings choices, navigation entries, routines, and exercises within a routine
 are identity-first even when some of them are not interactive.
+
+Internal app navigation uses a native button with the app shell's delegated
+`data-action="navigate"` behavior. Reserve the row's `href` mode for genuine
+links where browser link behavior is desirable.
 
 Use a chevron only when a row navigates to another page. A row that opens a
 sheet uses `activation="button"` without a chevron; the native button behavior,

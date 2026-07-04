@@ -38,7 +38,9 @@ export class RrrRoutineList extends HTMLElement {
 
     return `
       <rrr-list-row
-        href="#/routines/${encodeURIComponent(summary.routine.id)}"
+        activation="button"
+        data-action="navigate"
+        data-href="#/routines/${encodeURIComponent(summary.routine.id)}"
         label="${escapeHtml(summary.routine.name)}"
         description="${escapeHtml(exercisePreview)}"
         accessory="chevron"

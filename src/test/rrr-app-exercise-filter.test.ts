@@ -96,43 +96,50 @@ describe('rrr-app exercise filters', () => {
     const app = document.createElement('rrr-app')
     document.body.append(app)
 
-    const settingsLink = app.shadowRoot?.querySelector<HTMLAnchorElement>(
-      'a.header-action[href="#/settings"]',
+    expect(app.shadowRoot?.querySelectorAll('.primary-nav button.nav-button')).toHaveLength(4)
+    expect(app.shadowRoot?.querySelector('.primary-nav a')).toBeNull()
+
+    const settingsButton = app.shadowRoot?.querySelector<HTMLButtonElement>(
+      'button.header-action[data-href="#/settings"]',
     )
 
-    expect(settingsLink).toBeTruthy()
-    expect(settingsLink?.querySelector('rrr-icon')?.getAttribute('name')).toBe('settings')
+    expect(settingsButton).toBeTruthy()
+    expect(settingsButton?.querySelector('rrr-icon')?.getAttribute('name')).toBe('settings')
     expect(app.shadowRoot?.querySelector('.options-panel')).toBeNull()
 
-    window.location.hash = settingsLink?.hash ?? ''
+    settingsButton?.click()
     window.dispatchEvent(new HashChangeEvent('hashchange'))
 
     expect(window.location.hash).toBe('#/settings')
-    expect(app.shadowRoot?.querySelector('.route-header-layer-current a.header-action')).toBeNull()
+    expect(app.shadowRoot?.querySelector('.route-header-layer-current button.header-action')).toBeNull()
 
-    const backLink = app.shadowRoot?.querySelector<HTMLAnchorElement>(
-      '.route-header-layer-current a.header-back[href="#/workouts"]',
+    const backButton = app.shadowRoot?.querySelector<HTMLButtonElement>(
+      '.route-header-layer-current button.header-back[data-href="#/workouts"]',
     )
-    expect(backLink).toBeTruthy()
+    expect(backButton).toBeTruthy()
 
-    window.location.hash = backLink?.hash ?? ''
+    backButton?.click()
     window.dispatchEvent(new HashChangeEvent('hashchange'))
 
     expect(window.location.hash).toBe('#/workouts')
-    expect(app.shadowRoot?.querySelector('.route-header-layer-current a.header-action[href="#/settings"]')).toBeTruthy()
+    expect(app.shadowRoot?.querySelector(
+      '.route-header-layer-current button.header-action[data-href="#/settings"]',
+    )).toBeTruthy()
 
     window.location.hash = '#/routines'
     window.dispatchEvent(new HashChangeEvent('hashchange'))
 
-    expect(app.shadowRoot?.querySelector('.route-header-layer-current a.header-action[href="#/settings"]')).toBeNull()
+    expect(app.shadowRoot?.querySelector(
+      '.route-header-layer-current button.header-action[data-href="#/settings"]',
+    )).toBeNull()
 
-    const newRoutineLink = app.shadowRoot?.querySelector<HTMLAnchorElement>(
-      '.route-header-layer-current a.header-action[href="#/routines/new"]',
+    const newRoutineButton = app.shadowRoot?.querySelector<HTMLButtonElement>(
+      '.route-header-layer-current button.header-action[data-href="#/routines/new"]',
     )
-    expect(newRoutineLink).toBeTruthy()
-    expect(newRoutineLink?.querySelector('rrr-icon')?.getAttribute('name')).toBe('add')
+    expect(newRoutineButton).toBeTruthy()
+    expect(newRoutineButton?.querySelector('rrr-icon')?.getAttribute('name')).toBe('add')
 
-    window.location.hash = newRoutineLink?.hash ?? ''
+    newRoutineButton?.click()
 
     expect(window.location.hash).toBe('#/routines/new')
     app.remove()
@@ -210,7 +217,7 @@ describe('rrr-app exercise filters', () => {
     document.body.append(app)
 
     const getNavLabels = (): string[] => Array
-      .from(app.shadowRoot?.querySelectorAll<HTMLElement>('.primary-nav .nav-link span') ?? [])
+      .from(app.shadowRoot?.querySelectorAll<HTMLElement>('.primary-nav .nav-button span') ?? [])
       .map((label) => label.textContent ?? '')
 
     expect(getNavLabels()).toEqual(['Vandaag', 'Routines', 'Oefeningen', 'Geschiedenis'])
@@ -240,7 +247,12 @@ describe('rrr-app exercise filters', () => {
     const exerciseAction = detail
       ?.querySelector<HTMLElement>('rrr-list-row[data-routine-exercise-id]')
 
-    expect(app.shadowRoot?.querySelector('.route-header-layer-current a.header-action')).toBeNull()
+    expect(app.shadowRoot?.querySelector(
+      '.route-header-layer-current button.header-action[data-action="navigate"]',
+    )).toBeNull()
+    expect(app.shadowRoot?.querySelector(
+      '.route-header-layer-current button.header-action[data-action="rename-routine"]',
+    )).toBeTruthy()
     expect(detail?.querySelector('[data-action="edit-workout"]')).toBeNull()
     expect(exerciseAction?.getAttribute('activation')).toBe('button')
     expect(startAction?.getAttribute('activation')).toBe('button')

@@ -18,14 +18,19 @@ beforeEach(() => {
 })
 
 describe('rrr-routine-list', () => {
-  test('renders routines as navigation rows without inline actions', () => {
+  test('renders routines as button navigation rows without inline actions', async () => {
     const list = document.createElement('rrr-routine-list')
     document.body.append(list)
+    await Promise.resolve()
 
     const routine = storageService.getData().routines[0]!
-    const row = list.querySelector('rrr-list-row')
+    const row = list.querySelector<HTMLElement>('rrr-list-row')
 
-    expect(row?.getAttribute('href')).toBe(`#/routines/${routine.id}`)
+    expect(row?.getAttribute('activation')).toBe('button')
+    expect(row?.dataset.action).toBe('navigate')
+    expect(row?.dataset.href).toBe(`#/routines/${routine.id}`)
+    expect(row?.querySelector(':scope > button')).toBeTruthy()
+    expect(row?.querySelector(':scope > a')).toBeNull()
     expect(row?.getAttribute('accessory')).toBe('chevron')
     expect(row?.querySelector('[slot="body"]')).toBeTruthy()
     expect(list.querySelector('rrr-button')).toBeNull()
