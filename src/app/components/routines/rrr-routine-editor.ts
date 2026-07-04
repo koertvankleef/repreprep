@@ -520,12 +520,12 @@ export class RrrRoutineEditor extends HTMLElement {
                   `
       : `<p>${t('routineEditor.exercises.empty')}</p>`
   }
-            ${renderRoutineFlowControls({
+          </div>
+          ${renderRoutineFlowControls({
     addAction: 'add-routine-exercise',
     transitionAction: 'edit-transition-default',
     transitionSeconds: this.transitionSeconds,
   })}
-          </div>
         </rrr-section>
         <rrr-section>
           <span slot="heading">${t('routineDetail.actions')}</span>

@@ -150,6 +150,11 @@ describe('rrr-routine-editor new routine confirmation', () => {
     expect(editor.querySelector('.exercise-list')).toBeNull()
     expect(editor.querySelector('.exercise-item')).toBeNull()
     expect(editor.querySelector('input[type="number"]')).toBeNull()
+    const flowSection = editor.querySelector<HTMLElement>('rrr-section')
+    expect(flowSection?.querySelector(':scope > .rrr-card > rrr-sequence')).not.toBeNull()
+    expect(flowSection?.querySelector(
+      ':scope > .rrr-list-card [data-action="add-routine-exercise"]',
+    )).not.toBeNull()
 
     const firstExercise = draftEditor.exercises[0]!
     editor.querySelector<HTMLElement>(

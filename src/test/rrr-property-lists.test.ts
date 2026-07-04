@@ -107,7 +107,9 @@ describe('value-first property lists', () => {
       (section) => section.querySelector('[slot="heading"]')?.textContent === 'Flow',
     )
     const flowCard = flowSection?.querySelector<HTMLElement>(':scope > .rrr-card')
-    const timingCard = flowCard?.querySelector<HTMLElement>(':scope > .rrr-list-card')
+    const timingCard = flowSection?.querySelector<HTMLElement>(
+      ':scope > .rrr-list-card',
+    )
     const timingRows = Array.from(timingCard?.querySelectorAll<HTMLElement>('rrr-list-row') ?? [])
 
     expect(propertyList).not.toBeNull()
@@ -131,6 +133,7 @@ describe('value-first property lists', () => {
     expect(timingRows[0]?.dataset.action).toBe('add-routine-exercise')
     expect(timingRows[1]?.dataset.action).toBe('edit-transition-default')
     expect(flowCard?.querySelector(':scope > rrr-sequence')).toBe(exerciseSequence)
+    expect(flowCard?.querySelector(':scope > .rrr-list-card')).toBeNull()
     expect(actionRow?.getAttribute('activation')).toBe('button')
     expect(actionRow?.querySelector(':scope > button')).not.toBeNull()
     expect(actionRow?.querySelector('rrr-icon[slot="leading"][name="play"]')).not.toBeNull()
