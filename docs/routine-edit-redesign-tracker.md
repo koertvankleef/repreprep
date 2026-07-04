@@ -306,6 +306,10 @@ There is no planned-set reordering: a routine exercise owns only a set count.
 
 ## Swipe deletion
 
+Status note: the non-gesture Delete exercise action is now shipped for sheet and
+desktop paths, but it does not replace this gesture track. Swipe deletion
+remains a required follow-up for this redesign.
+
 Treat swipe as progressive enhancement around a routine-exercise row:
 
 ```html
@@ -397,7 +401,7 @@ structural routine version.
 - [x] Convert exercise links to sheet-opening button rows without chevrons.
 - [x] Implement set-count/rest routine-exercise sheet.
 - [x] Use a localized, button-only number stepper for set count and rest.
-- [ ] Include the non-gesture Delete exercise action.
+- [x] Include the non-gesture Delete exercise action.
 - [x] Remove routine-exercise routes, page, translations, and tests.
 - [x] Update add-exercise behavior for the new model.
 - [x] Retire target/planned-set controls from the legacy editor.
@@ -425,6 +429,8 @@ structural routine version.
 
 ### Phase 6 — Routine-exercise swipe deletion
 
+- [x] Keep swipe gesture deletion as a required milestone after shipping
+  non-gesture deletion.
 - [ ] Implement the swipe decorator and Outlook-like state progression.
 - [ ] Integrate immediate exercise deletion.
 - [ ] Add explicit desktop and sheet deletion actions.

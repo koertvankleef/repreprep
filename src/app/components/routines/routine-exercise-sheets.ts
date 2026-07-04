@@ -8,6 +8,10 @@ export type RoutineExerciseSettings = {
   restSeconds: number
 }
 
+export type RoutineExerciseSheetResult =
+  | { kind: 'confirm'; settings: RoutineExerciseSettings }
+  | { kind: 'delete' }
+
 function createNumberStepper(options: {
   name: string
   label: string
@@ -45,7 +49,7 @@ export async function promptRoutineExerciseSettings(options: {
   exerciseName: string
   setCount: number
   restSeconds: number
-}): Promise<RoutineExerciseSettings | undefined> {
+}): Promise<RoutineExerciseSheetResult | undefined> {
   const sheet = document.createElement('rrr-sheet') as RrrSheet
   const heading = document.createElement('h3')
   heading.slot = 'heading'
@@ -73,6 +77,13 @@ export async function promptRoutineExerciseSettings(options: {
   confirmButton.setAttribute('data-sheet-result', 'confirm')
   confirmButton.textContent = t('action.confirm')
 
+  const deleteButton = document.createElement('rrr-button')
+  deleteButton.slot = 'actions'
+  deleteButton.setAttribute('type', 'button')
+  deleteButton.setAttribute('data-sheet-result', 'delete')
+  deleteButton.setAttribute('tone', 'danger')
+  deleteButton.textContent = t('routineExercise.sheet.delete')
+
   const syncConfirmation = (): void => {
     confirmButton.toggleAttribute(
       'disabled',
@@ -84,15 +95,26 @@ export async function promptRoutineExerciseSettings(options: {
   setCountInput.addEventListener('input', syncConfirmation)
   restInput.addEventListener('input', syncConfirmation)
   syncConfirmation()
-  sheet.append(heading, setCountInput, restInput, confirmButton)
+  sheet.append(heading, setCountInput, restInput, confirmButton, deleteButton)
 
-  if (await presentSheet(sheet) !== 'confirm') {
+  const result = await presentSheet(sheet)
+
+  if (result === 'delete') {
+    return { kind: 'delete' }
+  }
+
+  if (result !== 'confirm') {
     return undefined
   }
 
   const setCount = parseRequiredInteger(setCountInput, 1)
   const restSeconds = parseRequiredInteger(restInput, 0)
-  return setCount === undefined || restSeconds === undefined
-    ? undefined
-    : { setCount, restSeconds }
+  if (setCount === undefined || restSeconds === undefined) {
+    return undefined
+  }
+
+  return {
+    kind: 'confirm',
+    settings: { setCount, restSeconds },
+  }
 }

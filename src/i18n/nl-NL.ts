@@ -445,6 +445,9 @@ export const nlNlMessages = {
   'styleguide.numberStepper.decimalHelper': 'In dit voorbeeld kunnen gelokaliseerde decimale waarden worden ingevoerd.',
 
   'routineExercise.sheet.heading': '{exercise} bewerken',
+  'routineExercise.sheet.delete': 'Oefening verwijderen',
+  'routineExercise.dialog.delete.title': '{exercise} verwijderen?',
+  'routineExercise.dialog.delete.message': 'Dit verwijdert de oefening uit deze routine en kan niet ongedaan worden gemaakt.',
   'routineExercise.setCount.label': 'Aantal sets',
   'routineExercise.rest.sheet.seconds': 'Seconden rust tussen sets',
 

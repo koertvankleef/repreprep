@@ -351,17 +351,41 @@ export class RrrRoutineDetail extends HTMLElement {
 
     this.timingSheetActive = true
     try {
-      const settings = await promptRoutineExerciseSettings({
+      const result = await promptRoutineExerciseSettings({
         exerciseName,
         setCount: routineExercise.setCount,
         restSeconds: routineExercise.restSeconds,
       })
+      if (!result) {
+        return
+      }
+
+      if (result.kind === 'delete') {
+        const confirmed = await confirmSheet({
+          title: t('routineExercise.dialog.delete.title', { exercise: exerciseName }),
+          message: t('routineExercise.dialog.delete.message'),
+          confirmLabel: t('action.delete'),
+          confirmTone: 'danger',
+        })
+        if (!confirmed) {
+          return
+        }
+
+        const latest = this.getCurrentRoutineVersion()
+        if (latest) {
+          this.saveRoutineVersion(latest.routine, latest.version, {
+            exercises: latest.version.exercises.filter(
+              (exercise) => exercise.id !== routineExerciseId,
+            ),
+          })
+        }
+        return
+      }
+
+      const { settings } = result
       if (
-        !settings
-        || (
-          settings.setCount === routineExercise.setCount
-          && settings.restSeconds === routineExercise.restSeconds
-        )
+        settings.setCount === routineExercise.setCount
+        && settings.restSeconds === routineExercise.restSeconds
       ) {
         return
       }

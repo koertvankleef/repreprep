@@ -445,6 +445,9 @@ export const enUsMessages = {
   'styleguide.numberStepper.decimalHelper': 'This example accepts localized decimal values.',
 
   'routineExercise.sheet.heading': 'Edit {exercise}',
+  'routineExercise.sheet.delete': 'Delete exercise',
+  'routineExercise.dialog.delete.title': 'Delete {exercise}?',
+  'routineExercise.dialog.delete.message': 'This removes the exercise from this routine and cannot be undone.',
   'routineExercise.setCount.label': 'Number of sets',
   'routineExercise.rest.sheet.seconds': 'Seconds of rest between sets',
 

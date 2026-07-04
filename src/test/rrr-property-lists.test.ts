@@ -223,6 +223,40 @@ describe('value-first property lists', () => {
     expect(updatedExercise).toMatchObject({ setCount: 4, restSeconds: 30 })
   })
 
+  test('deletes a routine exercise from the edit sheet', async () => {
+    const data = storageService.getData()
+    const routine = data.routines[0]!
+    const previousVersionId = routine.activeVersionId
+    const version = data.routineVersions.find(({ id }) => id === previousVersionId)!
+    const routineExercise = version.exercises[0]!
+    const previousCount = version.exercises.length
+    const detail = new RrrRoutineDetail()
+    detail.routineId = routine.id
+    document.body.append(detail)
+    await Promise.resolve()
+
+    detail.querySelector<HTMLButtonElement>(
+      `rrr-list-row[data-routine-exercise-id="${routineExercise.id}"] > button`,
+    )?.click()
+
+    document.querySelector<HTMLElement>('rrr-sheet [data-sheet-result="delete"]')?.click()
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    document.querySelector<HTMLElement>('rrr-sheet [data-sheet-result="confirm"]')?.click()
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    const updatedRoutine = storageService.getData().routines.find(
+      ({ id }) => id === routine.id,
+    )!
+    const updatedVersion = storageService.getData().routineVersions.find(
+      ({ id }) => id === updatedRoutine.activeVersionId,
+    )!
+
+    expect(updatedRoutine.activeVersionId).not.toBe(previousVersionId)
+    expect(updatedVersion.exercises).toHaveLength(previousCount - 1)
+    expect(updatedVersion.exercises.some(({ id }) => id === routineExercise.id)).toBe(false)
+  })
+
   test('edits the routine transition default and saves a new active version', async () => {
     const routine = storageService.getData().routines[0]!
     const previousVersionId = routine.activeVersionId
