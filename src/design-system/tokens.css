@@ -13,6 +13,7 @@
   --rrr-colors-grayscale-20: oklch(96.11% 0.0030 196.00);
   --rrr-colors-grayscale-10: oklch(98.82% 0.0015 176.00);
   --rrr-colors-grayscale-00: oklch(100.00% 0.0000 0.00);
+  --rrr-colors-grayscale-mix: oklch(78.46% 0.0220 230.00);
 
   /* Brand mapping: brand-inspired tone derived from --rrr-colors-serene-mint-60. */
   --rrr-colors-serene-mint-10: oklch(95.26% 0.0284 184.51);
@@ -24,6 +25,7 @@
   --rrr-colors-serene-mint-70: oklch(45.90% 0.0814 197.32);
   --rrr-colors-serene-mint-80: oklch(34.89% 0.0666 195.17);
   --rrr-colors-serene-mint-90: oklch(23.89% 0.0518 193.02);
+  --rrr-colors-serene-mint-mix: oklch(0.77 0.16 196.21);
 
   /* Brand mapping: brand-inspired tone derived from --rrr-colors-activity-indigo-60 (#4F46E5). */
   --rrr-colors-activity-indigo-10: oklch(98.60% 0.1610 277.20);
@@ -35,10 +37,7 @@
   --rrr-colors-activity-indigo-70: oklch(42.12% 0.2160 275.52);
   --rrr-colors-activity-indigo-80: oklch(33.17% 0.2019 274.06);
   --rrr-colors-activity-indigo-90: oklch(24.23% 0.1878 272.61);
-
-  --temp1: #F8FAFC;
-  --temp2: #03888d;
-  --temp3: oklch(51.06% 0.2301 276.97);
+  --rrr-colors-activity-indigo-mix: oklch(0.46 0.29 273.1);
 
   --rrr-colors-context-danger-10: oklch(97.69% 0.0450 24.00);
   --rrr-colors-context-danger-20: oklch(89.00% 0.0950 23.00);
@@ -49,6 +48,7 @@
   --rrr-colors-context-danger-70: oklch(44.00% 0.2050 18.00);
   --rrr-colors-context-danger-80: oklch(35.50% 0.1800 17.00);
   --rrr-colors-context-danger-90: oklch(26.32% 0.1550 16.00);
+  --rrr-colors-context-danger-mix: oklch(0.54 0.24 25.24);
 
   --rrr-colors-context-success-10: oklch(97.69% 0.0224 154.49);
   --rrr-colors-context-success-20: oklch(90.84% 0.0612 152.83);
@@ -59,6 +59,7 @@
   --rrr-colors-context-success-70: oklch(44.11% 0.1689 140.53);
   --rrr-colors-context-success-80: oklch(35.21% 0.1269 140.54);
   --rrr-colors-context-success-90: oklch(26.32% 0.1149 140.55);
+  --rrr-colors-context-success-mix: oklch(0.87 0.29 144.64);
 
   --rrr-colors-context-info-10: oklch(97.69% 0.0225 266.13);
   --rrr-colors-context-info-20: oklch(88.14% 0.0579 266.18);
@@ -69,6 +70,7 @@
   --rrr-colors-context-info-70: oklch(43.71% 0.1429 262.43);
   --rrr-colors-context-info-80: oklch(35.11% 0.1269 262.41);
   --rrr-colors-context-info-90: oklch(26.32% 0.1109 262.38);
+  --rrr-colors-context-info-mix: oklch(0.55 0.25 257.88);
 
   --rrr-colors-context-warning-10: oklch(97.69% 0.0300 74.50);
   --rrr-colors-context-warning-20: oklch(91.20% 0.0780 72.40);
@@ -79,15 +81,21 @@
   --rrr-colors-context-warning-70: oklch(45.00% 0.1700 64.30);
   --rrr-colors-context-warning-80: oklch(36.00% 0.1480 63.50);
   --rrr-colors-context-warning-90: oklch(26.32% 0.1250 62.80);
+  --rrr-colors-context-warning-mix: oklch(69.57% 0.18508 49.543);
 
   /* App-level semantic tokens used by the current UI surface. */
   --rrr-color-primary: var(--rrr-colors-serene-mint-60);
   --rrr-color-primary-deep: var(--rrr-colors-serene-mint-70);
+  /* use mix as: color-mix(in oklab, var(--rrr-color-primary-mix), transparent 85%) */
+  --rrr-color-primary-mix: var(--rrr-colors-serene-mint-mix);
+  --rrr-color-primary-translucent-bg: color-mix(in oklab, var(--rrr-color-primary-mix), transparent 85%);
   --rrr-color-contrast: var(--rrr-colors-grayscale-00);
   --rrr-color-contrast-negative: var(--rrr-colors-grayscale-100);
   --rrr-color-accent: var(--rrr-colors-activity-indigo-60);
   --rrr-color-accent-deep: var(--rrr-colors-activity-indigo-70);
-  --rrr-color-accent-contrast: var(--rrr-colors-grayscale-00);
+  --rrr-color-accent-mix: var(--rrr-colors-activity-indigo-mix);
+  --rrr-color-neutral-mix: var(--rrr-colors-grayscale-mix);
+
   --rrr-color-text: var(--rrr-colors-grayscale-90);
   --rrr-color-link: var(--rrr-color-primary-deep);
   --rrr-color-link-hover: var(--rrr-color-accent-deep);
@@ -206,6 +214,8 @@
 }
 
 :root[data-theme='dark'] {
+  --rrr-color-primary: var(--rrr-colors-serene-mint-60);
+
   --rrr-colors-grayscale-00: oklch(18.00% 0.0080 266.00);
   --rrr-colors-grayscale-10: oklch(21.00% 0.0090 264.00);
   --rrr-colors-grayscale-20: oklch(26.00% 0.0100 260.00);
@@ -248,6 +258,10 @@
 
 /* Contrast augments the resolved theme instead of choosing light or dark. */
 :root[data-theme='light'][data-contrast='high'] {
+  --rrr-color-primary: var(--rrr-colors-serene-mint-60);
+  --rrr-color-primary-deep: var(--rrr-colors-serene-mint-80);
+
+
   --rrr-colors-grayscale-00: #ffffff;
   --rrr-colors-grayscale-10: #ffffff;
   --rrr-colors-grayscale-20: #f5f5f5;
@@ -260,7 +274,6 @@
   --rrr-colors-grayscale-90: #111111;
   --rrr-colors-grayscale-100: #000000;
 
-  --rrr-color-primary: var(--rrr-colors-serene-mint-60);
   --rrr-color-contrast: #ffffff;
   --rrr-surface-raised: #ffffff;
   --rrr-border-subtle: #000000;
@@ -281,6 +294,10 @@
 }
 
 :root[data-theme='dark'][data-contrast='high'] {
+  --rrr-color-primary: var(--rrr-colors-serene-mint-60);
+
+  --rrr-list-row-icon-color: var(--rrr-colors-serene-mint-20);
+
   --rrr-colors-grayscale-00: #000000;
   --rrr-colors-grayscale-10: #000000;
   --rrr-colors-grayscale-20: #0f0f0f;
@@ -293,7 +310,6 @@
   --rrr-colors-grayscale-90: #f0f0f0;
   --rrr-colors-grayscale-100: #ffffff;
 
-  --rrr-color-primary: var(--rrr-colors-serene-mint-60);
   --rrr-color-contrast: #ffffff;
   --rrr-surface-base: var(--rrr-colors-grayscale-30);
   --rrr-surface-raised: var(--rrr-colors-grayscale-20);
@@ -304,7 +320,6 @@
   --rrr-color-link-hover: var(--rrr-colors-activity-indigo-20);
   --rrr-color-scheme: dark;
   --rrr-color-heading: #ffffff;
-  --rrr-list-row-icon-color: var(--rrr-colors-serene-mint-20);
 
   --global-focus-ring-color: #ffffff;
   --rrr-depth-1-shadow: 0 0 0 1px #ffffff;

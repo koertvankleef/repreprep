@@ -388,20 +388,15 @@ export class RrrStyleguide extends HTMLElement {
             <div class="rrr-card">
             <div class="showcase-block">
               <p class="sample-text">${t('styleguide.buttonGuidance')}</p>
-              <div class="button-row role-row">
-                <rrr-button type="button">${t('styleguide.buttons.primary')}</rrr-button>
-                <rrr-button type="button" variant="outline">${t('styleguide.buttons.secondary')}</rrr-button>
-                <rrr-button type="button" variant="danger">${t('styleguide.buttons.danger')}</rrr-button>
-              </div>
               <div class="button-row">
                 <rrr-button type="button" disabled>${t('styleguide.buttons.primary')} (${t('styleguide.disabledExample')})</rrr-button>
                 <rrr-button type="button" variant="outline" disabled>${t('styleguide.buttons.secondary')} (${t('styleguide.disabledExample')})</rrr-button>
-                <rrr-button type="button" variant="danger" disabled>${t('styleguide.buttons.danger')} (${t('styleguide.disabledExample')})</rrr-button>
+                <rrr-button type="button" tone="danger" disabled>${t('styleguide.buttons.danger')} (${t('styleguide.disabledExample')})</rrr-button>
               </div>
               <div class="button-row role-row">
                 <rrr-button type="button" tone="primary">tone=primary</rrr-button>
-                <rrr-button type="button" tone="neutral">tone=neutral</rrr-button>
                 <rrr-button type="button" tone="accent">tone=accent</rrr-button>
+                <rrr-button type="button" tone="neutral">tone=neutral</rrr-button>
                 <rrr-button type="button" tone="info">tone=info</rrr-button>
                 <rrr-button type="button" tone="success">tone=success</rrr-button>
                 <rrr-button type="button" tone="warning">tone=warning</rrr-button>
@@ -409,15 +404,19 @@ export class RrrStyleguide extends HTMLElement {
               </div>
               <div class="button-row role-row">
                 <rrr-button type="button" variant="outline" tone="primary">outline primary</rrr-button>
-                <rrr-button type="button" variant="outline" tone="neutral">outline neutral</rrr-button>
                 <rrr-button type="button" variant="outline" tone="accent">outline accent</rrr-button>
+                <rrr-button type="button" variant="outline" tone="neutral">outline neutral</rrr-button>
+                <rrr-button type="button" variant="outline" tone="info">outline info</rrr-button>
                 <rrr-button type="button" variant="outline" tone="success">outline success</rrr-button>
+                <rrr-button type="button" variant="outline" tone="warning">outline warning</rrr-button>
                 <rrr-button type="button" variant="outline" tone="danger">outline danger</rrr-button>
               </div>
               <div class="button-row">
                 <rrr-button type="button" variant="ghost" tone="primary">ghost primary</rrr-button>
-                <rrr-button type="button" variant="ghost" tone="neutral">ghost neutral</rrr-button>
                 <rrr-button type="button" variant="ghost" tone="accent">ghost accent</rrr-button>
+                <rrr-button type="button" variant="ghost" tone="neutral">ghost neutral</rrr-button>
+                <rrr-button type="button" variant="ghost" tone="info">ghost info</rrr-button>
+                <rrr-button type="button" variant="ghost" tone="success">ghost success</rrr-button>
                 <rrr-button type="button" variant="ghost" tone="warning">ghost warning</rrr-button>
                 <rrr-button type="button" variant="ghost" tone="danger">ghost danger</rrr-button>
                 <rrr-tooltip><rrr-button type="button" variant="ghost" tone="primary" aria-label="icon only ghost button" title="icon only ghost button"><rrr-icon name="settings"></rrr-icon></rrr-button></rrr-tooltip>

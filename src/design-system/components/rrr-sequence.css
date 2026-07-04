@@ -51,13 +51,13 @@ rrr-sequence-gutter {
 
 .rrr-sequence-gutter__control:hover:not(:disabled) {
   border-color: transparent;
-  background: color-mix(in oklab, var(--rrr-color-primary) 10%, transparent);
+  background: color-mix(in oklab, var(--rrr-color-primary-mix), var(--rrr-surface-raised) 85%);
   box-shadow: none;
 }
 
 .rrr-sequence-gutter__control:active:not(:disabled) {
   border-color: transparent;
-  background: color-mix(in oklab, var(--rrr-color-primary) 16%, transparent);
+  background: color-mix(in oklab, var(--rrr-color-primary-mix), var(--rrr-surface-raised) 85%);
   box-shadow: none;
   transform: none;
 }

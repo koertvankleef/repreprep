@@ -12,7 +12,7 @@
   --rrr-app-link-radius: var(--rrr-radius-m);
   --rrr-app-link-color: var(--rrr-colors-grayscale-80);
   --rrr-app-link-transition: var(--rrr-transition-default);
-  --rrr-app-link-hover-background: color-mix(in oklab, var(--rrr-color-primary), transparent 85%);
+  --rrr-app-link-hover-background: var(--rrr-color-primary-translucent-bg);
   --rrr-app-link-hover-color: var(--rrr-button-fg);
   --rrr-app-link-active-background: var(--rrr-color-primary);
   --rrr-app-link-active-color: var(--rrr-color-heading);
