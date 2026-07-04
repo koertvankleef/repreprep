@@ -10,7 +10,6 @@ export type AppRouteId =
   | 'routines'
   | 'routine-new'
   | 'routine-detail'
-  | 'routine-edit'
   | 'settings'
   | 'settings-appearance'
   | 'settings-language'
@@ -34,7 +33,6 @@ export type AppRoute =
   | { name: 'routines' }
   | { name: 'routine-new' }
   | { name: 'routine-detail'; routineId: string }
-  | { name: 'routine-edit'; routineId: string }
   | { name: 'settings' }
   | { name: 'settings-appearance' }
   | { name: 'settings-language' }
@@ -177,21 +175,6 @@ export const appRoutes: HashRouteConfig<AppRouteMeta>[] = [
     },
   },
   {
-    id: 'routine-edit',
-    pattern: '/routines/:routineId/edit',
-    meta: {
-      nav: 'routines',
-      depth: 2,
-      main: false,
-      surface: 'padded',
-      header: 'standard',
-      titleKey: 'app.header.routineEdit',
-      backHref: (route) => route.name === 'routine-edit'
-        ? `#/routines/${encodeURIComponent(route.routineId)}`
-        : '#/routines',
-    },
-  },
-  {
     id: 'settings',
     pattern: '/settings',
     meta: {
@@ -301,7 +284,7 @@ export function toAppRoute(
     return { name: routeId, workoutId: match.params.workoutId ?? '' }
   }
 
-  if (routeId === 'routine-detail' || routeId === 'routine-edit') {
+  if (routeId === 'routine-detail') {
     return { name: routeId, routineId: match.params.routineId ?? '' }
   }
 

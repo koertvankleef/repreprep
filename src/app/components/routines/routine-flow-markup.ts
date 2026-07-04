@@ -10,22 +10,51 @@ type FlowMarkupOptions = {
   resolveExerciseName: (exerciseId: string) => string
   exerciseInteractive?: boolean
   transitionInteractive?: boolean
+  sortable?: boolean
 }
 
 function renderExerciseRow(
   exercise: Extract<RoutineFlowItem, { kind: 'exercise' }>['exercise'],
   resolveExerciseName: (exerciseId: string) => string,
   interactive: boolean,
+  sortable: boolean,
 ): string {
   const exerciseName = resolveExerciseName(exercise.exerciseId)
-
-  return `
+  const row = `
     <rrr-list-row
       ${interactive ? 'activation="button"' : ''}
       label="${escapeHtml(exerciseName)}"
       description="${escapeHtml(tPlural('routineDetail.setCount', exercise.setCount))}"
       data-routine-exercise-id="${escapeHtml(exercise.id)}"
     ></rrr-list-row>
+  `
+
+  if (!sortable) {
+    return row
+  }
+
+  const handleLabel = t('routineDetail.reorder.handleAria', {
+    exercise: exerciseName,
+  })
+
+  return `
+    <div
+      class="rrr-sortable-item"
+      data-sequence-item
+      data-sort-id="${escapeHtml(exercise.id)}"
+      data-sort-label="${escapeHtml(exerciseName)}"
+    >
+      ${row}
+      <button
+        class="rrr-sort-handle"
+        type="button"
+        data-sort-handle
+        aria-label="${escapeHtml(handleLabel)}"
+        title="${escapeHtml(handleLabel)}"
+      >
+        <rrr-icon name="re-order-dots-vertical"></rrr-icon>
+      </button>
+    </div>
   `
 }
 
@@ -78,10 +107,11 @@ export function renderRoutineFlowSequence(
   const resolveExerciseName = options.resolveExerciseName
   const exerciseInteractive = options.exerciseInteractive ?? true
   const transitionInteractive = options.transitionInteractive ?? true
+  const sortable = options.sortable ?? false
 
   return buildRoutineFlow(version)
     .map((item) => item.kind === 'exercise'
-      ? renderExerciseRow(item.exercise, resolveExerciseName, exerciseInteractive)
+      ? renderExerciseRow(item.exercise, resolveExerciseName, exerciseInteractive, sortable)
       : renderTransitionGutter(item, version, resolveExerciseName, transitionInteractive))
     .join('')
 }

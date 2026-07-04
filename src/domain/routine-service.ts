@@ -76,6 +76,30 @@ export function getActiveRoutineVersion(data: AppData, routineId: string): Routi
   return getRoutineVersion(data, routine.activeVersionId)
 }
 
+export function reorderRoutineExercises(
+  exercises: RoutineExercise[],
+  orderedIds: string[],
+): RoutineExercise[] {
+  if (
+    orderedIds.length !== exercises.length
+    || new Set(orderedIds).size !== orderedIds.length
+  ) {
+    return exercises
+  }
+
+  const exerciseById = new Map(exercises.map((exercise) => [exercise.id, exercise]))
+  const reordered = orderedIds.map((id) => exerciseById.get(id))
+  if (reordered.some((exercise) => exercise === undefined)) {
+    return exercises
+  }
+
+  if (reordered.every((exercise, index) => exercise === exercises[index])) {
+    return exercises
+  }
+
+  return reordered as RoutineExercise[]
+}
+
 export function createRoutine(data: AppData, name: string, exercises: RoutineExercise[], transitionSeconds = DEFAULT_TRANSITION_SECONDS): AppData {
   const timestamp = new Date().toISOString()
   const routineId = generateId()

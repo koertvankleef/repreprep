@@ -1,12 +1,16 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { initLocale } from '../i18n/index.ts'
+import { registerRrrListRow } from '../design-system/components/rrr-list-row.ts'
+import { registerRrrSequence } from '../design-system/components/rrr-sequence.ts'
+import { registerRrrSequenceGutter } from '../design-system/components/rrr-sequence-gutter.ts'
 import { registerRrrSheet } from '../design-system/components/rrr-sheet.ts'
 import { storageService } from '../app/storage-instance.ts'
 import { RrrRoutineEditor } from '../app/components/routines/rrr-routine-editor.ts'
+import type { RoutineExercise } from '../domain/types.ts'
 
 const natoPrefixPattern = '(Alpha|Bravo|Charlie|Delta|Echo|Foxtrot|Golf|Hotel|India|Juliett|Kilo|Lima|Mike|November|Oscar|Papa|Quebec|Romeo|Sierra|Tango|Uniform|Victor|Whiskey|X-ray|Yankee|Zulu)'
 
-beforeAll(() => {
+beforeAll(async () => {
   if (!('replaceSync' in CSSStyleSheet.prototype)) {
     Object.defineProperty(CSSStyleSheet.prototype, 'replaceSync', {
       configurable: true,
@@ -27,7 +31,14 @@ beforeAll(() => {
     },
   })
 
+  const { registerRrrNumberStepper } = await import(
+    '../design-system/components/rrr-number-stepper.ts'
+  )
   initLocale('en-US')
+  registerRrrListRow()
+  registerRrrNumberStepper()
+  registerRrrSequence()
+  registerRrrSequenceGutter()
   registerRrrSheet()
 })
 
@@ -118,5 +129,56 @@ describe('rrr-routine-editor new routine confirmation', () => {
     expect(storageService.getData().routines).toHaveLength(initialCount + 1)
     const created = storageService.getData().routines.at(-1)
     expect(created?.name).toBe('Morning Session')
+  })
+
+  test('edits the local routine draft through Flow without a duplicate exercise section', async () => {
+    const data = storageService.getData()
+    const sourceVersion = data.routineVersions[0]!
+    const editor = new RrrRoutineEditor()
+    document.body.append(editor)
+
+    const draftEditor = editor as unknown as {
+      exercises: RoutineExercise[]
+      render: () => void
+    }
+    draftEditor.exercises = sourceVersion.exercises.slice(0, 2).map(
+      (exercise) => ({ ...exercise }),
+    )
+    draftEditor.render()
+    await Promise.resolve()
+
+    expect(editor.querySelector('.exercise-list')).toBeNull()
+    expect(editor.querySelector('.exercise-item')).toBeNull()
+    expect(editor.querySelector('input[type="number"]')).toBeNull()
+
+    const firstExercise = draftEditor.exercises[0]!
+    editor.querySelector<HTMLElement>(
+      `rrr-list-row[data-routine-exercise-id="${firstExercise.id}"]`,
+    )?.click()
+    await Promise.resolve()
+
+    const setCount = document.querySelector<HTMLElement & { value: string }>(
+      'rrr-sheet rrr-number-stepper[name="set-count"]',
+    )
+    const restSeconds = document.querySelector<HTMLElement & { value: string }>(
+      'rrr-sheet rrr-number-stepper[name="rest-seconds"]',
+    )
+    setCount!.value = '4'
+    restSeconds!.value = '30'
+    setCount?.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    restSeconds?.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    document.querySelector<HTMLElement>(
+      'rrr-sheet [data-sheet-result="confirm"]',
+    )?.click()
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    expect(draftEditor.exercises[0]).toMatchObject({
+      id: firstExercise.id,
+      setCount: 4,
+      restSeconds: 30,
+    })
+    expect(editor.querySelector(
+      `rrr-list-row[data-routine-exercise-id="${firstExercise.id}"]`,
+    )?.getAttribute('description')).toBe('4 sets')
   })
 })

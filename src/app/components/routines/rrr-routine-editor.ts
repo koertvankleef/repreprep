@@ -2,24 +2,30 @@ import { storageService } from '../../storage-instance.ts'
 import { getActiveExercises } from '../../../domain/exercise-service.ts'
 import {
   createRoutineExercise,
-  getActiveRoutineVersion,
-  getRoutine,
+  reorderRoutineExercises,
 } from '../../../domain/routine-service.ts'
 import { t } from '../../../i18n/index.ts'
 import type { RoutineExercise } from '../../../domain/types.ts'
+import type {
+  SequenceReorderDetail,
+  SequenceSortStatusDetail,
+} from '../../../design-system/components/rrr-sequence.ts'
 import { escapeHtml } from '../../render-helpers.ts'
 import { confirmSheet } from '../../../utils/sheet-service.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
 import { presentSheet } from '../../../utils/sheet-service.ts'
-import { promptRoutineTransitionDefault } from './routine-timing-sheets.ts'
+import {
+  promptRoutineTransitionDefault,
+  promptTransitionOverride,
+} from './routine-timing-sheets.ts'
+import { promptRoutineExerciseSettings } from './routine-exercise-sheets.ts'
 import {
   renderRoutineFlowControls,
   renderRoutineFlowSequence,
 } from './routine-flow-markup.ts'
-import styles from './rrr-routine-editor.css?inline'
+import { announceRoutineFlowSort } from './routine-flow-sorting.ts'
 
 export class RrrRoutineEditor extends HTMLElement {
-  private static readonly defaultRestSeconds = 20
   private static readonly defaultTransitionSeconds = 10
   private static readonly natoAlphabet = [
     'Alpha',
@@ -76,25 +82,13 @@ export class RrrRoutineEditor extends HTMLElement {
     'Spring',
   ]
 
-  private routineIdValue: string | null = null
   private name = ''
   private transitionSeconds = RrrRoutineEditor.defaultTransitionSeconds
   private exercises: RoutineExercise[] = []
   private listenersBound = false
-  private statusMessage = ''
-  private statusType: 'error' | 'success' | null = null
   private createConfirmActive = false
   private renameSheetActive = false
   private timingSheetActive = false
-
-  set routineId(value: string | null) {
-    this.routineIdValue = value
-    this.initialize()
-  }
-
-  get routineId(): string | null {
-    return this.routineIdValue
-  }
 
   connectedCallback(): void {
     this.bindListeners()
@@ -104,31 +98,9 @@ export class RrrRoutineEditor extends HTMLElement {
   private initialize(): void {
     const data = storageService.getData()
 
-    if (this.routineIdValue) {
-      const routine = getRoutine(data, this.routineIdValue)
-
-      if (!routine) {
-        this.name = ''
-        this.exercises = []
-        this.render()
-        return
-      }
-
-      const version = getActiveRoutineVersion(data, this.routineIdValue)
-
-      this.name = routine.name
-      this.transitionSeconds = Math.max(0, version?.transitionSeconds ?? RrrRoutineEditor.defaultTransitionSeconds)
-      this.exercises = version
-        ? version.exercises.map((exercise) => ({
-            ...exercise,
-            restSeconds: Math.max(0, exercise.restSeconds ?? RrrRoutineEditor.defaultRestSeconds),
-          }))
-        : []
-    } else {
-      this.name = this.getSuggestedRoutineName(data)
-      this.transitionSeconds = RrrRoutineEditor.defaultTransitionSeconds
-      this.exercises = []
-    }
+    this.name = this.getSuggestedRoutineName(data)
+    this.transitionSeconds = RrrRoutineEditor.defaultTransitionSeconds
+    this.exercises = []
 
     this.render()
   }
@@ -142,7 +114,7 @@ export class RrrRoutineEditor extends HTMLElement {
 
     for (let offset = 0; offset < RrrRoutineEditor.natoAlphabet.length; offset += 1) {
       const prefixIndex = (prefixStartIndex + offset) % RrrRoutineEditor.natoAlphabet.length
-      const prefix = RrrRoutineEditor.natoAlphabet[prefixIndex]
+      const prefix = RrrRoutineEditor.natoAlphabet[prefixIndex]!
       const geographics = this.getShuffledGeographicNames()
 
       for (const geographic of geographics) {
@@ -160,7 +132,7 @@ export class RrrRoutineEditor extends HTMLElement {
     while (true) {
       for (let offset = 0; offset < RrrRoutineEditor.natoAlphabet.length; offset += 1) {
         const prefixIndex = (prefixStartIndex + offset) % RrrRoutineEditor.natoAlphabet.length
-        const prefix = RrrRoutineEditor.natoAlphabet[prefixIndex]
+        const prefix = RrrRoutineEditor.natoAlphabet[prefixIndex]!
         const geographics = this.getShuffledGeographicNames()
 
         for (const geographic of geographics) {
@@ -193,10 +165,6 @@ export class RrrRoutineEditor extends HTMLElement {
     return values
   }
 
-  private setStatus(message: string, type: 'error' | 'success'): void {
-    this.statusMessage = message
-    this.statusType = type
-  }
   private bindListeners(): void {
     if (this.listenersBound) {
       return
@@ -204,7 +172,50 @@ export class RrrRoutineEditor extends HTMLElement {
 
     this.listenersBound = true
 
+    this.addEventListener('rrr-sequence-sort-status', (event) => {
+      announceRoutineFlowSort(
+        (event as CustomEvent<SequenceSortStatusDetail>).detail,
+      )
+    })
+    this.addEventListener('rrr-sequence-reorder', (event) => {
+      const detail = (event as CustomEvent<SequenceReorderDetail>).detail
+      const exercises = reorderRoutineExercises(this.exercises, detail.orderedIds)
+      if (exercises === this.exercises) {
+        return
+      }
+
+      this.exercises = exercises
+      this.render()
+
+      if (detail.input === 'keyboard') {
+        queueMicrotask(() => {
+          Array.from(this.querySelectorAll<HTMLElement>('[data-sort-id]'))
+            .find((item) => item.dataset.sortId === detail.movedId)
+            ?.querySelector<HTMLElement>('[data-sort-handle]')
+            ?.focus()
+        })
+      }
+    })
+
     this.addEventListener('click', (event) => {
+      const routineExerciseTarget = event
+        .composedPath()
+        .find((node): node is HTMLElement => node instanceof HTMLElement
+          && node.dataset.routineExerciseId !== undefined)
+      if (routineExerciseTarget?.dataset.routineExerciseId) {
+        void this.editRoutineExercise(routineExerciseTarget.dataset.routineExerciseId)
+        return
+      }
+
+      const transitionTarget = event
+        .composedPath()
+        .find((node): node is HTMLElement => node instanceof HTMLElement
+          && node.dataset.beforeExerciseId !== undefined)
+      if (transitionTarget?.dataset.beforeExerciseId) {
+        void this.editTransitionOverride(transitionTarget.dataset.beforeExerciseId)
+        return
+      }
+
       const actionTarget = event
         .composedPath()
         .find((node): node is HTMLElement => node instanceof HTMLElement && node.dataset.action !== undefined)
@@ -225,67 +236,11 @@ export class RrrRoutineEditor extends HTMLElement {
         return
       }
 
-      if (action === 'remove-exercise') {
-        const id = actionTarget.dataset.id
-
-        if (id) {
-          this.removeExercise(id)
-        }
-
-        return
-      }
-
-      if (action === 'move-up') {
-        const id = actionTarget.dataset.id
-
-        if (id) {
-          this.moveExercise(id, -1)
-        }
-
-        return
-      }
-
-      if (action === 'move-down') {
-        const id = actionTarget.dataset.id
-
-        if (id) {
-          this.moveExercise(id, 1)
-        }
-
-        return
-      }
-
       if (action === 'save') {
         void this.save()
         return
       }
 
-      if (action === 'back') {
-        window.location.hash = this.getReturnHash()
-      }
-    })
-  }
-
-  private readFields(): void {
-    this.exercises = this.exercises.map((exercise) => {
-      const restInput = this.querySelector<HTMLInputElement>(
-        `input[data-exercise-id="${exercise.id}"][data-field="rest-seconds"]`,
-      )
-      const restValue = restInput?.valueAsNumber
-      const setCountInput = this.querySelector<HTMLInputElement>(
-        `input[data-exercise-id="${exercise.id}"][data-field="set-count"]`,
-      )
-      const setCountValue = setCountInput?.valueAsNumber
-
-      return {
-        ...exercise,
-        restSeconds: Number.isFinite(restValue)
-          ? Math.max(0, Math.trunc(restValue ?? RrrRoutineEditor.defaultRestSeconds))
-          : Math.max(0, exercise.restSeconds ?? RrrRoutineEditor.defaultRestSeconds),
-        setCount: Number.isFinite(setCountValue)
-          ? Math.max(1, Math.trunc(setCountValue ?? 1))
-          : Math.max(1, exercise.setCount),
-      }
     })
   }
 
@@ -297,7 +252,6 @@ export class RrrRoutineEditor extends HTMLElement {
   }
 
   private async addRoutineExercise(): Promise<void> {
-    this.readFields()
     if (this.timingSheetActive) {
       return
     }
@@ -353,7 +307,6 @@ export class RrrRoutineEditor extends HTMLElement {
       return
     }
 
-    this.readFields()
     this.timingSheetActive = true
     try {
       const seconds = await promptRoutineTransitionDefault(this.transitionSeconds)
@@ -369,39 +322,90 @@ export class RrrRoutineEditor extends HTMLElement {
     this.render()
   }
 
-  private removeExercise(id: string): void {
-    this.readFields()
-    this.exercises = this.exercises.filter((e) => e.id !== id)
-    this.render()
+  private async editRoutineExercise(routineExerciseId: string): Promise<void> {
+    const routineExercise = this.exercises.find(
+      (exercise) => exercise.id === routineExerciseId,
+    )
+    if (!routineExercise || this.timingSheetActive) {
+      return
+    }
+
+    const exerciseName = this.resolveExerciseName(routineExercise.exerciseId)
+    this.timingSheetActive = true
+    try {
+      const result = await promptRoutineExerciseSettings({
+        exerciseName,
+        setCount: routineExercise.setCount,
+        restSeconds: routineExercise.restSeconds,
+      })
+      if (!result) {
+        return
+      }
+
+      if (result.kind === 'delete') {
+        const confirmed = await confirmSheet({
+          title: t('routineExercise.dialog.delete.title', { exercise: exerciseName }),
+          message: t('routineExercise.dialog.delete.message'),
+          confirmLabel: t('action.delete'),
+          confirmTone: 'danger',
+        })
+        if (confirmed) {
+          this.exercises = this.exercises.filter(
+            (exercise) => exercise.id !== routineExerciseId,
+          )
+          this.render()
+        }
+        return
+      }
+
+      const { settings } = result
+      if (
+        settings.setCount === routineExercise.setCount
+        && settings.restSeconds === routineExercise.restSeconds
+      ) {
+        return
+      }
+
+      this.exercises = this.exercises.map((exercise) =>
+        exercise.id === routineExerciseId
+          ? { ...exercise, ...settings }
+          : exercise)
+      this.render()
+    } finally {
+      this.timingSheetActive = false
+    }
   }
 
-  private moveExercise(id: string, direction: -1 | 1): void {
-    this.readFields()
-    const index = this.exercises.findIndex((e) => e.id === id)
-
-    if (index === -1) {
+  private async editTransitionOverride(beforeExerciseId: string): Promise<void> {
+    const destination = this.exercises.find(
+      (exercise) => exercise.id === beforeExerciseId,
+    )
+    if (!destination || this.timingSheetActive) {
       return
     }
 
-    const next = index + direction
+    this.timingSheetActive = true
+    try {
+      const override = await promptTransitionOverride({
+        routineDefaultSeconds: this.transitionSeconds,
+        currentOverrideSeconds: destination.transitionBeforeOverrideSeconds,
+        destinationName: this.resolveExerciseName(destination.exerciseId),
+      })
+      if (
+        override === undefined
+        || override === destination.transitionBeforeOverrideSeconds
+      ) {
+        return
+      }
 
-    if (next < 0 || next >= this.exercises.length) {
-      return
+      this.exercises = this.exercises.map((exercise) =>
+        exercise.id === beforeExerciseId
+          ? { ...exercise, transitionBeforeOverrideSeconds: override }
+          : exercise)
+      this.render()
+    } finally {
+      this.timingSheetActive = false
     }
-
-    const updated = [...this.exercises]
-    const temp = updated[index]
-    const swapTarget = updated[next]
-
-    if (!temp || !swapTarget) {
-      return
-    }
-
-    updated[index] = swapTarget
-    updated[next] = temp
-
-    this.exercises = updated
-    this.render()
   }
 
   async openRenameSheet(): Promise<boolean> {
@@ -453,115 +457,53 @@ export class RrrRoutineEditor extends HTMLElement {
   }
 
   private async save(): Promise<void> {
-    this.readFields()
-
     const resolvedName = this.name.trim() || this.getSuggestedRoutineName(storageService.getData())
     this.name = resolvedName
 
-    if (!this.routineIdValue) {
-      if (this.createConfirmActive) {
-        return
-      }
-
-      this.createConfirmActive = true
-      try {
-        const confirmed = await confirmSheet({
-          title: t('routineEditor.dialog.create.title'),
-          message: t('routineEditor.dialog.create.message', { name: resolvedName }),
-          confirmLabel: t('routineEditor.dialog.create.confirm'),
-        })
-        if (!confirmed) {
-          return
-        }
-      } finally {
-        this.createConfirmActive = false
-      }
-    }
-
-    const saved = storageService.saveRoutine(this.routineIdValue, resolvedName, this.exercises, this.transitionSeconds)
-
-    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
-    this.routineIdValue = saved.id
-    window.location.hash = `#/routines/${encodeURIComponent(saved.id)}`
-  }
-
-  private getReturnHash(): string {
-    return this.routineIdValue && getRoutine(storageService.getData(), this.routineIdValue)
-      ? `#/routines/${encodeURIComponent(this.routineIdValue)}`
-      : '#/routines'
-  }
-
-  private render(): void {
-    const data = storageService.getData()
-    const isEditing = this.routineIdValue !== null
-
-    if (isEditing && this.routineIdValue !== null && !getRoutine(data, this.routineIdValue)) {
-      this.innerHTML = `
-        <style>${styles}</style>
-        <section class="page">
-          <div class="rrr-card">
-            <h2>${t('routineEditor.notFound.title')}</h2>
-            <rrr-button type="button" variant="outline" data-action="back">${t('routineEditor.notFound.back')}</rrr-button>
-          </div>
-        </section>
-      `
+    if (this.createConfirmActive) {
       return
     }
 
-    const exerciseListHtml = this.exercises
-      .map((routineExercise, index) => {
-            const def = data.exercises.find((e) => e.id === routineExercise.exerciseId)
-            const exerciseName = def?.name ?? t('routineEditor.exercises.unknown')
-            const exerciseHeadingId = `routine-exercise-${routineExercise.id}`
-            const isFirst = index === 0
-            const isLast = index === this.exercises.length - 1
+    this.createConfirmActive = true
+    try {
+      const confirmed = await confirmSheet({
+        title: t('routineEditor.dialog.create.title'),
+        message: t('routineEditor.dialog.create.message', { name: resolvedName }),
+        confirmLabel: t('routineEditor.dialog.create.confirm'),
+      })
+      if (!confirmed) {
+        return
+      }
+    } finally {
+      this.createConfirmActive = false
+    }
 
-            return `
-              <section class="exercise-item" aria-labelledby="${exerciseHeadingId}">
-                <div class="exercise-header">
-                  <span class="exercise-name" id="${exerciseHeadingId}">${escapeHtml(exerciseName)}</span>
-                  <div class="exercise-order">
-                    <rrr-button type="button" variant="outline" data-action="move-up" data-id="${routineExercise.id}"
-                      ${isFirst ? 'disabled' : ''} aria-label="${escapeHtml(t('routineEditor.action.moveUpAria', { name: exerciseName }))}">↑</rrr-button>
-                    <rrr-button type="button" variant="outline" data-action="move-down" data-id="${routineExercise.id}"
-                      ${isLast ? 'disabled' : ''} aria-label="${escapeHtml(t('routineEditor.action.moveDownAria', { name: exerciseName }))}">↓</rrr-button>
-                    <rrr-button type="button" variant="ghost" tone="danger" data-action="remove-exercise" data-id="${routineExercise.id}" aria-label="${escapeHtml(t('routineEditor.action.removeExerciseAria', { name: exerciseName }))}"><rrr-icon name="delete"></rrr-icon></rrr-button>
-                  </div>
-                </div>
-                <label>
-                  ${t('routineExercise.setCount.label')}
-                  <input type="number" min="1" step="1"
-                    data-exercise-id="${routineExercise.id}"
-                    data-field="set-count"
-                    value="${Math.max(1, routineExercise.setCount)}" />
-                </label>
-                <label>
-                  ${t('routineEditor.field.restSeconds')}
-                  <input type="number" min="0" step="1"
-                    data-exercise-id="${routineExercise.id}"
-                    data-field="rest-seconds"
-                    value="${Math.max(0, routineExercise.restSeconds ?? RrrRoutineEditor.defaultRestSeconds)}" />
-                </label>
-              </section>
-            `
-            })
-          .join('')
+    const saved = storageService.saveRoutine(
+      null,
+      resolvedName,
+      this.exercises,
+      this.transitionSeconds,
+    )
 
+    window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+    window.location.hash = `#/routines/${encodeURIComponent(saved.id)}`
+  }
+
+  private render(): void {
     this.innerHTML = `
-      <style>${styles}</style>
       <section class="page">
-        <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('routineEditor.status.default')}</p>
+        <p class="status-message">${t('routineEditor.status.default')}</p>
         <rrr-section>
           <span slot="heading">${t('routineDetail.section.flow')}</span>
           <div class="rrr-card">
             ${
     this.exercises.length > 0
       ? `
-                    <rrr-sequence aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
+                    <rrr-sequence sortable aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
                       ${renderRoutineFlowSequence(
       {
         id: 'editor-preview',
-        routineId: this.routineIdValue ?? 'new',
+        routineId: 'new',
         previousVersionId: null,
         transitionSeconds: this.transitionSeconds,
         exercises: this.exercises,
@@ -569,8 +511,9 @@ export class RrrRoutineEditor extends HTMLElement {
       },
       {
         resolveExerciseName: (exerciseId) => this.resolveExerciseName(exerciseId),
-        exerciseInteractive: false,
-        transitionInteractive: false,
+        exerciseInteractive: true,
+        transitionInteractive: true,
+        sortable: true,
       },
     )}
                     </rrr-sequence>
@@ -584,16 +527,6 @@ export class RrrRoutineEditor extends HTMLElement {
   })}
           </div>
         </rrr-section>
-        ${
-    this.exercises.length > 0
-      ? `
-            <div>
-              <h3>${t('routineEditor.section.exercises')}</h3>
-              <div class="exercise-list" aria-live="polite">${exerciseListHtml}</div>
-            </div>
-          `
-      : ''
-  }
         <rrr-section>
           <span slot="heading">${t('routineDetail.actions')}</span>
           <div class="rrr-list-card">

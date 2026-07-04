@@ -366,6 +366,64 @@ describe('value-first property lists', () => {
     expect(detail.querySelector('rrr-sequence-gutter')?.hasAttribute('description')).toBe(false)
   })
 
+  test('reorders routine exercises from the sequence and re-derives transition gutters', async () => {
+    const data = storageService.getData()
+    const routine = data.routines[0]!
+    const version = data.routineVersions.find(({ id }) => id === routine.activeVersionId)!
+    const first = version.exercises[0]!
+    const second = version.exercises[1]!
+    const detail = new RrrRoutineDetail()
+    detail.routineId = routine.id
+    document.body.append(detail)
+    await Promise.resolve()
+
+    const firstHandle = detail.querySelector<HTMLButtonElement>(
+      `[data-sort-id="${first.id}"] [data-sort-handle]`,
+    )!
+    expect(firstHandle.getAttribute('aria-label')).toContain('Press Space')
+
+    firstHandle.dispatchEvent(new KeyboardEvent('keydown', {
+      key: ' ',
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    }))
+    expect(detail.querySelector('rrr-sequence')?.getAttribute('data-sorting'))
+      .toBe('keyboard')
+
+    firstHandle.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'ArrowDown',
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    }))
+    firstHandle.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    }))
+    await Promise.resolve()
+    await Promise.resolve()
+
+    const updatedRoutine = storageService.getData().routines.find(
+      ({ id }) => id === routine.id,
+    )!
+    const updatedVersion = storageService.getData().routineVersions.find(
+      ({ id }) => id === updatedRoutine.activeVersionId,
+    )!
+    const firstGutter = detail.querySelector<HTMLElement>('rrr-sequence-gutter')
+    const focusedHandle = document.activeElement?.closest<HTMLElement>('[data-sort-id]')
+
+    expect(updatedRoutine.activeVersionId).not.toBe(version.id)
+    expect(updatedVersion.exercises.slice(0, 2).map(({ id }) => id))
+      .toEqual([second.id, first.id])
+    expect(firstGutter?.dataset.beforeExerciseId).toBe(first.id)
+    expect(focusedHandle?.dataset.sortId).toBe(first.id)
+    expect(document.querySelector<HTMLElement>('[role="status"].sr-only')?.textContent)
+      .toContain('dropped at position 2')
+  })
+
   test('starts an active workout from the bottom action row', async () => {
     const routine = storageService.getData().routines[0]!
     const initialWorkoutCount = storageService.getData().workouts.length

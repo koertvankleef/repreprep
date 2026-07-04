@@ -214,6 +214,7 @@
 
 :root[data-theme='dark'] {
   --rrr-color-primary: var(--rrr-colors-serene-mint-60);
+  --rrr-color-primary-deep: var(--rrr-colors-serene-mint-50);
 
   --rrr-colors-grayscale-00: oklch(18.00% 0.0080 266.00);
   --rrr-colors-grayscale-10: oklch(21.00% 0.0090 264.00);

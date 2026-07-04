@@ -11,6 +11,7 @@ import {
   getRoutine,
   getRoutineVersion,
   renameRoutine,
+  reorderRoutineExercises,
   setRoutinePrefillSource,
 } from '../domain/routine-service.ts'
 import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
@@ -269,6 +270,23 @@ describe('routine-service', () => {
       },
       { kind: 'exercise', exercise: version?.exercises[2] },
     ])
+  })
+
+  test('reorders routine exercises only for a complete unique identity list', () => {
+    const data = createDefaultData()
+    const version = data.routineVersions[0]!
+    const [first, second, third] = version.exercises
+    const reordered = reorderRoutineExercises(
+      version.exercises,
+      [third!.id, first!.id, second!.id, ...version.exercises.slice(3).map(({ id }) => id)],
+    )
+
+    expect(reordered.slice(0, 3)).toEqual([third, first, second])
+    expect(reorderRoutineExercises(version.exercises, [first!.id])).toBe(version.exercises)
+    expect(reorderRoutineExercises(
+      version.exercises,
+      version.exercises.map(() => first!.id),
+    )).toBe(version.exercises)
   })
 
   test('default data includes a Full Body routine', () => {

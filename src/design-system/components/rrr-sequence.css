@@ -15,6 +15,68 @@ rrr-sequence > :where(rrr-list-row, [data-sequence-item]) {
   background: var(--rrr-sequence-row-background);
 }
 
+.rrr-sortable-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+}
+
+.rrr-sortable-item > rrr-list-row {
+  min-inline-size: 0;
+}
+
+.rrr-sort-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: var(--rrr-sizes-grid-6);
+  margin: 0;
+  padding: var(--rrr-spacing-s);
+  border: 0;
+  border-inline-start: var(--rrr-border-width) solid transparent;
+  color: var(--rrr-text-muted);
+  background: transparent;
+  box-shadow: none;
+  cursor: grab;
+  touch-action: none;
+  border-radius: 0;
+}
+
+.rrr-sort-handle:hover,
+.rrr-sort-handle:active {
+  border-color: var(--rrr-sequence-row-border-color);
+  color: var(--rrr-color-primary-deep);
+  background: color-mix(in oklab, var(--rrr-color-primary-mix), var(--rrr-surface-raised) 85%);
+  box-shadow: none;
+  transform: none;
+}
+
+.rrr-sort-handle:focus-visible {
+  position: relative;
+  z-index: 2;
+  outline: var(--global-focus-ring-width) solid var(--global-focus-ring-color);
+  outline-offset: calc(var(--global-focus-ring-width) * -1);
+}
+
+rrr-sequence[data-sorting] > rrr-sequence-gutter {
+  display: none;
+}
+
+rrr-sequence[data-sorting] > [data-sort-id] {
+  transition: opacity var(--rrr-transition-default);
+}
+
+rrr-sequence[data-sorting] > [data-sort-active] {
+  z-index: 3;
+  opacity: .86;
+  box-shadow: var(--rrr-depth-3-shadow);
+}
+
+rrr-sequence[data-sorting] .rrr-sort-handle {
+  cursor: grabbing;
+}
+
 rrr-sequence-gutter {
   position: relative;
   display: flex;
@@ -101,5 +163,11 @@ rrr-sequence-gutter rrr-measurement {
 @media (forced-colors: active) {
   rrr-sequence-gutter {
     border: var(--rrr-border-width) solid CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  rrr-sequence[data-sorting] > [data-sort-id] {
+    transition: none;
   }
 }

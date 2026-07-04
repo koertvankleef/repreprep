@@ -196,6 +196,8 @@ The routine page is the management hub.
 - The page provides add, reorder, swipe-delete, rename, start, and delete
   actions.
 - The route remains `/routines/:routineId`.
+- Existing routines have no separate edit mode or `/edit` route; routine
+  detail applies edits at their confirmed interaction boundaries.
 
 The current routine-exercise route and page are obsolete and should be removed.
 
@@ -283,24 +285,31 @@ and its surface remains available for horizontal swipe.
 
 Pointer behavior:
 
-- [ ] Begin sorting only from the drag handle.
-- [ ] Use Pointer Events rather than native HTML drag-and-drop.
+- [x] Begin sorting only from the drag handle.
+- [x] Use Pointer Events rather than native HTML drag-and-drop.
 - [ ] Preserve vertical scrolling until handle drag intent is established.
-- [ ] Animate neighboring rows into prospective positions.
-- [ ] Recalculate derived transition gutters for the prospective order.
-- [ ] Emit ordered routine-exercise IDs and commit immediately on drop.
+- [x] Animate neighboring rows into prospective positions.
+- [x] Collapse gutters while sorting and re-derive them for the committed
+      order.
+- [x] Emit ordered routine-exercise IDs and commit immediately on drop.
+
+The first pointer implementation reserves touch gestures that begin on the
+explicit handle. Validate whether a later touch refinement can hand short,
+uncommitted handle gestures back to page scrolling without making sorting
+unreliable.
 
 Keyboard behavior:
 
-- [ ] Give the handle an accessible name containing the exercise name.
-- [ ] Support lift, arrow-key movement, drop, and cancel.
-- [ ] Announce pickup, new position, drop, and cancellation.
-- [ ] Restore focus to the moved row's handle after rendering.
+- [x] Give the handle an accessible name containing the exercise name.
+- [x] Support lift, arrow-key movement, drop, and cancel.
+- [x] Announce pickup, new position, drop, and cancellation.
+- [x] Restore focus to the moved row's handle after rendering.
 
-Presentation still to decide during implementation:
+Presentation:
 
-- [ ] Keep or temporarily collapse gutters while sorting.
-- [ ] Decide whether first/last positions need special drop affordances.
+- [x] Temporarily collapse gutters while sorting.
+- [x] Use the same positional movement at first/last without special drop
+      affordances for the MVP.
 
 There is no planned-set reordering: a routine exercise owns only a set count.
 
@@ -406,8 +415,29 @@ structural routine version.
 - [x] Update add-exercise behavior for the new model.
 - [x] Retire target/planned-set controls from the legacy editor.
 - [x] Preserve coherent confirmed new-routine creation.
+- [x] Remove the dedicated existing-routine edit page and route.
 
-### Phase 4 — Workout completion and history
+### Phase 5 — Routine-exercise reordering
+
+- [x] Implement pointer sorting from an explicit handle.
+- [x] Implement keyboard sorting and announcements.
+- [x] Integrate persistence and derived-gutter movement.
+- [ ] Validate touch scrolling and handle drag intent on physical touch input.
+
+### Phase 6 — Routine-exercise swipe deletion
+
+- [x] Keep swipe gesture deletion as a required milestone after shipping
+  non-gesture deletion.
+- [ ] Implement the swipe decorator and Outlook-like state progression.
+- [ ] Integrate immediate exercise deletion.
+- [x] Add explicit desktop and sheet deletion actions.
+- [ ] Test touch scrolling, hybrid input, pointer cancellation, and reduced
+      motion.
+
+### Deferred Phase 4 — Workout completion and history
+
+Workout-detail/history work stays below the routine interaction milestones
+until editing historical logged values receives a separate product review.
 
 - [x] Persist workout completion state so only completed workouts can be
       offered as prefill sources.
@@ -420,22 +450,6 @@ structural routine version.
 - [x] Allow selecting any completed workout belonging to the routine.
 - [x] Add a clear/no-prefill action.
 - [ ] Add recent related workouts to routine detail when its design is ready.
-
-### Phase 5 — Routine-exercise reordering
-
-- [ ] Implement pointer sorting.
-- [ ] Implement keyboard sorting and announcements.
-- [ ] Integrate persistence and derived-gutter movement.
-
-### Phase 6 — Routine-exercise swipe deletion
-
-- [x] Keep swipe gesture deletion as a required milestone after shipping
-  non-gesture deletion.
-- [ ] Implement the swipe decorator and Outlook-like state progression.
-- [ ] Integrate immediate exercise deletion.
-- [ ] Add explicit desktop and sheet deletion actions.
-- [ ] Test touch scrolling, hybrid input, pointer cancellation, and reduced
-      motion.
 
 ### Phase 7 — Cleanup
 

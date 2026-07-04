@@ -4,6 +4,10 @@ import { registerRrrListCard } from '../design-system/components/rrr-list-card.t
 import { registerRrrListRow, type RrrListRow } from '../design-system/components/rrr-list-row.ts'
 import { registerRrrSection } from '../design-system/components/rrr-section.ts'
 import { registerRrrSequence } from '../design-system/components/rrr-sequence.ts'
+import type {
+  SequenceReorderDetail,
+  SequenceSortStatusDetail,
+} from '../design-system/components/rrr-sequence.ts'
 import { registerRrrSequenceGutter } from '../design-system/components/rrr-sequence-gutter.ts'
 import '../app/components/settings/rrr-appearance-settings.ts'
 import '../app/components/settings/rrr-language-settings.ts'
@@ -73,6 +77,233 @@ describe('list structure primitives', () => {
       .toBe('Edit 45 seconds custom preparation before Row')
     expect(button?.querySelector('.rrr-sequence-gutter__description')?.textContent)
       .toBe('Custom')
+  })
+
+  test('reorders sequence items by keyboard and restores them on cancel', async () => {
+    document.body.innerHTML = `
+      <rrr-sequence sortable aria-label="Routine flow">
+        <div data-sequence-item data-sort-id="a" data-sort-label="Alpha">
+          <rrr-list-row activation="button" label="Alpha"></rrr-list-row>
+          <button type="button" data-sort-handle>Move Alpha</button>
+        </div>
+        <rrr-sequence-gutter value="10" unit="s"></rrr-sequence-gutter>
+        <div data-sequence-item data-sort-id="b" data-sort-label="Bravo">
+          <rrr-list-row activation="button" label="Bravo"></rrr-list-row>
+          <button type="button" data-sort-handle>Move Bravo</button>
+        </div>
+        <rrr-sequence-gutter value="10" unit="s"></rrr-sequence-gutter>
+        <div data-sequence-item data-sort-id="c" data-sort-label="Charlie">
+          <rrr-list-row activation="button" label="Charlie"></rrr-list-row>
+          <button type="button" data-sort-handle>Move Charlie</button>
+        </div>
+      </rrr-sequence>
+    `
+    await Promise.resolve()
+
+    const sequence = document.querySelector<HTMLElement>('rrr-sequence')!
+    const statuses: SequenceSortStatusDetail[] = []
+    const reorders: SequenceReorderDetail[] = []
+    sequence.addEventListener('rrr-sequence-sort-status', (event) => {
+      statuses.push((event as CustomEvent<SequenceSortStatusDetail>).detail)
+    })
+    sequence.addEventListener('rrr-sequence-reorder', (event) => {
+      reorders.push((event as CustomEvent<SequenceReorderDetail>).detail)
+    })
+    const ids = (): string[] => Array.from(
+      sequence.querySelectorAll<HTMLElement>(':scope > [data-sort-id]'),
+    ).map((item) => item.dataset.sortId ?? '')
+    const alphaHandle = sequence.querySelector<HTMLButtonElement>(
+      '[data-sort-id="a"] [data-sort-handle]',
+    )!
+
+    alphaHandle.dispatchEvent(new KeyboardEvent('keydown', {
+      key: ' ',
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    }))
+    alphaHandle.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'ArrowDown',
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    }))
+
+    expect(sequence.dataset.sorting).toBe('keyboard')
+    expect(ids()).toEqual(['b', 'a', 'c'])
+    expect(statuses.map(({ status }) => status)).toEqual(['lifted', 'moved'])
+    expect(statuses[1]).toMatchObject({ id: 'a', position: 2, count: 3 })
+
+    alphaHandle.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    }))
+
+    expect(sequence.hasAttribute('data-sorting')).toBe(false)
+    expect(reorders).toEqual([{
+      orderedIds: ['b', 'a', 'c'],
+      movedId: 'a',
+      input: 'keyboard',
+    }])
+
+    const bravoHandle = sequence.querySelector<HTMLButtonElement>(
+      '[data-sort-id="b"] [data-sort-handle]',
+    )!
+    bravoHandle.dispatchEvent(new KeyboardEvent('keydown', {
+      key: ' ',
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    }))
+    bravoHandle.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'ArrowDown',
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    }))
+    bravoHandle.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'Escape',
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    }))
+
+    expect(ids()).toEqual(['b', 'a', 'c'])
+    expect(reorders).toHaveLength(1)
+    expect(statuses.at(-1)?.status).toBe('cancelled')
+    expect(document.activeElement).toBe(bravoHandle)
+  })
+
+  test('restores gutter DOM when sorting returns to the original order', async () => {
+    document.body.innerHTML = `
+      <rrr-sequence sortable>
+        <div data-sequence-item data-sort-id="a" data-sort-label="Alpha">
+          <button type="button" data-sort-handle>Move Alpha</button>
+        </div>
+        <rrr-sequence-gutter data-gutter="b" value="10" unit="s"></rrr-sequence-gutter>
+        <div data-sequence-item data-sort-id="b" data-sort-label="Bravo">
+          <button type="button" data-sort-handle>Move Bravo</button>
+        </div>
+      </rrr-sequence>
+    `
+    await Promise.resolve()
+
+    const sequence = document.querySelector<HTMLElement>('rrr-sequence')!
+    const handle = sequence.querySelector<HTMLButtonElement>(
+      '[data-sort-id="a"] [data-sort-handle]',
+    )!
+    const reorder = vi.fn()
+    sequence.addEventListener('rrr-sequence-reorder', reorder)
+
+    for (const key of [' ', 'ArrowDown', 'ArrowUp', 'Enter']) {
+      handle.dispatchEvent(new KeyboardEvent('keydown', {
+        key,
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      }))
+    }
+
+    expect(Array.from(sequence.children).map((child) =>
+      child.getAttribute('data-sort-id') ?? `gutter-${child.getAttribute('data-gutter')}`,
+    )).toEqual(['a', 'gutter-b', 'b'])
+    expect(reorder).not.toHaveBeenCalled()
+  })
+
+  test('reorders sequence items from pointer movement started on a handle', async () => {
+    document.body.innerHTML = `
+      <rrr-sequence sortable>
+        <div data-sequence-item data-sort-id="a" data-sort-label="Alpha">
+          <rrr-list-row label="Alpha"></rrr-list-row>
+          <button type="button" data-sort-handle>Move Alpha</button>
+        </div>
+        <rrr-sequence-gutter value="10" unit="s"></rrr-sequence-gutter>
+        <div data-sequence-item data-sort-id="b" data-sort-label="Bravo">
+          <rrr-list-row label="Bravo"></rrr-list-row>
+          <button type="button" data-sort-handle>Move Bravo</button>
+        </div>
+        <rrr-sequence-gutter value="10" unit="s"></rrr-sequence-gutter>
+        <div data-sequence-item data-sort-id="c" data-sort-label="Charlie">
+          <rrr-list-row label="Charlie"></rrr-list-row>
+          <button type="button" data-sort-handle>Move Charlie</button>
+        </div>
+      </rrr-sequence>
+    `
+    await Promise.resolve()
+
+    const sequence = document.querySelector<HTMLElement>('rrr-sequence')!
+    const items = Array.from(sequence.querySelectorAll<HTMLElement>('[data-sort-id]'))
+    for (const item of items) {
+      item.getBoundingClientRect = () => {
+        const index = Array.from(
+          sequence.querySelectorAll<HTMLElement>(':scope > [data-sort-id]'),
+        ).indexOf(item)
+        return {
+          x: 0,
+          y: index * 100,
+          top: index * 100,
+          right: 300,
+          bottom: index * 100 + 80,
+          left: 0,
+          width: 300,
+          height: 80,
+          toJSON: () => ({}),
+        }
+      }
+    }
+
+    const pointerEvent = (
+      type: string,
+      options: {
+        pointerId: number
+        clientX: number
+        clientY: number
+        button?: number
+      },
+    ): Event => {
+      const event = new Event(type, { bubbles: true, composed: true, cancelable: true })
+      Object.defineProperties(event, {
+        pointerId: { value: options.pointerId },
+        clientX: { value: options.clientX },
+        clientY: { value: options.clientY },
+        button: { value: options.button ?? 0 },
+        isPrimary: { value: true },
+      })
+      return event
+    }
+
+    const reorder = vi.fn()
+    sequence.addEventListener('rrr-sequence-reorder', reorder)
+    const alphaHandle = sequence.querySelector<HTMLElement>(
+      '[data-sort-id="a"] [data-sort-handle]',
+    )!
+    alphaHandle.dispatchEvent(pointerEvent('pointerdown', {
+      pointerId: 1,
+      clientX: 10,
+      clientY: 40,
+    }))
+    sequence.dispatchEvent(pointerEvent('pointermove', {
+      pointerId: 1,
+      clientX: 10,
+      clientY: 160,
+    }))
+    sequence.dispatchEvent(pointerEvent('pointerup', {
+      pointerId: 1,
+      clientX: 10,
+      clientY: 160,
+    }))
+
+    expect(Array.from(sequence.querySelectorAll<HTMLElement>(
+      ':scope > [data-sort-id]',
+    )).map((item) => item.dataset.sortId)).toEqual(['b', 'a', 'c'])
+    expect((reorder.mock.calls[0]?.[0] as CustomEvent<SequenceReorderDetail>).detail)
+      .toEqual({
+        orderedIds: ['b', 'a', 'c'],
+        movedId: 'a',
+        input: 'pointer',
+      })
   })
 
   test('renders navigation and action rows as honest light-DOM interactive elements', async () => {

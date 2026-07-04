@@ -89,6 +89,37 @@ derived domain information. Routine transition gutters can be interactive.
 Scheduled rest between sets is edited as one routine-exercise value rather than
 as individually actionable gutters.
 
+Add `sortable` when a sequence controller should reorder direct
+`[data-sort-id]` items. A sortable item wraps its identity row and a sibling
+native button marked with `data-sort-handle`; never place the handle inside the
+row's own button. Supply `data-sort-label` for announcements.
+
+```html
+<rrr-sequence sortable aria-label="Routine exercise sequence">
+  <div
+    class="rrr-sortable-item"
+    data-sequence-item
+    data-sort-id="routine-exercise-1"
+    data-sort-label="Push-ups"
+  >
+    <rrr-list-row activation="button" label="Push-ups"></rrr-list-row>
+    <button
+      class="rrr-sort-handle"
+      type="button"
+      data-sort-handle
+      aria-label="Move Push-ups. Press Space or Enter to start reordering."
+    >
+      <rrr-icon name="arrow-move"></rrr-icon>
+    </button>
+  </div>
+</rrr-sequence>
+```
+
+The controller emits `rrr-sequence-sort-status` for lifted, moved, dropped,
+and cancelled states, and `rrr-sequence-reorder` with the committed ordered
+IDs. Consumers own localized announcements and domain persistence. Gutters
+collapse during sorting and are re-derived from domain data after commit.
+
 Use the same value/unit treatment outside a gutter with `rrr-measurement`:
 
 ```html

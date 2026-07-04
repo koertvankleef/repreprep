@@ -14,8 +14,13 @@ import {
   createRoutineExercise,
   getActiveRoutineVersion,
   getRoutine,
+  reorderRoutineExercises,
 } from '../../../domain/routine-service.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
+import type {
+  SequenceReorderDetail,
+  SequenceSortStatusDetail,
+} from '../../../design-system/components/rrr-sequence.ts'
 import {
   escapeHtml,
   formatShortDate,
@@ -32,6 +37,7 @@ import {
 } from './routine-timing-sheets.ts'
 import { promptRoutineExerciseSettings } from './routine-exercise-sheets.ts'
 import { promptRoutinePrefillSource } from './routine-prefill-sheets.ts'
+import { announceRoutineFlowSort } from './routine-flow-sorting.ts'
 
 export class RrrRoutineDetail extends HTMLElement {
   private routineIdValue: string | null = null
@@ -55,11 +61,61 @@ export class RrrRoutineDetail extends HTMLElement {
 
   connectedCallback(): void {
     window.addEventListener('rrr-data-changed', this.handleDataChanged)
+    this.addEventListener(
+      'rrr-sequence-reorder',
+      this.handleSequenceReorder as EventListener,
+    )
+    this.addEventListener(
+      'rrr-sequence-sort-status',
+      this.handleSequenceSortStatus as EventListener,
+    )
     this.initialize()
   }
 
   disconnectedCallback(): void {
     window.removeEventListener('rrr-data-changed', this.handleDataChanged)
+    this.removeEventListener(
+      'rrr-sequence-reorder',
+      this.handleSequenceReorder as EventListener,
+    )
+    this.removeEventListener(
+      'rrr-sequence-sort-status',
+      this.handleSequenceSortStatus as EventListener,
+    )
+  }
+
+  private readonly handleSequenceSortStatus = (
+    event: CustomEvent<SequenceSortStatusDetail>,
+  ): void => {
+    announceRoutineFlowSort(event.detail)
+  }
+
+  private readonly handleSequenceReorder = (
+    event: CustomEvent<SequenceReorderDetail>,
+  ): void => {
+    const current = this.getCurrentRoutineVersion()
+    if (!current) {
+      return
+    }
+
+    const exercises = reorderRoutineExercises(
+      current.version.exercises,
+      event.detail.orderedIds,
+    )
+    if (exercises === current.version.exercises) {
+      return
+    }
+
+    this.saveRoutineVersion(current.routine, current.version, { exercises })
+
+    if (event.detail.input === 'keyboard') {
+      queueMicrotask(() => {
+        Array.from(this.querySelectorAll<HTMLElement>('[data-sort-id]'))
+          .find((item) => item.dataset.sortId === event.detail.movedId)
+          ?.querySelector<HTMLElement>('[data-sort-handle]')
+          ?.focus()
+      })
+    }
   }
 
   private initialize(): void {
@@ -161,14 +217,6 @@ export class RrrRoutineDetail extends HTMLElement {
     storageService.saveWorkout(workout)
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
     window.location.hash = `#/workouts/${workout.id}/log`
-  }
-
-  private editWorkout(): void {
-    if (!this.routineIdValue) {
-      return
-    }
-
-    window.location.hash = `#/routines/${encodeURIComponent(this.routineIdValue)}/edit`
   }
 
   private async editPrefillSource(): Promise<void> {
@@ -524,11 +572,12 @@ export class RrrRoutineDetail extends HTMLElement {
             ${
               exerciseCount > 0
                 ? `
-                  <rrr-sequence aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
+                  <rrr-sequence sortable aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
                     ${summary.version
     ? renderRoutineFlowSequence(summary.version, {
       resolveExerciseName: (exerciseId) => this.resolveExerciseName(exerciseId),
       transitionInteractive: true,
+      sortable: true,
     })
     : ''}
                   </rrr-sequence>
@@ -555,14 +604,6 @@ export class RrrRoutineDetail extends HTMLElement {
             </rrr-list-row>
             <rrr-list-row
               activation="button"
-              label="${t('action.edit')}"
-              data-action="edit-workout"
-              accessory="value-chevron"
-            >
-              <rrr-icon slot="leading" name="edit"></rrr-icon>
-            </rrr-list-row>
-            <rrr-list-row
-              activation="button"
               label="${t('action.delete')}"
               data-action="delete-routine"
               tone="danger"
@@ -577,8 +618,6 @@ export class RrrRoutineDetail extends HTMLElement {
 
     this.querySelector<HTMLElement>('rrr-list-row[data-action="start-workout"]')
       ?.addEventListener('click', () => this.startWorkout())
-    this.querySelector<HTMLElement>('rrr-list-row[data-action="edit-workout"]')
-      ?.addEventListener('click', () => this.editWorkout())
     this.querySelector<HTMLElement>('rrr-list-row[data-action="delete-routine"]')
       ?.addEventListener('click', () => void this.deleteRoutine())
     this.querySelector<HTMLElement>('rrr-list-row[data-action="edit-transition-default"]')

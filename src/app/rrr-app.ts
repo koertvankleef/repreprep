@@ -83,7 +83,6 @@ type ExerciseCatalogueElement = HTMLElement & {
 }
 
 type RoutineEditorElement = HTMLElement & {
-  routineId: string | null
   openRenameSheet(): Promise<boolean>
   getCurrentName?(): string
 }
@@ -332,7 +331,6 @@ export class RrrApp extends HTMLElement {
     if (
       this.route.name !== 'routine-detail'
       && this.route.name !== 'routine-new'
-      && this.route.name !== 'routine-edit'
     ) {
       return
     }
@@ -453,10 +451,6 @@ export class RrrApp extends HTMLElement {
     }
 
     if (a.name === 'routine-detail' && b.name === 'routine-detail') {
-      return a.routineId === b.routineId
-    }
-
-    if (a.name === 'routine-edit' && b.name === 'routine-edit') {
       return a.routineId === b.routineId
     }
 
@@ -607,7 +601,6 @@ export class RrrApp extends HTMLElement {
 
     if (route.name === 'routine-new') {
       const editor = document.createElement('rrr-routine-editor') as RoutineEditorElement
-      editor.routineId = null
       return editor
     }
 
@@ -615,12 +608,6 @@ export class RrrApp extends HTMLElement {
       const detail = document.createElement('rrr-routine-detail') as HTMLElement & { routineId: string | null }
       detail.routineId = route.routineId
       return detail
-    }
-
-    if (route.name === 'routine-edit') {
-      const editor = document.createElement('rrr-routine-editor') as RoutineEditorElement
-      editor.routineId = route.routineId
-      return editor
     }
 
     if (route.name === 'settings-styleguide') {
@@ -833,29 +820,21 @@ export class RrrApp extends HTMLElement {
   }
 
   private getHeaderTitle(route: AppRoute): string {
-    if (route.name === 'routine-new' || route.name === 'routine-edit') {
+    if (route.name === 'routine-new') {
       const editorName = this.currentRouteView?.tagName.toLowerCase() === 'rrr-routine-editor'
         ? (this.currentRouteView as RoutineEditorElement).getCurrentName?.().trim()
         : undefined
       if (editorName) {
-        return route.name === 'routine-new'
-          ? t('app.header.routineCreatingNamed', { name: editorName })
-          : t('app.header.routineEditNamed', { name: editorName })
+        return t('app.header.routineCreatingNamed', { name: editorName })
       }
 
-      return route.name === 'routine-new'
-        ? t('app.header.routineCreating')
-        : t('app.header.routineEdit')
+      return t('app.header.routineCreating')
     }
 
-    if (route.name === 'routine-detail' || route.name === 'routine-edit') {
+    if (route.name === 'routine-detail') {
       const routineName = storageService
         .getData()
         .routines.find((routine) => routine.id === route.routineId)?.name
-
-      if (routineName && route.name === 'routine-edit') {
-        return t('app.header.routineEditNamed', { name: routineName })
-      }
 
       if (routineName) {
         return routineName
@@ -923,7 +902,6 @@ export class RrrApp extends HTMLElement {
     const actionContent = (
       route.name === 'routine-detail'
       || route.name === 'routine-new'
-      || route.name === 'routine-edit'
     )
       ? this.renderRoutineRenameButton()
       : endLink
