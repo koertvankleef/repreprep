@@ -1,19 +1,19 @@
 import { storageService } from '../../storage-instance.ts'
+import { getActiveExercises } from '../../../domain/exercise-service.ts'
 import { getRoutineSummary } from '../../../domain/routine-summary-service.ts'
 import {
   createWorkoutFromRoutine,
   getCompletedWorkoutsForRoutine,
 } from '../../../domain/workout-service.ts'
 import { toastService } from '../../../foundation/toast.ts'
-import { t, tPlural } from '../../../i18n/index.ts'
+import { t } from '../../../i18n/index.ts'
 import type { Routine, RoutineExercise, RoutineVersion } from '../../../domain/types.ts'
 import { todayIso } from '../../../utils/date.ts'
 import { confirmSheet, presentSheet } from '../../../utils/sheet-service.ts'
 import {
-  buildRoutineFlow,
+  createRoutineExercise,
   getActiveRoutineVersion,
   getRoutine,
-  type RoutineFlowItem,
 } from '../../../domain/routine-service.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
 import {
@@ -22,6 +22,10 @@ import {
   getMuscleLabel,
   renderPropertyRow,
 } from '../../render-helpers.ts'
+import {
+  renderRoutineFlowControls,
+  renderRoutineFlowSequence,
+} from './routine-flow-markup.ts'
 import {
   promptRoutineTransitionDefault,
   promptTransitionOverride,
@@ -196,6 +200,64 @@ export class RrrRoutineDetail extends HTMLElement {
     }
   }
 
+  private async addRoutineExercise(): Promise<void> {
+    const current = this.getCurrentRoutineVersion()
+    if (!current || this.timingSheetActive) {
+      return
+    }
+
+    const options = getActiveExercises(storageService.getData())
+    if (options.length === 0) {
+      return
+    }
+
+    const sheet = document.createElement('rrr-sheet') as RrrSheet
+    const heading = document.createElement('h3')
+    heading.slot = 'heading'
+    heading.className = 'sheet-title'
+    heading.textContent = t('label.addExercise')
+
+    const select = document.createElement('rrr-select') as HTMLElement & { value: string }
+    select.slot = 'body'
+    select.setAttribute('label', t('label.addExercise'))
+    select.setAttribute('name', 'add-exercise')
+    select.innerHTML = options
+      .map((exercise) => `<option value="${escapeHtml(exercise.id)}">${escapeHtml(exercise.name)}</option>`)
+      .join('')
+    select.value = options[0]?.id ?? ''
+
+    const confirmButton = document.createElement('rrr-button')
+    confirmButton.slot = 'actions'
+    confirmButton.setAttribute('type', 'button')
+    confirmButton.setAttribute('data-sheet-result', 'confirm')
+    confirmButton.textContent = t('action.add')
+
+    sheet.append(heading, select, confirmButton)
+
+    this.timingSheetActive = true
+    try {
+      if (await presentSheet(sheet) !== 'confirm') {
+        return
+      }
+
+      const selectedExerciseId = String(select.value ?? '').trim()
+      if (!selectedExerciseId) {
+        return
+      }
+
+      const latest = this.getCurrentRoutineVersion()
+      if (!latest) {
+        return
+      }
+
+      this.saveRoutineVersion(latest.routine, latest.version, {
+        exercises: [...latest.version.exercises, createRoutineExercise(selectedExerciseId)],
+      })
+    } finally {
+      this.timingSheetActive = false
+    }
+  }
+
   private async deleteRoutine(): Promise<void> {
     if (!this.routineIdValue) {
       return
@@ -217,69 +279,11 @@ export class RrrRoutineDetail extends HTMLElement {
     window.location.hash = '#/routines'
   }
 
-  private renderExerciseRow(routineExercise: RoutineExercise): string {
-    const exercise = storageService
+  private resolveExerciseName(exerciseId: string): string {
+    return storageService
       .getData()
-      .exercises.find((candidate) => candidate.id === routineExercise.exerciseId)
-    const exerciseName = exercise?.name ?? t('routineDetail.exercises.unknown')
-
-    return `
-      <rrr-list-row
-        activation="button"
-        label="${escapeHtml(exerciseName)}"
-        description="${escapeHtml(tPlural('routineDetail.setCount', routineExercise.setCount))}"
-        data-routine-exercise-id="${escapeHtml(routineExercise.id)}"
-      ></rrr-list-row>
-    `
-  }
-
-  private renderTransitionGutter(
-    transition: Extract<RoutineFlowItem, { kind: 'transition' }>,
-    version: RoutineVersion,
-  ): string {
-    const destination = version.exercises.find(
-      (exercise) => exercise.id === transition.beforeExerciseId,
-    )
-    const destinationName = storageService
-      .getData()
-      .exercises.find((exercise) => exercise.id === destination?.exerciseId)?.name
+      .exercises.find((exercise) => exercise.id === exerciseId)?.name
       ?? t('routineDetail.exercises.unknown')
-    const spokenDuration = tPlural(
-      'routineDetail.transition.durationLong',
-      transition.seconds,
-    )
-    const customDescription = transition.inherited
-      ? ''
-      : t('routineDetail.transition.custom')
-    const actionLabel = t(
-      transition.inherited
-        ? 'routineDetail.transition.editAria'
-        : 'routineDetail.transition.editCustomAria',
-      {
-        duration: spokenDuration,
-        exercise: destinationName,
-      },
-    )
-
-    return `
-      <rrr-sequence-gutter
-        icon="water-bottle"
-        activation="button"
-        data-before-exercise-id="${escapeHtml(transition.beforeExerciseId)}"
-        value="${transition.seconds}"
-        unit="s"
-        ${customDescription ? `description="${escapeHtml(customDescription)}"` : ''}
-        action-label="${escapeHtml(actionLabel)}"
-      ></rrr-sequence-gutter>
-    `
-  }
-
-  private renderRoutineFlow(version: RoutineVersion): string {
-    return buildRoutineFlow(version)
-      .map((item) => item.kind === 'exercise'
-        ? this.renderExerciseRow(item.exercise)
-        : this.renderTransitionGutter(item, version))
-      .join('')
   }
 
   private getCurrentRoutineVersion(): {
@@ -517,29 +521,25 @@ export class RrrRoutineDetail extends HTMLElement {
         <rrr-section>
           <span slot="heading">${t('routineDetail.section.flow')}</span>
           <div class="rrr-card">
-            <div class="rrr-list-card">
-              <rrr-list-row
-                activation="button"
-                label="${t('routineDetail.transition.defaultLabel')}"
-                value-text="${escapeHtml(tPlural(
-                  'routineDetail.transition.duration',
-                  summary.version?.transitionSeconds ?? 0,
-                ))}"
-                accessory="value"
-                data-action="edit-transition-default"
-              >
-                <rrr-icon slot="leading" name="timer"></rrr-icon>
-              </rrr-list-row>
-            </div>
             ${
               exerciseCount > 0
                 ? `
                   <rrr-sequence aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
-                    ${summary.version ? this.renderRoutineFlow(summary.version) : ''}
+                    ${summary.version
+    ? renderRoutineFlowSequence(summary.version, {
+      resolveExerciseName: (exerciseId) => this.resolveExerciseName(exerciseId),
+      transitionInteractive: true,
+    })
+    : ''}
                   </rrr-sequence>
                 `
                 : `<p>${t('routineDetail.exercises.empty')}</p>`
             }
+            ${renderRoutineFlowControls({
+    addAction: 'add-routine-exercise',
+    transitionAction: 'edit-transition-default',
+    transitionSeconds: summary.version?.transitionSeconds ?? 0,
+  })}
           </div>
         </rrr-section>
 
@@ -583,6 +583,8 @@ export class RrrRoutineDetail extends HTMLElement {
       ?.addEventListener('click', () => void this.deleteRoutine())
     this.querySelector<HTMLElement>('rrr-list-row[data-action="edit-transition-default"]')
       ?.addEventListener('click', () => void this.editDefaultTransition())
+    this.querySelector<HTMLElement>('rrr-list-row[data-action="add-routine-exercise"]')
+      ?.addEventListener('click', () => void this.addRoutineExercise())
     this.querySelector<HTMLElement>('rrr-list-row[data-action="edit-prefill-source"]')
       ?.addEventListener('click', () => void this.editPrefillSource())
     this.querySelectorAll<HTMLElement>('rrr-sequence-gutter[data-before-exercise-id]')

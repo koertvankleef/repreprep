@@ -108,6 +108,7 @@ describe('value-first property lists', () => {
     )
     const flowCard = flowSection?.querySelector<HTMLElement>(':scope > .rrr-card')
     const timingCard = flowCard?.querySelector<HTMLElement>(':scope > .rrr-list-card')
+    const timingRows = Array.from(timingCard?.querySelectorAll<HTMLElement>('rrr-list-row') ?? [])
 
     expect(propertyList).not.toBeNull()
     expectSemanticPropertyRows(propertyList!)
@@ -124,6 +125,8 @@ describe('value-first property lists', () => {
     expect(timingCard?.querySelector(
       'rrr-list-row[data-action="edit-transition-default"]',
     )?.getAttribute('accessory')).toBe('value')
+    expect(timingRows[0]?.dataset.action).toBe('add-routine-exercise')
+    expect(timingRows[1]?.dataset.action).toBe('edit-transition-default')
     expect(flowCard?.querySelector(':scope > rrr-sequence')).toBe(exerciseSequence)
     expect(actionRow?.getAttribute('activation')).toBe('button')
     expect(actionRow?.querySelector(':scope > button')).not.toBeNull()
@@ -377,6 +380,36 @@ describe('value-first property lists', () => {
 
     expect(storageService.getData().workouts).toHaveLength(initialWorkoutCount + 1)
     expect(window.location.hash).toMatch(/^#\/workouts\/.+\/log$/)
+  })
+
+  test('adds a routine exercise from the flow card', async () => {
+    const routine = storageService.getData().routines[0]!
+    const previousVersionId = routine.activeVersionId
+    const previousVersion = storageService.getData().routineVersions.find(
+      ({ id }) => id === previousVersionId,
+    )!
+    const previousCount = previousVersion.exercises.length
+    const detail = new RrrRoutineDetail()
+    detail.routineId = routine.id
+    document.body.append(detail)
+    await Promise.resolve()
+
+    detail
+      .querySelector<HTMLButtonElement>('rrr-list-row[data-action="add-routine-exercise"] > button')
+      ?.click()
+    await Promise.resolve()
+
+    expect(document.querySelector('rrr-sheet rrr-select[name="add-exercise"]')).not.toBeNull()
+    document.querySelector<HTMLElement>('rrr-sheet [data-sheet-result="confirm"]')?.click()
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    const updatedRoutine = storageService.getData().routines.find(({ id }) => id === routine.id)!
+    const updatedVersion = storageService.getData().routineVersions.find(
+      ({ id }) => id === updatedRoutine.activeVersionId,
+    )!
+
+    expect(updatedRoutine.activeVersionId).not.toBe(previousVersionId)
+    expect(updatedVersion.exercises).toHaveLength(previousCount + 1)
   })
 
   test('selects and clears the completed workout used for starting values', async () => {

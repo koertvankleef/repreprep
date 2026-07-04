@@ -11,8 +11,8 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] Bottom main navigation on mobile; left side of screen navigation on desktop; minimised variant on tablet.
 - [x] Add a read-only Routine Details page after creation/editing with the routine name as title, a header Edit affordance, exercise list, and Start Workout action.
 - [ ] Define a trustworthy routine-duration estimation policy before adding estimated duration to routine summaries.
-- [ ] Prefill routine names automatically; do not require the user to invent one from scratch.
-- [ ] [low priority] Use NATO/geographic-style routine naming and consider whether the natural 26-routine cap is acceptable.
+- [x] Prefill routine names automatically; do not require the user to invent one from scratch.
+- [x] [low priority] Use NATO/geographic-style routine naming and consider whether the natural 26-routine cap is acceptable.
 - [ ] When the app loads incompatible local storage data, show a toast error message with a close button and proceed with a blank slate.
 - [ ] Non-MVP follow-up: allow the user one chance to download the data after having cleared it from storage.
 - [ ] Expand trust/history surfaces around existing import/export and history features so users can clearly review progress and feel ownership of their data.

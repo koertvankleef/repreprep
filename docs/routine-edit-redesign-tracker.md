@@ -405,7 +405,7 @@ structural routine version.
 - [x] Remove routine-exercise routes, page, translations, and tests.
 - [x] Update add-exercise behavior for the new model.
 - [x] Retire target/planned-set controls from the legacy editor.
-- [ ] Preserve coherent confirmed new-routine creation.
+- [x] Preserve coherent confirmed new-routine creation.
 
 ### Phase 4 — Workout completion and history
 

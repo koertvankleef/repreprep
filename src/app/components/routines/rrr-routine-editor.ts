@@ -8,11 +8,73 @@ import {
 import { t } from '../../../i18n/index.ts'
 import type { RoutineExercise } from '../../../domain/types.ts'
 import { escapeHtml } from '../../render-helpers.ts'
+import { confirmSheet } from '../../../utils/sheet-service.ts'
+import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
+import { presentSheet } from '../../../utils/sheet-service.ts'
+import { promptRoutineTransitionDefault } from './routine-timing-sheets.ts'
+import {
+  renderRoutineFlowControls,
+  renderRoutineFlowSequence,
+} from './routine-flow-markup.ts'
 import styles from './rrr-routine-editor.css?inline'
 
 export class RrrRoutineEditor extends HTMLElement {
   private static readonly defaultRestSeconds = 20
   private static readonly defaultTransitionSeconds = 10
+  private static readonly natoAlphabet = [
+    'Alpha',
+    'Bravo',
+    'Charlie',
+    'Delta',
+    'Echo',
+    'Foxtrot',
+    'Golf',
+    'Hotel',
+    'India',
+    'Juliett',
+    'Kilo',
+    'Lima',
+    'Mike',
+    'November',
+    'Oscar',
+    'Papa',
+    'Quebec',
+    'Romeo',
+    'Sierra',
+    'Tango',
+    'Uniform',
+    'Victor',
+    'Whiskey',
+    'X-ray',
+    'Yankee',
+    'Zulu',
+  ]
+  private static readonly geographicNames = [
+    'Harbor',
+    'Summit',
+    'Valley',
+    'Ridge',
+    'Bay',
+    'Cove',
+    'Delta',
+    'Canyon',
+    'Plateau',
+    'Lagoon',
+    'Meadow',
+    'Glacier',
+    'Dune',
+    'Forest',
+    'Prairie',
+    'Cliff',
+    'Rapids',
+    'River',
+    'Strait',
+    'Isle',
+    'Tundra',
+    'Marsh',
+    'Grove',
+    'Spring',
+  ]
 
   private routineIdValue: string | null = null
   private name = ''
@@ -21,6 +83,9 @@ export class RrrRoutineEditor extends HTMLElement {
   private listenersBound = false
   private statusMessage = ''
   private statusType: 'error' | 'success' | null = null
+  private createConfirmActive = false
+  private renameSheetActive = false
+  private timingSheetActive = false
 
   set routineId(value: string | null) {
     this.routineIdValue = value
@@ -60,12 +125,72 @@ export class RrrRoutineEditor extends HTMLElement {
           }))
         : []
     } else {
-      this.name = ''
+      this.name = this.getSuggestedRoutineName(data)
       this.transitionSeconds = RrrRoutineEditor.defaultTransitionSeconds
       this.exercises = []
     }
 
     this.render()
+  }
+
+  private getSuggestedRoutineName(data: ReturnType<typeof storageService.getData>): string {
+    const existingNames = new Set(
+      data.routines.map((routine) => routine.name.trim().toLowerCase()).filter(Boolean),
+    )
+
+    const prefixStartIndex = data.routines.length % RrrRoutineEditor.natoAlphabet.length
+
+    for (let offset = 0; offset < RrrRoutineEditor.natoAlphabet.length; offset += 1) {
+      const prefixIndex = (prefixStartIndex + offset) % RrrRoutineEditor.natoAlphabet.length
+      const prefix = RrrRoutineEditor.natoAlphabet[prefixIndex]
+      const geographics = this.getShuffledGeographicNames()
+
+      for (const geographic of geographics) {
+        const candidate = t('routineEditor.autoName.comboPattern', {
+          nato: prefix,
+          geographic,
+        })
+        if (!existingNames.has(candidate.trim().toLowerCase())) {
+          return candidate
+        }
+      }
+    }
+
+    let suffix = 2
+    while (true) {
+      for (let offset = 0; offset < RrrRoutineEditor.natoAlphabet.length; offset += 1) {
+        const prefixIndex = (prefixStartIndex + offset) % RrrRoutineEditor.natoAlphabet.length
+        const prefix = RrrRoutineEditor.natoAlphabet[prefixIndex]
+        const geographics = this.getShuffledGeographicNames()
+
+        for (const geographic of geographics) {
+          const baseCandidate = t('routineEditor.autoName.comboPattern', {
+            nato: prefix,
+            geographic,
+          })
+          const candidate = `${baseCandidate} ${suffix}`
+          if (!existingNames.has(candidate.trim().toLowerCase())) {
+            return candidate
+          }
+        }
+      }
+      suffix += 1
+    }
+  }
+
+  private getShuffledGeographicNames(): string[] {
+    const values = [...RrrRoutineEditor.geographicNames]
+    for (let index = values.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1))
+      const current = values[index]
+      const target = values[swapIndex]
+      if (!current || !target) {
+        continue
+      }
+      values[index] = target
+      values[swapIndex] = current
+    }
+    return values
   }
 
   private setStatus(message: string, type: 'error' | 'success'): void {
@@ -90,8 +215,13 @@ export class RrrRoutineEditor extends HTMLElement {
 
       const action = actionTarget.dataset.action
 
-      if (action === 'add-exercise') {
-        this.addExercise()
+      if (action === 'add-routine-exercise') {
+        void this.addRoutineExercise()
+        return
+      }
+
+      if (action === 'edit-transition-default') {
+        void this.editDefaultTransition()
         return
       }
 
@@ -126,7 +256,7 @@ export class RrrRoutineEditor extends HTMLElement {
       }
 
       if (action === 'save') {
-        this.save()
+        void this.save()
         return
       }
 
@@ -137,18 +267,6 @@ export class RrrRoutineEditor extends HTMLElement {
   }
 
   private readFields(): void {
-    const nameInput = this.querySelector<HTMLInputElement>('rrr-input[name="routine-name"]')
-
-    if (nameInput) {
-      this.name = nameInput.value
-    }
-
-    const transitionInput = this.querySelector<HTMLInputElement>('input[name="routine-transition-seconds"]')
-    const transitionValue = transitionInput?.valueAsNumber
-    this.transitionSeconds = Number.isFinite(transitionValue)
-      ? Math.max(0, Math.trunc(transitionValue ?? RrrRoutineEditor.defaultTransitionSeconds))
-      : this.transitionSeconds
-
     this.exercises = this.exercises.map((exercise) => {
       const restInput = this.querySelector<HTMLInputElement>(
         `input[data-exercise-id="${exercise.id}"][data-field="rest-seconds"]`,
@@ -171,17 +289,83 @@ export class RrrRoutineEditor extends HTMLElement {
     })
   }
 
-  private addExercise(): void {
+  private resolveExerciseName(exerciseId: string): string {
+    return storageService
+      .getData()
+      .exercises.find((exercise) => exercise.id === exerciseId)?.name
+      ?? t('routineEditor.exercises.unknown')
+  }
+
+  private async addRoutineExercise(): Promise<void> {
     this.readFields()
-
-    const select = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="add-exercise"]')
-    const exerciseId = String(select?.value ?? '')
-
-    if (!exerciseId) {
+    if (this.timingSheetActive) {
       return
     }
 
-    this.exercises = [...this.exercises, createRoutineExercise(exerciseId)]
+    const options = getActiveExercises(storageService.getData())
+    if (options.length === 0) {
+      return
+    }
+
+    const sheet = document.createElement('rrr-sheet') as RrrSheet
+    const heading = document.createElement('h3')
+    heading.slot = 'heading'
+    heading.className = 'sheet-title'
+    heading.textContent = t('label.addExercise')
+
+    const select = document.createElement('rrr-select') as HTMLElement & { value: string }
+    select.slot = 'body'
+    select.setAttribute('label', t('label.addExercise'))
+    select.setAttribute('name', 'add-exercise')
+    select.innerHTML = options
+      .map((exercise) => `<option value="${escapeHtml(exercise.id)}">${escapeHtml(exercise.name)}</option>`)
+      .join('')
+    select.value = options[0]?.id ?? ''
+
+    const confirmButton = document.createElement('rrr-button')
+    confirmButton.slot = 'actions'
+    confirmButton.setAttribute('type', 'button')
+    confirmButton.setAttribute('data-sheet-result', 'confirm')
+    confirmButton.textContent = t('action.add')
+
+    sheet.append(heading, select, confirmButton)
+
+    this.timingSheetActive = true
+    try {
+      if (await presentSheet(sheet) !== 'confirm') {
+        return
+      }
+
+      const exerciseId = String(select.value ?? '').trim()
+      if (!exerciseId) {
+        return
+      }
+
+      this.exercises = [...this.exercises, createRoutineExercise(exerciseId)]
+      this.render()
+    } finally {
+      this.timingSheetActive = false
+    }
+  }
+
+  private async editDefaultTransition(): Promise<void> {
+    if (this.timingSheetActive) {
+      return
+    }
+
+    this.readFields()
+    this.timingSheetActive = true
+    try {
+      const seconds = await promptRoutineTransitionDefault(this.transitionSeconds)
+      if (seconds === undefined || seconds === this.transitionSeconds) {
+        return
+      }
+
+      this.transitionSeconds = seconds
+    } finally {
+      this.timingSheetActive = false
+    }
+
     this.render()
   }
 
@@ -220,17 +404,81 @@ export class RrrRoutineEditor extends HTMLElement {
     this.render()
   }
 
-  private save(): void {
-    this.readFields()
-
-    if (!this.name.trim()) {
-      this.setStatus(t('routineEditor.status.nameRequired'), 'error')
-      this.render()
-      this.querySelector<HTMLElement>('rrr-input[name="routine-name"]')?.focus()
-      return
+  async openRenameSheet(): Promise<boolean> {
+    if (this.renameSheetActive) {
+      return false
     }
 
-    const saved = storageService.saveRoutine(this.routineIdValue, this.name.trim(), this.exercises, this.transitionSeconds)
+    const sheet = document.createElement('rrr-sheet') as RrrSheet
+    const heading = document.createElement('h3')
+    heading.slot = 'heading'
+    heading.className = 'sheet-title'
+    heading.textContent = t('routineEditor.dialog.rename.title')
+
+    const nameInput = document.createElement('rrr-input') as HTMLElement & { value: string }
+    nameInput.slot = 'body'
+    nameInput.setAttribute('autofocus', '')
+    nameInput.setAttribute('label', t('routineEditor.dialog.rename.label'))
+    nameInput.setAttribute('placeholder', this.getSuggestedRoutineName(storageService.getData()))
+    nameInput.value = this.name
+
+    const confirmButton = document.createElement('rrr-button')
+    confirmButton.slot = 'actions'
+    confirmButton.setAttribute('type', 'button')
+    confirmButton.setAttribute('data-sheet-result', 'confirm')
+    confirmButton.textContent = t('action.confirm')
+
+    sheet.append(heading, nameInput, confirmButton)
+    this.renameSheetActive = true
+    try {
+      if (await presentSheet(sheet) !== 'confirm') {
+        return false
+      }
+
+      const nextName = nameInput.value.trim()
+      if (nextName === this.name) {
+        return false
+      }
+
+      this.name = nextName
+      this.render()
+      return true
+    } finally {
+      this.renameSheetActive = false
+    }
+  }
+
+  getCurrentName(): string {
+    return this.name.trim() || this.getSuggestedRoutineName(storageService.getData())
+  }
+
+  private async save(): Promise<void> {
+    this.readFields()
+
+    const resolvedName = this.name.trim() || this.getSuggestedRoutineName(storageService.getData())
+    this.name = resolvedName
+
+    if (!this.routineIdValue) {
+      if (this.createConfirmActive) {
+        return
+      }
+
+      this.createConfirmActive = true
+      try {
+        const confirmed = await confirmSheet({
+          title: t('routineEditor.dialog.create.title'),
+          message: t('routineEditor.dialog.create.message', { name: resolvedName }),
+          confirmLabel: t('routineEditor.dialog.create.confirm'),
+        })
+        if (!confirmed) {
+          return
+        }
+      } finally {
+        this.createConfirmActive = false
+      }
+    }
+
+    const saved = storageService.saveRoutine(this.routineIdValue, resolvedName, this.exercises, this.transitionSeconds)
 
     window.dispatchEvent(new CustomEvent('rrr-data-changed'))
     this.routineIdValue = saved.id
@@ -245,7 +493,6 @@ export class RrrRoutineEditor extends HTMLElement {
 
   private render(): void {
     const data = storageService.getData()
-    const activeExercises = getActiveExercises(data)
     const isEditing = this.routineIdValue !== null
 
     if (isEditing && this.routineIdValue !== null && !getRoutine(data, this.routineIdValue)) {
@@ -261,10 +508,8 @@ export class RrrRoutineEditor extends HTMLElement {
       return
     }
 
-    const exerciseListHtml = this.exercises.length === 0
-      ? `<p>${t('routineEditor.exercises.empty')}</p>`
-      : this.exercises
-          .map((routineExercise, index) => {
+    const exerciseListHtml = this.exercises
+      .map((routineExercise, index) => {
             const def = data.exercises.find((e) => e.id === routineExercise.exerciseId)
             const exerciseName = def?.name ?? t('routineEditor.exercises.unknown')
             const exerciseHeadingId = `routine-exercise-${routineExercise.id}`
@@ -299,49 +544,68 @@ export class RrrRoutineEditor extends HTMLElement {
                 </label>
               </section>
             `
-          })
+            })
           .join('')
 
     this.innerHTML = `
       <style>${styles}</style>
       <section class="page">
-        <div class="rrr-card">
-          <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('routineEditor.status.default')}</p>
-          <div class="row">
-            ${isEditing ? '' : `<rrr-input label="${t('field.name')}" name="routine-name" placeholder="${t('routineEditor.field.name.placeholder')}"></rrr-input>`}
-            <label>
-              ${t('routineEditor.field.transitionSeconds')}
-              <input type="number" min="0" step="1" name="routine-transition-seconds" value="${this.transitionSeconds}" />
-            </label>
+        <p class="status-message${this.statusType ? ` status-${this.statusType}` : ''}" role="status" aria-live="polite" aria-atomic="true">${this.statusMessage || t('routineEditor.status.default')}</p>
+        <rrr-section>
+          <span slot="heading">${t('routineDetail.section.flow')}</span>
+          <div class="rrr-card">
+            ${
+    this.exercises.length > 0
+      ? `
+                    <rrr-sequence aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
+                      ${renderRoutineFlowSequence(
+      {
+        id: 'editor-preview',
+        routineId: this.routineIdValue ?? 'new',
+        previousVersionId: null,
+        transitionSeconds: this.transitionSeconds,
+        exercises: this.exercises,
+        createdAt: '',
+      },
+      {
+        resolveExerciseName: (exerciseId) => this.resolveExerciseName(exerciseId),
+        exerciseInteractive: false,
+        transitionInteractive: false,
+      },
+    )}
+                    </rrr-sequence>
+                  `
+      : `<p>${t('routineEditor.exercises.empty')}</p>`
+  }
+            ${renderRoutineFlowControls({
+    addAction: 'add-routine-exercise',
+    transitionAction: 'edit-transition-default',
+    transitionSeconds: this.transitionSeconds,
+  })}
           </div>
-          <div>
-            <h3>${t('routineEditor.section.exercises')}</h3>
-            <div class="exercise-list" aria-live="polite">${exerciseListHtml}</div>
+        </rrr-section>
+        ${
+    this.exercises.length > 0
+      ? `
+            <div>
+              <h3>${t('routineEditor.section.exercises')}</h3>
+              <div class="exercise-list" aria-live="polite">${exerciseListHtml}</div>
+            </div>
+          `
+      : ''
+  }
+        <rrr-section>
+          <span slot="heading">${t('routineDetail.actions')}</span>
+          <div class="rrr-list-card">
+            <rrr-list-row
+              activation="button"
+              label="${t('routineEditor.action.save')}"
+              data-action="save"
+            ></rrr-list-row>
           </div>
-          <div class="add-exercise-row">
-            <rrr-select label="${t('label.addExercise')}" name="add-exercise">
-              ${activeExercises.map((e) => `<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('')}
-            </rrr-select>
-            <rrr-button type="button" data-action="add-exercise">${t('action.add')}</rrr-button>
-          </div>
-          <div class="actions">
-            <rrr-button type="button" data-action="save">${t('routineEditor.action.save')}</rrr-button>
-            <rrr-button type="button" variant="outline" data-action="back">${t('action.cancel')}</rrr-button>
-          </div>
-        </div>
+        </rrr-section>
       </section>
     `
-
-    const nameField = this.querySelector<HTMLElement>('rrr-input[name="routine-name"]')
-    const exerciseField = this.querySelector<HTMLElement & { value: string }>('rrr-select[name="add-exercise"]')
-
-    if (nameField) {
-      nameField.setAttribute('value', this.name)
-    }
-
-    if (exerciseField) {
-      exerciseField.setAttribute('value', activeExercises[0]?.id ?? '')
-    }
   }
 }
 

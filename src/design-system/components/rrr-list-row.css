@@ -4,7 +4,7 @@ rrr-list-row {
   --rrr-list-row-background: var(--rrr-surface-raised);
   --rrr-list-row-color: var(--rrr-color-text);
   --rrr-list-row-description-color: var(--rrr-text-muted);
-  --rrr-list-row-tone-primary-color: var(--rrr-color-primary);
+  --rrr-list-row-tone-primary-color: var(--rrr-color-primary-deep);
   --rrr-list-row-tone-neutral-color: var(--rrr-button-neutral-fg, var(--rrr-color-text));
   --rrr-list-row-tone-accent-color: var(--rrr-button-fg-accent);
   --rrr-list-row-tone-info-color: var(--rrr-button-fg-info);
