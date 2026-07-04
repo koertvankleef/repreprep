@@ -411,9 +411,10 @@ structural routine version.
       actions at the end of active workout logging.
 - [ ] Replace the temporary actions during the active-workout redesign with a
       refined completion choice that defaults to using the finished values.
+- [x] Show the selected source and open its selector from routine detail.
 - [ ] Show selected-source state on workout detail/edit.
-- [ ] Allow selecting any completed workout belonging to the routine.
-- [ ] Add a clear/no-prefill action.
+- [x] Allow selecting any completed workout belonging to the routine.
+- [x] Add a clear/no-prefill action.
 - [ ] Add recent related workouts to routine detail when its design is ready.
 
 ### Phase 5 — Routine-exercise reordering

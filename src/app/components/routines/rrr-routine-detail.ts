@@ -1,6 +1,9 @@
 import { storageService } from '../../storage-instance.ts'
 import { getRoutineSummary } from '../../../domain/routine-summary-service.ts'
-import { createWorkoutFromRoutine } from '../../../domain/workout-service.ts'
+import {
+  createWorkoutFromRoutine,
+  getCompletedWorkoutsForRoutine,
+} from '../../../domain/workout-service.ts'
 import { toastService } from '../../../foundation/toast.ts'
 import { t, tPlural } from '../../../i18n/index.ts'
 import type { Routine, RoutineExercise, RoutineVersion } from '../../../domain/types.ts'
@@ -24,11 +27,13 @@ import {
   promptTransitionOverride,
 } from './routine-timing-sheets.ts'
 import { promptRoutineExerciseSettings } from './routine-exercise-sheets.ts'
+import { promptRoutinePrefillSource } from './routine-prefill-sheets.ts'
 
 export class RrrRoutineDetail extends HTMLElement {
   private routineIdValue: string | null = null
   private renameSheetActive = false
   private timingSheetActive = false
+  private prefillSheetActive = false
   private name = ''
 
   private readonly handleDataChanged = (): void => {
@@ -160,6 +165,35 @@ export class RrrRoutineDetail extends HTMLElement {
     }
 
     window.location.hash = `#/routines/${encodeURIComponent(this.routineIdValue)}/edit`
+  }
+
+  private async editPrefillSource(): Promise<void> {
+    const routineId = this.routineIdValue
+    if (!routineId || this.prefillSheetActive) {
+      return
+    }
+
+    const data = storageService.getData()
+    const routine = getRoutine(data, routineId)
+    if (!routine) {
+      return
+    }
+
+    this.prefillSheetActive = true
+    try {
+      const workoutId = await promptRoutinePrefillSource({
+        workouts: getCompletedWorkoutsForRoutine(data, routine.id),
+        selectedWorkoutId: routine.prefillSourceWorkoutId,
+      })
+      if (workoutId === undefined || workoutId === routine.prefillSourceWorkoutId) {
+        return
+      }
+
+      storageService.setRoutinePrefillSource(routine.id, workoutId)
+      window.dispatchEvent(new CustomEvent('rrr-data-changed'))
+    } finally {
+      this.prefillSheetActive = false
+    }
   }
 
   private async deleteRoutine(): Promise<void> {
@@ -412,6 +446,16 @@ export class RrrRoutineDetail extends HTMLElement {
     const lastStarted = summary.lastStartedAt
       ? formatShortDate(new Date(summary.lastStartedAt))
       : t('routineDetail.lastStartedNever')
+    const completedWorkouts = getCompletedWorkoutsForRoutine(
+      storageService.getData(),
+      summary.routine.id,
+    )
+    const prefillSource = completedWorkouts.find(
+      (workout) => workout.id === summary.routine.prefillSourceWorkoutId,
+    )
+    const prefillSourceLabel = prefillSource
+      ? formatShortDate(new Date(`${prefillSource.date}T12:00:00`))
+      : t('routineDetail.prefill.noneValue')
 
     this.innerHTML = `
       <section class="page">
@@ -429,6 +473,21 @@ export class RrrRoutineDetail extends HTMLElement {
               textValue: lastStarted,
             })}
           </dl>
+        </rrr-section>
+
+        <rrr-section>
+          <span slot="heading">${t('routineDetail.section.nextWorkout')}</span>
+          <div class="rrr-list-card">
+            <rrr-list-row
+              activation="button"
+              label="${t('routineDetail.prefill.label')}"
+              value-text="${escapeHtml(prefillSourceLabel)}"
+              accessory="value"
+              data-action="edit-prefill-source"
+            >
+              <rrr-icon slot="leading" name="arrow-repeat-1"></rrr-icon>
+            </rrr-list-row>
+          </div>
         </rrr-section>
 
         <rrr-section>
@@ -500,6 +559,8 @@ export class RrrRoutineDetail extends HTMLElement {
       ?.addEventListener('click', () => void this.deleteRoutine())
     this.querySelector<HTMLElement>('rrr-list-row[data-action="edit-transition-default"]')
       ?.addEventListener('click', () => void this.editDefaultTransition())
+    this.querySelector<HTMLElement>('rrr-list-row[data-action="edit-prefill-source"]')
+      ?.addEventListener('click', () => void this.editPrefillSource())
     this.querySelectorAll<HTMLElement>('rrr-sequence-gutter[data-before-exercise-id]')
       .forEach((gutter) => {
         gutter.addEventListener('click', () => {

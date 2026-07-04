@@ -1,6 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { initLocale } from '../i18n/index.ts'
 import { registerRrrListRow } from '../design-system/components/rrr-list-row.ts'
+import { registerRrrListCard } from '../design-system/components/rrr-list-card.ts'
 import { registerRrrSequence } from '../design-system/components/rrr-sequence.ts'
 import { registerRrrSequenceGutter } from '../design-system/components/rrr-sequence-gutter.ts'
 import { registerRrrSheet } from '../design-system/components/rrr-sheet.ts'
@@ -8,6 +9,7 @@ import { registerRrrSection } from '../design-system/components/rrr-section.ts'
 import { storageService } from '../app/storage-instance.ts'
 import { RrrExerciseDetail } from '../app/components/exercises/rrr-exercise-detail.ts'
 import { RrrRoutineDetail } from '../app/components/routines/rrr-routine-detail.ts'
+import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
 
 beforeAll(async () => {
   if (!('replaceSync' in CSSStyleSheet.prototype)) {
@@ -38,6 +40,7 @@ beforeAll(async () => {
   registerRrrNumberStepper()
   registerRrrSheet()
   registerRrrListRow()
+  registerRrrListCard()
   registerRrrSequence()
   registerRrrSequenceGutter()
   registerRrrSection()
@@ -340,6 +343,74 @@ describe('value-first property lists', () => {
 
     expect(storageService.getData().workouts).toHaveLength(initialWorkoutCount + 1)
     expect(window.location.hash).toMatch(/^#\/workouts\/.+\/log$/)
+  })
+
+  test('selects and clears the completed workout used for starting values', async () => {
+    const data = storageService.getData()
+    const routine = data.routines[0]!
+    const older = {
+      ...createWorkoutFromRoutine(data, routine.id, '2026-06-01')!,
+      completedAt: '2026-06-01T12:00:00.000Z',
+    }
+    const newer = {
+      ...createWorkoutFromRoutine(data, routine.id, '2026-06-02')!,
+      completedAt: '2026-06-02T12:00:00.000Z',
+    }
+    const unfinished = createWorkoutFromRoutine(data, routine.id, '2026-06-03')!
+    storageService.saveWorkout(older)
+    storageService.saveWorkout(newer)
+    storageService.saveWorkout(unfinished)
+
+    const detail = new RrrRoutineDetail()
+    detail.routineId = routine.id
+    document.body.append(detail)
+    await Promise.resolve()
+
+    const sourceRow = detail.querySelector<HTMLElement>(
+      'rrr-list-row[data-action="edit-prefill-source"]',
+    )
+    expect(sourceRow?.getAttribute('value-text')).toBe('None')
+    expect(sourceRow?.getAttribute('accessory')).toBe('value')
+    sourceRow?.querySelector<HTMLButtonElement>(':scope > button')?.click()
+    await Promise.resolve()
+
+    const choices = Array.from(document.querySelectorAll<HTMLElement>(
+      'rrr-sheet rrr-list-row[data-prefill-source-id]',
+    ))
+    expect(choices.map((row) => row.dataset.prefillSourceId)).toEqual([
+      '__none__',
+      newer.id,
+      older.id,
+    ])
+    expect(choices.some((row) => row.dataset.prefillSourceId === unfinished.id)).toBe(false)
+
+    const newerChoice = choices.find((row) => row.dataset.prefillSourceId === newer.id) as
+      | (HTMLElement & { checked: boolean })
+      | undefined
+    newerChoice!.checked = true
+    newerChoice?.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    expect(storageService.getData().routines[0]?.prefillSourceWorkoutId).toBe(newer.id)
+    expect(detail.querySelector(
+      'rrr-list-row[data-action="edit-prefill-source"]',
+    )?.getAttribute('value-text')).toBe('Jun 2, 2026')
+
+    detail.querySelector<HTMLElement>(
+      'rrr-list-row[data-action="edit-prefill-source"] > button',
+    )?.click()
+    await Promise.resolve()
+    const noneChoice = document.querySelector<HTMLElement & { checked: boolean }>(
+      'rrr-sheet rrr-list-row[data-prefill-source-id="__none__"]',
+    )
+    noneChoice!.checked = true
+    noneChoice?.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    expect(storageService.getData().routines[0]?.prefillSourceWorkoutId).toBeNull()
+    expect(detail.querySelector(
+      'rrr-list-row[data-action="edit-prefill-source"]',
+    )?.getAttribute('value-text')).toBe('None')
   })
 
   test('only deletes a routine after confirmation and returns to the routine list', async () => {

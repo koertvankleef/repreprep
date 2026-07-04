@@ -55,6 +55,20 @@ export function getWorkout(data: AppData, id: string): Workout | undefined {
   return data.workouts.find((workout) => workout.id === id)
 }
 
+export function getCompletedWorkoutsForRoutine(
+  data: AppData,
+  routineId: string,
+): Workout[] {
+  return data.workouts
+    .filter((workout) =>
+      workout.routineId === routineId
+      && workout.completedAt !== null,
+    )
+    .sort((left, right) =>
+      (right.completedAt ?? '').localeCompare(left.completedAt ?? ''),
+    )
+}
+
 export function completeWorkout(
   data: AppData,
   id: string,

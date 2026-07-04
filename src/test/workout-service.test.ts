@@ -10,11 +10,12 @@ import {
   createWorkoutFromRoutine,
   completeWorkout,
   deleteWorkout,
+  getCompletedWorkoutsForRoutine,
   removeExerciseFromWorkout,
   removeSetFromExerciseEntry,
   updateWorkout,
 } from '../domain/workout-service.ts'
-import { setRoutinePrefillSource } from '../domain/routine-service.ts'
+import { createRoutine, setRoutinePrefillSource } from '../domain/routine-service.ts'
 
 describe('workout-service', () => {
   test('addWorkout adds workout to data', () => {
@@ -121,6 +122,33 @@ describe('workout-service', () => {
     const data = createDefaultData()
 
     expect(completeWorkout(data, 'missing', true)).toBe(data)
+  })
+
+  test('lists only completed workouts for a routine, newest completion first', () => {
+    const data = createDefaultData()
+    const routine = data.routines[0]!
+    const older = {
+      ...createWorkoutFromRoutine(data, routine.id, '2026-06-01')!,
+      completedAt: '2026-06-01T12:00:00.000Z',
+    }
+    const newer = {
+      ...createWorkoutFromRoutine(data, routine.id, '2026-06-02')!,
+      completedAt: '2026-06-02T12:00:00.000Z',
+    }
+    const unfinished = createWorkoutFromRoutine(data, routine.id, '2026-06-03')!
+    const withOtherRoutine = createRoutine(data, 'Other', [])
+    const otherRoutine = withOtherRoutine.routines.find(({ name }) => name === 'Other')!
+    const other = {
+      ...createWorkoutFromRoutine(withOtherRoutine, otherRoutine.id, '2026-06-04')!,
+      completedAt: '2026-06-04T12:00:00.000Z',
+    }
+    const withWorkouts = {
+      ...withOtherRoutine,
+      workouts: [older, unfinished, other, newer],
+    }
+
+    expect(getCompletedWorkoutsForRoutine(withWorkouts, routine.id).map(({ id }) => id))
+      .toEqual([newer.id, older.id])
   })
 
   test('addExerciseToWorkout adds entry', () => {
