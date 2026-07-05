@@ -13,6 +13,7 @@ import { registerRrrNumberStepper } from './rrr-number-stepper.ts'
 import { registerRrrSection } from './rrr-section.ts'
 import { registerRrrSequence } from './rrr-sequence.ts'
 import { registerRrrSequenceGutter } from './rrr-sequence-gutter.ts'
+import { registerRrrSwipeAction } from './rrr-swipe-action.ts'
 import { registerRrrSelect } from './rrr-select.ts'
 import { registerRrrSheet } from './rrr-sheet.ts'
 import { registerRrrTextarea } from './rrr-textarea.ts'
@@ -33,6 +34,7 @@ export function registerDesignSystemComponents(): void {
   registerRrrSection()
   registerRrrSequence()
   registerRrrSequenceGutter()
+  registerRrrSwipeAction()
   registerRrrListCard()
   registerRrrListRow()
   registerRrrSheet()

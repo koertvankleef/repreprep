@@ -9,17 +9,32 @@ import type {
   SequenceSortStatusDetail,
 } from '../design-system/components/rrr-sequence.ts'
 import { registerRrrSequenceGutter } from '../design-system/components/rrr-sequence-gutter.ts'
+import type {
+  SwipeActionCommitDetail,
+} from '../design-system/components/rrr-swipe-action.ts'
 import '../app/components/settings/rrr-appearance-settings.ts'
 import '../app/components/settings/rrr-language-settings.ts'
 import '../app/components/settings/rrr-settings.ts'
 
-beforeAll(() => {
+beforeAll(async () => {
+  if (!('replaceSync' in CSSStyleSheet.prototype)) {
+    Object.defineProperty(CSSStyleSheet.prototype, 'replaceSync', {
+      configurable: true,
+      value: () => {},
+    })
+  }
+  vi.stubGlobal('SVGSymbolElement', SVGElement)
+
+  const { registerRrrSwipeAction } = await import(
+    '../design-system/components/rrr-swipe-action.ts'
+  )
   initLocale('en-US')
   registerRrrSection()
   registerRrrListCard()
   registerRrrListRow()
   registerRrrSequence()
   registerRrrSequenceGutter()
+  registerRrrSwipeAction()
 })
 
 beforeEach(() => {
@@ -77,6 +92,200 @@ describe('list structure primitives', () => {
       .toBe('Edit 45 seconds custom preparation before Row')
     expect(button?.querySelector('.rrr-sequence-gutter__description')?.textContent)
       .toBe('Custom')
+  })
+
+  test('locks swipe actions only after horizontal intent and commits when armed', async () => {
+    document.body.innerHTML = `
+      <rrr-swipe-action
+        action="delete"
+        action-label="Delete Push-ups"
+        direction="end-to-start"
+        icon="delete"
+      >
+        <rrr-list-row activation="button" label="Push-ups"></rrr-list-row>
+      </rrr-swipe-action>
+    `
+    await Promise.resolve()
+
+    const swipeAction = document.querySelector<HTMLElement>('rrr-swipe-action')!
+    const content = swipeAction.querySelector<HTMLElement>('.rrr-swipe-action__content')!
+    const commit = vi.fn()
+    const setPointerCapture = vi.fn()
+    content.setPointerCapture = setPointerCapture
+    swipeAction.getBoundingClientRect = () => ({
+      x: 0,
+      y: 0,
+      top: 0,
+      right: 300,
+      bottom: 80,
+      left: 0,
+      width: 300,
+      height: 80,
+      toJSON: () => ({}),
+    })
+    swipeAction.addEventListener('rrr-swipe-action-commit', commit)
+
+    const pointerEvent = (
+      type: string,
+      options: {
+        pointerId: number
+        clientX: number
+        clientY: number
+      },
+    ): Event => {
+      const event = new Event(type, { bubbles: true, composed: true, cancelable: true })
+      Object.defineProperties(event, {
+        pointerId: { value: options.pointerId },
+        clientX: { value: options.clientX },
+        clientY: { value: options.clientY },
+        button: { value: 0 },
+        isPrimary: { value: true },
+      })
+      return event
+    }
+
+    content.dispatchEvent(pointerEvent('pointerdown', {
+      pointerId: 1,
+      clientX: 250,
+      clientY: 20,
+    }))
+    const verticalMove = pointerEvent('pointermove', {
+      pointerId: 1,
+      clientX: 244,
+      clientY: 60,
+    })
+    swipeAction.dispatchEvent(verticalMove)
+
+    expect(verticalMove.defaultPrevented).toBe(false)
+    expect(swipeAction.dataset.swipeState).toBe('closed')
+
+    content.dispatchEvent(pointerEvent('pointerdown', {
+      pointerId: 2,
+      clientX: 250,
+      clientY: 20,
+    }))
+    const revealMove = pointerEvent('pointermove', {
+      pointerId: 2,
+      clientX: 190,
+      clientY: 22,
+    })
+    swipeAction.dispatchEvent(revealMove)
+
+    expect(revealMove.defaultPrevented).toBe(true)
+    expect(swipeAction.dataset.swipeState).toBe('revealing')
+    expect(setPointerCapture).toHaveBeenCalledWith(2)
+
+    swipeAction.dispatchEvent(pointerEvent('pointerup', {
+      pointerId: 2,
+      clientX: 190,
+      clientY: 22,
+    }))
+    expect(swipeAction.dataset.swipeState).toBe('closed')
+    expect(commit).not.toHaveBeenCalled()
+
+    content.dispatchEvent(pointerEvent('pointerdown', {
+      pointerId: 3,
+      clientX: 250,
+      clientY: 20,
+    }))
+    swipeAction.dispatchEvent(pointerEvent('pointermove', {
+      pointerId: 3,
+      clientX: 120,
+      clientY: 22,
+    }))
+
+    expect(swipeAction.dataset.swipeState).toBe('armed')
+
+    swipeAction.dispatchEvent(pointerEvent('pointerup', {
+      pointerId: 3,
+      clientX: 120,
+      clientY: 22,
+    }))
+
+    expect(commit).toHaveBeenCalledOnce()
+    expect((commit.mock.calls[0]?.[0] as CustomEvent<SwipeActionCommitDetail>).detail)
+      .toEqual({ action: 'delete' })
+    await Promise.resolve()
+    expect(swipeAction.dataset.swipeState).toBe('closed')
+
+    swipeAction.style.direction = 'rtl'
+    content.dispatchEvent(pointerEvent('pointerdown', {
+      pointerId: 4,
+      clientX: 50,
+      clientY: 20,
+    }))
+    swipeAction.dispatchEvent(pointerEvent('pointermove', {
+      pointerId: 4,
+      clientX: 180,
+      clientY: 22,
+    }))
+    expect(swipeAction.dataset.swipeState).toBe('armed')
+    swipeAction.dispatchEvent(pointerEvent('pointercancel', {
+      pointerId: 4,
+      clientX: 180,
+      clientY: 22,
+    }))
+  })
+
+  test('ignores drag handles and closes another active swipe row', async () => {
+    document.body.innerHTML = `
+      <rrr-swipe-action action="delete" action-label="Delete Alpha">
+        <rrr-list-row activation="button" label="Alpha"></rrr-list-row>
+        <button type="button" data-sort-handle>Move Alpha</button>
+      </rrr-swipe-action>
+      <rrr-swipe-action action="delete" action-label="Delete Bravo">
+        <rrr-list-row activation="button" label="Bravo"></rrr-list-row>
+      </rrr-swipe-action>
+    `
+    await Promise.resolve()
+
+    const actions = Array.from(document.querySelectorAll<HTMLElement>('rrr-swipe-action'))
+    const pointerEvent = (
+      type: string,
+      pointerId: number,
+      clientX: number,
+      clientY: number,
+    ): Event => {
+      const event = new Event(type, { bubbles: true, composed: true, cancelable: true })
+      Object.defineProperties(event, {
+        pointerId: { value: pointerId },
+        clientX: { value: clientX },
+        clientY: { value: clientY },
+        button: { value: 0 },
+        isPrimary: { value: true },
+      })
+      return event
+    }
+    for (const action of actions) {
+      action.getBoundingClientRect = () => ({
+        x: 0,
+        y: 0,
+        top: 0,
+        right: 300,
+        bottom: 80,
+        left: 0,
+        width: 300,
+        height: 80,
+        toJSON: () => ({}),
+      })
+    }
+
+    const firstHandle = actions[0]?.querySelector<HTMLElement>('[data-sort-handle]')
+    firstHandle?.dispatchEvent(pointerEvent('pointerdown', 1, 250, 20))
+    actions[0]?.dispatchEvent(pointerEvent('pointermove', 1, 100, 20))
+    expect(actions[0]?.dataset.swipeState).toBe('closed')
+
+    const firstContent = actions[0]?.querySelector<HTMLElement>('.rrr-swipe-action__content')
+    firstContent?.dispatchEvent(pointerEvent('pointerdown', 2, 250, 20))
+    actions[0]?.dispatchEvent(pointerEvent('pointermove', 2, 190, 20))
+    expect(actions[0]?.dataset.swipeState).toBe('revealing')
+
+    const secondContent = actions[1]?.querySelector<HTMLElement>('.rrr-swipe-action__content')
+    secondContent?.dispatchEvent(pointerEvent('pointerdown', 3, 250, 20))
+    actions[1]?.dispatchEvent(pointerEvent('pointermove', 3, 190, 20))
+
+    expect(actions[0]?.dataset.swipeState).toBe('closed')
+    expect(actions[1]?.dataset.swipeState).toBe('revealing')
   })
 
   test('reorders sequence items by keyboard and restores them on cancel', async () => {

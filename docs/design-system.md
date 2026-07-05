@@ -118,8 +118,36 @@ row's own button. Supply `data-sort-label` for announcements.
 The controller emits `rrr-sequence-sort-status` for lifted, moved, dropped,
 and cancelled states, and `rrr-sequence-reorder` with the committed ordered
 IDs. Consumers own localized announcements and domain persistence. Gutter
-content collapses during sorting while an equivalent grid gap preserves the
-sequence rhythm; gutters are re-derived from domain data after commit.
+content fades and collapses when reorder mode begins; gutters are re-derived
+from domain data after commit.
+
+## Swipe actions
+
+Use `rrr-swipe-action` as progressive enhancement around one identity row.
+It recognizes horizontal intent without preventing ordinary vertical
+scrolling, uses logical directions for RTL support, and ignores gestures that
+begin on drag handles or explicit opt-out controls.
+
+```html
+<rrr-swipe-action
+  direction="end-to-start"
+  action="delete"
+  action-label="Delete Push-ups"
+  icon="delete"
+  tone="danger"
+>
+  <rrr-list-row activation="button" label="Push-ups"></rrr-list-row>
+</rrr-swipe-action>
+```
+
+The action surface remains neutral while revealing and changes to its semantic
+tone only after the commit threshold. Releasing earlier closes the row.
+Releasing while armed emits `rrr-swipe-action-commit` with an `action` detail;
+the component never deletes domain data itself. This separation also leaves a
+clean integration point for a future Undo coordinator.
+
+Swipe must not be the only path to an action. Keep a discoverable non-gesture
+alternative in the relevant sheet or desktop interface.
 
 Use the same value/unit treatment outside a gutter with `rrr-measurement`:
 

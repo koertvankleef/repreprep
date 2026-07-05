@@ -1,0 +1,96 @@
+rrr-swipe-action {
+  --rrr-swipe-action-translate: 0px;
+  --rrr-swipe-action-surface: var(--rrr-surface-base);
+  --rrr-swipe-action-color: var(--rrr-text-muted);
+  --rrr-swipe-action-armed-surface:
+    color-mix(
+      in oklab,
+      var(--rrr-colors-context-danger-mix),
+      var(--rrr-surface-raised) 85%
+    );
+  --rrr-swipe-action-armed-color: var(--rrr-button-fg-danger);
+  --rrr-swipe-action-width: var(--rrr-sizes-grid-8);
+  position: relative;
+  display: grid;
+  min-inline-size: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.rrr-swipe-action__surface,
+.rrr-swipe-action__content {
+  grid-area: 1 / 1;
+  min-inline-size: 0;
+}
+
+.rrr-swipe-action__surface {
+  z-index: 0;
+  display: flex;
+  justify-content: flex-end;
+  color: var(--rrr-swipe-action-color);
+  background: var(--rrr-swipe-action-surface);
+  transition:
+    color var(--rrr-transition-default),
+    background var(--rrr-transition-default);
+}
+
+rrr-swipe-action[direction='start-to-end'] .rrr-swipe-action__surface {
+  justify-content: flex-start;
+}
+
+.rrr-swipe-action__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--rrr-swipe-action-width);
+  min-block-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: inherit;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.rrr-swipe-action__button:hover,
+.rrr-swipe-action__button:active {
+  border-color: transparent;
+  color: inherit;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.rrr-swipe-action__button rrr-icon {
+  font-size: 1.4rem;
+}
+
+.rrr-swipe-action__content {
+  z-index: 1;
+  translate: var(--rrr-swipe-action-translate) 0;
+  background: var(--rrr-surface-raised);
+  touch-action: pan-y;
+}
+
+rrr-swipe-action:not([data-swipe-dragging]) .rrr-swipe-action__content {
+  transition: translate var(--rrr-transition-default);
+}
+
+rrr-swipe-action[data-swipe-state='armed'] .rrr-swipe-action__surface,
+rrr-swipe-action[data-swipe-state='committed'] .rrr-swipe-action__surface {
+  color: var(--rrr-swipe-action-armed-color);
+  background: var(--rrr-swipe-action-armed-surface);
+}
+
+rrr-swipe-action[disabled] {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rrr-swipe-action__surface,
+  .rrr-swipe-action__content {
+    transition: none;
+  }
+}

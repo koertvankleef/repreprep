@@ -623,6 +623,26 @@ export class RrrStyleguide extends HTMLElement {
               </div>
 
               <div class="showcase-block">
+                <h3>${t('styleguide.sequences.swipeHeading')}</h3>
+                <p class="sample-text">${t('styleguide.sequences.swipeDescription')}</p>
+                <div class="rrr-list-card">
+                  <rrr-swipe-action
+                    direction="end-to-start"
+                    action="delete"
+                    action-label="${t('styleguide.sequences.swipeDelete')}"
+                    icon="delete"
+                    tone="danger"
+                  >
+                    <rrr-list-row
+                      activation="button"
+                      label="${t('styleguide.sequences.swipeExercise')}"
+                      description="${t('styleguide.sequences.exercise.sets.three')}"
+                    ></rrr-list-row>
+                  </rrr-swipe-action>
+                </div>
+              </div>
+
+              <div class="showcase-block">
                 <h3>${t('styleguide.sequences.setHeading')}</h3>
                 <p class="sample-text">${t('styleguide.sequences.setDescription')}</p>
                 <rrr-sequence aria-label="${t('styleguide.sequences.setAria')}">

@@ -358,21 +358,25 @@ Gesture states:
 
 Interaction requirements:
 
-- [ ] Lock horizontally only after intent exceeds vertical movement.
-- [ ] Do not suppress normal vertical scrolling before lock.
-- [ ] Disable swipe initiation from drag handles and interactive descendants.
-- [ ] Use pointer capture after horizontal intent is established.
-- [ ] Respect logical direction for LTR and RTL.
-- [ ] Close a revealed row when another row begins interaction.
-- [ ] Keep the action backed by a real localized button.
-- [ ] Provide sheet and desktop deletion paths that require no gesture.
+- [x] Lock horizontally only after intent exceeds vertical movement.
+- [x] Do not suppress normal vertical scrolling before lock.
+- [x] Disable swipe initiation from drag handles and explicit interactive
+      descendants.
+- [x] Use pointer capture after horizontal intent is established.
+- [x] Respect logical direction for LTR and RTL.
+- [x] Close a revealed row when another row begins interaction.
+- [x] Keep the action backed by a real localized button.
+- [x] Provide sheet and desktop deletion paths that require no gesture.
 - [ ] Commit without confirmation or Undo.
-- [ ] Preserve state feedback in reduced-motion mode.
+- [x] Preserve state feedback in reduced-motion mode.
 
 Deferred:
 
 - [ ] Optionally teach swipe with one subtle partial reveal.
 - [ ] Consider configurable actions only after a second real action exists.
+- [ ] After the first deletion pass, consider restoring deleted routine
+      exercises through an Undo action without coupling history to the swipe
+      primitive.
 
 ## Save and versioning
 
@@ -447,7 +451,7 @@ structural routine version.
 
 - [x] Keep swipe gesture deletion as a required milestone after shipping
   non-gesture deletion.
-- [ ] Implement the swipe decorator and Outlook-like state progression.
+- [x] Implement the swipe decorator and Outlook-like state progression.
 - [ ] Integrate immediate exercise deletion.
 - [x] Add explicit desktop and sheet deletion actions.
 - [ ] Test touch scrolling, hybrid input, pointer cancellation, and reduced
