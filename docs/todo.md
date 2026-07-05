@@ -8,7 +8,10 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] Non-MVP follow-up: let the user toggle the wake lock feature on or off.
 - [ ] Add a user-facing toggle for auto-advance / auto-continue in workout flow, separate from the actual auto-advance behavior design.
 - [ ] Refine timed-exercise IxD: current grace/Edit behavior can restart the timed set, which feels wrong and needs a cleaner interaction model.
-- [ ] Bottom main navigation on mobile; left side of screen navigation on desktop; minimised variant on tablet.
+- [ ] Refine the responsive desktop layout: keep the working bottom navigation
+      on mobile and left navigation rail on desktop, add a minimised tablet
+      variant, and consider constraining ordinary page content (route-view) and interactive rows to a
+      readable width instead of stretching them across the available viewport. Many list rows currently always put description below label, in a wide/desktop screen layout those two should behave like the property lists already do: side by side.
 - [x] Add a read-only Routine Details page after creation/editing with the routine name as title, a header Edit affordance, exercise list, and Start Workout action.
 - [ ] Define a trustworthy routine-duration estimation policy before adding estimated duration to routine summaries.
 - [x] Prefill routine names automatically; do not require the user to invent one from scratch.

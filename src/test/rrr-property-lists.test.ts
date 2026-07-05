@@ -123,6 +123,8 @@ describe('value-first property lists', () => {
     expect(firstExerciseRow?.getAttribute('activation')).toBe('button')
     expect(firstExerciseRow?.hasAttribute('href')).toBe(false)
     expect(firstExerciseRow?.hasAttribute('accessory')).toBe(false)
+    expect(exerciseSequence?.hasAttribute('sortable')).toBe(false)
+    expect(exerciseSequence?.querySelector('[data-sort-handle]')).toBeNull()
     expect(exerciseSequence?.querySelector('rrr-sequence-gutter')).not.toBeNull()
     expect(timingCard?.querySelector(
       'rrr-list-row[data-action="edit-transition-default"]',
@@ -131,7 +133,10 @@ describe('value-first property lists', () => {
       'rrr-list-row[data-action="edit-transition-default"]',
     )?.getAttribute('description')).toBe('Default time between exercises')
     expect(timingRows[0]?.dataset.action).toBe('add-routine-exercise')
-    expect(timingRows[1]?.dataset.action).toBe('edit-transition-default')
+    expect(timingRows[1]?.dataset.action).toBe('toggle-reorder-exercises')
+    expect(timingRows[1]?.getAttribute('control')).toBe('switch')
+    expect(timingRows[1]?.hasAttribute('checked')).toBe(false)
+    expect(timingRows[2]?.dataset.action).toBe('edit-transition-default')
     expect(flowCard?.querySelector(':scope > rrr-sequence')).toBe(exerciseSequence)
     expect(flowCard?.querySelector(':scope > .rrr-list-card')).toBeNull()
     expect(actionRow?.getAttribute('activation')).toBe('button')
@@ -383,9 +388,31 @@ describe('value-first property lists', () => {
     document.body.append(detail)
     await Promise.resolve()
 
+    const reorderControl = detail.querySelector<HTMLElement & { checked: boolean }>(
+      'rrr-list-row[data-action="toggle-reorder-exercises"]',
+    )!
+    reorderControl.checked = true
+    reorderControl.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    await Promise.resolve()
+
+    const sequence = detail.querySelector<HTMLElement>('rrr-sequence')
     const firstHandle = detail.querySelector<HTMLButtonElement>(
       `[data-sort-id="${first.id}"] [data-sort-handle]`,
     )!
+    const firstSortableItem = firstHandle.closest<HTMLElement>('[data-sort-id]')!
+    const firstExerciseRow = firstSortableItem.querySelector<HTMLElement>(
+      'rrr-list-row[data-routine-exercise-id]',
+    )
+    const addExercise = detail.querySelector<HTMLElement>(
+      'rrr-list-row[data-action="add-routine-exercise"]',
+    )
+
+    expect(sequence?.hasAttribute('sortable')).toBe(true)
+    expect(firstSortableItem.firstElementChild).toBe(firstHandle)
+    expect(firstExerciseRow?.hasAttribute('activation')).toBe(false)
+    expect(detail.querySelector('rrr-sequence-gutter')?.hasAttribute('activation')).toBe(false)
+    expect(addExercise?.hasAttribute('disabled')).toBe(true)
+    expect(document.activeElement).toBe(firstHandle)
     expect(firstHandle.getAttribute('aria-label')).toContain('Press Space')
 
     firstHandle.dispatchEvent(new KeyboardEvent('keydown', {
@@ -394,7 +421,7 @@ describe('value-first property lists', () => {
       composed: true,
       cancelable: true,
     }))
-    expect(detail.querySelector('rrr-sequence')?.getAttribute('data-sorting'))
+    expect(sequence?.getAttribute('data-sorting'))
       .toBe('keyboard')
 
     firstHandle.dispatchEvent(new KeyboardEvent('keydown', {

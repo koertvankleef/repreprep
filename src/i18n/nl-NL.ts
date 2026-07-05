@@ -421,6 +421,7 @@ export const nlNlMessages = {
   'routineDetail.setCount.other': '{count} sets',
   'routineDetail.exercises.sequenceAria': 'Oefeningen en overgangstijden',
   'routineDetail.reorder.handleAria': 'Verplaats {exercise}. Druk op spatie of Enter om de volgorde te wijzigen.',
+  'routineDetail.reorder.toggleLabel': 'Oefeningen herordenen',
   'routineDetail.reorder.lifted': '{exercise} opgepakt. Positie {position} van {count}.',
   'routineDetail.reorder.moved': '{exercise} verplaatst naar positie {position} van {count}.',
   'routineDetail.reorder.dropped': '{exercise} neergezet op positie {position} van {count}.',

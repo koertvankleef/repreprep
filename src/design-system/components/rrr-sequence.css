@@ -18,7 +18,7 @@ rrr-sequence > :where(rrr-list-row, [data-sequence-item]) {
 .rrr-sortable-item {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: stretch;
 }
 
@@ -34,7 +34,7 @@ rrr-sequence > :where(rrr-list-row, [data-sequence-item]) {
   margin: 0;
   padding: var(--rrr-spacing-s);
   border: 0;
-  border-inline-start: var(--rrr-border-width) solid transparent;
+  border-inline-end: var(--rrr-border-width) solid transparent;
   color: var(--rrr-text-muted);
   background: transparent;
   box-shadow: none;

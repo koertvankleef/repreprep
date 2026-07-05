@@ -142,8 +142,11 @@ export class RrrListRow extends HTMLElement {
     if (control) {
       const inputType = control === 'radio' ? 'radio' : 'checkbox'
       const role = control === 'switch' ? ' role="switch"' : ''
+      const interactiveClass = control === 'radio'
+        ? ''
+        : ' rrr-list-row__row--interactive'
       rowMarkup = `
-        <label class="rrr-row rrr-list-row__row rrr-list-row__row--control">
+        <label class="rrr-row rrr-list-row__row rrr-list-row__row--control${interactiveClass}">
           ${content}
           <input
             class="rrr-list-row__control rrr-list-row__control--${control}"

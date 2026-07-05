@@ -281,11 +281,19 @@ native button activation without a navigation accessory.
 
 ## Reordering routine exercises
 
-Use a dedicated drag handle. The row remains available for sheet activation,
-and its surface remains available for horizontal swipe.
+Reordering is a transient editing mode, enabled by a `Reorder exercises`
+switch below Add exercise. The mode is off by default and is not persisted.
+Normal mode keeps exercise rows available for sheet activation and future
+horizontal swipe deletion; reorder mode disables those interactions and shows
+dedicated handles at logical inline-start. Add exercise is disabled while the
+mode is active.
 
 Pointer behavior:
 
+- [x] Require the explicit reorder-mode switch before exposing handles.
+- [x] Place handles at logical inline-start.
+- [x] Disable exercise and gutter activation while reordering.
+- [x] Disable Add exercise while reordering.
 - [x] Begin sorting only from the drag handle.
 - [x] Use Pointer Events rather than native HTML drag-and-drop.
 - [ ] Preserve vertical scrolling until handle drag intent is established.
@@ -422,6 +430,10 @@ structural routine version.
 
 ### Phase 5 — Routine-exercise reordering
 
+- [x] Add a transient reorder-mode switch to create and detail flows.
+- [x] Hide handles and preserve normal row/gutter activation outside the mode.
+- [x] Place active reorder handles at logical inline-start.
+- [x] Disable Add exercise while the mode is active.
 - [x] Implement pointer sorting from an explicit handle.
 - [x] Implement keyboard sorting and announcements.
 - [x] Integrate persistence and derived-gutter movement.

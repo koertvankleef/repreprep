@@ -161,4 +161,74 @@ describe('rrr-routine-editor creation', () => {
       `rrr-list-row[data-routine-exercise-id="${firstExercise.id}"]`,
     )?.getAttribute('description')).toBe('4 sets')
   })
+
+  test('uses an explicit reorder mode for the local routine draft', async () => {
+    const sourceVersion = storageService.getData().routineVersions[0]!
+    const editor = new RrrRoutineEditor()
+    document.body.append(editor)
+
+    const draftEditor = editor as unknown as {
+      exercises: RoutineExercise[]
+      render: () => void
+    }
+    draftEditor.exercises = sourceVersion.exercises.slice(0, 2).map(
+      (exercise) => ({ ...exercise }),
+    )
+    draftEditor.render()
+    await Promise.resolve()
+
+    const firstExerciseId = draftEditor.exercises[0]!.id
+    const normalRow = editor.querySelector<HTMLElement>(
+      `rrr-list-row[data-routine-exercise-id="${firstExerciseId}"]`,
+    )
+    const reorderControl = editor.querySelector<HTMLElement & { checked: boolean }>(
+      'rrr-list-row[data-action="toggle-reorder-exercises"]',
+    )!
+
+    expect(editor.querySelector('rrr-sequence')?.hasAttribute('sortable')).toBe(false)
+    expect(editor.querySelector('[data-sort-handle]')).toBeNull()
+    expect(normalRow?.getAttribute('activation')).toBe('button')
+
+    reorderControl.checked = true
+    reorderControl.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    await Promise.resolve()
+
+    const firstHandle = editor.querySelector<HTMLButtonElement>(
+      `[data-sort-id="${firstExerciseId}"] [data-sort-handle]`,
+    )
+    const sortableItem = firstHandle?.closest<HTMLElement>('[data-sort-id]')
+    const reorderRow = editor.querySelector<HTMLElement>(
+      `rrr-list-row[data-routine-exercise-id="${firstExerciseId}"]`,
+    )
+
+    expect(editor.querySelector('rrr-sequence')?.hasAttribute('sortable')).toBe(true)
+    expect(sortableItem?.firstElementChild).toBe(firstHandle)
+    expect(reorderRow?.hasAttribute('activation')).toBe(false)
+    expect(editor.querySelector('rrr-sequence-gutter')?.hasAttribute('activation')).toBe(false)
+    expect(editor.querySelector(
+      'rrr-list-row[data-action="add-routine-exercise"]',
+    )?.hasAttribute('disabled')).toBe(true)
+    expect(document.activeElement).toBe(firstHandle)
+
+    reorderRow?.click()
+    expect(document.querySelector('rrr-sheet')).toBeNull()
+
+    const activeReorderControl = editor.querySelector<HTMLElement & { checked: boolean }>(
+      'rrr-list-row[data-action="toggle-reorder-exercises"]',
+    )!
+    activeReorderControl.checked = false
+    activeReorderControl.dispatchEvent(new Event('change', {
+      bubbles: true,
+      composed: true,
+    }))
+    await Promise.resolve()
+
+    expect(editor.querySelector('[data-sort-handle]')).toBeNull()
+    expect(editor.querySelector(
+      `rrr-list-row[data-routine-exercise-id="${firstExerciseId}"]`,
+    )?.getAttribute('activation')).toBe('button')
+    expect(editor.querySelector(
+      'rrr-list-row[data-action="add-routine-exercise"]',
+    )?.hasAttribute('disabled')).toBe(false)
+  })
 })

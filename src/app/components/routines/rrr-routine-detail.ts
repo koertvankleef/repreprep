@@ -44,6 +44,7 @@ export class RrrRoutineDetail extends HTMLElement {
   private renameSheetActive = false
   private timingSheetActive = false
   private prefillSheetActive = false
+  private reorderMode = false
   private name = ''
 
   private readonly handleDataChanged = (): void => {
@@ -51,6 +52,9 @@ export class RrrRoutineDetail extends HTMLElement {
   }
 
   set routineId(value: string | null) {
+    if (value !== this.routineIdValue) {
+      this.reorderMode = false
+    }
     this.routineIdValue = value
     this.initialize()
   }
@@ -73,6 +77,7 @@ export class RrrRoutineDetail extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    this.reorderMode = false
     window.removeEventListener('rrr-data-changed', this.handleDataChanged)
     this.removeEventListener(
       'rrr-sequence-reorder',
@@ -93,6 +98,10 @@ export class RrrRoutineDetail extends HTMLElement {
   private readonly handleSequenceReorder = (
     event: CustomEvent<SequenceReorderDetail>,
   ): void => {
+    if (!this.reorderMode) {
+      return
+    }
+
     const current = this.getCurrentRoutineVersion()
     if (!current) {
       return
@@ -250,7 +259,7 @@ export class RrrRoutineDetail extends HTMLElement {
 
   private async addRoutineExercise(): Promise<void> {
     const current = this.getCurrentRoutineVersion()
-    if (!current || this.timingSheetActive) {
+    if (!current || this.timingSheetActive || this.reorderMode) {
       return
     }
 
@@ -388,6 +397,10 @@ export class RrrRoutineDetail extends HTMLElement {
   }
 
   private async editRoutineExercise(routineExerciseId: string): Promise<void> {
+    if (this.reorderMode) {
+      return
+    }
+
     const current = this.getCurrentRoutineVersion()
     const routineExercise = current?.version.exercises.find(
       (exercise) => exercise.id === routineExerciseId,
@@ -458,6 +471,10 @@ export class RrrRoutineDetail extends HTMLElement {
   }
 
   private async editTransitionOverride(beforeExerciseId: string): Promise<void> {
+    if (this.reorderMode) {
+      return
+    }
+
     const current = this.getCurrentRoutineVersion()
     const destination = current?.version.exercises.find(
       (exercise) => exercise.id === beforeExerciseId,
@@ -500,6 +517,26 @@ export class RrrRoutineDetail extends HTMLElement {
     }
   }
 
+  private setReorderMode(enabled: boolean): void {
+    const exerciseCount = this.getCurrentRoutineVersion()?.version.exercises.length ?? 0
+    const nextMode = enabled && exerciseCount > 1
+    if (nextMode === this.reorderMode) {
+      return
+    }
+
+    this.reorderMode = nextMode
+    this.render()
+
+    queueMicrotask(() => {
+      const focusTarget = nextMode
+        ? this.querySelector<HTMLElement>('[data-sort-handle]')
+        : this.querySelector<HTMLElement>(
+            'rrr-list-row[data-action="toggle-reorder-exercises"]',
+          )
+      focusTarget?.focus()
+    })
+  }
+
   private render(): void {
     const routineId = this.routineIdValue
     const summary = routineId
@@ -516,6 +553,11 @@ export class RrrRoutineDetail extends HTMLElement {
     }
 
     const exerciseCount = summary.version?.exercises.length ?? 0
+    const reorderAvailable = exerciseCount > 1
+    const reorderEnabled = this.reorderMode && reorderAvailable
+    if (this.reorderMode !== reorderEnabled) {
+      this.reorderMode = reorderEnabled
+    }
     const primaryMuscles = summary.primaryMuscles.length > 0
       ? summary.primaryMuscles.map(getMuscleLabel).join(', ')
       : t('routineDetail.muscles.none')
@@ -572,12 +614,13 @@ export class RrrRoutineDetail extends HTMLElement {
             ${
               exerciseCount > 0
                 ? `
-                  <rrr-sequence sortable aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
+                  <rrr-sequence ${reorderEnabled ? 'sortable' : ''} aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
                     ${summary.version
     ? renderRoutineFlowSequence(summary.version, {
       resolveExerciseName: (exerciseId) => this.resolveExerciseName(exerciseId),
-      transitionInteractive: true,
-      sortable: true,
+      exerciseInteractive: !reorderEnabled,
+      transitionInteractive: !reorderEnabled,
+      sortable: reorderEnabled,
     })
     : ''}
                   </rrr-sequence>
@@ -587,6 +630,10 @@ export class RrrRoutineDetail extends HTMLElement {
           </div>
           ${renderRoutineFlowControls({
     addAction: 'add-routine-exercise',
+    addDisabled: reorderEnabled,
+    reorderAction: 'toggle-reorder-exercises',
+    reorderAvailable,
+    reorderEnabled,
     transitionAction: 'edit-transition-default',
     transitionSeconds: summary.version?.transitionSeconds ?? 0,
   })}
@@ -624,26 +671,34 @@ export class RrrRoutineDetail extends HTMLElement {
       ?.addEventListener('click', () => void this.editDefaultTransition())
     this.querySelector<HTMLElement>('rrr-list-row[data-action="add-routine-exercise"]')
       ?.addEventListener('click', () => void this.addRoutineExercise())
+    const reorderControl = this.querySelector<HTMLElement & { checked: boolean }>(
+      'rrr-list-row[data-action="toggle-reorder-exercises"]',
+    )
+    reorderControl?.addEventListener('change', () => {
+      this.setReorderMode(reorderControl.checked)
+    })
     this.querySelector<HTMLElement>('rrr-list-row[data-action="edit-prefill-source"]')
       ?.addEventListener('click', () => void this.editPrefillSource())
-    this.querySelectorAll<HTMLElement>('rrr-sequence-gutter[data-before-exercise-id]')
-      .forEach((gutter) => {
-        gutter.addEventListener('click', () => {
-          const beforeExerciseId = gutter.dataset.beforeExerciseId
-          if (beforeExerciseId) {
-            void this.editTransitionOverride(beforeExerciseId)
-          }
+    if (!reorderEnabled) {
+      this.querySelectorAll<HTMLElement>('rrr-sequence-gutter[data-before-exercise-id]')
+        .forEach((gutter) => {
+          gutter.addEventListener('click', () => {
+            const beforeExerciseId = gutter.dataset.beforeExerciseId
+            if (beforeExerciseId) {
+              void this.editTransitionOverride(beforeExerciseId)
+            }
+          })
         })
-      })
-    this.querySelectorAll<HTMLElement>('rrr-list-row[data-routine-exercise-id]')
-      .forEach((row) => {
-        row.addEventListener('click', () => {
-          const routineExerciseId = row.dataset.routineExerciseId
-          if (routineExerciseId) {
-            void this.editRoutineExercise(routineExerciseId)
-          }
+      this.querySelectorAll<HTMLElement>('rrr-list-row[data-routine-exercise-id]')
+        .forEach((row) => {
+          row.addEventListener('click', () => {
+            const routineExerciseId = row.dataset.routineExerciseId
+            if (routineExerciseId) {
+              void this.editRoutineExercise(routineExerciseId)
+            }
+          })
         })
-      })
+    }
   }
 }
 

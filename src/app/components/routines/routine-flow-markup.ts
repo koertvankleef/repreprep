@@ -44,7 +44,6 @@ function renderExerciseRow(
       data-sort-id="${escapeHtml(exercise.id)}"
       data-sort-label="${escapeHtml(exerciseName)}"
     >
-      ${row}
       <button
         class="rrr-sort-handle"
         type="button"
@@ -54,6 +53,7 @@ function renderExerciseRow(
       >
         <rrr-icon name="re-order-dots-vertical"></rrr-icon>
       </button>
+      ${row}
     </div>
   `
 }
@@ -118,6 +118,10 @@ export function renderRoutineFlowSequence(
 
 export function renderRoutineFlowControls(options: {
   addAction: string
+  addDisabled?: boolean
+  reorderAction: string
+  reorderAvailable: boolean
+  reorderEnabled: boolean
   transitionAction: string
   transitionSeconds: number
 }): string {
@@ -127,8 +131,19 @@ export function renderRoutineFlowControls(options: {
         activation="button"
         label="${t('label.addExercise')}"
         data-action="${escapeHtml(options.addAction)}"
+        ${options.addDisabled ? 'disabled' : ''}
       >
         <rrr-icon slot="leading" name="add"></rrr-icon>
+      </rrr-list-row>
+      <rrr-list-row
+        control="switch"
+        name="reorder-exercises"
+        label="${t('routineDetail.reorder.toggleLabel')}"
+        data-action="${escapeHtml(options.reorderAction)}"
+        ${options.reorderEnabled ? 'checked' : ''}
+        ${options.reorderAvailable ? '' : 'disabled'}
+      >
+        <rrr-icon slot="leading" name="arrow-sort"></rrr-icon>
       </rrr-list-row>
       <rrr-list-row
         activation="button"

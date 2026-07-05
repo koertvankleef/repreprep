@@ -421,6 +421,7 @@ export const enUsMessages = {
   'routineDetail.setCount.other': '{count} sets',
   'routineDetail.exercises.sequenceAria': 'Exercises and transition times',
   'routineDetail.reorder.handleAria': 'Move {exercise}. Press Space or Enter to start reordering.',
+  'routineDetail.reorder.toggleLabel': 'Reorder exercises',
   'routineDetail.reorder.lifted': '{exercise} picked up. Position {position} of {count}.',
   'routineDetail.reorder.moved': '{exercise} moved to position {position} of {count}.',
   'routineDetail.reorder.dropped': '{exercise} dropped at position {position} of {count}.',

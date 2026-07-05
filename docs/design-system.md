@@ -169,8 +169,9 @@ interactive color, and focus treatment communicate activation without implying
 navigation.
 
 Navigation and action rows use the icon accent color for their primary label to
-reinforce that they activate something. Selection controls and static rows keep
-the normal text color.
+reinforce that they activate something. Checkbox and switch rows receive the
+same treatment because their full row toggles the control. Radio choices and
+static rows keep the normal text color.
 
 Action rows accept the same semantic tones as buttons: `primary` (the default),
 `neutral`, `accent`, `info`, `success`, `warning`, and `danger`. A tone colors

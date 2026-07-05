@@ -439,18 +439,28 @@ describe('list structure primitives', () => {
     expect(secondRow.querySelector<HTMLInputElement>('input')?.tabIndex).toBe(-1)
   })
 
-  test('renders switch semantics and reflects its checked state', async () => {
+  test('renders switch and checkbox rows with interactive identity', async () => {
     document.body.innerHTML = `
       <rrr-list-row control="switch" name="wake-lock" label="Keep screen awake"></rrr-list-row>
+      <rrr-list-row control="checkbox" name="show-tips" label="Show tips"></rrr-list-row>
+      <rrr-list-row control="radio" name="theme" label="Dark"></rrr-list-row>
     `
     await Promise.resolve()
 
-    const row = document.querySelector<RrrListRow>('rrr-list-row')
-    const input = row?.querySelector<HTMLInputElement>('input')
+    const rows = Array.from(document.querySelectorAll<RrrListRow>('rrr-list-row'))
+    const switchRow = rows[0]
+    const switchInput = switchRow?.querySelector<HTMLInputElement>('input')
 
-    expect(input?.getAttribute('role')).toBe('switch')
-    input?.click()
-    expect(row?.checked).toBe(true)
+    expect(switchInput?.getAttribute('role')).toBe('switch')
+    expect(switchRow?.querySelector(':scope > label')?.classList)
+      .toContain('rrr-list-row__row--interactive')
+    expect(rows[1]?.querySelector(':scope > label')?.classList)
+      .toContain('rrr-list-row__row--interactive')
+    expect(rows[2]?.querySelector(':scope > label')?.classList)
+      .not.toContain('rrr-list-row__row--interactive')
+
+    switchInput?.click()
+    expect(switchRow?.checked).toBe(true)
   })
 
   test('preserves arbitrary row body content across light-DOM rerenders', async () => {
