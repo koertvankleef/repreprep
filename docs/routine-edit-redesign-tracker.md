@@ -282,7 +282,8 @@ native button activation without a navigation accessory.
 ## Reordering routine exercises
 
 Reordering is a transient editing mode, enabled by a `Reorder exercises`
-switch below Add exercise. The mode is off by default and is not persisted.
+switch above the exercise sequence. The mode is off by default and is not
+persisted.
 Normal mode keeps exercise rows available for sheet activation and future
 horizontal swipe deletion; reorder mode disables those interactions and shows
 dedicated handles at logical inline-start. Add exercise is disabled while the
@@ -293,13 +294,14 @@ Pointer behavior:
 - [x] Require the explicit reorder-mode switch before exposing handles.
 - [x] Place handles at logical inline-start.
 - [x] Disable exercise and gutter activation while reordering.
+- [x] Hide exercise configuration descriptions while reordering.
 - [x] Disable Add exercise while reordering.
 - [x] Begin sorting only from the drag handle.
 - [x] Use Pointer Events rather than native HTML drag-and-drop.
 - [ ] Preserve vertical scrolling until handle drag intent is established.
 - [x] Animate neighboring rows into prospective positions.
-- [x] Collapse gutters while sorting and re-derive them for the committed
-      order.
+- [x] Fade and collapse gutters when reorder mode starts, then re-derive them
+      for the committed order.
 - [x] Emit ordered routine-exercise IDs and commit immediately on drop.
 
 The first pointer implementation reserves touch gestures that begin on the
@@ -316,8 +318,9 @@ Keyboard behavior:
 
 Presentation:
 
-- [x] Temporarily collapse gutter content while preserving its spacing during
-      sorting.
+- [x] Animate gutters to zero opacity and height on entering reorder mode.
+- [x] Reveal gutters again on leaving reorder mode and on initial page layout.
+- [x] Run mode-entry motion once so saving a reorder does not replay it.
 - [x] Use the same positional movement at first/last without special drop
       affordances for the MVP.
 
@@ -433,6 +436,7 @@ structural routine version.
 - [x] Add a transient reorder-mode switch to create and detail flows.
 - [x] Hide handles and preserve normal row/gutter activation outside the mode.
 - [x] Place active reorder handles at logical inline-start.
+- [x] Collapse and reveal gutters at reorder-mode boundaries.
 - [x] Disable Add exercise while the mode is active.
 - [x] Implement pointer sorting from an explicit handle.
 - [x] Implement keyboard sorting and announcements.

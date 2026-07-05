@@ -107,10 +107,13 @@ describe('value-first property lists', () => {
       (section) => section.querySelector('[slot="heading"]')?.textContent === 'Flow',
     )
     const flowCard = flowSection?.querySelector<HTMLElement>(':scope > .rrr-card')
-    const timingCard = flowSection?.querySelector<HTMLElement>(
-      ':scope > .rrr-list-card',
+    const reorderCard = flowSection?.querySelector<HTMLElement>(
+      ':scope > .routine-flow-reorder-control',
     )
-    const timingRows = Array.from(timingCard?.querySelectorAll<HTMLElement>('rrr-list-row') ?? [])
+    const dataControls = flowSection?.querySelector<HTMLElement>(
+      ':scope > .routine-flow-data-controls',
+    )
+    const dataRows = Array.from(dataControls?.querySelectorAll<HTMLElement>('rrr-list-row') ?? [])
 
     expect(propertyList).not.toBeNull()
     expectSemanticPropertyRows(propertyList!)
@@ -126,17 +129,21 @@ describe('value-first property lists', () => {
     expect(exerciseSequence?.hasAttribute('sortable')).toBe(false)
     expect(exerciseSequence?.querySelector('[data-sort-handle]')).toBeNull()
     expect(exerciseSequence?.querySelector('rrr-sequence-gutter')).not.toBeNull()
-    expect(timingCard?.querySelector(
+    expect(dataControls?.querySelector(
       'rrr-list-row[data-action="edit-transition-default"]',
     )?.getAttribute('accessory')).toBe('value')
-    expect(timingCard?.querySelector(
+    expect(dataControls?.querySelector(
       'rrr-list-row[data-action="edit-transition-default"]',
     )?.getAttribute('description')).toBe('Default time between exercises')
-    expect(timingRows[0]?.dataset.action).toBe('add-routine-exercise')
-    expect(timingRows[1]?.dataset.action).toBe('toggle-reorder-exercises')
-    expect(timingRows[1]?.getAttribute('control')).toBe('switch')
-    expect(timingRows[1]?.hasAttribute('checked')).toBe(false)
-    expect(timingRows[2]?.dataset.action).toBe('edit-transition-default')
+    expect(reorderCard?.querySelector(
+      'rrr-list-row[data-action="toggle-reorder-exercises"]',
+    )?.getAttribute('control')).toBe('switch')
+    expect(dataRows[0]?.dataset.action).toBe('add-routine-exercise')
+    expect(dataRows[1]?.dataset.action).toBe('edit-transition-default')
+    expect(reorderCard!.compareDocumentPosition(flowCard!)
+      & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(flowCard!.compareDocumentPosition(dataControls!)
+      & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(flowCard?.querySelector(':scope > rrr-sequence')).toBe(exerciseSequence)
     expect(flowCard?.querySelector(':scope > .rrr-list-card')).toBeNull()
     expect(actionRow?.getAttribute('activation')).toBe('button')
@@ -410,8 +417,26 @@ describe('value-first property lists', () => {
     expect(sequence?.hasAttribute('sortable')).toBe(true)
     expect(firstSortableItem.firstElementChild).toBe(firstHandle)
     expect(firstExerciseRow?.hasAttribute('activation')).toBe(false)
+    expect(firstExerciseRow?.hasAttribute('description')).toBe(false)
     expect(detail.querySelector('rrr-sequence-gutter')?.hasAttribute('activation')).toBe(false)
     expect(addExercise?.hasAttribute('disabled')).toBe(true)
+    expect(sequence?.dataset.gutterMotion).toBe('collapse')
+    expect(sequence?.getAttribute('aria-busy')).toBe('true')
+
+    firstHandle.dispatchEvent(new KeyboardEvent('keydown', {
+      key: ' ',
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    }))
+    expect(sequence?.hasAttribute('data-sorting')).toBe(false)
+
+    detail.querySelector('rrr-sequence-gutter')?.dispatchEvent(
+      new Event('animationend', { bubbles: true }),
+    )
+    await Promise.resolve()
+
+    expect(sequence?.hasAttribute('aria-busy')).toBe(false)
     expect(document.activeElement).toBe(firstHandle)
     expect(firstHandle.getAttribute('aria-label')).toContain('Press Space')
 
@@ -453,6 +478,8 @@ describe('value-first property lists', () => {
       .toEqual([second.id, first.id])
     expect(firstGutter?.dataset.beforeExerciseId).toBe(first.id)
     expect(focusedHandle?.dataset.sortId).toBe(first.id)
+    expect(detail.querySelector('rrr-sequence')?.hasAttribute('data-gutter-motion'))
+      .toBe(false)
     expect(document.querySelector<HTMLElement>('[role="status"].sr-only')?.textContent)
       .toContain('dropped at position 2')
   })

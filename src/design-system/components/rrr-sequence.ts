@@ -39,6 +39,8 @@ type ActiveSort = {
 
 export class RrrSequence extends HTMLElement {
   private activeSort: ActiveSort | null = null
+  private gutterCollapsePending = false
+  private gutterMotionFallbackId: number | null = null
 
   private readonly observer = new MutationObserver(() => {
     this.syncSemantics()
@@ -55,7 +57,10 @@ export class RrrSequence extends HTMLElement {
     this.addEventListener('pointermove', this.handlePointerMove)
     this.addEventListener('pointerup', this.handlePointerUp)
     this.addEventListener('pointercancel', this.handlePointerCancel)
+    this.addEventListener('animationend', this.handleGutterMotionEnd)
+    this.addEventListener('animationcancel', this.handleGutterMotionEnd)
     this.syncSemantics()
+    this.initializeGutterMotion()
   }
 
   disconnectedCallback(): void {
@@ -65,7 +70,56 @@ export class RrrSequence extends HTMLElement {
     this.removeEventListener('pointermove', this.handlePointerMove)
     this.removeEventListener('pointerup', this.handlePointerUp)
     this.removeEventListener('pointercancel', this.handlePointerCancel)
+    this.removeEventListener('animationend', this.handleGutterMotionEnd)
+    this.removeEventListener('animationcancel', this.handleGutterMotionEnd)
+    if (this.gutterMotionFallbackId !== null) {
+      window.clearTimeout(this.gutterMotionFallbackId)
+      this.gutterMotionFallbackId = null
+    }
     this.activeSort = null
+  }
+
+  private initializeGutterMotion(): void {
+    if (this.dataset.gutterMotion !== 'collapse') {
+      return
+    }
+
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      queueMicrotask(() => this.finishGutterCollapse())
+      return
+    }
+
+    this.gutterCollapsePending = true
+    this.setAttribute('aria-busy', 'true')
+    this.gutterMotionFallbackId = window.setTimeout(
+      () => this.finishGutterCollapse(),
+      500,
+    )
+  }
+
+  private readonly handleGutterMotionEnd = (event: Event): void => {
+    if (
+      this.gutterCollapsePending
+      && event.target instanceof HTMLElement
+      && event.target.parentElement === this
+      && event.target.matches('rrr-sequence-gutter')
+    ) {
+      this.finishGutterCollapse()
+    }
+  }
+
+  private finishGutterCollapse(): void {
+    if (this.gutterMotionFallbackId !== null) {
+      window.clearTimeout(this.gutterMotionFallbackId)
+      this.gutterMotionFallbackId = null
+    }
+
+    this.gutterCollapsePending = false
+    this.removeAttribute('aria-busy')
+    this.dispatchEvent(new CustomEvent('rrr-sequence-reorder-ready', {
+      bubbles: true,
+      composed: true,
+    }))
   }
 
   private syncSemantics(): void {
@@ -77,7 +131,7 @@ export class RrrSequence extends HTMLElement {
   }
 
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
-    if (!this.hasAttribute('sortable')) {
+    if (!this.hasAttribute('sortable') || this.gutterCollapsePending) {
       return
     }
 
@@ -129,6 +183,7 @@ export class RrrSequence extends HTMLElement {
   private readonly handlePointerDown = (event: PointerEvent): void => {
     if (
       !this.hasAttribute('sortable')
+      || this.gutterCollapsePending
       || this.activeSort
       || event.button !== 0
       || event.isPrimary === false

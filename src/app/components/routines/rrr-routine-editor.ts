@@ -21,7 +21,9 @@ import {
 import { promptRoutineExerciseSettings } from './routine-exercise-sheets.ts'
 import {
   renderRoutineFlowControls,
+  renderRoutineReorderControl,
   renderRoutineFlowSequence,
+  type RoutineFlowGutterMotion,
 } from './routine-flow-markup.ts'
 import { announceRoutineFlowSort } from './routine-flow-sorting.ts'
 
@@ -90,6 +92,7 @@ export class RrrRoutineEditor extends HTMLElement {
   private renameSheetActive = false
   private timingSheetActive = false
   private reorderMode = false
+  private gutterMotion: RoutineFlowGutterMotion = 'reveal'
 
   connectedCallback(): void {
     this.bindListeners()
@@ -103,6 +106,7 @@ export class RrrRoutineEditor extends HTMLElement {
     this.transitionSeconds = RrrRoutineEditor.defaultTransitionSeconds
     this.exercises = []
     this.reorderMode = false
+    this.gutterMotion = 'reveal'
 
     this.render()
   }
@@ -445,16 +449,27 @@ export class RrrRoutineEditor extends HTMLElement {
     }
 
     this.reorderMode = nextMode
+    this.gutterMotion = nextMode ? 'collapse' : 'reveal'
     this.render()
 
-    queueMicrotask(() => {
-      const focusTarget = nextMode
+    const focusTarget = (): void => {
+      const target = nextMode
         ? this.querySelector<HTMLElement>('[data-sort-handle]')
         : this.querySelector<HTMLElement>(
             'rrr-list-row[data-action="toggle-reorder-exercises"]',
           )
-      focusTarget?.focus()
-    })
+      target?.focus()
+    }
+    const sequence = this.querySelector<HTMLElement>('rrr-sequence')
+    if (nextMode && sequence?.getAttribute('aria-busy') === 'true') {
+      sequence.addEventListener(
+        'rrr-sequence-reorder-ready',
+        () => focusTarget(),
+        { once: true },
+      )
+    } else {
+      queueMicrotask(focusTarget)
+    }
   }
 
   async openRenameSheet(): Promise<boolean> {
@@ -536,17 +551,32 @@ export class RrrRoutineEditor extends HTMLElement {
     if (this.reorderMode !== reorderEnabled) {
       this.reorderMode = reorderEnabled
     }
+    const gutterMotion = this.exercises.length > 1 ? this.gutterMotion : 'none'
+    const gutterMotionAttribute = gutterMotion === 'none'
+      ? ''
+      : `data-gutter-motion="${gutterMotion}"`
 
     this.innerHTML = `
       <section class="page">
         <p class="status-message">${t('routineEditor.status.default')}</p>
         <rrr-section>
           <span slot="heading">${t('routineDetail.section.flow')}</span>
+          ${this.exercises.length > 0
+            ? renderRoutineReorderControl({
+                action: 'toggle-reorder-exercises',
+                available: reorderAvailable,
+                enabled: reorderEnabled,
+              })
+            : ''}
           <div class="rrr-card">
             ${
     this.exercises.length > 0
       ? `
-                    <rrr-sequence ${reorderEnabled ? 'sortable' : ''} aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
+                    <rrr-sequence
+                      ${reorderEnabled ? 'sortable' : ''}
+                      ${gutterMotionAttribute}
+                      aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}"
+                    >
                       ${renderRoutineFlowSequence(
       {
         id: 'editor-preview',
@@ -558,6 +588,7 @@ export class RrrRoutineEditor extends HTMLElement {
       },
       {
         resolveExerciseName: (exerciseId) => this.resolveExerciseName(exerciseId),
+        showExerciseDescription: !reorderEnabled,
         exerciseInteractive: !reorderEnabled,
         transitionInteractive: !reorderEnabled,
         sortable: reorderEnabled,
@@ -571,9 +602,6 @@ export class RrrRoutineEditor extends HTMLElement {
           ${renderRoutineFlowControls({
     addAction: 'add-routine-exercise',
     addDisabled: reorderEnabled,
-    reorderAction: 'toggle-reorder-exercises',
-    reorderAvailable,
-    reorderEnabled,
     transitionAction: 'edit-transition-default',
     transitionSeconds: this.transitionSeconds,
   })}
@@ -590,6 +618,10 @@ export class RrrRoutineEditor extends HTMLElement {
         </rrr-section>
       </section>
     `
+
+    if (gutterMotion !== 'none' && this.isConnected) {
+      this.gutterMotion = 'none'
+    }
   }
 }
 

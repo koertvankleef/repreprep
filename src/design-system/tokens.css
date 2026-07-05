@@ -19,7 +19,7 @@
   --rrr-colors-serene-mint-10: oklch(95.26% 0.0284 184.51);
   --rrr-colors-serene-mint-20: oklch(87.59% 0.0456 187.50);
   --rrr-colors-serene-mint-30: oklch(79.92% 0.0660 192.20);
-  --rrr-colors-serene-mint-40: oklch(72.24% 0.0800 193.49);
+  --rrr-colors-serene-mint-40: oklch(72.24% 0.1100 193.49);
   --rrr-colors-serene-mint-50: oklch(64.57% 0.0942 196.48);
   --rrr-colors-serene-mint-60: oklch(56.90% 0.0962 199.47);
   --rrr-colors-serene-mint-70: oklch(45.90% 0.0814 197.32);
@@ -205,7 +205,7 @@
   --rrr-border-subtle: var(--rrr-colors-grayscale-30);
   --rrr-text-muted: var(--rrr-colors-grayscale-70);
 
-  --rrr-color-heading: var(--rrr-colors-serene-mint-70);
+  --rrr-color-heading: var(--rrr-color-primary-deep);
   --rrr-list-row-icon-color: var(--rrr-color-primary-deep);
 
   --rrr-font-family: 'Exo 2', system-ui, -apple-system, sans-serif;
@@ -214,7 +214,7 @@
 
 :root[data-theme='dark'] {
   --rrr-color-primary: var(--rrr-colors-serene-mint-60);
-  --rrr-color-primary-deep: var(--rrr-colors-serene-mint-50);
+  --rrr-color-primary-deep: var(--rrr-colors-serene-mint-40);
 
   --rrr-colors-grayscale-00: oklch(18.00% 0.0080 266.00);
   --rrr-colors-grayscale-10: oklch(21.00% 0.0090 264.00);
@@ -247,7 +247,6 @@
   --rrr-depth-2-shadow: 0 2px 4px #00000066, 0 1px 2px #0000004d;
   --rrr-depth-3-shadow: 0 4px 10px #0000007d, 0 2px 6px #00000052;
 
-  --rrr-color-heading: var(--rrr-colors-serene-mint-40);
   --rrr-list-row-icon-color: var(--rrr-colors-serene-mint-40);
 }
 

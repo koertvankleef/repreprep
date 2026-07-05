@@ -204,10 +204,19 @@ describe('rrr-routine-editor creation', () => {
     expect(editor.querySelector('rrr-sequence')?.hasAttribute('sortable')).toBe(true)
     expect(sortableItem?.firstElementChild).toBe(firstHandle)
     expect(reorderRow?.hasAttribute('activation')).toBe(false)
+    expect(reorderRow?.hasAttribute('description')).toBe(false)
     expect(editor.querySelector('rrr-sequence-gutter')?.hasAttribute('activation')).toBe(false)
     expect(editor.querySelector(
       'rrr-list-row[data-action="add-routine-exercise"]',
     )?.hasAttribute('disabled')).toBe(true)
+
+    expect(editor.querySelector<HTMLElement>('rrr-sequence')?.dataset.gutterMotion)
+      .toBe('collapse')
+    editor.querySelector('rrr-sequence-gutter')?.dispatchEvent(
+      new Event('animationend', { bubbles: true }),
+    )
+    await Promise.resolve()
+
     expect(document.activeElement).toBe(firstHandle)
 
     reorderRow?.click()
@@ -224,9 +233,14 @@ describe('rrr-routine-editor creation', () => {
     await Promise.resolve()
 
     expect(editor.querySelector('[data-sort-handle]')).toBeNull()
+    expect(editor.querySelector<HTMLElement>('rrr-sequence')?.dataset.gutterMotion)
+      .toBe('reveal')
     expect(editor.querySelector(
       `rrr-list-row[data-routine-exercise-id="${firstExerciseId}"]`,
     )?.getAttribute('activation')).toBe('button')
+    expect(editor.querySelector(
+      `rrr-list-row[data-routine-exercise-id="${firstExerciseId}"]`,
+    )?.hasAttribute('description')).toBe(true)
     expect(editor.querySelector(
       'rrr-list-row[data-action="add-routine-exercise"]',
     )?.hasAttribute('disabled')).toBe(false)

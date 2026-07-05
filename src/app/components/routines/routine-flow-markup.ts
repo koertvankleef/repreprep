@@ -6,8 +6,11 @@ import {
 import { t, tPlural } from '../../../i18n/index.ts'
 import { escapeHtml } from '../../render-helpers.ts'
 
+export type RoutineFlowGutterMotion = 'none' | 'reveal' | 'collapse'
+
 type FlowMarkupOptions = {
   resolveExerciseName: (exerciseId: string) => string
+  showExerciseDescription?: boolean
   exerciseInteractive?: boolean
   transitionInteractive?: boolean
   sortable?: boolean
@@ -16,6 +19,7 @@ type FlowMarkupOptions = {
 function renderExerciseRow(
   exercise: Extract<RoutineFlowItem, { kind: 'exercise' }>['exercise'],
   resolveExerciseName: (exerciseId: string) => string,
+  showDescription: boolean,
   interactive: boolean,
   sortable: boolean,
 ): string {
@@ -24,7 +28,9 @@ function renderExerciseRow(
     <rrr-list-row
       ${interactive ? 'activation="button"' : ''}
       label="${escapeHtml(exerciseName)}"
-      description="${escapeHtml(tPlural('routineDetail.setCount', exercise.setCount))}"
+      ${showDescription
+        ? `description="${escapeHtml(tPlural('routineDetail.setCount', exercise.setCount))}"`
+        : ''}
       data-routine-exercise-id="${escapeHtml(exercise.id)}"
     ></rrr-list-row>
   `
@@ -105,13 +111,20 @@ export function renderRoutineFlowSequence(
   options: FlowMarkupOptions,
 ): string {
   const resolveExerciseName = options.resolveExerciseName
+  const showExerciseDescription = options.showExerciseDescription ?? true
   const exerciseInteractive = options.exerciseInteractive ?? true
   const transitionInteractive = options.transitionInteractive ?? true
   const sortable = options.sortable ?? false
 
   return buildRoutineFlow(version)
     .map((item) => item.kind === 'exercise'
-      ? renderExerciseRow(item.exercise, resolveExerciseName, exerciseInteractive, sortable)
+      ? renderExerciseRow(
+          item.exercise,
+          resolveExerciseName,
+          showExerciseDescription,
+          exerciseInteractive,
+          sortable,
+        )
       : renderTransitionGutter(item, version, resolveExerciseName, transitionInteractive))
     .join('')
 }
@@ -119,14 +132,11 @@ export function renderRoutineFlowSequence(
 export function renderRoutineFlowControls(options: {
   addAction: string
   addDisabled?: boolean
-  reorderAction: string
-  reorderAvailable: boolean
-  reorderEnabled: boolean
   transitionAction: string
   transitionSeconds: number
 }): string {
   return `
-    <div class="rrr-list-card">
+    <div class="rrr-list-card routine-flow-data-controls">
       <rrr-list-row
         activation="button"
         label="${t('label.addExercise')}"
@@ -134,16 +144,6 @@ export function renderRoutineFlowControls(options: {
         ${options.addDisabled ? 'disabled' : ''}
       >
         <rrr-icon slot="leading" name="add"></rrr-icon>
-      </rrr-list-row>
-      <rrr-list-row
-        control="switch"
-        name="reorder-exercises"
-        label="${t('routineDetail.reorder.toggleLabel')}"
-        data-action="${escapeHtml(options.reorderAction)}"
-        ${options.reorderEnabled ? 'checked' : ''}
-        ${options.reorderAvailable ? '' : 'disabled'}
-      >
-        <rrr-icon slot="leading" name="arrow-sort"></rrr-icon>
       </rrr-list-row>
       <rrr-list-row
         activation="button"
@@ -157,6 +157,27 @@ export function renderRoutineFlowControls(options: {
         data-action="${escapeHtml(options.transitionAction)}"
       >
         <rrr-icon slot="leading" name="timer"></rrr-icon>
+      </rrr-list-row>
+    </div>
+  `
+}
+
+export function renderRoutineReorderControl(options: {
+  action: string
+  available: boolean
+  enabled: boolean
+}): string {
+  return `
+    <div class="rrr-list-card routine-flow-reorder-control">
+      <rrr-list-row
+        control="switch"
+        name="reorder-exercises"
+        label="${t('routineDetail.reorder.toggleLabel')}"
+        data-action="${escapeHtml(options.action)}"
+        ${options.enabled ? 'checked' : ''}
+        ${options.available ? '' : 'disabled'}
+      >
+        <rrr-icon slot="leading" name="arrow-sort"></rrr-icon>
       </rrr-list-row>
     </div>
   `

@@ -29,7 +29,9 @@ import {
 } from '../../render-helpers.ts'
 import {
   renderRoutineFlowControls,
+  renderRoutineReorderControl,
   renderRoutineFlowSequence,
+  type RoutineFlowGutterMotion,
 } from './routine-flow-markup.ts'
 import {
   promptRoutineTransitionDefault,
@@ -45,6 +47,7 @@ export class RrrRoutineDetail extends HTMLElement {
   private timingSheetActive = false
   private prefillSheetActive = false
   private reorderMode = false
+  private gutterMotion: RoutineFlowGutterMotion = 'reveal'
   private name = ''
 
   private readonly handleDataChanged = (): void => {
@@ -54,6 +57,7 @@ export class RrrRoutineDetail extends HTMLElement {
   set routineId(value: string | null) {
     if (value !== this.routineIdValue) {
       this.reorderMode = false
+      this.gutterMotion = 'reveal'
     }
     this.routineIdValue = value
     this.initialize()
@@ -78,6 +82,7 @@ export class RrrRoutineDetail extends HTMLElement {
 
   disconnectedCallback(): void {
     this.reorderMode = false
+    this.gutterMotion = 'reveal'
     window.removeEventListener('rrr-data-changed', this.handleDataChanged)
     this.removeEventListener(
       'rrr-sequence-reorder',
@@ -525,16 +530,27 @@ export class RrrRoutineDetail extends HTMLElement {
     }
 
     this.reorderMode = nextMode
+    this.gutterMotion = nextMode ? 'collapse' : 'reveal'
     this.render()
 
-    queueMicrotask(() => {
-      const focusTarget = nextMode
+    const focusTarget = (): void => {
+      const target = nextMode
         ? this.querySelector<HTMLElement>('[data-sort-handle]')
         : this.querySelector<HTMLElement>(
             'rrr-list-row[data-action="toggle-reorder-exercises"]',
           )
-      focusTarget?.focus()
-    })
+      target?.focus()
+    }
+    const sequence = this.querySelector<HTMLElement>('rrr-sequence')
+    if (nextMode && sequence?.getAttribute('aria-busy') === 'true') {
+      sequence.addEventListener(
+        'rrr-sequence-reorder-ready',
+        () => focusTarget(),
+        { once: true },
+      )
+    } else {
+      queueMicrotask(focusTarget)
+    }
   }
 
   private render(): void {
@@ -558,6 +574,10 @@ export class RrrRoutineDetail extends HTMLElement {
     if (this.reorderMode !== reorderEnabled) {
       this.reorderMode = reorderEnabled
     }
+    const gutterMotion = exerciseCount > 1 ? this.gutterMotion : 'none'
+    const gutterMotionAttribute = gutterMotion === 'none'
+      ? ''
+      : `data-gutter-motion="${gutterMotion}"`
     const primaryMuscles = summary.primaryMuscles.length > 0
       ? summary.primaryMuscles.map(getMuscleLabel).join(', ')
       : t('routineDetail.muscles.none')
@@ -610,14 +630,26 @@ export class RrrRoutineDetail extends HTMLElement {
 
         <rrr-section>
           <span slot="heading">${t('routineDetail.section.flow')}</span>
+          ${exerciseCount > 0
+            ? renderRoutineReorderControl({
+                action: 'toggle-reorder-exercises',
+                available: reorderAvailable,
+                enabled: reorderEnabled,
+              })
+            : ''}
           <div class="rrr-card">
             ${
               exerciseCount > 0
                 ? `
-                  <rrr-sequence ${reorderEnabled ? 'sortable' : ''} aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}">
+                  <rrr-sequence
+                    ${reorderEnabled ? 'sortable' : ''}
+                    ${gutterMotionAttribute}
+                    aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}"
+                  >
                     ${summary.version
     ? renderRoutineFlowSequence(summary.version, {
       resolveExerciseName: (exerciseId) => this.resolveExerciseName(exerciseId),
+      showExerciseDescription: !reorderEnabled,
       exerciseInteractive: !reorderEnabled,
       transitionInteractive: !reorderEnabled,
       sortable: reorderEnabled,
@@ -631,9 +663,6 @@ export class RrrRoutineDetail extends HTMLElement {
           ${renderRoutineFlowControls({
     addAction: 'add-routine-exercise',
     addDisabled: reorderEnabled,
-    reorderAction: 'toggle-reorder-exercises',
-    reorderAvailable,
-    reorderEnabled,
     transitionAction: 'edit-transition-default',
     transitionSeconds: summary.version?.transitionSeconds ?? 0,
   })}
@@ -662,6 +691,10 @@ export class RrrRoutineDetail extends HTMLElement {
 
       </section>
     `
+
+    if (gutterMotion !== 'none' && this.isConnected) {
+      this.gutterMotion = 'none'
+    }
 
     this.querySelector<HTMLElement>('rrr-list-row[data-action="start-workout"]')
       ?.addEventListener('click', () => this.startWorkout())

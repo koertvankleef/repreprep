@@ -59,14 +59,6 @@ rrr-sequence > :where(rrr-list-row, [data-sequence-item]) {
   outline-offset: calc(var(--global-focus-ring-width) * -1);
 }
 
-rrr-sequence[data-sorting] > rrr-sequence-gutter {
-  display: none;
-}
-
-rrr-sequence[data-sorting] {
-  row-gap: var(--rrr-sequence-gutter-min-block-size);
-}
-
 rrr-sequence[data-sorting] > [data-sort-id] {
   transition: opacity var(--rrr-transition-default);
 }
@@ -83,13 +75,56 @@ rrr-sequence[data-sorting] .rrr-sort-handle {
 
 rrr-sequence-gutter {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-rows: 1fr;
   min-block-size: var(--rrr-sequence-gutter-min-block-size);
   overflow: hidden;
+  opacity: 1;
   color: var(--rrr-sequence-gutter-color);
   text-align: center;
+}
+
+rrr-sequence[sortable] > rrr-sequence-gutter {
+  grid-template-rows: 0fr;
+  min-block-size: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+rrr-sequence[data-gutter-motion='collapse'] > rrr-sequence-gutter {
+  animation: rrr-sequence-gutter-collapse var(--rrr-transition-default) both;
+}
+
+rrr-sequence[data-gutter-motion='reveal'] > rrr-sequence-gutter {
+  animation: rrr-sequence-gutter-reveal var(--rrr-transition-default) both;
+}
+
+@keyframes rrr-sequence-gutter-collapse {
+  from {
+    grid-template-rows: 1fr;
+    min-block-size: var(--rrr-sequence-gutter-min-block-size);
+    opacity: 1;
+  }
+
+  to {
+    grid-template-rows: 0fr;
+    min-block-size: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes rrr-sequence-gutter-reveal {
+  from {
+    grid-template-rows: 0fr;
+    min-block-size: 0;
+    opacity: 0;
+  }
+
+  to {
+    grid-template-rows: 1fr;
+    min-block-size: var(--rrr-sequence-gutter-min-block-size);
+    opacity: 1;
+  }
 }
 
 .rrr-sequence-gutter__control {
@@ -98,6 +133,7 @@ rrr-sequence-gutter {
   justify-content: center;
   inline-size: 100%;
   min-block-size: inherit;
+  overflow: hidden;
   margin: 0;
   padding: 0;
   border: 0;
@@ -138,8 +174,12 @@ rrr-sequence-gutter {
   z-index: 1;
   display: inline-flex;
   align-items: center;
+  align-self: center;
+  justify-self: center;
   gap: var(--rrr-spacing-xs);
   max-inline-size: calc(100% - (2 * var(--rrr-spacing-m)));
+  min-block-size: 0;
+  overflow: hidden;
   padding: var(--rrr-spacing-2xs) var(--rrr-spacing-s);
   line-height: 1.2;
 }
@@ -173,5 +213,9 @@ rrr-sequence-gutter rrr-measurement {
 @media (prefers-reduced-motion: reduce) {
   rrr-sequence[data-sorting] > [data-sort-id] {
     transition: none;
+  }
+
+  rrr-sequence[data-gutter-motion] > rrr-sequence-gutter {
+    animation: none;
   }
 }
