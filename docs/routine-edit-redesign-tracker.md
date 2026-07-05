@@ -217,19 +217,6 @@ The sheet edits one occurrence, not the catalogue exercise.
 Transition timing remains edited through the gutter because it describes the
 relationship between two exercises, not the destination row alone.
 
-### Related workouts
-
-Routine detail may become the jump pad for executions of that routine.
-
-- Show recent workouts belonging to the routine.
-- Identify the selected prefill source.
-- Navigate to an individual workout's detail/edit page.
-- Offer “View all” when the recent list is intentionally limited.
-- Allow a completed workout to become or stop being the prefill source.
-
-This section can follow the core model and routine editing replacement; it does
-not block removal of targets.
-
 ### Workout completion
 
 The eventual completion/review experience provides an explicit “Use these
@@ -472,7 +459,6 @@ until editing historical logged values receives a separate product review.
 - [ ] Show selected-source state on workout detail/edit.
 - [x] Allow selecting any completed workout belonging to the routine.
 - [x] Add a clear/no-prefill action.
-- [ ] Add recent related workouts to routine detail when its design is ready.
 
 ### Phase 7 — Cleanup
 

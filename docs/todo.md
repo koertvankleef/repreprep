@@ -19,6 +19,12 @@ Use this file to capture product and prototype follow-up tasks that should not b
 - [ ] When the app loads incompatible local storage data, show a toast error message with a close button and proceed with a blank slate.
 - [ ] Non-MVP follow-up: allow the user one chance to download the data after having cleared it from storage.
 - [ ] Expand trust/history surfaces around existing import/export and history features so users can clearly review progress and feel ownership of their data.
+- [ ] Make routine detail a jump-off point for workouts executed from that
+      routine. Show a limited list of recent completed workouts, identify the
+      selected prefill source, allow navigation to an individual workout, and
+      offer “View all”. Consider allowing the user to select or clear the
+      prefill source from this context. Design this after reviewing workout
+      history/detail IxD, especially whether historical logs should be editable.
 - [ ] Enrich exercise definitions with metadata such as description and materials used. This is to help users choose the right exercise. This is not an instruction on how to do the exercise, we expect the user to look this info up elsewhere. It's purpose is simply that the user is able to choose the right exercise (like if they forgot the name).
 - [ ] Revisit workout progress rail UX: prefer article-scroll style position indicator with a marker over filled progress to improve glance readability and reduce visual distraction.
 - [ ] Prototype segmented workout rail where section ranges are encoded as mint/indigo zones that reflect workout structure.

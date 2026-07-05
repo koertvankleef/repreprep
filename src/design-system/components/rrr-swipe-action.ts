@@ -3,6 +3,7 @@ import { registerRrrIcon } from './rrr-icon.ts'
 
 const intentThreshold = 8
 const commitThreshold = 96
+const armedHapticDuration = 10
 const interactiveExclusionSelector = [
   '[data-no-swipe]',
   '[data-sort-handle]',
@@ -21,6 +22,7 @@ type PointerGesture = {
   startX: number
   startY: number
   locked: boolean
+  armedFeedbackGiven: boolean
 }
 
 export class RrrSwipeAction extends HTMLElement {
@@ -136,6 +138,7 @@ export class RrrSwipeAction extends HTMLElement {
       startX: event.clientX,
       startY: event.clientY,
       locked: false,
+      armedFeedbackGiven: false,
     }
   }
 
@@ -179,6 +182,10 @@ export class RrrSwipeAction extends HTMLElement {
       this.getMaximumDistance(),
     )
     const armed = distance >= this.getCommitThreshold()
+    if (armed && !gesture.armedFeedbackGiven) {
+      gesture.armedFeedbackGiven = true
+      navigator.vibrate?.(armedHapticDuration)
+    }
     this.dataset.swipeState = armed ? 'armed' : 'revealing'
     this.style.setProperty(
       '--rrr-swipe-action-translate',

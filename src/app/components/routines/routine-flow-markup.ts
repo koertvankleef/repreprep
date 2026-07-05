@@ -154,6 +154,7 @@ export function renderRoutineFlowControls(options: {
   addDisabled?: boolean
   transitionAction: string
   transitionSeconds: number
+  prefillSourceLabel?: string
 }): string {
   return `
     <div class="rrr-list-card routine-flow-data-controls">
@@ -178,6 +179,20 @@ export function renderRoutineFlowControls(options: {
       >
         <rrr-icon slot="leading" name="timer"></rrr-icon>
       </rrr-list-row>
+      ${options.prefillSourceLabel === undefined
+        ? ''
+        : `
+          <rrr-list-row
+            activation="button"
+            label="${t('routineDetail.prefill.label')}"
+            description="${t('routineDetail.prefill.description')}"
+            value-text="${escapeHtml(options.prefillSourceLabel)}"
+            accessory="value"
+            data-action="edit-prefill-source"
+          >
+            <rrr-icon slot="leading" name="arrow-repeat-1"></rrr-icon>
+          </rrr-list-row>
+        `}
     </div>
   `
 }

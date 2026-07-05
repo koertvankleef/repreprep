@@ -654,21 +654,6 @@ export class RrrRoutineDetail extends HTMLElement {
         </rrr-section>
 
         <rrr-section>
-          <span slot="heading">${t('routineDetail.section.nextWorkout')}</span>
-          <div class="rrr-list-card">
-            <rrr-list-row
-              activation="button"
-              label="${t('routineDetail.prefill.label')}"
-              value-text="${escapeHtml(prefillSourceLabel)}"
-              accessory="value"
-              data-action="edit-prefill-source"
-            >
-              <rrr-icon slot="leading" name="arrow-repeat-1"></rrr-icon>
-            </rrr-list-row>
-          </div>
-        </rrr-section>
-
-        <rrr-section>
           <span slot="heading">${t('routineDetail.section.flow')}</span>
           ${exerciseCount > 0
             ? renderRoutineReorderControl({
@@ -706,6 +691,7 @@ export class RrrRoutineDetail extends HTMLElement {
     addDisabled: reorderEnabled,
     transitionAction: 'edit-transition-default',
     transitionSeconds: summary.version?.transitionSeconds ?? 0,
+    prefillSourceLabel,
   })}
         </rrr-section>
 

@@ -95,6 +95,11 @@ describe('list structure primitives', () => {
   })
 
   test('locks swipe actions only after horizontal intent and commits when armed', async () => {
+    const vibrate = vi.fn()
+    Object.defineProperty(navigator, 'vibrate', {
+      configurable: true,
+      value: vibrate,
+    })
     document.body.innerHTML = `
       <rrr-swipe-action
         action="delete"
@@ -203,10 +208,19 @@ describe('list structure primitives', () => {
     }))
 
     expect(swipeAction.dataset.swipeState).toBe('armed')
+    expect(vibrate).toHaveBeenCalledOnce()
+    expect(vibrate).toHaveBeenCalledWith(10)
+
+    swipeAction.dispatchEvent(pointerEvent('pointermove', {
+      pointerId: 3,
+      clientX: 145,
+      clientY: 22,
+    }))
+    expect(vibrate).toHaveBeenCalledOnce()
 
     swipeAction.dispatchEvent(pointerEvent('pointerup', {
       pointerId: 3,
-      clientX: 154,
+      clientX: 145,
       clientY: 22,
     }))
 
