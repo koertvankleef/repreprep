@@ -21,6 +21,9 @@ import type {
   SequenceReorderDetail,
   SequenceSortStatusDetail,
 } from '../../../design-system/components/rrr-sequence.ts'
+import type {
+  SwipeActionCommitDetail,
+} from '../../../design-system/components/rrr-swipe-action.ts'
 import {
   escapeHtml,
   formatShortDate,
@@ -77,6 +80,10 @@ export class RrrRoutineDetail extends HTMLElement {
       'rrr-sequence-sort-status',
       this.handleSequenceSortStatus as EventListener,
     )
+    this.addEventListener(
+      'rrr-swipe-action-commit',
+      this.handleSwipeActionCommit as EventListener,
+    )
     this.initialize()
   }
 
@@ -91,6 +98,10 @@ export class RrrRoutineDetail extends HTMLElement {
     this.removeEventListener(
       'rrr-sequence-sort-status',
       this.handleSequenceSortStatus as EventListener,
+    )
+    this.removeEventListener(
+      'rrr-swipe-action-commit',
+      this.handleSwipeActionCommit as EventListener,
     )
   }
 
@@ -130,6 +141,35 @@ export class RrrRoutineDetail extends HTMLElement {
           ?.focus()
       })
     }
+  }
+
+  private readonly handleSwipeActionCommit = (
+    event: CustomEvent<SwipeActionCommitDetail>,
+  ): void => {
+    if (this.reorderMode || event.detail.action !== 'delete') {
+      return
+    }
+
+    const target = event.target
+    const routineExerciseId = target instanceof HTMLElement
+      ? target.dataset.swipeRoutineExerciseId
+      : undefined
+    if (!routineExerciseId) {
+      return
+    }
+
+    const current = this.getCurrentRoutineVersion()
+    if (!current || !current.version.exercises.some(
+      (exercise) => exercise.id === routineExerciseId,
+    )) {
+      return
+    }
+
+    this.saveRoutineVersion(current.routine, current.version, {
+      exercises: current.version.exercises.filter(
+        (exercise) => exercise.id !== routineExerciseId,
+      ),
+    })
   }
 
   private initialize(): void {
@@ -653,6 +693,7 @@ export class RrrRoutineDetail extends HTMLElement {
       exerciseInteractive: !reorderEnabled,
       transitionInteractive: !reorderEnabled,
       sortable: reorderEnabled,
+      swipeable: !reorderEnabled,
     })
     : ''}
                   </rrr-sequence>

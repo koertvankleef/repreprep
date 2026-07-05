@@ -190,7 +190,15 @@ describe('list structure primitives', () => {
     }))
     swipeAction.dispatchEvent(pointerEvent('pointermove', {
       pointerId: 3,
-      clientX: 120,
+      clientX: 155,
+      clientY: 22,
+    }))
+
+    expect(swipeAction.dataset.swipeState).toBe('revealing')
+
+    swipeAction.dispatchEvent(pointerEvent('pointermove', {
+      pointerId: 3,
+      clientX: 154,
       clientY: 22,
     }))
 
@@ -198,7 +206,7 @@ describe('list structure primitives', () => {
 
     swipeAction.dispatchEvent(pointerEvent('pointerup', {
       pointerId: 3,
-      clientX: 120,
+      clientX: 154,
       clientY: 22,
     }))
 

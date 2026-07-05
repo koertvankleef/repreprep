@@ -8,7 +8,7 @@ rrr-sequence {
   min-inline-size: 0;
 }
 
-rrr-sequence > :where(rrr-list-row, [data-sequence-item]) {
+rrr-sequence > :where(rrr-list-row, rrr-swipe-action, [data-sequence-item]) {
   overflow: hidden;
   border: var(--rrr-border-width) solid var(--rrr-sequence-row-border-color);
   border-radius: var(--rrr-sequence-row-border-radius);

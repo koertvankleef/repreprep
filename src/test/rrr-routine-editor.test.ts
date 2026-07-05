@@ -162,6 +162,40 @@ describe('rrr-routine-editor creation', () => {
     )?.getAttribute('description')).toBe('4 sets')
   })
 
+  test('deletes an exercise from the local draft when swipe commits', async () => {
+    const sourceVersion = storageService.getData().routineVersions[0]!
+    const editor = new RrrRoutineEditor()
+    document.body.append(editor)
+
+    const draftEditor = editor as unknown as {
+      exercises: RoutineExercise[]
+      render: () => void
+    }
+    draftEditor.exercises = sourceVersion.exercises.slice(0, 2).map(
+      (exercise) => ({ ...exercise }),
+    )
+    draftEditor.render()
+    await Promise.resolve()
+
+    const removedExercise = draftEditor.exercises[0]!
+    const swipeAction = editor.querySelector<HTMLElement>(
+      `rrr-swipe-action[data-swipe-routine-exercise-id="${removedExercise.id}"]`,
+    )!
+
+    expect(swipeAction.getAttribute('action-label')).toContain('Delete ')
+    swipeAction.dispatchEvent(new CustomEvent('rrr-swipe-action-commit', {
+      bubbles: true,
+      composed: true,
+      detail: { action: 'delete' },
+    }))
+
+    expect(draftEditor.exercises.some(({ id }) => id === removedExercise.id)).toBe(false)
+    expect(editor.querySelector(
+      `rrr-swipe-action[data-swipe-routine-exercise-id="${removedExercise.id}"]`,
+    )).toBeNull()
+    expect(document.querySelector('rrr-sheet')).toBeNull()
+  })
+
   test('uses an explicit reorder mode for the local routine draft', async () => {
     const sourceVersion = storageService.getData().routineVersions[0]!
     const editor = new RrrRoutineEditor()
@@ -202,6 +236,7 @@ describe('rrr-routine-editor creation', () => {
     )
 
     expect(editor.querySelector('rrr-sequence')?.hasAttribute('sortable')).toBe(true)
+    expect(editor.querySelector('rrr-swipe-action')).toBeNull()
     expect(sortableItem?.firstElementChild).toBe(firstHandle)
     expect(reorderRow?.hasAttribute('activation')).toBe(false)
     expect(reorderRow?.hasAttribute('description')).toBe(false)

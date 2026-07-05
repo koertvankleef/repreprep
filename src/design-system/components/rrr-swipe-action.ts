@@ -2,6 +2,7 @@ import { defineCustomElementOnce } from './shared.ts'
 import { registerRrrIcon } from './rrr-icon.ts'
 
 const intentThreshold = 8
+const commitThreshold = 96
 const interactiveExclusionSelector = [
   '[data-no-swipe]',
   '[data-sort-handle]',
@@ -253,8 +254,7 @@ export class RrrSwipeAction extends HTMLElement {
   }
 
   private getCommitThreshold(): number {
-    const width = this.getBoundingClientRect().width
-    return Math.min(Math.max(width * 0.35, 64), 120)
+    return commitThreshold
   }
 
   private getMaximumDistance(): number {

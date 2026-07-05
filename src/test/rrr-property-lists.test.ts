@@ -278,6 +278,38 @@ describe('value-first property lists', () => {
     expect(updatedVersion.exercises.some(({ id }) => id === routineExercise.id)).toBe(false)
   })
 
+  test('deletes a routine exercise immediately when swipe commits', async () => {
+    const data = storageService.getData()
+    const routine = data.routines[0]!
+    const previousVersionId = routine.activeVersionId
+    const version = data.routineVersions.find(({ id }) => id === previousVersionId)!
+    const routineExercise = version.exercises[0]!
+    const detail = new RrrRoutineDetail()
+    detail.routineId = routine.id
+    document.body.append(detail)
+    await Promise.resolve()
+
+    const swipeAction = detail.querySelector<HTMLElement>(
+      `rrr-swipe-action[data-swipe-routine-exercise-id="${routineExercise.id}"]`,
+    )!
+    swipeAction.dispatchEvent(new CustomEvent('rrr-swipe-action-commit', {
+      bubbles: true,
+      composed: true,
+      detail: { action: 'delete' },
+    }))
+
+    const updatedRoutine = storageService.getData().routines.find(
+      ({ id }) => id === routine.id,
+    )!
+    const updatedVersion = storageService.getData().routineVersions.find(
+      ({ id }) => id === updatedRoutine.activeVersionId,
+    )!
+
+    expect(updatedRoutine.activeVersionId).not.toBe(previousVersionId)
+    expect(updatedVersion.exercises.some(({ id }) => id === routineExercise.id)).toBe(false)
+    expect(document.querySelector('rrr-sheet')).toBeNull()
+  })
+
   test('edits the routine transition default and saves a new active version', async () => {
     const routine = storageService.getData().routines[0]!
     const previousVersionId = routine.activeVersionId

@@ -14,6 +14,7 @@ type FlowMarkupOptions = {
   exerciseInteractive?: boolean
   transitionInteractive?: boolean
   sortable?: boolean
+  swipeable?: boolean
 }
 
 function renderExerciseRow(
@@ -22,6 +23,7 @@ function renderExerciseRow(
   showDescription: boolean,
   interactive: boolean,
   sortable: boolean,
+  swipeable: boolean,
 ): string {
   const exerciseName = resolveExerciseName(exercise.exerciseId)
   const row = `
@@ -34,6 +36,22 @@ function renderExerciseRow(
       data-routine-exercise-id="${escapeHtml(exercise.id)}"
     ></rrr-list-row>
   `
+
+  if (swipeable && !sortable) {
+    return `
+      <rrr-swipe-action
+        action="delete"
+        action-label="${escapeHtml(t('routineExercise.swipe.delete', {
+          exercise: exerciseName,
+        }))}"
+        direction="end-to-start"
+        tone="danger"
+        data-swipe-routine-exercise-id="${escapeHtml(exercise.id)}"
+      >
+        ${row}
+      </rrr-swipe-action>
+    `
+  }
 
   if (!sortable) {
     return row
@@ -115,6 +133,7 @@ export function renderRoutineFlowSequence(
   const exerciseInteractive = options.exerciseInteractive ?? true
   const transitionInteractive = options.transitionInteractive ?? true
   const sortable = options.sortable ?? false
+  const swipeable = options.swipeable ?? false
 
   return buildRoutineFlow(version)
     .map((item) => item.kind === 'exercise'
@@ -124,6 +143,7 @@ export function renderRoutineFlowSequence(
           showExerciseDescription,
           exerciseInteractive,
           sortable,
+          swipeable,
         )
       : renderTransitionGutter(item, version, resolveExerciseName, transitionInteractive))
     .join('')

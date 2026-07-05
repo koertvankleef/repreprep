@@ -2,10 +2,9 @@
 .rrr-property-row {
   box-sizing: border-box;
   inline-size: 100%;
-  min-block-size: var(--rrr-row-min-block-size, var(--rrr-sizes-grid-7));
+  min-block-size: var(--rrr-row-min-block-size, var(--rrr-sizes-grid-6));
   margin: 0;
-  padding: var(--rrr-row-padding-block, var(--rrr-spacing-m))
-    var(--rrr-row-padding-inline, var(--rrr-spacing-m));
+  padding: var(--rrr-spacing-s) var(--rrr-spacing-m);
   border: 0;
   border-radius: 0;
   background: var(--rrr-row-background);

@@ -10,6 +10,9 @@ import type {
   SequenceReorderDetail,
   SequenceSortStatusDetail,
 } from '../../../design-system/components/rrr-sequence.ts'
+import type {
+  SwipeActionCommitDetail,
+} from '../../../design-system/components/rrr-swipe-action.ts'
 import { escapeHtml } from '../../render-helpers.ts'
 import { confirmSheet } from '../../../utils/sheet-service.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
@@ -205,6 +208,27 @@ export class RrrRoutineEditor extends HTMLElement {
             ?.focus()
         })
       }
+    })
+    this.addEventListener('rrr-swipe-action-commit', (event) => {
+      if (
+        this.reorderMode
+        || (event as CustomEvent<SwipeActionCommitDetail>).detail.action !== 'delete'
+      ) {
+        return
+      }
+
+      const target = event.target
+      const routineExerciseId = target instanceof HTMLElement
+        ? target.dataset.swipeRoutineExerciseId
+        : undefined
+      if (!routineExerciseId) {
+        return
+      }
+
+      this.exercises = this.exercises.filter(
+        (exercise) => exercise.id !== routineExerciseId,
+      )
+      this.render()
     })
     this.addEventListener('change', (event) => {
       const reorderControl = event
@@ -592,6 +616,7 @@ export class RrrRoutineEditor extends HTMLElement {
         exerciseInteractive: !reorderEnabled,
         transitionInteractive: !reorderEnabled,
         sortable: reorderEnabled,
+        swipeable: !reorderEnabled,
       },
     )}
                     </rrr-sequence>

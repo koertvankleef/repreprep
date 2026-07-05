@@ -457,6 +457,7 @@ export const enUsMessages = {
 
   'routineExercise.sheet.heading': 'Edit {exercise}',
   'routineExercise.sheet.delete': 'Delete exercise',
+  'routineExercise.swipe.delete': 'Delete {exercise}',
   'routineExercise.dialog.delete.title': 'Delete {exercise}?',
   'routineExercise.dialog.delete.message': 'This removes the exercise from this routine and cannot be undone.',
   'routineExercise.setCount.label': 'Number of sets',

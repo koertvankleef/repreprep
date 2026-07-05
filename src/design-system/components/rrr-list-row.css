@@ -14,9 +14,9 @@ rrr-list-row {
   --rrr-list-row-tone-color: var(--rrr-list-row-tone-primary-color);
   --rrr-list-row-tone-mix-color: var(--rrr-color-primary-mix);
   --rrr-list-row-background-hover: color-mix(in oklab, var(--rrr-list-row-tone-mix-color), var(--rrr-surface-raised) 85%);
-  --rrr-list-row-min-block-size: var(--rrr-sizes-grid-7);
-  --rrr-list-row-padding-block: var(--rrr-spacing-m);
-  --rrr-list-row-padding-inline: var(--rrr-spacing-m);
+  --rrr-list-row-min-block-size: var(--rrr-sizes-grid-6);
+  --rrr-list-row-padding-block: var(--rrr-spacing-s) var(--rrr-spacing-m);
+  --rrr-list-row-padding-inline: var(--rrr-spacing-s) var(--rrr-spacing-m);
   --rrr-list-row-gap: var(--rrr-spacing-m);
   --rrr-list-row-transition: var(--rrr-transition-default);
   --rrr-row-background: var(--rrr-list-row-background);

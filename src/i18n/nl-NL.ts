@@ -457,6 +457,7 @@ export const nlNlMessages = {
 
   'routineExercise.sheet.heading': '{exercise} bewerken',
   'routineExercise.sheet.delete': 'Oefening verwijderen',
+  'routineExercise.swipe.delete': '{exercise} verwijderen',
   'routineExercise.dialog.delete.title': '{exercise} verwijderen?',
   'routineExercise.dialog.delete.message': 'Dit verwijdert de oefening uit deze routine en kan niet ongedaan worden gemaakt.',
   'routineExercise.setCount.label': 'Aantal sets',

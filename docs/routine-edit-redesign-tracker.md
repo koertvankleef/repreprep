@@ -367,7 +367,7 @@ Interaction requirements:
 - [x] Close a revealed row when another row begins interaction.
 - [x] Keep the action backed by a real localized button.
 - [x] Provide sheet and desktop deletion paths that require no gesture.
-- [ ] Commit without confirmation or Undo.
+- [x] Commit without confirmation or Undo.
 - [x] Preserve state feedback in reduced-motion mode.
 
 Deferred:
@@ -452,7 +452,7 @@ structural routine version.
 - [x] Keep swipe gesture deletion as a required milestone after shipping
   non-gesture deletion.
 - [x] Implement the swipe decorator and Outlook-like state progression.
-- [ ] Integrate immediate exercise deletion.
+- [x] Integrate immediate exercise deletion.
 - [x] Add explicit desktop and sheet deletion actions.
 - [ ] Test touch scrolling, hybrid input, pointer cancellation, and reduced
       motion.
