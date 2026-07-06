@@ -242,8 +242,6 @@ export const nlNlMessages = {
   'exercise.search.label': 'Oefeningen zoeken',
   'exercise.search.placeholder': 'Zoek op naam, spiergroep, materiaal of categorie',
   'routineExercisePicker.addAria': 'Voeg {exercise} toe',
-  'routineExercisePicker.results.one': '{count} oefening gevonden',
-  'routineExercisePicker.results.other': '{count} oefeningen gevonden',
   'routineExercisePicker.exerciseAdded': '{exercise} toegevoegd',
   'exercise.filter.open': 'Oefeningen filteren',
   'exercise.filter.openActive': 'Oefeningen filteren, filters actief',
@@ -468,7 +466,7 @@ export const nlNlMessages = {
   'routineExercise.setCount.label': 'Aantal sets',
   'routineExercise.rest.sheet.seconds': 'Seconden rust tussen sets',
 
-  'routineEditor.status.default': 'Definieer een routinestructuur en sla die op als herbruikbare template.',
+  'routineEditor.status.default': 'Definieer een routinestructuur en sla die op als herbruikbare template. Veeg naar links op een oefening om die te verwijderen.',
   'routineEditor.autoName.comboPattern': '{nato} {geographic}',
   'routineEditor.exercises.empty': 'Nog geen oefeningen toegevoegd.',
   'routineEditor.exercises.unknown': 'Onbekende oefening',

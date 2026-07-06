@@ -46,7 +46,7 @@ beforeEach(() => {
 })
 
 describe('routine exercise picker', () => {
-  specIt('renders exercises alphabetically and narrows the list without replacing search focus', ['PICKER-SRCH-001', 'PICKER-SRCH-002', 'PICKER-SRCH-003'], async () => {
+  specIt('renders exercises alphabetically and narrows the list without replacing search focus', ['PICKER-SRCH-001', 'PICKER-SRCH-002'], async () => {
     const exercises = createDefaultData().exercises.slice(0, 8).reverse()
     const picker = new RrrRoutineExercisePicker()
     picker.exercises = exercises
@@ -86,8 +86,7 @@ describe('routine exercise picker', () => {
     expect(filteredRows.map((row) => row.dataset.exerciseId))
       .toEqual(expectedMatches.map((exercise) => exercise.id))
     expect(getDeepActiveElement()).toBe(internalInput)
-    expect(picker.querySelector('[data-picker-status]')?.textContent)
-      .toBe(`${expectedMatches.length} exercises found`)
+    expect(picker.querySelector('[data-picker-status]')).toBeNull()
   })
 
   specIt('uses the complete row as an accessible Add action and reports selection', ['PICKER-ADD-001', 'PICKER-ADD-002', 'PICKER-ADD-003'], async () => {

@@ -2,7 +2,7 @@ import { searchExercises, type ExerciseFilters } from '../../../domain/exercise-
 import { equipmentValues, exerciseCategories } from '../../../domain/exercise-metadata.ts'
 import type { Equipment, ExerciseCategory, ExerciseDefinition } from '../../../domain/types.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
-import { getLocale, t, tPlural } from '../../../i18n/index.ts'
+import { getLocale, t } from '../../../i18n/index.ts'
 import { presentSheet } from '../../../foundation/sheet-service.ts'
 import { toastService } from '../../../foundation/toast.ts'
 import { getEquipmentLabel, getExerciseCategoryLabel } from '../../exercise-labels.ts'
@@ -141,13 +141,6 @@ export class RrrRoutineExercisePicker extends HTMLElement {
         ${this.renderFilterTrigger()}
       </div>
       <div class="routine-exercise-picker-results" data-picker-results></div>
-      <p
-        class="sr-only"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        data-picker-status
-      ></p>
     `
     this.syncFilterTrigger()
     this.renderResults()
@@ -190,8 +183,7 @@ export class RrrRoutineExercisePicker extends HTMLElement {
 
   private renderResults(): void {
     const results = this.querySelector<HTMLElement>('[data-picker-results]')
-    const status = this.querySelector<HTMLElement>('[data-picker-status]')
-    if (!results || !status) {
+    if (!results) {
       return
     }
 
@@ -208,7 +200,6 @@ export class RrrRoutineExercisePicker extends HTMLElement {
           </div>
         `
       : `<p class="routine-exercise-picker-empty">${escapeHtml(t('exercise.list.empty'))}</p>`
-    status.textContent = tPlural('routineExercisePicker.results', exercises.length)
   }
 
   private renderExerciseRow(exercise: ExerciseDefinition): string {

@@ -114,6 +114,12 @@ describe('value-first property lists', () => {
     const flowSection = Array.from(sections).find(
       (section) => section.querySelector('[slot="heading"]')?.textContent === 'Flow',
     )
+    const actionSection = Array.from(sections).find(
+      (section) => section.querySelector('[slot="heading"]')?.textContent === 'Actions',
+    )
+    const overviewSection = Array.from(sections).find(
+      (section) => section.querySelector('[slot="heading"]')?.textContent === 'Overview',
+    )
     const flowCard = flowSection?.querySelector<HTMLElement>(':scope > .rrr-card')
     const reorderCard = flowSection?.querySelector<HTMLElement>(
       ':scope > .routine-flow-reorder-control',
@@ -131,6 +137,15 @@ describe('value-first property lists', () => {
     expect(Array.from(sections)
       .some((section) => section.querySelector('[slot="heading"]')?.textContent === 'Data'))
       .toBe(false)
+    expect(detail.querySelector('.status-message')?.textContent)
+      .toContain('Swipe left on an exercise to delete it.')
+    expect(flowSection).not.toBeUndefined()
+    expect(actionSection).not.toBeUndefined()
+    expect(overviewSection).not.toBeUndefined()
+    expect(flowSection!.compareDocumentPosition(actionSection!)
+      & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(actionSection!.compareDocumentPosition(overviewSection!)
+      & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(firstExerciseRow?.getAttribute('activation')).toBe('button')
     expect(firstExerciseRow?.hasAttribute('href')).toBe(false)
     expect(firstExerciseRow?.hasAttribute('accessory')).toBe(false)

@@ -242,8 +242,6 @@ export const enUsMessages = {
   'exercise.search.label': 'Search exercises',
   'exercise.search.placeholder': 'Search by name, muscle, equipment, or category',
   'routineExercisePicker.addAria': 'Add {exercise}',
-  'routineExercisePicker.results.one': '{count} exercise found',
-  'routineExercisePicker.results.other': '{count} exercises found',
   'routineExercisePicker.exerciseAdded': '{exercise} added',
   'exercise.filter.open': 'Filter exercises',
   'exercise.filter.openActive': 'Filter exercises, filters active',
@@ -468,7 +466,7 @@ export const enUsMessages = {
   'routineExercise.setCount.label': 'Number of sets',
   'routineExercise.rest.sheet.seconds': 'Seconds of rest between sets',
 
-  'routineEditor.status.default': 'Define a routine structure, then save it as a reusable template.',
+  'routineEditor.status.default': 'Define a routine structure, then save it as a reusable template. Swipe left on an exercise to delete it.',
   'routineEditor.autoName.comboPattern': '{nato} {geographic}',
   'routineEditor.exercises.empty': 'No exercises added yet.',
   'routineEditor.exercises.unknown': 'Unknown exercise',

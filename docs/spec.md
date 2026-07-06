@@ -93,10 +93,8 @@ explicitly dismisses it.
 
 All active exercises are displayed in alphabetical order [PICKER-SRCH-001].
 Typing in the search field immediately narrows the visible list without moving
-focus away from the search field [PICKER-SRCH-002]. A live count of matching
-exercises is announced to assistive technology [PICKER-SRCH-003]. When no
-exercises match the current search, a clear empty state is shown
-[PICKER-SRCH-004].
+focus away from the search field [PICKER-SRCH-002]. When no exercises match
+the current search, a clear empty state is shown [PICKER-SRCH-004].
 
 ## 2.2 Adding an exercise
 

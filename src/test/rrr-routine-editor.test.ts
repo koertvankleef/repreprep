@@ -65,6 +65,8 @@ describe('rrr-routine-editor creation', () => {
       .filter((node) => node.textContent?.includes('No exercises added yet.'))
 
     expect(emptyMentions).toHaveLength(1)
+    expect(editor.querySelector('.status-message')?.textContent)
+      .toContain('Swipe left on an exercise to delete it.')
     expect(editor.querySelector('[data-action="back"]')).toBeNull()
     expect(editor.querySelector('rrr-list-row[data-action="create-routine"]')).not.toBeNull()
     expect(editor.querySelector(

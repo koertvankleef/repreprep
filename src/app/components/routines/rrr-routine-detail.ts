@@ -611,21 +611,8 @@ export class RrrRoutineDetail extends HTMLElement {
 
     this.innerHTML = `
       <section class="page">
+        <p class="status-message">${t('routineEditor.status.default')}</p>
         ${summary.routine.description ? `<p>${escapeHtml(summary.routine.description)}</p>` : ''}
-
-        <rrr-section>
-          <span slot="heading">${t('routineDetail.section.overview')}</span>
-          <dl class="rrr-property-list">
-            ${renderPropertyRow({
-              label: t('routineDetail.muscles.label'),
-              textValue: primaryMuscles,
-            })}
-            ${renderPropertyRow({
-              label: t('routineDetail.lastStarted.label'),
-              textValue: lastStarted,
-            })}
-          </dl>
-        </rrr-section>
 
         <rrr-section>
           <span slot="heading">${t('routineDetail.section.flow')}</span>
@@ -688,6 +675,20 @@ export class RrrRoutineDetail extends HTMLElement {
               <rrr-icon slot="leading" name="delete"></rrr-icon>
             </rrr-list-row>
           </div>
+        </rrr-section>
+
+        <rrr-section>
+          <span slot="heading">${t('routineDetail.section.overview')}</span>
+          <dl class="rrr-property-list">
+            ${renderPropertyRow({
+              label: t('routineDetail.muscles.label'),
+              textValue: primaryMuscles,
+            })}
+            ${renderPropertyRow({
+              label: t('routineDetail.lastStarted.label'),
+              textValue: lastStarted,
+            })}
+          </dl>
         </rrr-section>
 
       </section>
