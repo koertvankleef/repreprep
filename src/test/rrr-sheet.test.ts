@@ -4,9 +4,30 @@ import { getTopSheetPresentation } from '../foundation/presentation-stack.ts'
 import { toastService } from '../foundation/toast.ts'
 import { confirmSheet, presentSheet } from '../utils/sheet-service.ts'
 import { initLocale } from '../i18n/index.ts'
+import { registerRrrListCard } from '../design-system/components/rrr-list-card.ts'
+import { registerRrrListRow } from '../design-system/components/rrr-list-row.ts'
 
-beforeAll(() => {
+beforeAll(async () => {
+  if (!('replaceSync' in CSSStyleSheet.prototype)) {
+    Object.defineProperty(CSSStyleSheet.prototype, 'replaceSync', {
+      configurable: true,
+      value: () => {},
+    })
+  }
+
+  const [
+    { registerRrrInput },
+    { registerRrrNumberStepper },
+  ] = await Promise.all([
+    import('../design-system/components/rrr-input.ts'),
+    import('../design-system/components/rrr-number-stepper.ts'),
+  ])
+
   registerRrrSheet()
+  registerRrrInput()
+  registerRrrNumberStepper()
+  registerRrrListRow()
+  registerRrrListCard()
 
   Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
     configurable: true,
@@ -153,6 +174,215 @@ describe('sheet presentation', () => {
     await expect(result).resolves.toBe('saved')
   })
 
+  test('advances eligible fields with Enter and confirms from the final field', async () => {
+    const sheet = document.createElement('rrr-sheet') as RrrSheet
+    const heading = document.createElement('h3')
+    heading.slot = 'heading'
+    heading.textContent = 'Edit values'
+
+    const firstField = document.createElement('rrr-input')
+    firstField.slot = 'body'
+    firstField.setAttribute('autofocus', '')
+    const skippedField = document.createElement('rrr-input')
+    skippedField.slot = 'body'
+    skippedField.setAttribute('disabled', '')
+    const finalField = document.createElement('rrr-number-stepper')
+    finalField.slot = 'body'
+
+    const confirm = document.createElement('button')
+    confirm.slot = 'actions'
+    confirm.dataset.sheetResult = 'confirm'
+    confirm.textContent = 'Confirm'
+    sheet.append(heading, firstField, skippedField, finalField, confirm)
+
+    const result = presentSheet(sheet)
+    await Promise.resolve()
+
+    const firstInput = firstField.shadowRoot!.querySelector<HTMLInputElement>('input')!
+    const skippedInput = skippedField.shadowRoot!.querySelector<HTMLInputElement>('input')!
+    const finalInput = finalField.shadowRoot!.querySelector<HTMLInputElement>('input')!
+
+    expect(firstInput.getAttribute('enterkeyhint')).toBe('next')
+    expect(skippedInput.hasAttribute('enterkeyhint')).toBe(false)
+    expect(finalInput.getAttribute('enterkeyhint')).toBe('done')
+
+    firstInput.focus()
+    const modifiedEnter = enterKeyEvent({ shiftKey: true })
+    firstInput.dispatchEvent(modifiedEnter)
+    expect(modifiedEnter.defaultPrevented).toBe(false)
+    expect(getDeepActiveElement()).toBe(firstInput)
+
+    const composingEnter = enterKeyEvent({ isComposing: true })
+    firstInput.dispatchEvent(composingEnter)
+    expect(composingEnter.defaultPrevented).toBe(false)
+    expect(getDeepActiveElement()).toBe(firstInput)
+
+    const nextEnter = enterKeyEvent()
+    firstInput.dispatchEvent(nextEnter)
+    expect(nextEnter.defaultPrevented).toBe(true)
+    expect(getDeepActiveElement()).toBe(finalInput)
+
+    const confirmEnter = enterKeyEvent()
+    finalInput.dispatchEvent(confirmEnter)
+    expect(confirmEnter.defaultPrevented).toBe(true)
+    await expect(result).resolves.toBe('confirm')
+  })
+
+  test('does not confirm from Enter while the confirm action is disabled', async () => {
+    const sheet = document.createElement('rrr-sheet') as RrrSheet
+    const heading = document.createElement('h3')
+    heading.slot = 'heading'
+    heading.textContent = 'Required value'
+    const field = document.createElement('input')
+    field.slot = 'body'
+    const confirm = document.createElement('button')
+    confirm.slot = 'actions'
+    confirm.dataset.sheetResult = 'confirm'
+    confirm.disabled = true
+    sheet.append(heading, field, confirm)
+
+    const result = presentSheet(sheet)
+    await Promise.resolve()
+
+    const input = field
+    expect(input.getAttribute('enterkeyhint')).toBe('done')
+    const enter = enterKeyEvent()
+    input.dispatchEvent(enter)
+
+    expect(enter.defaultPrevented).toBe(true)
+    expect(sheet.querySelector('dialog')?.hasAttribute('data-closing')).toBe(false)
+
+    confirm.disabled = false
+    const enabledEnter = enterKeyEvent()
+    input.dispatchEvent(enabledEnter)
+    expect(enabledEnter.defaultPrevented).toBe(true)
+    await expect(result).resolves.toBe('confirm')
+  })
+
+  test('treats a radio group as one choice before advancing', async () => {
+    const sheet = document.createElement('rrr-sheet') as RrrSheet
+    const heading = document.createElement('h3')
+    heading.slot = 'heading'
+    heading.textContent = 'Choose a mode'
+    const choices = document.createElement('rrr-list-card')
+    choices.slot = 'body'
+    choices.setAttribute('role', 'radiogroup')
+
+    const firstChoice = document.createElement('rrr-list-row')
+    firstChoice.setAttribute('control', 'radio')
+    firstChoice.setAttribute('name', 'mode')
+    firstChoice.setAttribute('label', 'Automatic')
+    firstChoice.setAttribute('checked', '')
+    const secondChoice = document.createElement('rrr-list-row')
+    secondChoice.setAttribute('control', 'radio')
+    secondChoice.setAttribute('name', 'mode')
+    secondChoice.setAttribute('label', 'Custom')
+    choices.append(firstChoice, secondChoice)
+
+    const nextField = document.createElement('rrr-input')
+    nextField.slot = 'body'
+    const confirm = document.createElement('button')
+    confirm.slot = 'actions'
+    confirm.dataset.sheetResult = 'confirm'
+    sheet.append(heading, choices, nextField, confirm)
+
+    const result = presentSheet(sheet)
+    await Promise.resolve()
+    await Promise.resolve()
+
+    const secondRadio = secondChoice.querySelector<HTMLInputElement>('input')!
+    secondRadio.focus()
+    const enter = enterKeyEvent()
+    secondRadio.dispatchEvent(enter)
+
+    expect(enter.defaultPrevented).toBe(true)
+    expect((secondChoice as HTMLElement & { checked: boolean }).checked).toBe(true)
+    expect(getDeepActiveElement()).toBe(
+      nextField.shadowRoot!.querySelector<HTMLInputElement>('input'),
+    )
+
+    confirm.click()
+    await expect(result).resolves.toBe('confirm')
+  })
+
+  test('reaffirms an already selected radio and toggles checkbox controls', async () => {
+    const choiceSheet = document.createElement('rrr-sheet') as RrrSheet
+    const choiceHeading = document.createElement('h3')
+    choiceHeading.slot = 'heading'
+    choiceHeading.textContent = 'Choose a source'
+    const choices = document.createElement('rrr-list-card')
+    choices.slot = 'body'
+    const selectedChoice = document.createElement('rrr-list-row')
+    selectedChoice.setAttribute('control', 'radio')
+    selectedChoice.setAttribute('name', 'source')
+    selectedChoice.setAttribute('checked', '')
+    choices.append(selectedChoice)
+    choices.addEventListener('change', () => choiceSheet.close('selected'))
+    choiceSheet.append(choiceHeading, choices)
+
+    const choiceResult = presentSheet(choiceSheet)
+    await Promise.resolve()
+    await Promise.resolve()
+    const selectedRadio = selectedChoice.querySelector<HTMLInputElement>('input')!
+    selectedRadio.dispatchEvent(enterKeyEvent())
+    await expect(choiceResult).resolves.toBe('selected')
+
+    const toggleSheet = document.createElement('rrr-sheet') as RrrSheet
+    const toggleHeading = document.createElement('h3')
+    toggleHeading.slot = 'heading'
+    toggleHeading.textContent = 'Choose an option'
+    const checkbox = document.createElement('rrr-list-row')
+    checkbox.slot = 'body'
+    checkbox.setAttribute('control', 'checkbox')
+    const confirm = document.createElement('button')
+    confirm.slot = 'actions'
+    confirm.dataset.sheetResult = 'confirm'
+    toggleSheet.append(toggleHeading, checkbox, confirm)
+
+    const toggleResult = presentSheet(toggleSheet)
+    await Promise.resolve()
+    await Promise.resolve()
+    const checkboxInput = checkbox.querySelector<HTMLInputElement>('input')!
+    checkboxInput.dispatchEvent(enterKeyEvent())
+
+    expect((checkbox as HTMLElement & { checked: boolean }).checked).toBe(true)
+    await expect(toggleResult).resolves.toBe('confirm')
+  })
+
+  test('preserves native Enter behavior outside eligible single-line fields', async () => {
+    const sheet = document.createElement('rrr-sheet') as RrrSheet
+    const heading = document.createElement('h3')
+    heading.slot = 'heading'
+    heading.textContent = 'Write notes'
+    const body = document.createElement('div')
+    body.slot = 'body'
+    const textarea = document.createElement('textarea')
+    const buttonOnlyStepper = document.createElement('rrr-number-stepper')
+    buttonOnlyStepper.setAttribute('button-only', '')
+    body.append(textarea, buttonOnlyStepper)
+    const confirm = document.createElement('button')
+    confirm.slot = 'actions'
+    confirm.dataset.sheetResult = 'confirm'
+    sheet.append(heading, body, confirm)
+
+    const result = presentSheet(sheet)
+    const enter = enterKeyEvent()
+    textarea.dispatchEvent(enter)
+
+    expect(enter.defaultPrevented).toBe(false)
+    expect(sheet.querySelector('dialog')?.hasAttribute('data-closing')).toBe(false)
+
+    const stepperInput = buttonOnlyStepper.shadowRoot!
+      .querySelector<HTMLInputElement>('input')!
+    const stepperEnter = enterKeyEvent()
+    stepperInput.dispatchEvent(stepperEnter)
+    expect(stepperEnter.defaultPrevented).toBe(false)
+    expect(stepperInput.hasAttribute('enterkeyhint')).toBe(false)
+
+    confirm.click()
+    await expect(result).resolves.toBe('confirm')
+  })
+
   test('places toasts inside the top sheet presentation layer', async () => {
     const result = confirmSheet({
       title: 'Sheet with feedback',
@@ -174,4 +404,22 @@ function pointerEvent(type: string, pointerId: number, clientY: number): Event {
   const event = new MouseEvent(type, { bubbles: true, clientY })
   Object.defineProperty(event, 'pointerId', { value: pointerId })
   return event
+}
+
+function enterKeyEvent(options: KeyboardEventInit = {}): KeyboardEvent {
+  return new KeyboardEvent('keydown', {
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    key: 'Enter',
+    ...options,
+  })
+}
+
+function getDeepActiveElement(): Element | null {
+  let activeElement: Element | null = document.activeElement
+  while (activeElement?.shadowRoot?.activeElement) {
+    activeElement = activeElement.shadowRoot.activeElement
+  }
+  return activeElement
 }

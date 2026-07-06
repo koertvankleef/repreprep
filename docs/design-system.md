@@ -288,6 +288,19 @@ when dismissing and canceling have the same result.
 Non-dismissible sheets omit the Close control and must provide an explicit
 action that completes the workflow.
 
+Within a sheet, Enter in `rrr-input`, a text-entry native input, or the editable
+input of `rrr-number-stepper` advances to the next enabled field. For a number
+stepper, this applies only when Enter originates from its editable text input;
+its step buttons and a read-only value input do not imply that adjustment is
+complete. Enter on a radio chooses that option; Enter on a checkbox or switch
+toggles it. These choice controls then advance as one completed field, with a
+radio group counting as one field. Enter in the final field activates the
+enabled `data-sheet-result="confirm"` action. The sheet also supplies
+`enterkeyhint="next"` and `"done"` to editable inputs. Textareas, selects, date
+pickers, buttons, and other controls keep their own behavior. Add
+`data-sheet-enter-ignore` to an otherwise eligible field when Enter has a
+different, field-specific meaning.
+
 ## Number steppers
 
 Use `rrr-number-stepper` when a numeric value is most naturally adjusted in

@@ -39,6 +39,7 @@ export class RrrNumberStepper extends HTMLElement {
     'button-only',
     'decrement-label',
     'disabled',
+    'enterkeyhint',
     'error-text',
     'helper-text',
     'increment-label',
@@ -175,6 +176,7 @@ export class RrrNumberStepper extends HTMLElement {
     this.input.readOnly = this.hasAttribute('button-only')
     this.input.disabled = disabled
     this.input.lang = this.locale
+    this.reflectEnterKeyHint()
     this.input.setAttribute('aria-readonly', this.input.readOnly ? 'true' : 'false')
 
     const ariaLabel = this.getAttribute('aria-label')
@@ -279,6 +281,16 @@ export class RrrNumberStepper extends HTMLElement {
     const value = this.currentNumber
     this.decrementButton.disabled = disabled || (value !== null && value <= this.minimum)
     this.incrementButton.disabled = disabled || (value !== null && value >= this.maximum)
+  }
+
+  private reflectEnterKeyHint(): void {
+    const enterKeyHint = this.getAttribute('enterkeyhint')
+    if (enterKeyHint === null) {
+      this.input.removeAttribute('enterkeyhint')
+      return
+    }
+
+    this.input.setAttribute('enterkeyhint', enterKeyHint)
   }
 
   private syncValueSemantics(): void {

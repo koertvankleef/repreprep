@@ -1,6 +1,7 @@
 import { getTopSheetPresentation, registerSheetPresentation } from '../../foundation/presentation-stack.ts'
 import { defineCustomElementOnce } from './shared.ts'
 import { ensureStyleInRoot } from './style-manager.ts'
+import { SheetEnterFlow } from './sheet-enter-flow.ts'
 import styles from './rrr-sheet.css?inline'
 
 export type SheetTone = 'primary' | 'neutral' | 'accent' | 'info' | 'success' | 'warning' | 'danger'
@@ -34,6 +35,7 @@ export class RrrSheet extends HTMLElement {
   private dragStartY = 0
   private dragStartTime = 0
   private dragOffset = 0
+  private enterFlow: SheetEnterFlow | null = null
 
   connectedCallback(): void {
     const root = this.getRootNode()
@@ -43,6 +45,8 @@ export class RrrSheet extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    this.enterFlow?.disconnect()
+    this.enterFlow = null
     this.unregisterPresentation?.()
     this.unregisterPresentation = null
 
@@ -202,6 +206,12 @@ export class RrrSheet extends HTMLElement {
     handleRegion.addEventListener('pointermove', this.handlePointerMove)
     handleRegion.addEventListener('pointerup', this.handlePointerUp)
     handleRegion.addEventListener('pointercancel', this.handlePointerCancel)
+
+    this.enterFlow = new SheetEnterFlow(
+      dialog,
+      () => this.closing || !this.isConnected,
+    )
+    this.enterFlow.connect()
   }
 
   private getInitialFocusTarget(): HTMLElement | null {

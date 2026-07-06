@@ -22,6 +22,7 @@ export class RrrInput extends HTMLElement {
     'aria-describedby',
     'aria-label',
     'disabled',
+    'enterkeyhint',
     'error-text',
     'invalid',
     'label',
@@ -104,12 +105,17 @@ export class RrrInput extends HTMLElement {
     this.setAttribute('value', nextValue)
   }
 
+  override focus(options?: FocusOptions): void {
+    this.input.focus(options)
+  }
+
   private syncAll(): void {
     const nextType = this.getAttribute('type') ?? 'text'
     this.input.type = allowedTypes.has(nextType) ? nextType : 'text'
     this.input.name = this.getAttribute('name') ?? ''
     this.input.placeholder = this.getAttribute('placeholder') ?? ''
     this.input.required = this.hasAttribute('required')
+    this.reflectOptionalAttribute('enterkeyhint')
     this.reflectOptionalAttribute('min')
     this.reflectOptionalAttribute('max')
     this.reflectOptionalAttribute('step')
@@ -141,7 +147,7 @@ export class RrrInput extends HTMLElement {
     this.syncError()
   }
 
-  private reflectOptionalAttribute(name: 'min' | 'max' | 'step'): void {
+  private reflectOptionalAttribute(name: 'enterkeyhint' | 'min' | 'max' | 'step'): void {
     const value = this.getAttribute(name)
     if (value === null) {
       this.input.removeAttribute(name)

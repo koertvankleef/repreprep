@@ -70,7 +70,11 @@ describe('Settings reset-data flow', () => {
 
     expect(confirm?.hasAttribute('disabled')).toBe(false)
     expect(sheet?.querySelector<HTMLElement>('.reset-confirm-hint')?.hidden).toBe(true)
-    confirmControl?.click()
+    input?.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Enter',
+    }))
     await new Promise((resolve) => window.setTimeout(resolve, 240))
 
     expect(clearRequest).toHaveBeenCalledOnce()
