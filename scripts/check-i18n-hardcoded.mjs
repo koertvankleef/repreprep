@@ -3,7 +3,6 @@ import { resolve } from 'node:path'
 
 const filesToCheck = [
   'src/app/rrr-app.ts',
-  'src/design-system/components/rrr-dialog-host.ts',
   'src/app/components/exercises/rrr-exercise-catalogue.ts',
   'src/app/components/exercises/rrr-exercise-detail.ts',
   'src/app/components/workouts/editor/rrr-exercise-entry.ts',

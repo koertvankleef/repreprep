@@ -1,7 +1,6 @@
 import { registerRrrBadge } from './rrr-badge.ts'
 import { registerRrrButton } from './rrr-button.ts'
 import { registerRrrCheckbox } from './rrr-checkbox.ts'
-import { registerRrrDialogHost } from './rrr-dialog-host.ts'
 import { registerRrrDateField } from './rrr-date-field.ts'
 import { registerRrrDatePicker } from './rrr-date-picker.ts'
 import { registerRrrInput } from './rrr-input.ts'
@@ -38,6 +37,5 @@ export function registerDesignSystemComponents(): void {
   registerRrrListCard()
   registerRrrListRow()
   registerRrrSheet()
-  registerRrrDialogHost()
   registerRrrTooltip()
 }

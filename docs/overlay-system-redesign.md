@@ -67,7 +67,7 @@ topmost sheet's presentation layer. Tooltips remain above every other surface.
 - [ ] Confirm navigation always clears sheets owned by the previous page.
 - [ ] Keep and document modal-dialog use for exceptional cases.
 - [ ] Move durable usage guidance to `docs/design-system.md`.
-- [ ] Remove the legacy confirmation/prompt dialog host when its final consumer
+- [x] Remove the legacy confirmation/prompt dialog host when its final consumer
   has migrated.
 - [ ] Remove this tracker.
 
