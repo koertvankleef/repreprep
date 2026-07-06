@@ -316,18 +316,18 @@ export class RrrRoutineDetail extends HTMLElement {
 
     this.timingSheetActive = true
     try {
-      const selectedExerciseId = await promptRoutineExercisePicker(options)
-      if (!selectedExerciseId) {
-        return
-      }
+      await promptRoutineExercisePicker(options, ({ exerciseId, settings }) => {
+        const latest = this.getCurrentRoutineVersion()
+        if (!latest) {
+          return
+        }
 
-      const latest = this.getCurrentRoutineVersion()
-      if (!latest) {
-        return
-      }
-
-      this.saveRoutineVersion(latest.routine, latest.version, {
-        exercises: [...latest.version.exercises, createRoutineExercise(selectedExerciseId)],
+        this.saveRoutineVersion(latest.routine, latest.version, {
+          exercises: [
+            ...latest.version.exercises,
+            createRoutineExercise(exerciseId, settings),
+          ],
+        })
       })
     } finally {
       this.timingSheetActive = false

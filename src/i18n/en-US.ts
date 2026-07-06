@@ -244,6 +244,7 @@ export const enUsMessages = {
   'routineExercisePicker.addAria': 'Add {exercise}',
   'routineExercisePicker.results.one': '{count} exercise found',
   'routineExercisePicker.results.other': '{count} exercises found',
+  'routineExercisePicker.exerciseAdded': '{exercise} added',
   'exercise.filter.open': 'Filter exercises',
   'exercise.filter.openActive': 'Filter exercises, filters active',
   'exercise.filter.railLabel': 'Exercise filters',
@@ -458,6 +459,7 @@ export const enUsMessages = {
   'styleguide.numberStepper.buttonOnlyHelper': 'This example only allows stepping with the buttons.',
   'styleguide.numberStepper.decimalHelper': 'This example accepts localized decimal values.',
 
+  'routineExercise.sheet.add.heading': 'Add {exercise}',
   'routineExercise.sheet.heading': 'Edit {exercise}',
   'routineExercise.sheet.delete': 'Delete exercise',
   'routineExercise.swipe.delete': 'Delete {exercise}',

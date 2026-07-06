@@ -3,11 +3,18 @@ import type { ExerciseDefinition } from '../../../domain/types.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
 import { getLocale, t, tPlural } from '../../../i18n/index.ts'
 import { presentSheet } from '../../../utils/sheet-service.ts'
+import { toastService } from '../../../foundation/toast.ts'
 import { escapeHtml } from '../../render-helpers.ts'
+import { promptAddRoutineExerciseSettings, type RoutineExerciseSettings } from './routine-exercise-sheets.ts'
 import styles from './routine-exercise-picker.css?inline'
 
 export type RoutineExercisePickerSelectDetail = {
   exerciseId: string
+}
+
+export type PickerAddedExercise = {
+  exerciseId: string
+  settings: RoutineExerciseSettings
 }
 
 export class RrrRoutineExercisePicker extends HTMLElement {
@@ -151,9 +158,10 @@ export class RrrRoutineExercisePicker extends HTMLElement {
 
 export async function promptRoutineExercisePicker(
   exercises: ExerciseDefinition[],
-): Promise<string | undefined> {
+  onAdd: (added: PickerAddedExercise) => void,
+): Promise<void> {
   if (exercises.length === 0) {
-    return undefined
+    return
   }
 
   const sheet = document.createElement('rrr-sheet') as RrrSheet
@@ -169,17 +177,42 @@ export async function promptRoutineExercisePicker(
   ) as RrrRoutineExercisePicker
   picker.slot = 'body'
   picker.exercises = exercises
-  picker.addEventListener('rrr-routine-exercise-picker-select', (event) => {
+
+  let sessionDefaults: RoutineExerciseSettings = { setCount: 1, restSeconds: 60 }
+  let configureOpen = false
+
+  picker.addEventListener('rrr-routine-exercise-picker-select', async (event) => {
+    if (configureOpen) {
+      return
+    }
+
     const selection = event as CustomEvent<RoutineExercisePickerSelectDetail>
-    sheet.close(selection.detail.exerciseId)
+    const { exerciseId } = selection.detail
+    const exercise = exercises.find((ex) => ex.id === exerciseId)
+    if (!exercise) {
+      return
+    }
+
+    configureOpen = true
+    try {
+      const settings = await promptAddRoutineExerciseSettings({
+        exerciseName: exercise.name,
+        setCount: sessionDefaults.setCount,
+        restSeconds: sessionDefaults.restSeconds,
+      })
+
+      if (settings) {
+        sessionDefaults = settings
+        onAdd({ exerciseId, settings })
+        toastService.success(t('routineExercisePicker.exerciseAdded', { exercise: exercise.name }))
+      }
+    } finally {
+      configureOpen = false
+    }
   })
 
   sheet.append(heading, picker)
-  const result = await presentSheet(sheet)
-
-  return result && exercises.some((exercise) => exercise.id === result)
-    ? result
-    : undefined
+  await presentSheet(sheet)
 }
 
 if (!customElements.get('rrr-routine-exercise-picker')) {

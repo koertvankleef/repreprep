@@ -226,12 +226,15 @@ export function archiveRoutine(data: AppData, id: string): AppData {
   }
 }
 
-export function createRoutineExercise(exerciseId: string): RoutineExercise {
+export function createRoutineExercise(
+  exerciseId: string,
+  overrides?: { setCount?: number; restSeconds?: number },
+): RoutineExercise {
   return {
     id: generateId(),
     exerciseId,
     transitionBeforeOverrideSeconds: null,
-    restSeconds: DEFAULT_REST_SECONDS,
-    setCount: 1,
+    restSeconds: overrides?.restSeconds ?? DEFAULT_REST_SECONDS,
+    setCount: overrides?.setCount ?? 1,
   }
 }

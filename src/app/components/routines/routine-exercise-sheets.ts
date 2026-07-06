@@ -118,3 +118,51 @@ export async function promptRoutineExerciseSettings(options: {
     settings: { setCount, restSeconds },
   }
 }
+
+export async function promptAddRoutineExerciseSettings(options: {
+  exerciseName: string
+  setCount: number
+  restSeconds: number
+}): Promise<RoutineExerciseSettings | undefined> {
+  const sheet = document.createElement('rrr-sheet') as RrrSheet
+  const heading = document.createElement('h3')
+  heading.slot = 'heading'
+  heading.className = 'sheet-title'
+  heading.textContent = t('routineExercise.sheet.add.heading', { exercise: options.exerciseName })
+
+  const setCountInput = createNumberStepper({
+    name: 'set-count',
+    label: t('routineExercise.setCount.label'),
+    value: options.setCount,
+    min: 1,
+    size: 2,
+    autofocus: true,
+  })
+  const restInput = createNumberStepper({
+    name: 'rest-seconds',
+    label: t('routineExercise.rest.sheet.seconds'),
+    value: options.restSeconds,
+    min: 0,
+    size: 3,
+  })
+  const confirmButton = document.createElement('rrr-button')
+  confirmButton.slot = 'actions'
+  confirmButton.setAttribute('type', 'button')
+  confirmButton.setAttribute('data-sheet-result', 'confirm')
+  confirmButton.textContent = t('action.add')
+
+  sheet.append(heading, setCountInput, restInput, confirmButton)
+  const result = await presentSheet(sheet)
+
+  if (result !== 'confirm') {
+    return undefined
+  }
+
+  const setCount = parseRequiredInteger(setCountInput, 1)
+  const restSeconds = parseRequiredInteger(restInput, 0)
+  if (setCount === undefined || restSeconds === undefined) {
+    return undefined
+  }
+
+  return { setCount, restSeconds }
+}

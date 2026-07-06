@@ -244,6 +244,7 @@ export const nlNlMessages = {
   'routineExercisePicker.addAria': 'Voeg {exercise} toe',
   'routineExercisePicker.results.one': '{count} oefening gevonden',
   'routineExercisePicker.results.other': '{count} oefeningen gevonden',
+  'routineExercisePicker.exerciseAdded': '{exercise} toegevoegd',
   'exercise.filter.open': 'Oefeningen filteren',
   'exercise.filter.openActive': 'Oefeningen filteren, filters actief',
   'exercise.filter.railLabel': 'Oefeningsfilters',
@@ -458,6 +459,7 @@ export const nlNlMessages = {
   'styleguide.numberStepper.buttonOnlyHelper': 'In dit voorbeeld kan de waarde alleen met de knoppen worden aangepast.',
   'styleguide.numberStepper.decimalHelper': 'In dit voorbeeld kunnen gelokaliseerde decimale waarden worden ingevoerd.',
 
+  'routineExercise.sheet.add.heading': '{exercise} toevoegen',
   'routineExercise.sheet.heading': '{exercise} bewerken',
   'routineExercise.sheet.delete': 'Oefening verwijderen',
   'routineExercise.swipe.delete': '{exercise} verwijderen',

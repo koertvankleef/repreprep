@@ -314,13 +314,10 @@ export class RrrRoutineEditor extends HTMLElement {
 
     this.timingSheetActive = true
     try {
-      const exerciseId = await promptRoutineExercisePicker(options)
-      if (!exerciseId) {
-        return
-      }
-
-      this.exercises = [...this.exercises, createRoutineExercise(exerciseId)]
-      this.render()
+      await promptRoutineExercisePicker(options, ({ exerciseId, settings }) => {
+        this.exercises = [...this.exercises, createRoutineExercise(exerciseId, settings)]
+        this.render()
+      })
     } finally {
       this.timingSheetActive = false
     }
