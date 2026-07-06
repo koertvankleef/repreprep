@@ -3,17 +3,14 @@ import { registerRrrSheet, type RrrSheet } from '../design-system/components/rrr
 import { getTopSheetPresentation } from '../foundation/presentation-stack.ts'
 import { toastService } from '../foundation/toast.ts'
 import { confirmSheet, presentSheet } from '../foundation/sheet-service.ts'
-import { initLocale } from '../i18n/index.ts'
 import { registerRrrListCard } from '../design-system/components/rrr-list-card.ts'
 import { registerRrrListRow } from '../design-system/components/rrr-list-row.ts'
+import { specIt, enterKeyEvent, getDeepActiveElement, initTestLocale } from './helpers.ts'
+import { patchCssStyleSheet, patchHTMLDialog } from './mocks.ts'
 
 beforeAll(async () => {
-  if (!('replaceSync' in CSSStyleSheet.prototype)) {
-    Object.defineProperty(CSSStyleSheet.prototype, 'replaceSync', {
-      configurable: true,
-      value: () => {},
-    })
-  }
+  patchCssStyleSheet()
+  patchHTMLDialog()
 
   const [
     { registerRrrInput },
@@ -28,28 +25,15 @@ beforeAll(async () => {
   registerRrrNumberStepper()
   registerRrrListRow()
   registerRrrListCard()
-
-  Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
-    configurable: true,
-    value(this: HTMLDialogElement): void {
-      this.open = true
-    },
-  })
-  Object.defineProperty(HTMLDialogElement.prototype, 'close', {
-    configurable: true,
-    value(this: HTMLDialogElement): void {
-      this.open = false
-    },
-  })
 })
 
 beforeEach(() => {
   document.body.innerHTML = ''
-  initLocale('en-US')
+  initTestLocale()
 })
 
 describe('sheet presentation', () => {
-  test('stacks independent sheets and dismisses only the top sheet', async () => {
+  specIt('stacks independent sheets and dismisses only the top sheet', ['SHEET-STACK-001', 'SHEET-DIMISS-001'], async () => {
     const firstResult = confirmSheet({
       title: 'First task',
       message: 'First message',
@@ -97,7 +81,7 @@ describe('sheet presentation', () => {
     await expect(firstResult).resolves.toBe(true)
   })
 
-  test('recalculates presentation depth when a sheet leaves the middle of the stack', async () => {
+  specIt('recalculates presentation depth when a sheet leaves the middle of the stack', ['SHEET-STACK-002'], async () => {
     const firstResult = confirmSheet({
       title: 'First task',
       message: 'First message',
@@ -136,7 +120,7 @@ describe('sheet presentation', () => {
     await expect(firstResult).resolves.toBe(true)
   })
 
-  test('dismisses from the backdrop and restores focus', async () => {
+  specIt('dismisses from the backdrop and restores focus', ['SHEET-DIMISS-002', 'SHEET-FOCUS-002'], async () => {
     const trigger = document.createElement('button')
     document.body.append(trigger)
     trigger.focus()
@@ -155,7 +139,7 @@ describe('sheet presentation', () => {
     expect(document.activeElement).toBe(trigger)
   })
 
-  test('provides a localized assistive dismiss control', async () => {
+  specIt('provides a localized assistive dismiss control', ['SHEET-DIMISS-003'], async () => {
     const result = confirmSheet({
       title: 'Choose a value',
       message: 'Select an option.',
@@ -170,7 +154,7 @@ describe('sheet presentation', () => {
     await expect(result).resolves.toBe(false)
   })
 
-  test('omits the assistive dismiss control when the sheet is non-dismissible', async () => {
+  specIt('omits the assistive dismiss control when the sheet is non-dismissible', ['SHEET-DIMISS-004'], async () => {
     const result = confirmSheet({
       title: 'Required decision',
       message: 'This workflow requires confirmation.',
@@ -187,7 +171,7 @@ describe('sheet presentation', () => {
     await expect(result).resolves.toBe(true)
   })
 
-  test('dismisses after a deliberate downward handle drag', async () => {
+  specIt('dismisses after a deliberate downward handle drag', ['SHEET-DRAG-001'], async () => {
     const result = confirmSheet({
       title: 'Drag sheet',
       message: 'Drag the handle down.',
@@ -202,7 +186,7 @@ describe('sheet presentation', () => {
     await expect(result).resolves.toBe(false)
   })
 
-  test('presents authored heading, body, and action content without replacing it', async () => {
+  specIt('presents authored heading, body, and action content without replacing it', ['SHEET-AUTH-001', 'SHEET-AUTH-002', 'SHEET-FOCUS-001'], async () => {
     const sheet = document.createElement('rrr-sheet') as RrrSheet
     const heading = document.createElement('h3')
     heading.slot = 'heading'
@@ -227,7 +211,7 @@ describe('sheet presentation', () => {
     await expect(result).resolves.toBe('saved')
   })
 
-  test('advances eligible fields with Enter and confirms from the final field', async () => {
+  specIt('advances eligible fields with Enter and confirms from the final field', ['SHEET-FIELD-001', 'SHEET-FIELD-002'], async () => {
     const sheet = document.createElement('rrr-sheet') as RrrSheet
     const heading = document.createElement('h3')
     heading.slot = 'heading'
@@ -281,7 +265,7 @@ describe('sheet presentation', () => {
     await expect(result).resolves.toBe('confirm')
   })
 
-  test('does not confirm from Enter while the confirm action is disabled', async () => {
+  specIt('does not confirm from Enter while the confirm action is disabled', ['SHEET-FIELD-003'], async () => {
     const sheet = document.createElement('rrr-sheet') as RrrSheet
     const heading = document.createElement('h3')
     heading.slot = 'heading'
@@ -312,7 +296,7 @@ describe('sheet presentation', () => {
     await expect(result).resolves.toBe('confirm')
   })
 
-  test('treats a radio group as one choice before advancing', async () => {
+  specIt('treats a radio group as one choice before advancing', ['SHEET-FIELD-004'], async () => {
     const sheet = document.createElement('rrr-sheet') as RrrSheet
     const heading = document.createElement('h3')
     heading.slot = 'heading'
@@ -403,7 +387,7 @@ describe('sheet presentation', () => {
     await expect(toggleResult).resolves.toBe('confirm')
   })
 
-  test('preserves native Enter behavior outside eligible single-line fields', async () => {
+  specIt('preserves native Enter behavior outside eligible single-line fields', ['SHEET-FIELD-005'], async () => {
     const sheet = document.createElement('rrr-sheet') as RrrSheet
     const heading = document.createElement('h3')
     heading.slot = 'heading'
@@ -437,7 +421,7 @@ describe('sheet presentation', () => {
     await expect(result).resolves.toBe('confirm')
   })
 
-  test('places toasts inside the top sheet presentation layer', async () => {
+  specIt('places toasts inside the top sheet presentation layer', ['SHEET-TOAST-001', 'SHEET-TOAST-002'], async () => {
     const result = confirmSheet({
       title: 'Sheet with feedback',
       message: 'The toast belongs above this sheet.',
@@ -460,20 +444,4 @@ function pointerEvent(type: string, pointerId: number, clientY: number): Event {
   return event
 }
 
-function enterKeyEvent(options: KeyboardEventInit = {}): KeyboardEvent {
-  return new KeyboardEvent('keydown', {
-    bubbles: true,
-    cancelable: true,
-    composed: true,
-    key: 'Enter',
-    ...options,
-  })
-}
 
-function getDeepActiveElement(): Element | null {
-  let activeElement: Element | null = document.activeElement
-  while (activeElement?.shadowRoot?.activeElement) {
-    activeElement = activeElement.shadowRoot.activeElement
-  }
-  return activeElement
-}

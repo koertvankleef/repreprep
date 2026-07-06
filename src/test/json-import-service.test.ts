@@ -1,41 +1,42 @@
 import { describe, expect, test } from 'vitest'
 import { isValidAppData } from '../import-export/json-import-service.ts'
 import { createDefaultData } from '../domain/create-default-data.ts'
+import { specIt } from './helpers.ts'
 
 describe('json-import-service', () => {
-  test('isValidAppData returns false for null', () => {
+  specIt('isValidAppData returns false for null', ['DATA-VALID-002'], () => {
     expect(isValidAppData(null)).toBe(false)
   })
 
-  test('isValidAppData returns false for missing schemaVersion', () => {
+  specIt('isValidAppData returns false for missing schemaVersion', ['DATA-VALID-002'], () => {
     expect(isValidAppData({ exercises: [], workouts: [], routines: [], routineVersions: [] })).toBe(false)
   })
 
-  test('isValidAppData returns false for missing exercises', () => {
+  specIt('isValidAppData returns false for missing exercises', ['DATA-VALID-002'], () => {
     expect(isValidAppData({ schemaVersion: 2, workouts: [], routines: [], routineVersions: [] })).toBe(false)
   })
 
-  test('isValidAppData returns false for non-array exercises', () => {
+  specIt('isValidAppData returns false for non-array exercises', ['DATA-VALID-003'], () => {
     expect(isValidAppData({ schemaVersion: 2, exercises: {}, workouts: [], routines: [], routineVersions: [] })).toBe(false)
   })
 
-  test('isValidAppData returns false for missing workouts', () => {
+  specIt('isValidAppData returns false for missing workouts', ['DATA-VALID-002'], () => {
     expect(isValidAppData({ schemaVersion: 2, exercises: [], routines: [], routineVersions: [] })).toBe(false)
   })
 
-  test('isValidAppData returns false for missing routines', () => {
+  specIt('isValidAppData returns false for missing routines', ['DATA-VALID-002'], () => {
     expect(isValidAppData({ schemaVersion: 2, exercises: [], workouts: [], routineVersions: [] })).toBe(false)
   })
 
-  test('isValidAppData returns false for missing routineVersions', () => {
+  specIt('isValidAppData returns false for missing routineVersions', ['DATA-VALID-002'], () => {
     expect(isValidAppData({ schemaVersion: 2, exercises: [], workouts: [], routines: [] })).toBe(false)
   })
 
-  test('isValidAppData returns true for valid minimal current AppData', () => {
+  specIt('isValidAppData returns true for valid minimal current AppData', ['DATA-VALID-001'], () => {
     expect(isValidAppData({ schemaVersion: 7, exercises: [], workouts: [], routines: [], routineVersions: [] })).toBe(true)
   })
 
-  test('isValidAppData rejects a routine exercise with zero sets', () => {
+  specIt('isValidAppData rejects a routine exercise with zero sets', ['DATA-VALID-004'], () => {
     const data = createDefaultData()
     const version = data.routineVersions[0]!
     const invalid = {
@@ -50,7 +51,7 @@ describe('json-import-service', () => {
     expect(isValidAppData(invalid)).toBe(false)
   })
 
-  test('isValidAppData requires persisted workout completion state', () => {
+  specIt('isValidAppData requires persisted workout completion state', ['DATA-VALID-005'], () => {
     const data = createDefaultData()
     const invalidWorkout = {
       id: 'workout-1',

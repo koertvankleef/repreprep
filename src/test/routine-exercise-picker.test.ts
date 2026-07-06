@@ -5,21 +5,12 @@ import {
 } from '../app/components/routines/routine-exercise-picker.ts'
 import { createDefaultData } from '../domain/create-default-data.ts'
 import { searchExercises } from '../domain/exercise-service.ts'
-import { initLocale } from '../i18n/index.ts'
+import { specIt, getDeepActiveElement, initTestLocale } from './helpers.ts'
+import { patchCssStyleSheet, patchSvgSymbolElement } from './mocks.ts'
 
 beforeAll(async () => {
-  if (!('replaceSync' in CSSStyleSheet.prototype)) {
-    Object.defineProperty(CSSStyleSheet.prototype, 'replaceSync', {
-      configurable: true,
-      value: () => {},
-    })
-  }
-  if (!globalThis.SVGSymbolElement) {
-    Object.defineProperty(globalThis, 'SVGSymbolElement', {
-      configurable: true,
-      value: SVGElement,
-    })
-  }
+  patchCssStyleSheet()
+  patchSvgSymbolElement()
 
   const [
     { registerRrrIcon },
@@ -38,11 +29,11 @@ beforeAll(async () => {
 
 beforeEach(() => {
   document.body.innerHTML = ''
-  initLocale('en-US')
+  initTestLocale()
 })
 
 describe('routine exercise picker', () => {
-  test('renders exercises alphabetically and narrows the list without replacing search focus', async () => {
+  specIt('renders exercises alphabetically and narrows the list without replacing search focus', ['PICKER-SRCH-001', 'PICKER-SRCH-002', 'PICKER-SRCH-003'], async () => {
     const exercises = createDefaultData().exercises.slice(0, 8).reverse()
     const picker = new RrrRoutineExercisePicker()
     picker.exercises = exercises
@@ -86,7 +77,7 @@ describe('routine exercise picker', () => {
       .toBe(`${expectedMatches.length} exercises found`)
   })
 
-  test('uses the complete row as an accessible Add action and reports selection', async () => {
+  specIt('uses the complete row as an accessible Add action and reports selection', ['PICKER-ADD-001', 'PICKER-ADD-002', 'PICKER-ADD-003'], async () => {
     const exercise = createDefaultData().exercises[0]!
     const picker = new RrrRoutineExercisePicker()
     picker.exercises = [exercise]
@@ -111,7 +102,7 @@ describe('routine exercise picker', () => {
     expect(selectedExerciseId).toBe(exercise.id)
   })
 
-  test('shows a clear empty state for a search with no matches', async () => {
+  specIt('shows a clear empty state for a search with no matches', ['PICKER-SRCH-004'], async () => {
     const picker = new RrrRoutineExercisePicker()
     picker.exercises = createDefaultData().exercises.slice(0, 4)
     document.body.append(picker)
@@ -130,10 +121,4 @@ describe('routine exercise picker', () => {
   })
 })
 
-function getDeepActiveElement(): Element | null {
-  let activeElement: Element | null = document.activeElement
-  while (activeElement?.shadowRoot?.activeElement) {
-    activeElement = activeElement.shadowRoot.activeElement
-  }
-  return activeElement
-}
+

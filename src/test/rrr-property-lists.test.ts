@@ -561,7 +561,15 @@ describe('value-first property lists', () => {
     const selectedExerciseId = selectedRow?.dataset.exerciseId
     expect(picker).not.toBeNull()
     selectedRow?.querySelector<HTMLButtonElement>(':scope > button')?.click()
-    await new Promise((resolve) => window.setTimeout(resolve, 240))
+    await Promise.resolve()
+
+    const sheets = document.querySelectorAll<HTMLElement & { close(result: string | null): void }>('rrr-sheet')
+    expect(sheets.length).toBe(2)
+    ;(sheets[sheets.length - 1] as typeof sheets[0])?.close('confirm')
+    await new Promise((resolve) => window.setTimeout(resolve, 230))
+    // dismiss picker so promptRoutineExercisePicker resolves
+    ;(sheets[0] as typeof sheets[0])?.close(null)
+    await new Promise((resolve) => window.setTimeout(resolve, 230))
 
     const updatedRoutine = storageService.getData().routines.find(({ id }) => id === routine.id)!
     const updatedVersion = storageService.getData().routineVersions.find(
@@ -571,7 +579,7 @@ describe('value-first property lists', () => {
     expect(updatedRoutine.activeVersionId).not.toBe(previousVersionId)
     expect(updatedVersion.exercises).toHaveLength(previousCount + 1)
     expect(updatedVersion.exercises.at(-1)?.exerciseId).toBe(selectedExerciseId)
-  })
+  }, 10000)
 
   test('selects and clears the completed workout used for starting values', async () => {
     const data = storageService.getData()

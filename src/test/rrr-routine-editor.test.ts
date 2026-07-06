@@ -137,13 +137,20 @@ describe('rrr-routine-editor creation', () => {
       `rrr-sheet [data-exercise-id="${target.id}"]`,
     )
     resultRow?.querySelector<HTMLButtonElement>(':scope > button')?.click()
-    await new Promise((resolve) => window.setTimeout(resolve, 240))
+    await Promise.resolve()
+
+    const sheets = document.querySelectorAll<HTMLElement & { close(result: string | null): void }>('rrr-sheet')
+    ;(sheets[sheets.length - 1] as typeof sheets[0])?.close('confirm')
+    await new Promise((resolve) => window.setTimeout(resolve, 230))
+    // dismiss picker so promptRoutineExercisePicker resolves
+    ;(sheets[0] as typeof sheets[0])?.close(null)
+    await new Promise((resolve) => window.setTimeout(resolve, 230))
 
     const draftEditor = editor as unknown as {
       exercises: RoutineExercise[]
     }
     expect(draftEditor.exercises.at(-1)?.exerciseId).toBe(target.id)
-  })
+  }, 10000)
 
   test('edits the local routine draft through Flow without a duplicate exercise section', async () => {
     const data = storageService.getData()

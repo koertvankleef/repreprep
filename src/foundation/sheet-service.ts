@@ -12,22 +12,7 @@ interface SheetElement extends HTMLElement {
 
 const sheetTagName = 'rrr-sheet'
 
-function getDeepActiveElement(): Element | null {
-  let activeElement: Element | null = document.activeElement
-
-  while (activeElement?.shadowRoot?.activeElement) {
-    activeElement = activeElement.shadowRoot.activeElement
-  }
-
-  return activeElement
-}
-
 function getSheetRoot(): Document | ShadowRoot {
-  const activeRoot = getDeepActiveElement()?.getRootNode()
-  if (activeRoot instanceof ShadowRoot) {
-    return activeRoot
-  }
-
   const appRoot = document.querySelector<HTMLElement>('rrr-app')?.shadowRoot
   return appRoot ?? document
 }

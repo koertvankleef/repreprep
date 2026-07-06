@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
   danger: vi.fn(),
 }))
 
-vi.mock('../utils/sheet-service.ts', () => ({
+vi.mock('../foundation/sheet-service.ts', () => ({
   confirmSheet: mocks.confirmSheet,
 }))
 
