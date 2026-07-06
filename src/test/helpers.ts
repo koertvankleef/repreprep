@@ -26,8 +26,9 @@ export function specIt(
   name: string,
   ids: SpecId[],
   fn: () => MaybePromise<unknown>,
+  timeout?: number,
 ): void {
-  it(name, () => fn())
+  it(name, () => fn(), timeout)
   specMap.push({ testName: name, ids: [...ids] })
 }
 

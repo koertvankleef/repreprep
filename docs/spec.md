@@ -7,6 +7,10 @@ This spec:
 * Describes **what the system guarantees**
 * Uses **plain domain language**
 
+> Verification note: Every requirement ID must be referenced by an automated
+> test through `specIt`, or carry `[UI-req_test-pending]` on the same line when
+> it requires rendered browser/user verification that is not automated yet.
+>
 > Requirement IDs are stable traceability anchors. Retired IDs are
 > intentionally kept and not renumbered.
 
@@ -101,6 +105,29 @@ The complete exercise row is the add target; there is no separate small button
 exercise name [PICKER-ADD-002]. A trailing plus icon provides a reinforcing
 visual cue [PICKER-ADD-003]. The same exercise may be added more than once to
 a routine [PICKER-ADD-004].
+
+## 2.3 Configuration session
+
+Activating an exercise opens a second-level configuration sheet while the
+picker remains open underneath it [PICKER-CONFIG-001]. Only one configuration
+sheet may be open from the picker at a time [PICKER-CONFIG-002].
+
+The first exercise configured in a picker session starts with one set and 60
+seconds rest [PICKER-CONFIG-003]. Confirming the configuration adds a complete
+routine exercise and makes those confirmed values the defaults for the next
+exercise configured during the same picker session [PICKER-CONFIG-004].
+Dismissing configuration adds nothing and does not change the session defaults
+[PICKER-CONFIG-005].
+
+Each confirmed addition is committed immediately when editing an existing
+routine [PICKER-CONFIG-006]. During new-routine creation, confirmed additions
+remain in the local draft until the user creates the routine
+[PICKER-CONFIG-007].
+
+After confirmation, the configuration sheet closes before the success message
+appears [PICKER-CONFIG-008]. The picker retains its search, list position, and
+focus context after configuration is confirmed or dismissed
+[PICKER-CONFIG-009].
 
 ---
 

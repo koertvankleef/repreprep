@@ -10,6 +10,7 @@ import { storageService } from '../app/storage-instance.ts'
 import { RrrExerciseDetail } from '../app/components/exercises/rrr-exercise-detail.ts'
 import { RrrRoutineDetail } from '../app/components/routines/rrr-routine-detail.ts'
 import { createWorkoutFromRoutine } from '../domain/workout-service.ts'
+import { specIt } from './helpers.ts'
 
 beforeAll(async () => {
   if (!('replaceSync' in CSSStyleSheet.prototype)) {
@@ -539,7 +540,7 @@ describe('value-first property lists', () => {
     expect(window.location.hash).toMatch(/^#\/workouts\/.+\/log$/)
   })
 
-  test('adds a routine exercise from the flow card', async () => {
+  specIt('adds a routine exercise from the flow card', ['PICKER-CONFIG-006'], async () => {
     const routine = storageService.getData().routines[0]!
     const previousVersionId = routine.activeVersionId
     const previousVersion = storageService.getData().routineVersions.find(

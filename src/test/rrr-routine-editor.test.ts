@@ -7,6 +7,7 @@ import { registerRrrSheet } from '../design-system/components/rrr-sheet.ts'
 import { storageService } from '../app/storage-instance.ts'
 import { RrrRoutineEditor } from '../app/components/routines/rrr-routine-editor.ts'
 import type { RoutineExercise } from '../domain/types.ts'
+import { specIt } from './helpers.ts'
 
 const natoPrefixPattern = '(Alpha|Bravo|Charlie|Delta|Echo|Foxtrot|Golf|Hotel|India|Juliett|Kilo|Lima|Mike|November|Oscar|Papa|Quebec|Romeo|Sierra|Tango|Uniform|Victor|Whiskey|X-ray|Yankee|Zulu)'
 
@@ -111,7 +112,7 @@ describe('rrr-routine-editor creation', () => {
     expect(created?.name).toBe('Morning Session')
   })
 
-  test('adds a selected exercise to the local routine draft through search', async () => {
+  specIt('adds a selected exercise to the local routine draft through search', ['PICKER-CONFIG-007'], async () => {
     const editor = new RrrRoutineEditor()
     document.body.append(editor)
     await Promise.resolve()

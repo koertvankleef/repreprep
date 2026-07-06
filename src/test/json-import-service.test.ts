@@ -51,6 +51,22 @@ describe('json-import-service', () => {
     expect(isValidAppData(invalid)).toBe(false)
   })
 
+  specIt('isValidAppData rejects the complete import when one entry is invalid', ['DATA-VALID-006'], () => {
+    const data = createDefaultData()
+    const validVersion = data.routineVersions[0]!
+    const invalidVersion = {
+      ...validVersion,
+      id: 'invalid-version',
+      exercises: validVersion.exercises.map((exercise, index) =>
+        index === 0 ? { ...exercise, setCount: 0 } : exercise),
+    }
+
+    expect(isValidAppData({
+      ...data,
+      routineVersions: [validVersion, invalidVersion],
+    })).toBe(false)
+  })
+
   specIt('isValidAppData requires persisted workout completion state', ['DATA-VALID-005'], () => {
     const data = createDefaultData()
     const invalidWorkout = {

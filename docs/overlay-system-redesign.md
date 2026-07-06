@@ -5,14 +5,14 @@ complete and durable guidance has moved to `docs/design-system.md`.
 
 ## Architectural contract
 
-The application has two task-overlay primitives:
-
-- **Sheet** — the default for temporary tasks in the context of the current page.
-- **Modal dialog** — an exception for interactions that genuinely do not fit a
-  sheet.
+The application currently has one task-overlay primitive: **Sheet**, the
+default for temporary tasks in the context of the current page. The legacy
+dialog host and dialog service have been removed. Introduce another primitive
+only when a concrete interaction cannot honestly use a sheet.
 
 Sheets are not routes. Opening or dismissing a sheet does not alter navigation
-history. Navigation dismisses any sheets owned by the previous page.
+history. Cleaning up page-owned sheets during navigation remains an open
+ownership requirement below.
 
 Every sheet is an independent presentation layer with its own native dialog,
 backdrop, result promise, focus lifecycle, and dismissal behavior. Independent
@@ -40,7 +40,7 @@ topmost sheet's presentation layer. Tooltips remain above every other surface.
 - [x] Respect reduced-motion preferences.
 - [x] Keep toasts above the active sheet and tooltips above toasts.
 - [x] Migrate Routine deletion to an affirmative-only danger confirmation sheet.
-- [x] Test two stacked sheets even though the first production consumer opens one.
+- [x] Test stacked sheets and exercise them in a nested production flow.
 - [ ] Manually verify Android Back on a physical device.
 - [ ] Manually verify touch dragging, narrow screens, enlarged text, dark theme,
   and both high-contrast variants.
@@ -60,13 +60,15 @@ topmost sheet's presentation layer. Tooltips remain above every other surface.
 
 ## Later phases
 
-- [ ] Migrate the Today-page workout deletion confirmation.
-- [ ] Migrate import confirmation and prompt-based workflows.
-- [ ] Define content-size variants for larger temporary tasks and pickers.
-- [ ] Exercise a real nested product flow and refine stacked-sheet visuals.
+- [x] Migrate the Today-page workout deletion confirmation.
+- [x] Migrate import confirmation and prompt-based workflows.
+- [x] Keep larger picker sizing feature-owned instead of introducing generic
+      content-size variants without another concrete use case.
+- [x] Exercise a real nested product flow through routine exercise
+      configuration.
+- [ ] Refine stacked-sheet visuals on physical devices and enlarged text.
 - [ ] Confirm navigation always clears sheets owned by the previous page.
-- [ ] Keep and document modal-dialog use for exceptional cases.
-- [ ] Move durable usage guidance to `docs/design-system.md`.
+- [x] Move durable usage guidance to `docs/design-system.md`.
 - [x] Remove the legacy confirmation/prompt dialog host when its final consumer
   has migrated.
 - [ ] Remove this tracker.

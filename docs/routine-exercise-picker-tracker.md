@@ -1,6 +1,7 @@
 # Routine Exercise Picker — Implementation Tracker
 
-Status: agreed product direction; implementation is split into small batches.
+Status: Batches 1–3 are complete; live filters and interaction/device
+verification remain.
 
 ## Intended outcome
 
@@ -107,16 +108,16 @@ decision rather than a picker-only exception.
 
 ### Batch 3 — Nested configuration and repeated addition
 
-- [ ] Open Configure as a second-level sheet without dismissing the picker.
-- [ ] Reuse the established set-count and rest-time controls.
-- [ ] Separate add-mode configuration from edit-mode deletion behavior.
-- [ ] Seed the first configuration from domain defaults.
-- [ ] Carry the latest confirmed values to the next configuration.
-- [ ] Leave defaults unchanged after cancellation.
-- [ ] Commit each confirmed addition immediately on existing routine detail.
-- [ ] Keep additions local in new-routine creation until Create routine.
-- [ ] Show the localized confirmation toast after Configure has closed.
-- [ ] Restore picker focus and list position after confirm and dismissal.
+- [x] Open Configure as a second-level sheet without dismissing the picker.
+- [x] Reuse the established set-count and rest-time controls.
+- [x] Separate add-mode configuration from edit-mode deletion behavior.
+- [x] Seed the first configuration from domain defaults.
+- [x] Carry the latest confirmed values to the next configuration.
+- [x] Leave defaults unchanged after cancellation.
+- [x] Commit each confirmed addition immediately on existing routine detail.
+- [x] Keep additions local in new-routine creation until Create routine.
+- [x] Show the localized confirmation toast after Configure has closed.
+- [x] Restore picker focus and list position after confirm and dismissal.
 
 ### Batch 4 — Nested live filters
 
