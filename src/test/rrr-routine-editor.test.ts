@@ -31,10 +31,15 @@ beforeAll(async () => {
     },
   })
 
-  const { registerRrrNumberStepper } = await import(
-    '../design-system/components/rrr-number-stepper.ts'
-  )
+  const [
+    { registerRrrInput },
+    { registerRrrNumberStepper },
+  ] = await Promise.all([
+    import('../design-system/components/rrr-input.ts'),
+    import('../design-system/components/rrr-number-stepper.ts'),
+  ])
   initLocale('en-US')
+  registerRrrInput()
   registerRrrListRow()
   registerRrrNumberStepper()
   registerRrrSequence()
@@ -104,6 +109,40 @@ describe('rrr-routine-editor creation', () => {
     expect(storageService.getData().routines).toHaveLength(initialCount + 1)
     const created = storageService.getData().routines.at(-1)
     expect(created?.name).toBe('Morning Session')
+  })
+
+  test('adds a selected exercise to the local routine draft through search', async () => {
+    const editor = new RrrRoutineEditor()
+    document.body.append(editor)
+    await Promise.resolve()
+
+    editor
+      .querySelector<HTMLButtonElement>(
+        'rrr-list-row[data-action="add-routine-exercise"] > button',
+      )
+      ?.click()
+    await Promise.resolve()
+
+    const search = document.querySelector<HTMLElement & { value: string }>(
+      'rrr-sheet [data-routine-exercise-search]',
+    )!
+    const target = storageService.getData().exercises.find(
+      (exercise) => exercise.name.toLowerCase().includes('plank'),
+    )!
+    search.value = target.name
+    search.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    await Promise.resolve()
+
+    const resultRow = document.querySelector<HTMLElement>(
+      `rrr-sheet [data-exercise-id="${target.id}"]`,
+    )
+    resultRow?.querySelector<HTMLButtonElement>(':scope > button')?.click()
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    const draftEditor = editor as unknown as {
+      exercises: RoutineExercise[]
+    }
+    expect(draftEditor.exercises.at(-1)?.exerciseId).toBe(target.id)
   })
 
   test('edits the local routine draft through Flow without a duplicate exercise section', async () => {

@@ -93,17 +93,17 @@ decision rather than a picker-only exception.
 
 ### Batch 2 — Searchable picker session
 
-- [ ] Introduce a feature-level routine exercise picker shared by routine
+- [x] Introduce a feature-level routine exercise picker shared by routine
       creation and routine detail.
-- [ ] Replace both current select-based Add exercise sheets.
-- [ ] Render active exercises alphabetically.
-- [ ] Add live search using the shared exercise search semantics.
-- [ ] Make the list body consume the first-level allowance and scroll
+- [x] Replace both current select-based Add exercise sheets.
+- [x] Render active exercises alphabetically.
+- [x] Add live search using the shared exercise search semantics.
+- [x] Make the list body consume the first-level allowance and scroll
       internally.
-- [ ] Preserve query, scroll position, and focus while the picker remains open.
-- [ ] Add accessible full-row Add actions with a plus cue.
-- [ ] Preserve duplicate-exercise support.
-- [ ] Cover empty results, keyboard operation, and both routine entry points.
+- [x] Preserve query, scroll position, and focus while the picker remains open.
+- [x] Add accessible full-row Add actions with a plus cue.
+- [x] Preserve duplicate-exercise support.
+- [x] Cover empty results, keyboard operation, and both routine entry points.
 
 ### Batch 3 — Nested configuration and repeated addition
 

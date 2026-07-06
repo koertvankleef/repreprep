@@ -29,6 +29,7 @@ import {
   type RoutineFlowGutterMotion,
 } from './routine-flow-markup.ts'
 import { announceRoutineFlowSort } from './routine-flow-sorting.ts'
+import { promptRoutineExercisePicker } from './routine-exercise-picker.ts'
 
 export class RrrRoutineEditor extends HTMLElement {
   private static readonly defaultTransitionSeconds = 10
@@ -311,36 +312,9 @@ export class RrrRoutineEditor extends HTMLElement {
       return
     }
 
-    const sheet = document.createElement('rrr-sheet') as RrrSheet
-    const heading = document.createElement('h3')
-    heading.slot = 'heading'
-    heading.className = 'sheet-title'
-    heading.textContent = t('label.addExercise')
-
-    const select = document.createElement('rrr-select') as HTMLElement & { value: string }
-    select.slot = 'body'
-    select.setAttribute('label', t('label.addExercise'))
-    select.setAttribute('name', 'add-exercise')
-    select.innerHTML = options
-      .map((exercise) => `<option value="${escapeHtml(exercise.id)}">${escapeHtml(exercise.name)}</option>`)
-      .join('')
-    select.value = options[0]?.id ?? ''
-
-    const confirmButton = document.createElement('rrr-button')
-    confirmButton.slot = 'actions'
-    confirmButton.setAttribute('type', 'button')
-    confirmButton.setAttribute('data-sheet-result', 'confirm')
-    confirmButton.textContent = t('action.add')
-
-    sheet.append(heading, select, confirmButton)
-
     this.timingSheetActive = true
     try {
-      if (await presentSheet(sheet) !== 'confirm') {
-        return
-      }
-
-      const exerciseId = String(select.value ?? '').trim()
+      const exerciseId = await promptRoutineExercisePicker(options)
       if (!exerciseId) {
         return
       }

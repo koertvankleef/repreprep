@@ -35,8 +35,15 @@ beforeAll(async () => {
     Object.defineProperty(ShadowRoot.prototype, 'adoptedStyleSheets', descriptor)
   }
 
-  const { registerRrrNumberStepper } = await import('../design-system/components/rrr-number-stepper.ts')
+  const [
+    { registerRrrInput },
+    { registerRrrNumberStepper },
+  ] = await Promise.all([
+    import('../design-system/components/rrr-input.ts'),
+    import('../design-system/components/rrr-number-stepper.ts'),
+  ])
   initLocale('en-US')
+  registerRrrInput()
   registerRrrNumberStepper()
   registerRrrSheet()
   registerRrrListRow()
@@ -549,8 +556,11 @@ describe('value-first property lists', () => {
       ?.click()
     await Promise.resolve()
 
-    expect(document.querySelector('rrr-sheet rrr-select[name="add-exercise"]')).not.toBeNull()
-    document.querySelector<HTMLElement>('rrr-sheet [data-sheet-result="confirm"]')?.click()
+    const picker = document.querySelector('rrr-sheet rrr-routine-exercise-picker')
+    const selectedRow = picker?.querySelector<HTMLElement>('[data-exercise-id]')
+    const selectedExerciseId = selectedRow?.dataset.exerciseId
+    expect(picker).not.toBeNull()
+    selectedRow?.querySelector<HTMLButtonElement>(':scope > button')?.click()
     await new Promise((resolve) => window.setTimeout(resolve, 240))
 
     const updatedRoutine = storageService.getData().routines.find(({ id }) => id === routine.id)!
@@ -560,6 +570,7 @@ describe('value-first property lists', () => {
 
     expect(updatedRoutine.activeVersionId).not.toBe(previousVersionId)
     expect(updatedVersion.exercises).toHaveLength(previousCount + 1)
+    expect(updatedVersion.exercises.at(-1)?.exerciseId).toBe(selectedExerciseId)
   })
 
   test('selects and clears the completed workout used for starting values', async () => {
