@@ -3,7 +3,7 @@ import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
 import type { Workout } from '../../../domain/types.ts'
 import { formatDate, t } from '../../../i18n/index.ts'
 import { formatShortDate } from '../../render-helpers.ts'
-import { presentSheet } from '../../../utils/sheet-service.ts'
+import { presentSheet } from '../../../foundation/sheet-service.ts'
 
 const noPrefillValue = '__none__'
 

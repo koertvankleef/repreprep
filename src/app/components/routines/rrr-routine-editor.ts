@@ -14,9 +14,9 @@ import type {
   SwipeActionCommitDetail,
 } from '../../../design-system/components/rrr-swipe-action.ts'
 import { escapeHtml } from '../../render-helpers.ts'
-import { confirmSheet } from '../../../utils/sheet-service.ts'
+import { confirmSheet } from '../../../foundation/sheet-service.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
-import { presentSheet } from '../../../utils/sheet-service.ts'
+import { presentSheet } from '../../../foundation/sheet-service.ts'
 import {
   promptRoutineTransitionDefault,
   promptTransitionOverride,

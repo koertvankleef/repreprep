@@ -1,7 +1,7 @@
 import type { RrrNumberStepper } from '../../../design-system/components/rrr-number-stepper.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
 import { getLocale, t } from '../../../i18n/index.ts'
-import { presentSheet } from '../../../utils/sheet-service.ts'
+import { presentSheet } from '../../../foundation/sheet-service.ts'
 
 export type RoutineExerciseSettings = {
   setCount: number

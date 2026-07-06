@@ -3,7 +3,7 @@ import { t } from '../../../i18n/index.ts'
 import { exportToJson } from '../../../import-export/json-export-service.ts'
 import { importFromJson } from '../../../import-export/json-import-service.ts'
 import styles from './rrr-import-export.css?inline'
-import { confirmSheet } from '../../../utils/sheet-service.ts'
+import { confirmSheet } from '../../../foundation/sheet-service.ts'
 import { toastService } from '../../../foundation/toast.ts'
 import type { RrrListRow } from '../../../design-system/components/rrr-list-row.ts'
 

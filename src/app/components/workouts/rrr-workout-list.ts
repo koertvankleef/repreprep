@@ -6,7 +6,7 @@ import { t } from '../../../i18n/index.ts'
 import { formatCalendarDate } from '../../render-helpers.ts'
 import { todayIso } from '../../../utils/date.ts'
 import styles from './rrr-workout-list.css?inline'
-import { confirmSheet } from '../../../utils/sheet-service.ts'
+import { confirmSheet } from '../../../foundation/sheet-service.ts'
 
 export class RrrWorkoutList extends HTMLElement {
   private selectedRoutineId: string | null = null

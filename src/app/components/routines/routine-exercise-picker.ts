@@ -2,7 +2,7 @@ import { searchExercises } from '../../../domain/exercise-service.ts'
 import type { ExerciseDefinition } from '../../../domain/types.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
 import { getLocale, t, tPlural } from '../../../i18n/index.ts'
-import { presentSheet } from '../../../utils/sheet-service.ts'
+import { presentSheet } from '../../../foundation/sheet-service.ts'
 import { toastService } from '../../../foundation/toast.ts'
 import { escapeHtml } from '../../render-helpers.ts'
 import { promptAddRoutineExerciseSettings, type RoutineExerciseSettings } from './routine-exercise-sheets.ts'
@@ -215,6 +215,4 @@ export async function promptRoutineExercisePicker(
   await presentSheet(sheet)
 }
 
-if (!customElements.get('rrr-routine-exercise-picker')) {
-  customElements.define('rrr-routine-exercise-picker', RrrRoutineExercisePicker)
-}
+customElements.define('rrr-routine-exercise-picker', RrrRoutineExercisePicker)

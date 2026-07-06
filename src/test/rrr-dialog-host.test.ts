@@ -34,7 +34,7 @@ describe('dialog service portal', () => {
     document.body.appendChild(app)
     trigger.focus()
 
-    const { confirmDialog } = await import('../utils/dialog-service.ts')
+    const { confirmDialog } = await import('../foundation/dialog-service.ts')
     const result = confirmDialog({
       title: 'Delete workout',
       message: 'This cannot be undone.',
