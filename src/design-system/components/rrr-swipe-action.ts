@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../utils/html.ts'
 import { defineCustomElementOnce } from './shared.ts'
 import { registerRrrIcon } from './rrr-icon.ts'
 
@@ -298,14 +299,6 @@ export class RrrSwipeAction extends HTMLElement {
       }
     })
   }
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
 }
 
 export function registerRrrSwipeAction(): void {

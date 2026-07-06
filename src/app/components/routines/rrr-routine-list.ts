@@ -5,7 +5,8 @@ import {
 } from '../../../domain/routine-summary-service.ts'
 import { t } from '../../../i18n/index.ts'
 import type { Muscle } from '../../../domain/types.ts'
-import { escapeHtml, formatShortDate, getMuscleLabel } from '../../render-helpers.ts'
+import { getMuscleLabel } from '../../exercise-labels.ts'
+import { escapeHtml, formatShortDate } from '../../render-helpers.ts'
 import styles from './rrr-routine-list.css?inline'
 
 const previewExerciseCount = 3

@@ -24,10 +24,10 @@ import type {
 import type {
   SwipeActionCommitDetail,
 } from '../../../design-system/components/rrr-swipe-action.ts'
+import { getMuscleLabel } from '../../exercise-labels.ts'
 import {
   escapeHtml,
   formatShortDate,
-  getMuscleLabel,
   renderPropertyRow,
 } from '../../render-helpers.ts'
 import {

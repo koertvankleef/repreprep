@@ -2,6 +2,8 @@
 
 Use this file to capture product and prototype follow-up tasks that should not be forgotten.
 
+- [ ] [top priority — architecture] `rrr-app.ts` is a god component that must be split before it becomes unmaintainable. It currently owns eight distinct responsibilities in a single Shadow DOM class: (1) hash routing and route transitions, (2) navigation/header markup rendering, (3) exercise filter state, (4) theme preferences (load/apply/persist/watch), (5) language preferences (load/apply/persist), (6) PWA install prompt, (7) data reset via `rrr-clear-data-request`, (8) all `render*` methods for route-specific header HTML. Splitting requires deciding on component boundaries first — a splitting strategy doc/discussion is needed before touching the file. A natural entry point is the planned options/settings panel work (see `upcoming-options-panel.md`), which would pull preferences and nav controls out into a dedicated component. Any split carries real regression risk and must be done with full test and build verification.
+
 - [ ] [top priority] In active workout logging, always show the current exercise load/weight prominently so the user can execute sets without guessing.
 - [ ] [top priority] During transition between exercises in an active workout, show the upcoming exercise load/weight so the user can prepare equipment in time.
 - [ ] During a workout, use the Screen Wake Lock API so the phone does not lock.

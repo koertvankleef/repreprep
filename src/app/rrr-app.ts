@@ -32,11 +32,8 @@ import {
   saveLanguagePreference,
   type LanguagePreference,
 } from './language-preferences.ts'
-import {
-  escapeHtml,
-  getEquipmentLabel,
-  getExerciseCategoryLabel,
-} from './render-helpers.ts'
+import { getEquipmentLabel, getExerciseCategoryLabel } from './exercise-labels.ts'
+import { escapeHtml } from './render-helpers.ts'
 import globalStyles from '../design-system/global.css?inline'
 import appStyles from './rrr-app.css?inline'
 

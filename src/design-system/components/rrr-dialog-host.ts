@@ -1,4 +1,5 @@
 import { t } from '../../i18n/index.ts'
+import { escapeHtml } from '../../utils/html.ts'
 import { defineCustomElementOnce } from './shared.ts'
 import styles from './rrr-dialog-host.css?inline'
 
@@ -199,10 +200,6 @@ export class RrrDialogHost extends HTMLElement {
       this.getPromptField()?.removeAttribute('error-text')
     })
   }
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 export function registerRrrDialogHost(): void {

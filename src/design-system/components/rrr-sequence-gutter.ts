@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../utils/html.ts'
 import { defineCustomElementOnce } from './shared.ts'
 import { registerRrrMeasurement } from './rrr-measurement.ts'
 
@@ -56,10 +57,6 @@ export class RrrSequenceGutter extends HTMLElement {
       `
       : content
   }
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 export function registerRrrSequenceGutter(): void {

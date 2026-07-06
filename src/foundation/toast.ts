@@ -1,4 +1,5 @@
 import { t } from '../i18n/index.ts'
+import { escapeHtml } from '../utils/html.ts'
 import { getTopSheetPresentation, subscribeToSheetStack } from './presentation-stack.ts'
 
 export type ToastType = 'info' | 'success' | 'warning' | 'danger' | 'neutral'
@@ -276,15 +277,6 @@ class RrrToastElement extends HTMLElement {
     actionButton?.addEventListener('click', () => this.handleActionClick())
     closeButton?.addEventListener('click', () => this.handleCloseClick())
   }
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;')
 }
 
 function getDurationMs(options: ToastOptions): number {

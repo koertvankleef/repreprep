@@ -1,30 +1,7 @@
-import type {
-  Equipment,
-  ExerciseCategory,
-  MeasurementType,
-  Muscle,
-} from '../domain/types.ts'
-import { formatDate, t } from '../i18n/index.ts'
+import { formatDate } from '../i18n/index.ts'
+import { escapeHtml } from '../utils/html.ts'
 
-export function escapeHtml(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-}
-
-export function getExerciseCategoryLabel(category: ExerciseCategory): string {
-  return t(`exercise.category.${category}`)
-}
-
-export function getEquipmentLabel(equipment: Equipment): string {
-  return t(`exercise.equipment.${equipment}`)
-}
-
-export function getMuscleLabel(muscle: Muscle): string {
-  return t(`exercise.muscle.${muscle}`)
-}
-
-export function getMeasurementTypeLabel(type: MeasurementType): string {
-  return t(`exercise.measurement.${type}`)
-}
+export { escapeHtml }
 
 export function formatCalendarDate(value: string): string {
   const date = new Date(`${value}T12:00:00`)

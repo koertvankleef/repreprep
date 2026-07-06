@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../utils/html.ts'
 import { defineCustomElementOnce } from './shared.ts'
 
 export class RrrMeasurement extends HTMLElement {
@@ -22,14 +23,6 @@ export class RrrMeasurement extends HTMLElement {
       <span class="rrr-measurement__unit">${escapeHtml(unit)}</span>
     `
   }
-}
-
-function escapeHtml(text: string): string {
-  return text
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
 }
 
 export function registerRrrMeasurement(): void {

@@ -5,11 +5,13 @@ import type {
 } from '../../../domain/types.ts'
 import { formatDate, t } from '../../../i18n/index.ts'
 import {
-  escapeHtml,
   getEquipmentLabel,
   getExerciseCategoryLabel,
   getMeasurementTypeLabel,
   getMuscleLabel,
+} from '../../exercise-labels.ts'
+import {
+  escapeHtml,
   renderPropertyRow,
   type PropertyRow,
 } from '../../render-helpers.ts'

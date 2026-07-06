@@ -3,11 +3,11 @@ import type { AppData, ExerciseDefinition, MeasurementProfile } from '../../../d
 import { t } from '../../../i18n/index.ts'
 import { FocusedSequenceController, type FocusSequenceState } from '../../focused-sequence-controller.ts'
 import {
-  escapeHtml,
   getEquipmentLabel,
   getMeasurementTypeLabel,
   getMuscleLabel,
-} from '../../render-helpers.ts'
+} from '../../exercise-labels.ts'
+import { escapeHtml } from '../../render-helpers.ts'
 import { storageService } from '../../storage-instance.ts'
 import styles from './rrr-exercise-catalogue.css?inline'
 
