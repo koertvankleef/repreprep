@@ -293,6 +293,20 @@ when dismissing and canceling have the same result.
 Non-dismissible sheets omit the Close control and must provide an explicit
 action that completes the workflow.
 
+Sheets may open another sheet for a temporary drill-in task. Each open sheet
+receives a one-based presentation depth, and its maximum height reserves one
+`--rrr-sheet-stack-step` of viewport space per level. Sheets remain
+content-height driven below that maximum: do not stretch a short child merely
+to advertise the stack, translate a covered parent, or add feature-specific
+stack offsets.
+
+A visible stack is also an authoring responsibility. A sheet that opens a
+child must be naturally or deliberately taller than that child so the parent's
+rounded top and handle remain visible through the child's backdrop. Long
+browsing and selection sheets are suitable parents. When that height
+relationship cannot be guaranteed, use in-place progression or another
+presentation rather than an invisible sheet stack.
+
 Within a sheet, Enter in `rrr-input`, a text-entry native input, or the editable
 input of `rrr-number-stepper` advances to the next enabled field. For a number
 stepper, this applies only when Enter originates from its editable text input;

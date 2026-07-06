@@ -61,7 +61,7 @@ describe('sheet presentation', () => {
       confirmLabel: 'Continue',
     })
 
-    const sheets = Array.from(document.querySelectorAll('rrr-sheet'))
+    const sheets = Array.from(document.querySelectorAll<HTMLElement>('rrr-sheet'))
     const firstDialog = sheets[0]?.querySelector<HTMLDialogElement>('dialog')
     const secondDialog = sheets[1]?.querySelector<HTMLDialogElement>('dialog')
 
@@ -69,6 +69,14 @@ describe('sheet presentation', () => {
     expect(firstDialog?.open).toBe(true)
     expect(secondDialog?.open).toBe(true)
     expect(getTopSheetPresentation()?.host).toBe(sheets[1])
+    expect(sheets[0]?.dataset.sheetStackDepth).toBe('1')
+    expect(sheets[1]?.dataset.sheetStackDepth).toBe('2')
+    expect(sheets[0]?.style.getPropertyValue('--rrr-sheet-stack-offset')).toBe(
+      'calc(var(--rrr-sheet-stack-step))',
+    )
+    expect(sheets[1]?.style.getPropertyValue('--rrr-sheet-stack-offset')).toBe(
+      'calc(var(--rrr-sheet-stack-step) + var(--rrr-sheet-stack-step))',
+    )
 
     firstDialog?.dispatchEvent(new Event('cancel', { cancelable: true }))
     expect(firstDialog?.hasAttribute('data-closing')).toBe(false)
@@ -78,7 +86,52 @@ describe('sheet presentation', () => {
 
     expect(firstDialog?.open).toBe(true)
     expect(getTopSheetPresentation()?.host).toBe(sheets[0])
+    expect(sheets[0]?.dataset.sheetStackDepth).toBe('1')
+    expect(sheets[0]?.style.getPropertyValue('--rrr-sheet-stack-offset')).toBe(
+      'calc(var(--rrr-sheet-stack-step))',
+    )
+    expect(sheets[1]?.dataset.sheetStackDepth).toBeUndefined()
+    expect(sheets[1]?.style.getPropertyValue('--rrr-sheet-stack-offset')).toBe('')
 
+    sheets[0]?.querySelector<HTMLElement>('[data-action="confirm"]')?.click()
+    await expect(firstResult).resolves.toBe(true)
+  })
+
+  test('recalculates presentation depth when a sheet leaves the middle of the stack', async () => {
+    const firstResult = confirmSheet({
+      title: 'First task',
+      message: 'First message',
+      confirmLabel: 'Continue',
+    })
+    const secondResult = confirmSheet({
+      title: 'Second task',
+      message: 'Second message',
+      confirmLabel: 'Continue',
+    })
+    const thirdResult = confirmSheet({
+      title: 'Third task',
+      message: 'Third message',
+      confirmLabel: 'Continue',
+    })
+    const sheets = Array.from(document.querySelectorAll<HTMLElement>('rrr-sheet'))
+
+    expect(sheets.map((sheet) => sheet.dataset.sheetStackDepth)).toEqual([
+      '1',
+      '2',
+      '3',
+    ])
+
+    sheets[1]?.remove()
+    await expect(secondResult).resolves.toBe(false)
+
+    expect(sheets[0]?.dataset.sheetStackDepth).toBe('1')
+    expect(sheets[2]?.dataset.sheetStackDepth).toBe('2')
+    expect(sheets[2]?.style.getPropertyValue('--rrr-sheet-stack-offset')).toBe(
+      'calc(var(--rrr-sheet-stack-step) + var(--rrr-sheet-stack-step))',
+    )
+
+    sheets[2]?.querySelector<HTMLElement>('[data-action="confirm"]')?.click()
+    await expect(thirdResult).resolves.toBe(true)
     sheets[0]?.querySelector<HTMLElement>('[data-action="confirm"]')?.click()
     await expect(firstResult).resolves.toBe(true)
   })

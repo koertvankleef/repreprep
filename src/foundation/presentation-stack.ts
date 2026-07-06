@@ -10,6 +10,7 @@ const listeners = new Set<StackChangeListener>()
 
 export function registerSheetPresentation(presentation: SheetPresentation): () => void {
   sheetStack.push(presentation)
+  updatePresentationDepths()
   notifyStackChange()
 
   return () => {
@@ -19,6 +20,8 @@ export function registerSheetPresentation(presentation: SheetPresentation): () =
     }
 
     sheetStack.splice(index, 1)
+    clearPresentationDepth(presentation)
+    updatePresentationDepths()
     notifyStackChange()
   }
 }
@@ -35,4 +38,27 @@ export function subscribeToSheetStack(listener: StackChangeListener): () => void
 function notifyStackChange(): void {
   const top = getTopSheetPresentation()
   listeners.forEach((listener) => listener(top))
+}
+
+function updatePresentationDepths(): void {
+  sheetStack.forEach((presentation, index) => {
+    const depth = index + 1
+    presentation.host.dataset.sheetStackDepth = String(depth)
+    presentation.host.style.setProperty(
+      '--rrr-sheet-stack-offset',
+      createStackOffset(depth),
+    )
+  })
+}
+
+function clearPresentationDepth(presentation: SheetPresentation): void {
+  delete presentation.host.dataset.sheetStackDepth
+  presentation.host.style.removeProperty('--rrr-sheet-stack-offset')
+}
+
+function createStackOffset(depth: number): string {
+  return `calc(${Array.from(
+    { length: depth },
+    () => 'var(--rrr-sheet-stack-step)',
+  ).join(' + ')})`
 }

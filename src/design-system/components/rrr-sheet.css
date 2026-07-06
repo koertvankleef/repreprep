@@ -1,7 +1,10 @@
 rrr-sheet {
   display: contents;
   --rrr-sheet-width: min(100%, 40rem);
-  --rrr-sheet-max-height: calc(100dvh - env(safe-area-inset-top) - var(--rrr-spacing-l));
+  --rrr-sheet-stack-step: var(--rrr-spacing-l);
+  --rrr-sheet-stack-offset: var(--rrr-sheet-stack-step);
+  --rrr-sheet-max-height:
+    calc(100dvh - env(safe-area-inset-top) - var(--rrr-sheet-stack-offset));
   --rrr-sheet-background: var(--rrr-surface-base);
   --rrr-sheet-color: var(--rrr-color-text);
   --rrr-sheet-radius: var(--rrr-radius-xl);
