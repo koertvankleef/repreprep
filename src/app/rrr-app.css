@@ -482,6 +482,10 @@ nav {
   text-overflow: ellipsis;
 }
 
+.rrr-domain-heading {
+  font-weight: var(--rrr-font-weight-semibold);
+}
+
 .app-header-search {
   width: 100%;
   min-width: 0;

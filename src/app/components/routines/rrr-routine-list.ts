@@ -41,10 +41,10 @@ export class RrrRoutineList extends HTMLElement {
         activation="button"
         data-action="navigate"
         data-href="#/routines/${encodeURIComponent(summary.routine.id)}"
-        label="${escapeHtml(summary.routine.name)}"
         description="${escapeHtml(exercisePreview)}"
         accessory="chevron"
       >
+        <span slot="label" class="rrr-domain-heading">${escapeHtml(summary.routine.name)}</span>
         <span slot="body" class="routine-row-body">
           <span>${escapeHtml(musclePreview)}</span>
           <span>${escapeHtml(lastStarted)}</span>

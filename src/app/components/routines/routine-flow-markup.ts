@@ -29,12 +29,13 @@ function renderExerciseRow(
   const row = `
     <rrr-list-row
       ${interactive ? 'activation="button"' : ''}
-      label="${escapeHtml(exerciseName)}"
       ${showDescription
         ? `description="${escapeHtml(tPlural('routineDetail.setCount', exercise.setCount))}"`
         : ''}
       data-routine-exercise-id="${escapeHtml(exercise.id)}"
-    ></rrr-list-row>
+    >
+      <span slot="label" class="rrr-domain-heading">${escapeHtml(exerciseName)}</span>
+    </rrr-list-row>
   `
 
   if (swipeable && !sortable) {

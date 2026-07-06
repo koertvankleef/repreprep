@@ -369,7 +369,7 @@ export class RrrExerciseCatalogue extends HTMLElement {
     return `
       <span class="exercise-browser-main">
         <span class="exercise-browser-heading">
-          <span class="exercise-browser-name">${escapeHtml(exercise.name)}</span>
+          <span class="exercise-browser-name rrr-domain-heading">${escapeHtml(exercise.name)}</span>
           ${exercise.createdByUser ? `<rrr-badge tone="accent">${t('exercise.badge.custom')}</rrr-badge>` : ''}
           ${used ? `<rrr-badge class="exercise-browser-used-badge">${t('exercise.badge.used')}</rrr-badge>` : ''}
         </span>

@@ -589,9 +589,10 @@ export class RrrStyleguide extends HTMLElement {
                 <rrr-sequence aria-label="${t('styleguide.sequences.routineAria')}">
                   <rrr-list-row
                     activation="button"
-                    label="${t('styleguide.sequences.exercise.pushups')}"
                     description="${t('styleguide.sequences.exercise.sets.three')}"
-                  ></rrr-list-row>
+                  >
+                    <span slot="label" class="rrr-domain-heading">${t('styleguide.sequences.exercise.pushups')}</span>
+                  </rrr-list-row>
                   <rrr-sequence-gutter
                     value="20"
                     unit="s"
@@ -602,9 +603,10 @@ export class RrrStyleguide extends HTMLElement {
                   ></rrr-sequence-gutter>
                   <rrr-list-row
                     activation="button"
-                    label="${t('styleguide.sequences.exercise.rows')}"
                     description="${t('styleguide.sequences.exercise.sets.three')}"
-                  ></rrr-list-row>
+                  >
+                    <span slot="label" class="rrr-domain-heading">${t('styleguide.sequences.exercise.rows')}</span>
+                  </rrr-list-row>
                   <rrr-sequence-gutter
                     value="45"
                     unit="s"
@@ -616,9 +618,10 @@ export class RrrStyleguide extends HTMLElement {
                   ></rrr-sequence-gutter>
                   <rrr-list-row
                     activation="button"
-                    label="${t('styleguide.sequences.exercise.lunges')}"
                     description="${t('styleguide.sequences.exercise.sets.two')}"
-                  ></rrr-list-row>
+                  >
+                    <span slot="label" class="rrr-domain-heading">${t('styleguide.sequences.exercise.lunges')}</span>
+                  </rrr-list-row>
                 </rrr-sequence>
               </div>
 
@@ -635,9 +638,10 @@ export class RrrStyleguide extends HTMLElement {
                   >
                     <rrr-list-row
                       activation="button"
-                      label="${t('styleguide.sequences.swipeExercise')}"
                       description="${t('styleguide.sequences.exercise.sets.three')}"
-                    ></rrr-list-row>
+                    >
+                      <span slot="label" class="rrr-domain-heading">${t('styleguide.sequences.swipeExercise')}</span>
+                    </rrr-list-row>
                   </rrr-swipe-action>
                 </div>
               </div>
