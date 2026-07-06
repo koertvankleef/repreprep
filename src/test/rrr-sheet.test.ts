@@ -291,11 +291,9 @@ describe('sheet presentation', () => {
     await Promise.resolve()
 
     const secondRadio = secondChoice.querySelector<HTMLInputElement>('input')!
-    secondRadio.focus()
-    const enter = enterKeyEvent()
-    secondRadio.dispatchEvent(enter)
+    secondRadio.click()
+    await Promise.resolve()
 
-    expect(enter.defaultPrevented).toBe(true)
     expect((secondChoice as HTMLElement & { checked: boolean }).checked).toBe(true)
     expect(getDeepActiveElement()).toBe(
       nextField.shadowRoot!.querySelector<HTMLInputElement>('input'),
@@ -317,14 +315,17 @@ describe('sheet presentation', () => {
     selectedChoice.setAttribute('name', 'source')
     selectedChoice.setAttribute('checked', '')
     choices.append(selectedChoice)
-    choices.addEventListener('change', () => choiceSheet.close('selected'))
+    choices.addEventListener(
+      'rrr-list-row-control-activate',
+      () => choiceSheet.close('selected'),
+    )
     choiceSheet.append(choiceHeading, choices)
 
     const choiceResult = presentSheet(choiceSheet)
     await Promise.resolve()
     await Promise.resolve()
     const selectedRadio = selectedChoice.querySelector<HTMLInputElement>('input')!
-    selectedRadio.dispatchEvent(enterKeyEvent())
+    selectedRadio.click()
     await expect(choiceResult).resolves.toBe('selected')
 
     const toggleSheet = document.createElement('rrr-sheet') as RrrSheet

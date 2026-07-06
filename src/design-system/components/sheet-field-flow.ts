@@ -29,7 +29,7 @@ const nativeInputTypes = new Set([
   'url',
 ])
 
-export class SheetEnterFlow {
+export class SheetFieldFlow {
   private readonly observer: MutationObserver
 
   constructor(
@@ -43,6 +43,10 @@ export class SheetEnterFlow {
 
   connect(): void {
     this.dialog.addEventListener('keydown', this.handleKeyDown)
+    this.dialog.addEventListener(
+      'rrr-list-row-control-activate',
+      this.handleControlActivate,
+    )
     this.observer.observe(this.dialog, {
       attributes: true,
       attributeFilter: [
@@ -61,6 +65,10 @@ export class SheetEnterFlow {
 
   disconnect(): void {
     this.dialog.removeEventListener('keydown', this.handleKeyDown)
+    this.dialog.removeEventListener(
+      'rrr-list-row-control-activate',
+      this.handleControlActivate,
+    )
     this.observer.disconnect()
   }
 
@@ -96,12 +104,31 @@ export class SheetEnterFlow {
 
     if (field.matches(controlSelector)) {
       event.preventDefault()
-      this.activateControl(field as RrrListRow, input)
-      if (this.shouldStop()) {
-        return
-      }
+      input.click()
+      return
     }
 
+    this.advanceFrom(field, event)
+  }
+
+  private readonly handleControlActivate = (event: Event): void => {
+    const row = event.target
+    if (
+      !(row instanceof HTMLElement)
+      || !row.matches(controlSelector)
+      || !this.isAvailable(row)
+    ) {
+      return
+    }
+
+    queueMicrotask(() => {
+      if (!this.shouldStop()) {
+        this.advanceFrom(row)
+      }
+    })
+  }
+
+  private advanceFrom(field: HTMLElement, event?: KeyboardEvent): void {
     const fields = this.getFields()
     const currentIndex = fields.findIndex((candidate) =>
       this.isSameField(candidate, field))
@@ -111,7 +138,7 @@ export class SheetEnterFlow {
 
     const nextField = fields[currentIndex + 1]
     if (nextField) {
-      event.preventDefault()
+      event?.preventDefault()
       nextField.focus()
       return
     }
@@ -121,7 +148,7 @@ export class SheetEnterFlow {
       return
     }
 
-    event.preventDefault()
+    event?.preventDefault()
     if (
       !confirmAction.hasAttribute('disabled')
       && confirmAction.getAttribute('aria-disabled') !== 'true'
@@ -183,19 +210,6 @@ export class SheetEnterFlow {
         )
       }
     })
-  }
-
-  private activateControl(row: RrrListRow, input: HTMLInputElement): void {
-    if (row.control === 'radio') {
-      const wasChecked = row.checked
-      row.selectControl()
-      if (wasChecked) {
-        row.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
-      }
-      return
-    }
-
-    input.click()
   }
 
   private isSameField(candidate: HTMLElement, field: HTMLElement): boolean {

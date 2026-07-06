@@ -201,6 +201,11 @@ reinforce that they activate something. Checkbox and switch rows receive the
 same treatment because their full row toggles the control. Radio choices and
 static rows keep the normal text color.
 
+Control rows emit `change` only when their value changes. They separately emit
+`rrr-list-row-control-activate` whenever the native control is deliberately
+activated, including re-activation of an already-selected radio. Use the latter
+only when reaffirming the current choice has interaction meaning.
+
 Action rows accept the same semantic tones as buttons: `primary` (the default),
 `neutral`, `accent`, `info`, `success`, `warning`, and `danger`. A tone colors
 the row's primary label and leading icon and supplies a subtle matching
@@ -292,13 +297,14 @@ Within a sheet, Enter in `rrr-input`, a text-entry native input, or the editable
 input of `rrr-number-stepper` advances to the next enabled field. For a number
 stepper, this applies only when Enter originates from its editable text input;
 its step buttons and a read-only value input do not imply that adjustment is
-complete. Enter on a radio chooses that option; Enter on a checkbox or switch
-toggles it. These choice controls then advance as one completed field, with a
-radio group counting as one field. Enter in the final field activates the
-enabled `data-sheet-result="confirm"` action. The sheet also supplies
+complete. Activating a radio, checkbox, or switch by pointer or keyboard
+advances it as one completed field, with a radio group counting as one field.
+Re-activating an already-selected radio also counts as completion without
+emitting a false native-style `change`. Completing the final field activates
+the enabled `data-sheet-result="confirm"` action. The sheet also supplies
 `enterkeyhint="next"` and `"done"` to editable inputs. Textareas, selects, date
 pickers, buttons, and other controls keep their own behavior. Add
-`data-sheet-enter-ignore` to an otherwise eligible field when Enter has a
+`data-sheet-enter-ignore` to an otherwise eligible field when activation has a
 different, field-specific meaning.
 
 ## Number steppers

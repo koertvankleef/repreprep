@@ -77,13 +77,12 @@ export async function promptRoutinePrefillSource(options: {
     }))
   }
 
-  choices.addEventListener('change', (event) => {
+  choices.addEventListener('rrr-list-row-control-activate', (event) => {
     const row = event
       .composedPath()
       .find((node): node is RrrListRow => node instanceof HTMLElement
         && node.tagName.toLowerCase() === 'rrr-list-row'
-        && node.dataset.prefillSourceId !== undefined
-        && (node as RrrListRow).checked)
+        && node.dataset.prefillSourceId !== undefined)
     if (row?.dataset.prefillSourceId) {
       sheet.close(row.dataset.prefillSourceId)
     }

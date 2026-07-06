@@ -601,11 +601,8 @@ describe('value-first property lists', () => {
     ])
     expect(choices.some((row) => row.dataset.prefillSourceId === unfinished.id)).toBe(false)
 
-    const newerChoice = choices.find((row) => row.dataset.prefillSourceId === newer.id) as
-      | (HTMLElement & { checked: boolean })
-      | undefined
-    newerChoice!.checked = true
-    newerChoice?.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    const newerChoice = choices.find((row) => row.dataset.prefillSourceId === newer.id)
+    newerChoice?.querySelector<HTMLInputElement>('input[type="radio"]')?.click()
     await new Promise((resolve) => window.setTimeout(resolve, 240))
 
     expect(storageService.getData().routines[0]?.prefillSourceWorkoutId).toBe(newer.id)
@@ -617,11 +614,22 @@ describe('value-first property lists', () => {
       'rrr-list-row[data-action="edit-prefill-source"] > button',
     )?.click()
     await Promise.resolve()
+    document.querySelector<HTMLElement>(
+      `rrr-sheet rrr-list-row[data-prefill-source-id="${newer.id}"]`,
+    )?.querySelector<HTMLInputElement>('input[type="radio"]')?.click()
+    await new Promise((resolve) => window.setTimeout(resolve, 240))
+
+    expect(document.querySelector('rrr-sheet')).toBeNull()
+    expect(storageService.getData().routines[0]?.prefillSourceWorkoutId).toBe(newer.id)
+
+    detail.querySelector<HTMLElement>(
+      'rrr-list-row[data-action="edit-prefill-source"] > button',
+    )?.click()
+    await Promise.resolve()
     const noneChoice = document.querySelector<HTMLElement & { checked: boolean }>(
       'rrr-sheet rrr-list-row[data-prefill-source-id="__none__"]',
     )
-    noneChoice!.checked = true
-    noneChoice?.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+    noneChoice?.querySelector<HTMLInputElement>('input[type="radio"]')?.click()
     await new Promise((resolve) => window.setTimeout(resolve, 240))
 
     expect(storageService.getData().routines[0]?.prefillSourceWorkoutId).toBeNull()

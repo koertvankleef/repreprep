@@ -210,6 +210,12 @@ export class RrrListRow extends HTMLElement {
       this.checked = this.controlElement?.checked ?? false
       this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
     })
+    this.controlElement?.addEventListener('click', () => {
+      this.dispatchEvent(new CustomEvent('rrr-list-row-control-activate', {
+        bubbles: true,
+        composed: true,
+      }))
+    })
 
     this.fileInput?.addEventListener('change', (event) => {
       event.stopPropagation()
