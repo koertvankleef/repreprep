@@ -94,7 +94,7 @@ export class RrrRoutineEditor extends HTMLElement {
   private listenersBound = false
   private creationCommitted = false
   private renameSheetActive = false
-  private timingSheetActive = false
+  private sheetSessionActive = false
   private reorderMode = false
   private gutterMotion: RoutineFlowGutterMotion = 'reveal'
 
@@ -303,7 +303,7 @@ export class RrrRoutineEditor extends HTMLElement {
   }
 
   private async addRoutineExercise(): Promise<void> {
-    if (this.timingSheetActive || this.reorderMode) {
+    if (this.sheetSessionActive || this.reorderMode) {
       return
     }
 
@@ -312,23 +312,23 @@ export class RrrRoutineEditor extends HTMLElement {
       return
     }
 
-    this.timingSheetActive = true
+    this.sheetSessionActive = true
     try {
       await promptRoutineExercisePicker(options, ({ exerciseId, settings }) => {
         this.exercises = [...this.exercises, createRoutineExercise(exerciseId, settings)]
         this.render()
       })
     } finally {
-      this.timingSheetActive = false
+      this.sheetSessionActive = false
     }
   }
 
   private async editDefaultTransition(): Promise<void> {
-    if (this.timingSheetActive) {
+    if (this.sheetSessionActive) {
       return
     }
 
-    this.timingSheetActive = true
+    this.sheetSessionActive = true
     try {
       const seconds = await promptRoutineTransitionDefault(this.transitionSeconds)
       if (seconds === undefined || seconds === this.transitionSeconds) {
@@ -337,7 +337,7 @@ export class RrrRoutineEditor extends HTMLElement {
 
       this.transitionSeconds = seconds
     } finally {
-      this.timingSheetActive = false
+      this.sheetSessionActive = false
     }
 
     this.render()
@@ -351,12 +351,12 @@ export class RrrRoutineEditor extends HTMLElement {
     const routineExercise = this.exercises.find(
       (exercise) => exercise.id === routineExerciseId,
     )
-    if (!routineExercise || this.timingSheetActive) {
+    if (!routineExercise || this.sheetSessionActive) {
       return
     }
 
     const exerciseName = this.resolveExerciseName(routineExercise.exerciseId)
-    this.timingSheetActive = true
+    this.sheetSessionActive = true
     try {
       const result = await promptRoutineExerciseSettings({
         exerciseName,
@@ -397,7 +397,7 @@ export class RrrRoutineEditor extends HTMLElement {
           : exercise)
       this.render()
     } finally {
-      this.timingSheetActive = false
+      this.sheetSessionActive = false
     }
   }
 
@@ -409,11 +409,11 @@ export class RrrRoutineEditor extends HTMLElement {
     const destination = this.exercises.find(
       (exercise) => exercise.id === beforeExerciseId,
     )
-    if (!destination || this.timingSheetActive) {
+    if (!destination || this.sheetSessionActive) {
       return
     }
 
-    this.timingSheetActive = true
+    this.sheetSessionActive = true
     try {
       const override = await promptTransitionOverride({
         routineDefaultSeconds: this.transitionSeconds,
@@ -433,7 +433,7 @@ export class RrrRoutineEditor extends HTMLElement {
           : exercise)
       this.render()
     } finally {
-      this.timingSheetActive = false
+      this.sheetSessionActive = false
     }
   }
 
