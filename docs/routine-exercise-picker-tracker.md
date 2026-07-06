@@ -1,7 +1,6 @@
 # Routine Exercise Picker — Implementation Tracker
 
-Status: Batches 1–3 are complete; live filters and interaction/device
-verification remain.
+Status: Batches 1–4 are complete; interaction/device verification remains.
 
 ## Intended outcome
 
@@ -121,14 +120,15 @@ decision rather than a picker-only exception.
 
 ### Batch 4 — Nested live filters
 
-- [ ] Add the Filter entry point and active-filter indication.
-- [ ] Extract reusable filter controls/state instead of copying app-header
-      behavior.
-- [ ] Open Filter as a second-level sheet.
-- [ ] Apply category and equipment changes immediately.
-- [ ] Provide a deliberate Clear filters action.
-- [ ] Preserve filters for the picker session and combine them with live search.
-- [ ] Verify that dismissing Filter returns focus to its trigger.
+- [x] Add the Filter entry point and active-filter indication.
+- [x] Reuse the shared filter state shape and metadata labels without copying
+      the app-header rail interaction.
+- [x] Open Filter as a second-level sheet.
+- [x] Apply category and equipment changes immediately using narrowing
+      match-all semantics.
+- [x] Provide a deliberate Clear filters action.
+- [x] Preserve filters for the picker session and combine them with live search.
+- [x] Verify that dismissing Filter returns focus to its trigger.
 
 ### Batch 5 — Interaction and device verification
 

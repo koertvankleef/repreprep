@@ -129,6 +129,20 @@ appears [PICKER-CONFIG-008]. The picker retains its search, list position, and
 focus context after configuration is confirmed or dismissed
 [PICKER-CONFIG-009].
 
+## 2.4 Filtering
+
+The picker provides a Filter action that opens a second-level filter sheet
+while the picker remains open underneath it [PICKER-FILTER-001]. Category and
+equipment filter changes apply immediately to the picker list, and every
+selected filter must match for an exercise to remain visible
+[PICKER-FILTER-002]. When any filter is active, the Filter action shows a
+visible active state [PICKER-FILTER-003].
+
+Filters combine with the current search query [PICKER-FILTER-004]. Dismissing
+the filter sheet keeps the selected filters for the current picker session and
+returns focus to the Filter action [PICKER-FILTER-005]. A clear action removes
+all active filters immediately [PICKER-FILTER-006].
+
 ---
 
 # 3. Data import

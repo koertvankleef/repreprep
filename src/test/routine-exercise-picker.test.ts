@@ -6,7 +6,8 @@ import {
   type PickerAddedExercise,
 } from '../app/components/routines/routine-exercise-picker.ts'
 import { createDefaultData } from '../domain/create-default-data.ts'
-import { searchExercises } from '../domain/exercise-service.ts'
+import { searchExercises, type ExerciseFilters } from '../domain/exercise-service.ts'
+import type { ExerciseDefinition } from '../domain/types.ts'
 import { specIt, getDeepActiveElement, initTestLocale } from './helpers.ts'
 import { patchCssStyleSheet, patchHTMLDialog, patchSvgSymbolElement } from './mocks.ts'
 
@@ -16,12 +17,14 @@ beforeAll(async () => {
   patchSvgSymbolElement()
 
   const [
+    { registerRrrButton },
     { registerRrrIcon },
     { registerRrrInput },
     { registerRrrListRow },
     { registerRrrNumberStepper },
     { registerRrrSheet },
   ] = await Promise.all([
+    import('../design-system/components/rrr-button.ts'),
     import('../design-system/components/rrr-icon.ts'),
     import('../design-system/components/rrr-input.ts'),
     import('../design-system/components/rrr-list-row.ts'),
@@ -29,6 +32,7 @@ beforeAll(async () => {
     import('../design-system/components/rrr-sheet.ts'),
   ])
 
+  registerRrrButton()
   registerRrrIcon()
   registerRrrInput()
   registerRrrListRow()
@@ -236,8 +240,176 @@ describe('routine exercise picker', () => {
     await waitForSheetClose()
     await pickerResult
   })
+
+  specIt('applies live filters in a second-level sheet without losing picker context', [
+    'PICKER-FILTER-001',
+    'PICKER-FILTER-002',
+    'PICKER-FILTER-003',
+    'PICKER-FILTER-004',
+    'PICKER-FILTER-005',
+    'PICKER-FILTER-006',
+  ], async () => {
+    const catalogue = createDefaultData().exercises
+    const exercises = [
+      ...catalogue
+        .filter((exercise) =>
+          exercise.categories.includes('strength')
+          && exercise.equipment.includes('bodyweight')
+          && exercise.equipment.includes('bench'))
+        .slice(0, 6),
+      ...catalogue
+        .filter((exercise) =>
+          exercise.equipment.includes('bodyweight')
+          && !exercise.equipment.includes('bench'))
+        .slice(0, 6),
+      ...catalogue
+        .filter((exercise) =>
+          exercise.equipment.includes('bench')
+          && !exercise.equipment.includes('bodyweight'))
+        .slice(0, 6),
+      ...catalogue
+        .filter((exercise) =>
+          !exercise.equipment.includes('bodyweight')
+          && !exercise.equipment.includes('bench'))
+        .slice(0, 6),
+    ]
+    const pickerResult = promptRoutineExercisePicker(exercises, () => {})
+    await Promise.resolve()
+    await Promise.resolve()
+
+    const pickerSheet = document.querySelector<HTMLElement & { close(result: string): void }>(
+      'rrr-sheet.routine-exercise-picker-sheet',
+    )!
+    const picker = pickerSheet.querySelector('rrr-routine-exercise-picker')!
+    const search = picker.querySelector<HTMLElement & { value: string }>(
+      '[data-routine-exercise-search]',
+    )!
+    const filterButton = picker.querySelector<HTMLElement>(
+      '[data-routine-exercise-filter-trigger]',
+    )!
+
+    filterButton.focus()
+    filterButton.click()
+    await Promise.resolve()
+
+    let sheets = Array.from(document.querySelectorAll<HTMLElement>('rrr-sheet'))
+    expect(sheets).toHaveLength(2)
+    expect(pickerSheet.isConnected).toBe(true)
+    expect(sheets.map((sheet) => sheet.dataset.sheetStackDepth)).toEqual(['1', '2'])
+
+    let filterSheet = sheets[1]!
+    filterSheet.querySelector<HTMLElement>(
+      '[data-routine-exercise-filter-type="equipment"][data-routine-exercise-filter-value="bodyweight"]',
+    )?.click()
+    await Promise.resolve()
+
+    expectCurrentResultIds(picker, exercises, '', {
+      categories: [],
+      equipment: ['bodyweight'],
+    })
+
+    const bodyweightCount = picker.querySelectorAll('[data-exercise-id]').length
+    filterSheet.querySelector<HTMLElement>(
+      '[data-routine-exercise-filter-type="equipment"][data-routine-exercise-filter-value="bench"]',
+    )?.click()
+    await Promise.resolve()
+
+    expectCurrentResultIds(picker, exercises, '', {
+      categories: [],
+      equipment: ['bodyweight', 'bench'],
+    })
+    expect(picker.querySelectorAll('[data-exercise-id]').length).toBeLessThan(bodyweightCount)
+    expect(filterButton.dataset.hasActiveFilters).toBe('true')
+    expect(filterButton.getAttribute('aria-label')).toBe('Filter exercises, filters active')
+
+    filterSheet.querySelector<HTMLElement>(
+      '[data-routine-exercise-filter-type="category"][data-routine-exercise-filter-value="strength"]',
+    )?.click()
+    await Promise.resolve()
+
+    expectCurrentResultIds(picker, exercises, '', {
+      categories: ['strength'],
+      equipment: ['bodyweight', 'bench'],
+    })
+
+    const matchingExercise = exercises.find((exercise) =>
+      exercise.categories.includes('strength')
+      && exercise.equipment.includes('bodyweight')
+      && exercise.equipment.includes('bench'))!
+    const searchToken = matchingExercise.name.split(/\s+/)[0]!
+    search.value = searchToken
+    search.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    await Promise.resolve()
+
+    expectCurrentResultIds(picker, exercises, searchToken, {
+      categories: ['strength'],
+      equipment: ['bodyweight', 'bench'],
+    })
+
+    filterSheet.querySelector<HTMLDialogElement>('dialog')
+      ?.dispatchEvent(new Event('cancel', { cancelable: true }))
+    await waitForSheetClose()
+
+    expect(document.querySelectorAll('rrr-sheet')).toHaveLength(1)
+    expect(getDeepActiveElement()?.closest('rrr-button')).toBe(filterButton)
+    expectCurrentResultIds(picker, exercises, searchToken, {
+      categories: ['strength'],
+      equipment: ['bodyweight', 'bench'],
+    })
+
+    filterButton.click()
+    await Promise.resolve()
+    filterSheet = document.querySelectorAll<HTMLElement>('rrr-sheet')[1]!
+    filterSheet.querySelector<HTMLElement>('[data-routine-exercise-filter-clear]')?.click()
+    await Promise.resolve()
+
+    expect(filterButton.dataset.hasActiveFilters).toBe('false')
+    expect(filterButton.getAttribute('aria-label')).toBe('Filter exercises')
+    expectCurrentResultIds(picker, exercises, searchToken, {
+      categories: [],
+      equipment: [],
+    })
+
+    filterSheet.querySelector<HTMLDialogElement>('dialog')
+      ?.dispatchEvent(new Event('cancel', { cancelable: true }))
+    await waitForSheetClose()
+    pickerSheet.close('')
+    await waitForSheetClose()
+    await pickerResult
+  }, 10000)
 })
 
 async function waitForSheetClose(): Promise<void> {
   await new Promise((resolve) => window.setTimeout(resolve, 230))
+}
+
+function expectCurrentResultIds(
+  picker: Element,
+  exercises: ExerciseDefinition[],
+  searchQuery: string,
+  filters: ExerciseFilters,
+): void {
+  const expectedIds = filterPickerExercises(searchExercises(exercises, searchQuery), filters)
+    .sort((left, right) => left.name.localeCompare(right.name, 'en-US', {
+      numeric: true,
+      sensitivity: 'base',
+    }))
+    .map((exercise) => exercise.id)
+  const actualIds = Array.from(picker.querySelectorAll<HTMLElement>('[data-exercise-id]'))
+    .map((row) => row.dataset.exerciseId)
+
+  expect(actualIds).toEqual(expectedIds)
+}
+
+function filterPickerExercises(
+  exercises: ExerciseDefinition[],
+  filters: ExerciseFilters,
+): ExerciseDefinition[] {
+  return exercises.filter((exercise) =>
+    includesEvery(exercise.categories, filters.categories)
+    && includesEvery(exercise.equipment, filters.equipment))
+}
+
+function includesEvery<T>(values: readonly T[], selectedValues: readonly T[]): boolean {
+  return selectedValues.every((value) => values.includes(value))
 }

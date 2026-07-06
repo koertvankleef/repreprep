@@ -19,6 +19,30 @@ rrr-routine-exercise-picker {
   min-block-size: 0;
 }
 
+.routine-exercise-picker-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--rrr-spacing-s);
+}
+
+.routine-exercise-picker-filter-trigger {
+  position: relative;
+  align-self: center;
+}
+
+.routine-exercise-picker-filter-trigger[data-has-active-filters="true"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.2rem;
+  inset-inline-end: 0.2rem;
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  border-radius: 50%;
+  background: var(--rrr-color-accent);
+  border: var(--rrr-border-width) solid var(--rrr-surface-raised);
+}
+
 .routine-exercise-picker-results {
   min-block-size: 0;
   overflow: auto;
@@ -31,4 +55,33 @@ rrr-routine-exercise-picker {
   padding: var(--rrr-spacing-l) var(--rrr-spacing-m);
   color: var(--rrr-text-muted);
   text-align: center;
+}
+
+.routine-exercise-filter-sheet {
+  display: grid;
+  gap: var(--rrr-spacing-l);
+}
+
+.routine-exercise-filter-group {
+  display: grid;
+  gap: var(--rrr-spacing-s);
+}
+
+.routine-exercise-filter-group-label {
+  color: var(--rrr-text-muted);
+  font-size: var(--rrr-font-size-s);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.routine-exercise-filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rrr-spacing-s);
+}
+
+.routine-exercise-filter-actions {
+  display: flex;
+  justify-content: flex-start;
 }
