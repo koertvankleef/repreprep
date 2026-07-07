@@ -13,6 +13,7 @@ import {
   type AppRoute,
   type AppHeaderLink,
 } from './app-routes.ts'
+import { computeRouteTransition, isSameAppRoute, type RouteTransition } from './app-route-transitions.ts'
 import { createHashRouter } from '../foundation/hash-router.ts'
 import { toastService } from '../foundation/toast.ts'
 import {
@@ -61,8 +62,6 @@ type DisplayPreferenceChangeDetail = {
 type LanguagePreferenceChangeDetail = {
   language: string
 }
-
-type RouteTransition = 'none' | 'sub-forward' | 'sub-back' | 'main-switch'
 
 type RouteHeader = {
   className?: string
@@ -424,53 +423,6 @@ export class RrrApp extends HTMLElement {
     return primaryNavigationItems
       .map((item) => this.renderNavButton(item.routeName, item.href, t(item.labelKey), item.iconName))
       .join('')
-  }
-
-  private computeRouteTransition(from: AppRoute | null, to: AppRoute): RouteTransition {
-    if (!from || from.name === to.name) {
-      return 'none'
-    }
-
-    const fromMeta = getAppRouteMeta(from)
-    const toMeta = getAppRouteMeta(to)
-
-    if (fromMeta.main && toMeta.main) {
-      return 'main-switch'
-    }
-
-    if (toMeta.depth > fromMeta.depth) {
-      return 'sub-forward'
-    }
-
-    if (toMeta.depth < fromMeta.depth) {
-      return 'sub-back'
-    }
-
-    return 'sub-forward'
-  }
-
-  private isSameRoute(a: AppRoute, b: AppRoute): boolean {
-    if (a.name !== b.name) {
-      return false
-    }
-
-    if (a.name === 'workout-edit' && b.name === 'workout-edit') {
-      return a.workoutId === b.workoutId
-    }
-
-    if (a.name === 'workout-log' && b.name === 'workout-log') {
-      return a.workoutId === b.workoutId
-    }
-
-    if (a.name === 'routine-detail' && b.name === 'routine-detail') {
-      return a.routineId === b.routineId
-    }
-
-    if (a.name === 'exercise-detail' && b.name === 'exercise-detail') {
-      return a.exerciseId === b.exerciseId
-    }
-
-    return true
   }
 
   private restoreRouteScrollPosition(): void {
@@ -1116,9 +1068,9 @@ export class RrrApp extends HTMLElement {
     }
 
     const previousRoute = this.previousRoute
-    const routeChanged = !previousRoute || !this.isSameRoute(previousRoute, route)
+    const routeChanged = !previousRoute || !isSameAppRoute(previousRoute, route)
     const transition = routeChanged
-      ? this.computeRouteTransition(previousRoute, route)
+      ? computeRouteTransition(previousRoute, route)
       : 'none'
 
     if (routeChanged) {
