@@ -15,23 +15,7 @@ import {
 import { computeRouteTransition, isSameAppRoute, type RouteTransition } from './app-route-transitions.ts'
 import { createHashRouter } from '../foundation/hash-router.ts'
 import { toastService } from '../foundation/toast.ts'
-import {
-  applyDisplayPreferences,
-  clearDisplayPreferences,
-  loadDisplayPreferences,
-  saveDisplayPreferences,
-  watchSystemThemePreference,
-  type ContrastMode,
-  type DisplayPreferences,
-  type ThemeMode,
-} from './theme-preferences.ts'
-import {
-  applyLanguagePreference,
-  clearLanguagePreference,
-  loadLanguagePreference,
-  saveLanguagePreference,
-  type LanguagePreference,
-} from './language-preferences.ts'
+import type { LanguagePreference } from './language-preferences.ts'
 import { escapeHtml } from './render-helpers.ts'
 import {
   createAppRouteViewElement,
@@ -43,6 +27,7 @@ import {
   renderExerciseCatalogueHeader,
   updateExerciseFilterRailOverflow,
 } from './exercise-catalogue-header.ts'
+import { AppPreferencesController } from './app-preferences-controller.ts'
 import globalStyles from '../design-system/global.css?inline'
 import appStyles from './rrr-app.css?inline'
 
@@ -95,12 +80,10 @@ const primaryNavigationItems: ReadonlyArray<{
 export class RrrApp extends HTMLElement {
   private route: AppRoute = { name: 'workouts' }
   private previousRoute: AppRoute | null = null
-  private displayPreferences: DisplayPreferences = loadDisplayPreferences()
-  private languagePreference: LanguagePreference = loadLanguagePreference()
+  private readonly preferences = new AppPreferencesController()
   private installPromptEvent: BeforeInstallPromptEvent | null = null
   private installAvailable = false
   private isStandalone = window.matchMedia('(display-mode: standalone)').matches
-  private stopWatchingSystemThemePreference: (() => void) | null = null
   private readonly styleguideEnabled = import.meta.env.DEV || localHosts.has(window.location.hostname)
   private shellRendered = false
   private exerciseSearchQuery = ''
@@ -147,12 +130,7 @@ export class RrrApp extends HTMLElement {
 
   private readonly handleClearDataRequest = (): void => {
     storageService.resetAllData()
-    clearDisplayPreferences()
-    clearLanguagePreference()
-    this.displayPreferences = loadDisplayPreferences()
-    this.languagePreference = loadLanguagePreference()
-    applyDisplayPreferences(this.displayPreferences)
-    applyLanguagePreference(this.languagePreference)
+    this.preferences.reset()
     toastService.success(t('app.settings.resetData.success'))
 
     if (window.location.hash !== '#/workouts') {
@@ -168,12 +146,16 @@ export class RrrApp extends HTMLElement {
     const { preference, value } = (event as CustomEvent<DisplayPreferenceChangeDetail>).detail
 
     if (preference === 'theme' && (value === 'light' || value === 'dark' || value === 'auto')) {
-      this.setThemeMode(value)
+      if (this.preferences.setThemeMode(value)) {
+        this.render()
+      }
       return
     }
 
     if (preference === 'contrast' && (value === 'normal' || value === 'high')) {
-      this.setContrastMode(value)
+      if (this.preferences.setContrastMode(value)) {
+        this.render()
+      }
     }
   }
 
@@ -183,14 +165,9 @@ export class RrrApp extends HTMLElement {
       return
     }
 
-    if (this.languagePreference === language) {
-      return
+    if (this.preferences.setLanguagePreference(language)) {
+      this.render()
     }
-
-    this.languagePreference = language
-    applyLanguagePreference(language)
-    saveLanguagePreference(language)
-    this.render()
   }
 
   private readonly handleClick = (event: Event): void => {
@@ -243,20 +220,6 @@ export class RrrApp extends HTMLElement {
 
   }
 
-  private setThemeMode(theme: ThemeMode): void {
-    if (this.displayPreferences.theme === theme) {
-      return
-    }
-
-    this.displayPreferences = {
-      ...this.displayPreferences,
-      theme,
-    }
-
-    this.applyAndPersistDisplayPreferences()
-    this.render()
-  }
-
   private toggleExerciseFilter(target: HTMLElement): void {
     const filterType = target.dataset.filterType
     const value = target.dataset.filterValue
@@ -283,25 +246,6 @@ export class RrrApp extends HTMLElement {
       this.syncExerciseCatalogueState()
       this.render()
     }
-  }
-
-  private setContrastMode(contrast: ContrastMode): void {
-    if (this.displayPreferences.contrast === contrast) {
-      return
-    }
-
-    this.displayPreferences = {
-      ...this.displayPreferences,
-      contrast,
-    }
-
-    this.applyAndPersistDisplayPreferences()
-    this.render()
-  }
-
-  private applyAndPersistDisplayPreferences(): void {
-    applyDisplayPreferences(this.displayPreferences)
-    saveDisplayPreferences(this.displayPreferences)
   }
 
   private async promptInstall(): Promise<void> {
@@ -347,15 +291,7 @@ export class RrrApp extends HTMLElement {
 
   connectedCallback(): void {
     void storageService.getData()
-    applyDisplayPreferences(this.displayPreferences)
-    applyLanguagePreference(this.languagePreference)
-    this.stopWatchingSystemThemePreference = watchSystemThemePreference(() => {
-      if (this.displayPreferences.theme !== 'auto') {
-        return
-      }
-
-      applyDisplayPreferences(this.displayPreferences)
-    })
+    this.preferences.start()
     window.addEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.addEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.addEventListener('click', this.handleClick)
@@ -376,8 +312,7 @@ export class RrrApp extends HTMLElement {
       this.exerciseSearchDebounceId = null
     }
     this.clearExerciseFilterRailBinding()
-    this.stopWatchingSystemThemePreference?.()
-    this.stopWatchingSystemThemePreference = null
+    this.preferences.stop()
     window.removeEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.removeEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.removeEventListener('click', this.handleClick)
@@ -520,8 +455,8 @@ export class RrrApp extends HTMLElement {
 
   private getRouteViewFactoryContext(): RouteViewFactoryContext {
     return {
-      displayPreferences: this.displayPreferences,
-      languagePreference: this.languagePreference,
+      displayPreferences: this.preferences.displayPreferences,
+      languagePreference: this.preferences.languagePreference,
       styleguideEnabled: this.styleguideEnabled,
       exerciseSearchQuery: this.exerciseSearchQuery,
       exerciseFilters: this.cloneExerciseFilters(),
@@ -899,8 +834,8 @@ export class RrrApp extends HTMLElement {
     if (!routeChanged && route.name === 'settings') {
       const settingsEl = this.shadowRoot.querySelector<HTMLElement>('#view > rrr-settings.route-view-current')
       if (settingsEl) {
-        settingsEl.setAttribute('theme', this.displayPreferences.theme)
-        settingsEl.setAttribute('language', this.languagePreference)
+        settingsEl.setAttribute('theme', this.preferences.displayPreferences.theme)
+        settingsEl.setAttribute('language', this.preferences.languagePreference)
         settingsEl.setAttribute('styleguide-enabled', this.styleguideEnabled ? 'true' : 'false')
       }
     }
@@ -908,15 +843,15 @@ export class RrrApp extends HTMLElement {
     if (!routeChanged && route.name === 'settings-appearance') {
       const appearanceEl = this.shadowRoot.querySelector<HTMLElement>('#view > rrr-appearance-settings.route-view-current')
       if (appearanceEl) {
-        appearanceEl.setAttribute('theme', this.displayPreferences.theme)
-        appearanceEl.setAttribute('contrast', this.displayPreferences.contrast)
+        appearanceEl.setAttribute('theme', this.preferences.displayPreferences.theme)
+        appearanceEl.setAttribute('contrast', this.preferences.displayPreferences.contrast)
       }
     }
 
     if (!routeChanged && route.name === 'settings-language') {
       const languageEl = this.shadowRoot.querySelector<HTMLElement>('#view > rrr-language-settings.route-view-current')
       if (languageEl) {
-        languageEl.setAttribute('language', this.languagePreference)
+        languageEl.setAttribute('language', this.preferences.languagePreference)
       }
     }
 

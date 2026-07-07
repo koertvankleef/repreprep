@@ -56,6 +56,8 @@ that state safely.
 - Done: route-to-element creation lives in `src/app/app-route-view-factory.ts`.
 - Done: exercise catalogue header rendering and filter rail overflow helpers live
   in `src/app/exercise-catalogue-header.ts`.
+- Done: display/language preference coordination lives in
+  `src/app/app-preferences-controller.ts`.
 - Next: decide whether the remaining exercise catalogue search/filter state and
-  event binding is still worth extracting, or move to preferences if that would
-  be a cleaner split.
+  event binding is still worth extracting, or whether install prompt/reset
+  coordination is the cleaner next split.
