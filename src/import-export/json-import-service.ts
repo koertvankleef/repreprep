@@ -183,7 +183,8 @@ function isValidRoutine(obj: unknown): obj is Routine {
 }
 
 export function isValidAppData(data: unknown): data is AppData {
-  return isRecord(data)
+  if (!(
+    isRecord(data)
     && data.schemaVersion === APP_DATA_SCHEMA_VERSION
     && Array.isArray(data.exercises)
     && data.exercises.every((exercise) => isValidExercise(exercise))
@@ -193,6 +194,92 @@ export function isValidAppData(data: unknown): data is AppData {
     && data.routines.every((routine) => isValidRoutine(routine))
     && Array.isArray(data.routineVersions)
     && data.routineVersions.every((version) => isValidRoutineVersion(version))
+  )) {
+    return false
+  }
+
+  return hasValidAppDataRelations(data as unknown as AppData)
+}
+
+function hasUniqueIds(items: { id: string }[]): boolean {
+  return new Set(items.map((item) => item.id)).size === items.length
+}
+
+function hasValidAppDataRelations(data: AppData): boolean {
+  if (
+    !hasUniqueIds(data.exercises)
+    || !hasUniqueIds(data.workouts)
+    || !hasUniqueIds(data.routines)
+    || !hasUniqueIds(data.routineVersions)
+  ) {
+    return false
+  }
+
+  const exerciseIds = new Set(data.exercises.map((exercise) => exercise.id))
+  const workoutById = new Map(data.workouts.map((workout) => [workout.id, workout]))
+  const routineById = new Map(data.routines.map((routine) => [routine.id, routine]))
+  const routineVersionById = new Map(data.routineVersions.map((version) => [version.id, version]))
+
+  return data.routines.every((routine) => {
+    const activeVersion = routineVersionById.get(routine.activeVersionId)
+    const prefillSource = routine.prefillSourceWorkoutId === null
+      ? null
+      : workoutById.get(routine.prefillSourceWorkoutId)
+
+    return activeVersion?.routineId === routine.id
+      && (
+        routine.prefillSourceWorkoutId === null
+        || (
+          prefillSource?.routineId === routine.id
+          && prefillSource.completedAt !== null
+        )
+      )
+  })
+    && data.routineVersions.every((version) =>
+      routineById.has(version.routineId)
+      && (
+        version.previousVersionId === null
+        || routineVersionById.get(version.previousVersionId)?.routineId === version.routineId
+      )
+      && version.exercises.every((exercise) => exerciseIds.has(exercise.exerciseId)),
+    )
+    && data.workouts.every((workout) => {
+      const routineVersion = workout.routineVersionId === undefined
+        ? undefined
+        : routineVersionById.get(workout.routineVersionId)
+      const routineExerciseById = new Map(
+        routineVersion?.exercises.map((exercise) => [exercise.id, exercise]) ?? [],
+      )
+
+      return (
+        workout.routineId === undefined
+        || routineById.has(workout.routineId)
+      )
+        && (
+          workout.routineVersionId === undefined
+          || (
+            routineVersion !== undefined
+            && (
+              workout.routineId === undefined
+              || routineVersion.routineId === workout.routineId
+            )
+          )
+        )
+        && workout.exercises.every((entry) => {
+          const routineExercise = entry.routineExerciseId === undefined
+            ? undefined
+            : routineExerciseById.get(entry.routineExerciseId)
+
+          return exerciseIds.has(entry.exerciseId)
+            && (
+              entry.routineExerciseId === undefined
+              || (
+                routineExercise !== undefined
+                && routineExercise.exerciseId === entry.exerciseId
+              )
+            )
+        })
+    })
 }
 
 export async function importFromJson(file: File): Promise<AppData> {
