@@ -122,7 +122,7 @@ export class RrrTooltip extends HTMLElement {
     })
   }
 
-  private static onDocKeyDown(e: KeyboardEvent): void {
+  private static readonly onDocKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape') {
       RrrTooltip.hide()
     }
@@ -395,10 +395,10 @@ export class RrrTooltip extends HTMLElement {
 // Registered once at module load time. Viewport changes reposition an open
 // tooltip after layout settles; scrolling dismisses it immediately.
 
-window.addEventListener('resize', RrrTooltip.scheduleReposition, { passive: true })
-window.addEventListener('scroll', RrrTooltip.hide, { passive: true, capture: true })
-window.addEventListener('orientationchange', RrrTooltip.scheduleReposition)
-window.visualViewport?.addEventListener('resize', RrrTooltip.scheduleReposition, { passive: true })
+window.addEventListener('resize', () => RrrTooltip.scheduleReposition(), { passive: true })
+window.addEventListener('scroll', () => RrrTooltip.hide(), { passive: true, capture: true })
+window.addEventListener('orientationchange', () => RrrTooltip.scheduleReposition())
+window.visualViewport?.addEventListener('resize', () => RrrTooltip.scheduleReposition(), { passive: true })
 
 // ─── Registration ─────────────────────────────────────────────────────────────
 

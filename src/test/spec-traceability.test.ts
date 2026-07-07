@@ -5,7 +5,7 @@ const testSources = import.meta.glob('./*.test.ts', {
   eager: true,
   import: 'default',
   query: '?raw',
-}) as Record<string, string>
+})
 
 const specIdPattern = /\[([A-Z][A-Z0-9-]*-\d{3})\]/g
 const testIdPattern = /'([A-Z][A-Z0-9-]*-\d{3})'/g

@@ -90,7 +90,7 @@ describe('workout-service', () => {
 
     const completed = completeWorkout(withWorkout, workout.id, true)
 
-    expect(completed.workouts[0]?.completedAt).toEqual(expect.any(String))
+    expect(typeof completed.workouts[0]?.completedAt).toBe('string')
     expect(completed.routines[0]?.prefillSourceWorkoutId).toBe(workout.id)
   })
 
@@ -114,7 +114,7 @@ describe('workout-service', () => {
 
     const completed = completeWorkout(withWorkouts, current.id, false)
 
-    expect(completed.workouts[1]?.completedAt).toEqual(expect.any(String))
+    expect(typeof completed.workouts[1]?.completedAt).toBe('string')
     expect(completed.routines[0]?.prefillSourceWorkoutId).toBe(previous.id)
   })
 

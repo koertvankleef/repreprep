@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
+import { beforeAll, beforeEach, describe, expect } from 'vitest'
 import {
   promptRoutineExercisePicker,
   RrrRoutineExercisePicker,
@@ -114,7 +114,7 @@ describe('routine exercise picker', () => {
     expect(selectedExerciseId).toBe(exercise.id)
   })
 
-  specIt('shows a clear empty state for a search with no matches', ['PICKER-SRCH-004'], async () => {
+  specIt('shows a clear empty state for a search with no matches', ['PICKER-SRCH-004'], () => {
     const picker = new RrrRoutineExercisePicker()
     picker.exercises = createDefaultData().exercises.slice(0, 4)
     document.body.append(picker)
@@ -167,7 +167,7 @@ describe('routine exercise picker', () => {
     addButton.click()
     await Promise.resolve()
 
-    let sheets = Array.from(document.querySelectorAll<HTMLElement>('rrr-sheet'))
+    const sheets = Array.from(document.querySelectorAll<HTMLElement>('rrr-sheet'))
     expect(sheets).toHaveLength(2)
     expect(pickerSheet.isConnected).toBe(true)
     expect(sheets.map((sheet) => sheet.dataset.sheetStackDepth)).toEqual(['1', '2'])
@@ -291,7 +291,7 @@ describe('routine exercise picker', () => {
     filterButton.click()
     await Promise.resolve()
 
-    let sheets = Array.from(document.querySelectorAll<HTMLElement>('rrr-sheet'))
+    const sheets = Array.from(document.querySelectorAll<HTMLElement>('rrr-sheet'))
     expect(sheets).toHaveLength(2)
     expect(pickerSheet.isConnected).toBe(true)
     expect(sheets.map((sheet) => sheet.dataset.sheetStackDepth)).toEqual(['1', '2'])

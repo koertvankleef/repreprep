@@ -15,7 +15,6 @@ import {
 import { computeRouteTransition, isSameAppRoute, type RouteTransition } from './app-route-transitions.ts'
 import { createHashRouter } from '../foundation/hash-router.ts'
 import { toastService } from '../foundation/toast.ts'
-import type { LanguagePreference } from './language-preferences.ts'
 import { escapeHtml } from './render-helpers.ts'
 import {
   createAppRouteViewElement,
@@ -264,9 +263,9 @@ export class RrrApp extends HTMLElement {
     window.addEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.addEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.addEventListener('click', this.handleClick)
-    this.shadowRoot?.addEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
-    this.shadowRoot?.addEventListener('rrr-display-preference-change', this.handleDisplayPreferenceChange as EventListener)
-    this.shadowRoot?.addEventListener('rrr-language-preference-change', this.handleLanguagePreferenceChange as EventListener)
+    this.shadowRoot?.addEventListener('rrr-clear-data-request', this.handleClearDataRequest)
+    this.shadowRoot?.addEventListener('rrr-display-preference-change', this.handleDisplayPreferenceChange)
+    this.shadowRoot?.addEventListener('rrr-language-preference-change', this.handleLanguagePreferenceChange)
     this.installPrompt.syncStandaloneDisplayMode()
     this.render()
     this.router.start()
@@ -282,9 +281,9 @@ export class RrrApp extends HTMLElement {
     window.removeEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.removeEventListener('appinstalled', this.handleAppInstalled)
     this.shadowRoot?.removeEventListener('click', this.handleClick)
-    this.shadowRoot?.removeEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
-    this.shadowRoot?.removeEventListener('rrr-display-preference-change', this.handleDisplayPreferenceChange as EventListener)
-    this.shadowRoot?.removeEventListener('rrr-language-preference-change', this.handleLanguagePreferenceChange as EventListener)
+    this.shadowRoot?.removeEventListener('rrr-clear-data-request', this.handleClearDataRequest)
+    this.shadowRoot?.removeEventListener('rrr-display-preference-change', this.handleDisplayPreferenceChange)
+    this.shadowRoot?.removeEventListener('rrr-language-preference-change', this.handleLanguagePreferenceChange)
     this.router.dispose()
   }
 
@@ -576,7 +575,7 @@ export class RrrApp extends HTMLElement {
     nextView.addEventListener('animationend', finish, { once: true })
   }
 
-  private renderShell(route: AppRoute): void {
+  private renderShell(): void {
     if (!this.shadowRoot) {
       return
     }
@@ -775,7 +774,7 @@ export class RrrApp extends HTMLElement {
     }
 
     if (!this.shellRendered) {
-      this.renderShell(route)
+      this.renderShell()
       this.mountRouteView(route, 'none')
       this.updateShellState(route)
       this.previousRoute = route

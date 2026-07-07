@@ -143,10 +143,12 @@ describe('rrr-routine-editor creation', () => {
     await Promise.resolve()
 
     const sheets = document.querySelectorAll<HTMLElement & { close(result: string | null): void }>('rrr-sheet')
-    ;(sheets[sheets.length - 1] as typeof sheets[0])?.close('confirm')
+    const topSheet = sheets[sheets.length - 1] as typeof sheets[0]
+    topSheet?.close('confirm')
     await new Promise((resolve) => window.setTimeout(resolve, 230))
     // dismiss picker so promptRoutineExercisePicker resolves
-    ;(sheets[0] as typeof sheets[0])?.close(null)
+    const pickerSheet = sheets[0] as typeof sheets[0]
+    pickerSheet?.close(null)
     await new Promise((resolve) => window.setTimeout(resolve, 230))
 
     const draftEditor = editor as unknown as {

@@ -14,19 +14,16 @@ import {
   REP_CONFIRM_GRACE_SECONDS,
   TIMELINE,
   getExercise,
-  type ActivationPlan,
   type ActiveStage,
   type RestItemViewModel,
   type SetItemViewModel,
   type TimelineItem,
-  type TimelineState,
   type TransitionItemViewModel,
   type WorkoutEvent,
 } from './rrr-workout-logging-model.ts'
 import { TimelineMotionController } from './rrr-workout-logging-motion.ts'
 import { ManagedTimer, startManagedCountdown } from './rrr-workout-logging-runtime.ts'
 import {
-  formatClock,
   getTimelineState,
   renderWorkoutLoggingMarkup,
   buildRestItemViewModel,

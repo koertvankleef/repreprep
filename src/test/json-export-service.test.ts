@@ -8,9 +8,12 @@ describe('json-export-service', () => {
   test('formatExportData creates valid JSON that parses back to the same data', () => {
     const data = createDefaultData()
     const json = formatExportData(data)
+    const parsed: unknown = JSON.parse(json)
 
-    expect(() => JSON.parse(json)).not.toThrow()
-    expect(JSON.parse(json)).toEqual(data)
+    expect(() => {
+      JSON.parse(json)
+    }).not.toThrow()
+    expect(parsed).toEqual(data)
   })
 
   test('export includes routines and routineVersions', () => {
@@ -18,12 +21,12 @@ describe('json-export-service', () => {
     const json = formatExportData(data)
     const parsed: unknown = JSON.parse(json)
 
-    expect(isValidAppData(parsed)).toBe(true)
-
-    if (isValidAppData(parsed)) {
-      expect(parsed.routines).toHaveLength(data.routines.length)
-      expect(parsed.routineVersions).toHaveLength(data.routineVersions.length)
+    if (!isValidAppData(parsed)) {
+      throw new Error('Expected exported JSON to validate as AppData')
     }
+
+    expect(parsed.routines).toHaveLength(data.routines.length)
+    expect(parsed.routineVersions).toHaveLength(data.routineVersions.length)
   })
 
   test('export preserves routine data round-trip', () => {
@@ -41,10 +44,11 @@ describe('json-export-service', () => {
     const json = formatExportData(data)
     const parsed: unknown = JSON.parse(json)
 
-    expect(isValidAppData(parsed)).toBe(true)
-    if (isValidAppData(parsed)) {
-      const upperBody = parsed.routines.find((r) => r.name === 'Upper Body')
-      expect(upperBody).toBeDefined()
+    if (!isValidAppData(parsed)) {
+      throw new Error('Expected exported JSON to validate as AppData')
     }
+
+    const upperBody = parsed.routines.find((r) => r.name === 'Upper Body')
+    expect(upperBody).toBeDefined()
   })
 })

@@ -97,10 +97,11 @@ describe('createWorkoutFromRoutine', () => {
     expect(entry?.sets[0]?.kind).toBe('reps')
 
     const firstSet = entry?.sets[0]
-    if (firstSet?.kind === 'reps') {
-      expect(firstSet.reps).toBe(0)
-      expect(firstSet.weightKg).toBeNull()
+    if (firstSet?.kind !== 'reps') {
+      throw new Error('Expected first set to be a reps set')
     }
+    expect(firstSet.reps).toBe(0)
+    expect(firstSet.weightKg).toBeNull()
   })
 
   test('creates zero-value duration sets from the routine set count', () => {
@@ -124,9 +125,10 @@ describe('createWorkoutFromRoutine', () => {
     const firstSet = entry?.sets[0]
 
     expect(firstSet?.kind).toBe('time')
-    if (firstSet?.kind === 'time') {
-      expect(firstSet.seconds).toBe(0)
+    if (firstSet?.kind !== 'time') {
+      throw new Error('Expected first set to be a time set')
     }
+    expect(firstSet.seconds).toBe(0)
   })
 
   test('copies rep, weight, and duration values from the selected source with fresh identities', () => {

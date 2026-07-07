@@ -186,8 +186,6 @@ export class RrrRoutineDetail extends HTMLElement {
         return
       }
 
-      const version = getActiveRoutineVersion(data, this.routineIdValue)
-
       this.name = routine.name
       /* this.transitionSeconds = Math.max(0, version?.transitionSeconds ?? RrrRoutineEditor.defaultTransitionSeconds)
       this.exercises = version

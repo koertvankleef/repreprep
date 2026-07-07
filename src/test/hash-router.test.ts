@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { createHashRouter, type HashRouteMatch } from '../foundation/hash-router.ts'
 import {
   appRoutes,
-  getAppRouteBackHref,
   getAppRouteEndLink,
   getAppRouteMeta,
 } from '../app/app-routes.ts'

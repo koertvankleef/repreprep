@@ -59,7 +59,7 @@ export function createAppRouteViewElement(route: AppRoute, context: RouteViewFac
   }
 
   if (route.name === 'routine-new') {
-    return document.createElement('rrr-routine-editor') as RoutineEditorElement
+    return document.createElement('rrr-routine-editor')
   }
 
   if (route.name === 'routine-detail') {

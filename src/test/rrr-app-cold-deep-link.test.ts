@@ -18,7 +18,7 @@ function installBrowserApiShims(): void {
       return (this as StylesheetHost).__adoptedStyleSheets ?? []
     },
     set(this: Document | ShadowRoot, value: CSSStyleSheet[]): void {
-      ;(this as StylesheetHost).__adoptedStyleSheets = value
+      (this as StylesheetHost).__adoptedStyleSheets = value
     },
   }
 

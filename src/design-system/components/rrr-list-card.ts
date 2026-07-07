@@ -39,7 +39,7 @@ export class RrrListCard extends HTMLElement {
       return
     }
 
-    let nextIndex = currentIndex
+    let nextIndex: number
     if (event.key === 'Home') {
       nextIndex = 0
     } else if (event.key === 'End') {

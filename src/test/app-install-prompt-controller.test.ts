@@ -12,12 +12,20 @@ function installMatchMedia(matches = false): void {
   })
 }
 
-function createPromptEvent(outcome: 'accepted' | 'dismissed'): BeforeInstallPromptEvent {
-  return {
-    preventDefault: vi.fn(),
-    prompt: vi.fn(),
+function createPromptEvent(outcome: 'accepted' | 'dismissed'): {
+  event: BeforeInstallPromptEvent
+  preventDefaultMock: ReturnType<typeof vi.fn>
+  promptMock: ReturnType<typeof vi.fn>
+} {
+  const preventDefaultMock = vi.fn()
+  const promptMock = vi.fn()
+  const event: BeforeInstallPromptEvent = {
+    preventDefault: preventDefaultMock,
+    prompt: promptMock,
     userChoice: Promise.resolve({ outcome, platform: 'web' }),
   } as unknown as BeforeInstallPromptEvent
+
+  return { event, preventDefaultMock, promptMock }
 }
 
 describe('app install prompt controller', () => {
@@ -42,7 +50,7 @@ describe('app install prompt controller', () => {
 
   test('tracks prompt availability and prompts the captured event', async () => {
     const onChange = vi.fn()
-    const event = createPromptEvent('accepted')
+    const { event, preventDefaultMock, promptMock } = createPromptEvent('accepted')
     const controller = new AppInstallPromptController({
       devMode: false,
       onChange,
@@ -51,12 +59,12 @@ describe('app install prompt controller', () => {
 
     controller.handlePromptAvailable(event)
 
-    expect(event.preventDefault).toHaveBeenCalledTimes(1)
+    expect(preventDefaultMock).toHaveBeenCalledTimes(1)
     expect(controller.shouldShowInstallButton).toBe(true)
 
     await controller.prompt()
 
-    expect(event.prompt).toHaveBeenCalledTimes(1)
+    expect(promptMock).toHaveBeenCalledTimes(1)
     expect(onChange).toHaveBeenCalledTimes(3)
   })
 
@@ -67,7 +75,7 @@ describe('app install prompt controller', () => {
       onDevPromptUnavailable: vi.fn(),
     })
 
-    controller.handlePromptAvailable(createPromptEvent('dismissed'))
+    controller.handlePromptAvailable(createPromptEvent('dismissed').event)
     expect(controller.shouldShowInstallButton).toBe(true)
 
     controller.handleAppInstalled()

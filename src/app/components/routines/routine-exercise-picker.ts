@@ -402,50 +402,54 @@ export async function promptRoutineExercisePicker(
   let configureOpen = false
   let filterOpen = false
 
-  picker.addEventListener('rrr-routine-exercise-picker-filter', async (event) => {
-    if (configureOpen || filterOpen) {
-      return
-    }
+  picker.addEventListener('rrr-routine-exercise-picker-filter', (event) => {
+    void (async () => {
+      if (configureOpen || filterOpen) {
+        return
+      }
 
-    filterOpen = true
-    try {
-      const detail = (event as CustomEvent<RoutineExercisePickerFilterDetail>).detail
-      await promptRoutineExerciseFilterSheet(detail.filters, (filters) => {
-        picker.filters = filters
-      })
-    } finally {
-      filterOpen = false
-    }
+      filterOpen = true
+      try {
+        const detail = (event as CustomEvent<RoutineExercisePickerFilterDetail>).detail
+        await promptRoutineExerciseFilterSheet(detail.filters, (filters) => {
+          picker.filters = filters
+        })
+      } finally {
+        filterOpen = false
+      }
+    })()
   })
 
-  picker.addEventListener('rrr-routine-exercise-picker-select', async (event) => {
-    if (configureOpen || filterOpen) {
-      return
-    }
-
-    const selection = event as CustomEvent<RoutineExercisePickerSelectDetail>
-    const { exerciseId } = selection.detail
-    const exercise = exercises.find((ex) => ex.id === exerciseId)
-    if (!exercise) {
-      return
-    }
-
-    configureOpen = true
-    try {
-      const settings = await promptAddRoutineExerciseSettings({
-        exerciseName: exercise.name,
-        setCount: sessionDefaults.setCount,
-        restSeconds: sessionDefaults.restSeconds,
-      })
-
-      if (settings) {
-        sessionDefaults = settings
-        onAdd({ exerciseId, settings })
-        toastService.success(t('routineExercisePicker.exerciseAdded', { exercise: exercise.name }))
+  picker.addEventListener('rrr-routine-exercise-picker-select', (event) => {
+    void (async () => {
+      if (configureOpen || filterOpen) {
+        return
       }
-    } finally {
-      configureOpen = false
-    }
+
+      const selection = event as CustomEvent<RoutineExercisePickerSelectDetail>
+      const { exerciseId } = selection.detail
+      const exercise = exercises.find((ex) => ex.id === exerciseId)
+      if (!exercise) {
+        return
+      }
+
+      configureOpen = true
+      try {
+        const settings = await promptAddRoutineExerciseSettings({
+          exerciseName: exercise.name,
+          setCount: sessionDefaults.setCount,
+          restSeconds: sessionDefaults.restSeconds,
+        })
+
+        if (settings) {
+          sessionDefaults = settings
+          onAdd({ exerciseId, settings })
+          toastService.success(t('routineExercisePicker.exerciseAdded', { exercise: exercise.name }))
+        }
+      } finally {
+        configureOpen = false
+      }
+    })()
   })
 
   sheet.append(heading, picker)

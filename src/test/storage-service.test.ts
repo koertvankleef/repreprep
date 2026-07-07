@@ -78,9 +78,9 @@ describe('WorkoutStorageService', () => {
 
     service.completeWorkout(workout.id, true)
 
-    expect(service.getData().workouts[0]?.completedAt).toEqual(expect.any(String))
+    expect(typeof service.getData().workouts[0]?.completedAt).toBe('string')
     expect(service.getData().routines[0]?.prefillSourceWorkoutId).toBe(workout.id)
-    expect(adapter.saved?.workouts[0]?.completedAt).toEqual(expect.any(String))
+    expect(typeof adapter.saved?.workouts[0]?.completedAt).toBe('string')
   })
 
   test('getData returns updated data after saveWorkout', () => {

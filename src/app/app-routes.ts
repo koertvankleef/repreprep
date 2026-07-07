@@ -292,5 +292,5 @@ export function toAppRoute(
     return { name: routeId, exerciseId: match.params.exerciseId ?? '' }
   }
 
-  return { name: routeId } as AppRoute
+  return { name: routeId }
 }
