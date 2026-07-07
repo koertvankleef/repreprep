@@ -48,3 +48,10 @@ that state safely.
   DOM ownership.
 - Keep route state changes in one place until route view mounting and header
   mounting have their own tests.
+
+## Progress
+
+- Done: pure route equality and transition selection live in
+  `src/app/app-route-transitions.ts`.
+- Done: route-to-element creation lives in `src/app/app-route-view-factory.ts`.
+- Next: extract the exercise catalogue header/search/filter controller.

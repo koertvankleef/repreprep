@@ -35,6 +35,12 @@ import {
 } from './language-preferences.ts'
 import { getEquipmentLabel, getExerciseCategoryLabel } from './exercise-labels.ts'
 import { escapeHtml } from './render-helpers.ts'
+import {
+  createAppRouteViewElement,
+  type ExerciseCatalogueElement,
+  type RoutineEditorElement,
+  type RouteViewFactoryContext,
+} from './app-route-view-factory.ts'
 import globalStyles from '../design-system/global.css?inline'
 import appStyles from './rrr-app.css?inline'
 
@@ -69,18 +75,6 @@ type RouteHeader = {
   secondaryClassName?: string
   secondaryHtml?: string
   bind?: (primaryHeader: HTMLElement, secondaryHeader: HTMLElement) => void
-}
-
-type ExerciseCatalogueElement = HTMLElement & {
-  searchQuery: string
-  filters: ExerciseFilters
-  focusedExerciseId: string | null
-  setSearchAndFilters?: (searchQuery: string, filters: ExerciseFilters) => void
-}
-
-type RoutineEditorElement = HTMLElement & {
-  openRenameSheet(): Promise<boolean>
-  getCurrentName?(): string
 }
 
 const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
@@ -519,92 +513,18 @@ export class RrrApp extends HTMLElement {
   }
 
   private createRouteViewElement(route: AppRoute): HTMLElement {
-    if (route.name === 'workouts') {
-      return document.createElement('rrr-workout-list')
+    return createAppRouteViewElement(route, this.getRouteViewFactoryContext())
+  }
+
+  private getRouteViewFactoryContext(): RouteViewFactoryContext {
+    return {
+      displayPreferences: this.displayPreferences,
+      languagePreference: this.languagePreference,
+      styleguideEnabled: this.styleguideEnabled,
+      exerciseSearchQuery: this.exerciseSearchQuery,
+      exerciseFilters: this.cloneExerciseFilters(),
+      exerciseCatalogueFocusedId: this.exerciseCatalogueFocusedId,
     }
-
-    if (route.name === 'workout-edit') {
-      const editor = document.createElement('rrr-workout-editor') as HTMLElement & { workoutId: string | null }
-      editor.workoutId = route.workoutId
-      return editor
-    }
-
-    if (route.name === 'workout-log') {
-      const logger = document.createElement('rrr-workout-logging') as HTMLElement & { workoutId: string | null }
-      logger.workoutId = route.workoutId
-      return logger
-    }
-
-    if (route.name === 'exercises') {
-      const catalogue = document.createElement('rrr-exercise-catalogue') as ExerciseCatalogueElement
-      const filters = this.cloneExerciseFilters()
-      catalogue.focusedExerciseId = this.exerciseCatalogueFocusedId
-
-      if (catalogue.setSearchAndFilters) {
-        catalogue.setSearchAndFilters(this.exerciseSearchQuery, filters)
-      } else {
-        catalogue.searchQuery = this.exerciseSearchQuery
-        catalogue.filters = filters
-      }
-      return catalogue
-    }
-
-    if (route.name === 'exercise-detail') {
-      const detail = document.createElement('rrr-exercise-detail') as HTMLElement & { exerciseId: string | null }
-      detail.exerciseId = route.exerciseId
-      return detail
-    }
-
-    if (route.name === 'history') {
-      return document.createElement('rrr-exercise-history')
-    }
-
-    if (route.name === 'routines') {
-      return document.createElement('rrr-routine-list')
-    }
-
-    if (route.name === 'routine-new') {
-      const editor = document.createElement('rrr-routine-editor') as RoutineEditorElement
-      return editor
-    }
-
-    if (route.name === 'routine-detail') {
-      const detail = document.createElement('rrr-routine-detail') as HTMLElement & { routineId: string | null }
-      detail.routineId = route.routineId
-      return detail
-    }
-
-    if (route.name === 'settings-styleguide') {
-      return document.createElement('rrr-styleguide')
-    }
-
-    if (route.name === 'settings-import-export') {
-      return document.createElement('rrr-import-export')
-    }
-
-    if (route.name === 'settings') {
-      const settingsEl = document.createElement('rrr-settings')
-      settingsEl.setAttribute('theme', this.displayPreferences.theme)
-      settingsEl.setAttribute('language', this.languagePreference)
-      settingsEl.setAttribute('styleguide-enabled', this.styleguideEnabled ? 'true' : 'false')
-      return settingsEl
-    }
-
-    if (route.name === 'settings-appearance') {
-      const appearanceEl = document.createElement('rrr-appearance-settings')
-      appearanceEl.setAttribute('theme', this.displayPreferences.theme)
-      appearanceEl.setAttribute('contrast', this.displayPreferences.contrast)
-      return appearanceEl
-    }
-
-    if (route.name === 'settings-language') {
-      const languageEl = document.createElement('rrr-language-settings')
-      languageEl.setAttribute('language', this.languagePreference)
-      return languageEl
-    }
-
-    /* TODO ! default to an error toast and returning to home/Today page */
-    return document.createElement('rrr-import-export')
   }
 
   private updateShellState(route: AppRoute, transition: RouteTransition = 'none'): void {
