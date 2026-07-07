@@ -1,9 +1,39 @@
-import { describe, expect, test } from 'vitest'
+import { beforeAll, describe, expect, test } from 'vitest'
 import {
   createAppRouteViewElement,
-  type ExerciseCatalogueElement,
   type RouteViewFactoryContext,
 } from '../app/app-route-view-factory.ts'
+import type { RrrExerciseCatalogue } from '../app/components/exercises/rrr-exercise-catalogue.ts'
+
+type StylesheetHost = (Document | ShadowRoot) & {
+  __adoptedStyleSheets?: CSSStyleSheet[]
+}
+
+function installConstructableStylesheetShim(): void {
+  if (!('replaceSync' in CSSStyleSheet.prototype)) {
+    Object.defineProperty(CSSStyleSheet.prototype, 'replaceSync', {
+      value: () => {},
+    })
+  }
+
+  const descriptor = {
+    configurable: true,
+    get(this: Document | ShadowRoot): CSSStyleSheet[] {
+      return (this as StylesheetHost).__adoptedStyleSheets ?? []
+    },
+    set(this: Document | ShadowRoot, value: CSSStyleSheet[]): void {
+      ;(this as StylesheetHost).__adoptedStyleSheets = value
+    },
+  }
+
+  if (!('adoptedStyleSheets' in Document.prototype)) {
+    Object.defineProperty(Document.prototype, 'adoptedStyleSheets', descriptor)
+  }
+
+  if (!('adoptedStyleSheets' in ShadowRoot.prototype)) {
+    Object.defineProperty(ShadowRoot.prototype, 'adoptedStyleSheets', descriptor)
+  }
+}
 
 function createContext(overrides: Partial<RouteViewFactoryContext> = {}): RouteViewFactoryContext {
   return {
@@ -12,12 +42,17 @@ function createContext(overrides: Partial<RouteViewFactoryContext> = {}): RouteV
     styleguideEnabled: true,
     exerciseSearchQuery: 'press',
     exerciseFilters: { categories: ['strength'], equipment: ['dumbbell'] },
-    exerciseCatalogueFocusedId: 'bench-press',
+    exerciseCatalogueFocusedId: 'arnold-dumbbell-press',
     ...overrides,
   }
 }
 
 describe('app route view factory', () => {
+  beforeAll(async () => {
+    installConstructableStylesheetShim()
+    await import('../app/components/exercises/rrr-exercise-catalogue.ts')
+  })
+
   test('creates route elements and assigns route params', () => {
     const workoutEditor = createAppRouteViewElement(
       { name: 'workout-edit', workoutId: 'workout-1' },
@@ -50,12 +85,12 @@ describe('app route view factory', () => {
 
   test('passes cloned exercise catalogue state', () => {
     const context = createContext()
-    const catalogue = createAppRouteViewElement({ name: 'exercises' }, context) as ExerciseCatalogueElement
+    const catalogue = createAppRouteViewElement({ name: 'exercises' }, context) as RrrExerciseCatalogue
 
     expect(catalogue.tagName.toLowerCase()).toBe('rrr-exercise-catalogue')
     expect(catalogue.searchQuery).toBe('press')
     expect(catalogue.filters).toEqual({ categories: ['strength'], equipment: ['dumbbell'] })
     expect(catalogue.filters).not.toBe(context.exerciseFilters)
-    expect(catalogue.focusedExerciseId).toBe('bench-press')
+    expect(catalogue.focusedExerciseId).toBe('arnold-dumbbell-press')
   })
 })

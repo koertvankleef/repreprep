@@ -54,4 +54,8 @@ that state safely.
 - Done: pure route equality and transition selection live in
   `src/app/app-route-transitions.ts`.
 - Done: route-to-element creation lives in `src/app/app-route-view-factory.ts`.
-- Next: extract the exercise catalogue header/search/filter controller.
+- Done: exercise catalogue header rendering and filter rail overflow helpers live
+  in `src/app/exercise-catalogue-header.ts`.
+- Next: decide whether the remaining exercise catalogue search/filter state and
+  event binding is still worth extracting, or move to preferences if that would
+  be a cleaner split.

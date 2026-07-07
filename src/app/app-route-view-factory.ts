@@ -2,13 +2,7 @@ import type { ExerciseFilters } from '../domain/exercise-service.ts'
 import type { DisplayPreferences } from './theme-preferences.ts'
 import type { LanguagePreference } from './language-preferences.ts'
 import type { AppRoute } from './app-routes.ts'
-
-export type ExerciseCatalogueElement = HTMLElement & {
-  searchQuery: string
-  filters: ExerciseFilters
-  focusedExerciseId: string | null
-  setSearchAndFilters?: (searchQuery: string, filters: ExerciseFilters) => void
-}
+import type { RrrExerciseCatalogue } from './components/exercises/rrr-exercise-catalogue.ts'
 
 export type RoutineEditorElement = HTMLElement & {
   openRenameSheet(): Promise<boolean>
@@ -42,16 +36,11 @@ export function createAppRouteViewElement(route: AppRoute, context: RouteViewFac
   }
 
   if (route.name === 'exercises') {
-    const catalogue = document.createElement('rrr-exercise-catalogue') as ExerciseCatalogueElement
+    const catalogue = document.createElement('rrr-exercise-catalogue') as RrrExerciseCatalogue
     const filters = cloneExerciseFilters(context.exerciseFilters)
     catalogue.focusedExerciseId = context.exerciseCatalogueFocusedId
 
-    if (catalogue.setSearchAndFilters) {
-      catalogue.setSearchAndFilters(context.exerciseSearchQuery, filters)
-    } else {
-      catalogue.searchQuery = context.exerciseSearchQuery
-      catalogue.filters = filters
-    }
+    catalogue.setSearchAndFilters(context.exerciseSearchQuery, filters)
     return catalogue
   }
 
