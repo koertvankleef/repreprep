@@ -28,6 +28,7 @@ import {
   updateExerciseFilterRailOverflow,
 } from './exercise-catalogue-header.ts'
 import { AppPreferencesController } from './app-preferences-controller.ts'
+import { AppInstallPromptController } from './app-install-prompt-controller.ts'
 import globalStyles from '../design-system/global.css?inline'
 import appStyles from './rrr-app.css?inline'
 
@@ -36,16 +37,6 @@ globalSheet.replaceSync(globalStyles)
 
 const appSheet = new CSSStyleSheet()
 appSheet.replaceSync(appStyles)
-
-type InstallPromptChoice = {
-  outcome: 'accepted' | 'dismissed'
-  platform: string
-}
-
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => unknown
-  userChoice: unknown
-}
 
 type DisplayPreferenceChangeDetail = {
   preference: 'theme' | 'contrast'
@@ -81,9 +72,11 @@ export class RrrApp extends HTMLElement {
   private route: AppRoute = { name: 'workouts' }
   private previousRoute: AppRoute | null = null
   private readonly preferences = new AppPreferencesController()
-  private installPromptEvent: BeforeInstallPromptEvent | null = null
-  private installAvailable = false
-  private isStandalone = window.matchMedia('(display-mode: standalone)').matches
+  private readonly installPrompt = new AppInstallPromptController({
+    devMode: import.meta.env.DEV,
+    onChange: () => this.render(),
+    onDevPromptUnavailable: () => toastService.info(t('app.install.devHint')),
+  })
   private readonly styleguideEnabled = import.meta.env.DEV || localHosts.has(window.location.hostname)
   private shellRendered = false
   private exerciseSearchQuery = ''
@@ -115,17 +108,11 @@ export class RrrApp extends HTMLElement {
   }
 
   private readonly handleInstallPromptAvailable = (event: Event): void => {
-    event.preventDefault()
-    this.installPromptEvent = event as BeforeInstallPromptEvent
-    this.installAvailable = true
-    this.render()
+    this.installPrompt.handlePromptAvailable(event)
   }
 
   private readonly handleAppInstalled = (): void => {
-    this.installPromptEvent = null
-    this.installAvailable = false
-    this.isStandalone = true
-    this.render()
+    this.installPrompt.handleAppInstalled()
   }
 
   private readonly handleClearDataRequest = (): void => {
@@ -190,7 +177,7 @@ export class RrrApp extends HTMLElement {
     }
 
     if (action === 'install-app') {
-      void this.promptInstall()
+      void this.installPrompt.prompt()
       return
     }
 
@@ -248,29 +235,6 @@ export class RrrApp extends HTMLElement {
     }
   }
 
-  private async promptInstall(): Promise<void> {
-    const promptEvent = this.installPromptEvent
-    if (!promptEvent) {
-      if (import.meta.env.DEV) {
-        toastService.info(t('app.install.devHint'))
-      }
-      return
-    }
-
-    this.installAvailable = false
-    this.render()
-
-    await promptEvent.prompt()
-    const choice = (await promptEvent.userChoice) as InstallPromptChoice
-    this.installPromptEvent = null
-
-    if (choice.outcome !== 'accepted') {
-      this.installAvailable = false
-    }
-
-    this.render()
-  }
-
   private async renameCurrentRoutine(): Promise<void> {
     if (
       this.route.name !== 'routine-detail'
@@ -298,10 +262,7 @@ export class RrrApp extends HTMLElement {
     this.shadowRoot?.addEventListener('rrr-clear-data-request', this.handleClearDataRequest as EventListener)
     this.shadowRoot?.addEventListener('rrr-display-preference-change', this.handleDisplayPreferenceChange as EventListener)
     this.shadowRoot?.addEventListener('rrr-language-preference-change', this.handleLanguagePreferenceChange as EventListener)
-    this.isStandalone = window.matchMedia('(display-mode: standalone)').matches
-    if (this.isStandalone) {
-      this.installAvailable = false
-    }
+    this.installPrompt.syncStandaloneDisplayMode()
     this.render()
     this.router.start()
   }
@@ -323,11 +284,7 @@ export class RrrApp extends HTMLElement {
   }
 
   private shouldShowInstallButton(): boolean {
-    if (this.isStandalone) {
-      return false
-    }
-
-    return import.meta.env.DEV || this.installAvailable
+    return this.installPrompt.shouldShowInstallButton
   }
 
   private renderNavButton(routeName: AppNavId, href: string, label: string, iconName: string): string {

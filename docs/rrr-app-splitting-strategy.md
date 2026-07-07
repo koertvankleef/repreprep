@@ -58,6 +58,8 @@ that state safely.
   in `src/app/exercise-catalogue-header.ts`.
 - Done: display/language preference coordination lives in
   `src/app/app-preferences-controller.ts`.
+- Done: install prompt event/prompt lifecycle lives in
+  `src/app/app-install-prompt-controller.ts`.
 - Next: decide whether the remaining exercise catalogue search/filter state and
-  event binding is still worth extracting, or whether install prompt/reset
-  coordination is the cleaner next split.
+  event binding is still worth extracting, or whether reset coordination is the
+  cleaner next split.
