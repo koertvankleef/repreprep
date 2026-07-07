@@ -60,6 +60,7 @@ that state safely.
   `src/app/app-preferences-controller.ts`.
 - Done: install prompt event/prompt lifecycle lives in
   `src/app/app-install-prompt-controller.ts`.
+- Done: app reset coordination lives in `src/app/app-reset-controller.ts`.
 - Next: decide whether the remaining exercise catalogue search/filter state and
-  event binding is still worth extracting, or whether reset coordination is the
-  cleaner next split.
+  event binding is still worth extracting before leaving route/header mounting
+  in the shell for the short term.

@@ -29,6 +29,7 @@ import {
 } from './exercise-catalogue-header.ts'
 import { AppPreferencesController } from './app-preferences-controller.ts'
 import { AppInstallPromptController } from './app-install-prompt-controller.ts'
+import { AppResetController } from './app-reset-controller.ts'
 import globalStyles from '../design-system/global.css?inline'
 import appStyles from './rrr-app.css?inline'
 
@@ -77,6 +78,14 @@ export class RrrApp extends HTMLElement {
     onChange: () => this.render(),
     onDevPromptUnavailable: () => toastService.info(t('app.install.devHint')),
   })
+  private readonly resetController = new AppResetController({
+    resetData: () => storageService.resetAllData(),
+    resetPreferences: () => this.preferences.reset(),
+    getHash: () => window.location.hash,
+    setHash: (hash) => {
+      window.location.hash = hash
+    },
+  })
   private readonly styleguideEnabled = import.meta.env.DEV || localHosts.has(window.location.hostname)
   private shellRendered = false
   private exerciseSearchQuery = ''
@@ -116,17 +125,13 @@ export class RrrApp extends HTMLElement {
   }
 
   private readonly handleClearDataRequest = (): void => {
-    storageService.resetAllData()
-    this.preferences.reset()
+    const resetResult = this.resetController.reset()
     toastService.success(t('app.settings.resetData.success'))
 
-    if (window.location.hash !== '#/workouts') {
-      window.location.hash = '/workouts'
-      return
+    if (resetResult.renderWorkoutsImmediately) {
+      this.route = { name: 'workouts' }
+      this.render()
     }
-
-    this.route = { name: 'workouts' }
-    this.render()
   }
 
   private readonly handleDisplayPreferenceChange = (event: Event): void => {
