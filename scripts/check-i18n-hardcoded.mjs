@@ -12,7 +12,6 @@ const filesToCheck = [
   'src/app/components/routines/rrr-routine-editor.ts',
   'src/app/components/routines/rrr-routine-list.ts',
   'src/app/components/workouts/editor/rrr-set-entry.ts',
-  'src/app/components/dev/rrr-styleguide.ts',
   'src/app/components/workouts/editor/rrr-workout-editor.ts',
   'src/app/components/workouts/rrr-workout-list.ts',
 ]

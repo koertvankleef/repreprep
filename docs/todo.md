@@ -4,6 +4,8 @@ Use this file to capture product and prototype follow-up tasks that should not b
 
 - [ ] [top priority — architecture] `rrr-app.ts` is a god component that must be split before it becomes unmaintainable. It currently owns eight distinct responsibilities in a single Shadow DOM class: (1) hash routing and route transitions, (2) navigation/header markup rendering, (3) exercise filter state, (4) theme preferences (load/apply/persist/watch), (5) language preferences (load/apply/persist), (6) PWA install prompt, (7) data reset via `rrr-clear-data-request`, (8) all `render*` methods for route-specific header HTML. Splitting requires deciding on component boundaries first — a splitting strategy doc/discussion is needed before touching the file. A natural entry point is the planned options/settings panel work, which would pull preferences and nav controls out into a dedicated component. Any split carries real regression risk and must be done with full test and build verification.
 
+- [ ] [top priority — audit] Re-run architecture, accessibility, import/export, and schema audits with fresh eyes before the tracked redesign work drifts further. Prior Copilot-assisted review is useful input, but this should be treated as a release-hardening pass rather than assumed complete.
+
 - [ ] [top priority] In active workout logging, always show the current exercise load/weight prominently so the user can execute sets without guessing.
 - [ ] [top priority] During transition between exercises in an active workout, show the upcoming exercise load/weight so the user can prepare equipment in time.
 - [ ] During a workout, use the Screen Wake Lock API so the phone does not lock.
@@ -28,6 +30,7 @@ Use this file to capture product and prototype follow-up tasks that should not b
       prefill source from this context. Design this after reviewing workout
       history/detail IxD, especially whether historical logs should be editable.
 - [ ] Enrich exercise definitions with metadata such as description and materials used. This is to help users choose the right exercise. This is not an instruction on how to do the exercise, we expect the user to look this info up elsewhere. It's purpose is simply that the user is able to choose the right exercise (like if they forgot the name).
+- [ ] Redesign the Exercises library page before adding custom-exercise creation to routine creation/editing. The routine picker needs an eventual "create custom exercise" path, but the exercise creation/editing surface should likely be shared with the library instead of being designed only inside the routine flow.
 - [ ] Revisit workout progress rail UX: prefer article-scroll style position indicator with a marker over filled progress to improve glance readability and reduce visual distraction.
 - [ ] Prototype segmented workout rail where section ranges are encoded as mint/indigo zones that reflect workout structure.
 - [ ] Prototype marker color/state changes based on active workout segment while keeping the underlying rail visually subtle.

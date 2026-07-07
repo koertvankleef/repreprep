@@ -465,9 +465,17 @@ until editing historical logged values receives a separate product review.
 - [x] Remove obsolete planned-set components, helpers, styles, and tests.
 - [x] Remove obsolete target language from all locales and documentation.
 - [x] Update Styleguide examples.
-- [ ] Re-run architecture, accessibility, import/export, and schema audits.
+- [ ] High priority: re-run architecture, accessibility, import/export, and
+      schema audits with a fresh perspective before this redesign drifts
+      further.
 
-### Deferred — Exercise-level starting defaults
+### Deferred — Exercise-level fallback starting values
+
+This is a future no-prefill fallback idea, not a routine target. For example,
+the exercise catalogue might eventually say that a rep-based bodyweight
+exercise should start new no-source sets at a sensible nonzero rep count. That
+fallback would live on the exercise definition, and it would only apply when no
+selected source workout provides a value.
 
 - [ ] Define and validate a default rep count for every rep-based exercise.
 - [ ] Use that value only when the selected source workout has no matching

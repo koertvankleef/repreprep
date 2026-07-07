@@ -36,6 +36,11 @@ describe('i18n runtime', () => {
     expect(t('exercise.title')).toBe('Oefeningen')
   })
 
+  test('falls back to English when the active locale omits a key', () => {
+    initLocale('nl-NL')
+    expect(t('styleguide.title')).toBe('Styleguide')
+  })
+
   test('selects pluralized English message by count', () => {
     expect(tPlural('message.routine.exerciseCount', 1)).toBe('1 exercise')
     expect(tPlural('message.routine.exerciseCount', 2)).toBe('2 exercises')
