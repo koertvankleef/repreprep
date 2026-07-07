@@ -41,6 +41,7 @@ import {
   isSetGraceStage,
   isSetInteractionStage,
 } from './rrr-workout-logging-workflow.ts'
+import { t } from '../../../../i18n/index.ts'
 
 export class RrrWorkoutLoggingFlow extends HTMLElement {
   private activeTimelineIndex = 0
@@ -186,9 +187,9 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
     this.repAdjustmentDebounceRemainingSeconds = 0
     this.completedSetsByExercise[currentItem.exerciseIndex] = currentItem.setNumber
     this.lastConfirmedSummary = source === 'adjusted-auto'
-      ? `${this.repValue} reps logged (auto).`
-      : `${this.repValue} reps logged.`
-    this.announce(`${this.repValue} reps logged. Rest starts soon.`)
+      ? t('workoutLogging.reps.loggedAuto', { count: this.repValue })
+      : t('workoutLogging.reps.logged', { count: this.repValue })
+    this.announce(t('workoutLogging.reps.loggedRestSoon', { count: this.repValue }))
     this.emitWorkoutEvent({
       type: 'repResultConfirmed',
       exerciseIndex: currentItem.exerciseIndex,
@@ -262,8 +263,8 @@ export class RrrWorkoutLoggingFlow extends HTMLElement {
 
     this.timedSetTimer.clear()
     this.completedSetsByExercise[currentItem.exerciseIndex] = currentItem.setNumber
-    this.lastConfirmedSummary = `${actualDurationSeconds} sec logged.`
-    this.announce(`${actualDurationSeconds} seconds logged. Rest starts soon.`)
+    this.lastConfirmedSummary = t('workoutLogging.timed.loggedShort', { seconds: actualDurationSeconds })
+    this.announce(t('workoutLogging.timed.loggedRestSoon', { seconds: actualDurationSeconds }))
     this.emitWorkoutEvent({
       type: 'timedSetCompleted',
       exerciseIndex: currentItem.exerciseIndex,

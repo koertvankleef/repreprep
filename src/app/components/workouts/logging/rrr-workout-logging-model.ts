@@ -92,7 +92,7 @@ export type RestItemViewModel = {
   restRemainingPercent: string
   showPrimaryAction: boolean
   primaryAction: 'pause-rest'
-  primaryLabel: 'Wait'
+  primaryLabel: string
 }
 
 export type TransitionItemViewModel = {
@@ -104,7 +104,7 @@ export type TransitionItemViewModel = {
   transitionRemainingPercent: string
   showPrimaryAction: boolean
   transitionPrimaryAction: 'stay-here'
-  transitionPrimaryLabel: 'Wait'
+  transitionPrimaryLabel: string
   nextExerciseName: string
 }
 

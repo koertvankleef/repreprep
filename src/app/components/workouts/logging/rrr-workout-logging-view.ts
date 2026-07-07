@@ -20,6 +20,7 @@ import {
   isTransitionActiveOrPausedStage,
   isTransitionActiveStage,
 } from './rrr-workout-logging-workflow.ts'
+import { t } from '../../../../i18n/index.ts'
 
 export type WorkoutLoggingViewState = {
   stage: ActiveStage
@@ -78,13 +79,13 @@ export function buildSetItemViewModelForState(item: Extract<TimelineItem, { kind
     isActiveTimedSet: isActive && isTimedReadyOrActiveStage(state.stage),
     isActiveDebounce: isActive && isSetDebounceStage(state.stage),
     isActiveGrace: isActive && isSetGraceStage(state.stage),
-    repDisplay: `${state.repValue} reps`,
+    repDisplay: t('workoutLogging.repsValue', { count: state.repValue }),
     timedDisplay: formatClock(state.timedSetElapsedSeconds),
     timedTargetDisplay: formatClock(exercise.targetDurationSeconds ?? 0),
     graceCountdownText: `${state.repConfirmGraceRemainingSeconds}`,
     debounceCountdownText: `${state.repAdjustmentDebounceRemainingSeconds}`,
     graceSummary: state.lastConfirmedSummary ?? '',
-    confirmLabel: `Log ${state.repValue} reps`,
+    confirmLabel: t('workoutLogging.action.logReps', { count: state.repValue }),
   }
 }
 
@@ -105,7 +106,7 @@ export function buildRestItemViewModel(item: Extract<TimelineItem, { kind: 'rest
         : '100%',
     showPrimaryAction: isRunningRest,
     primaryAction: 'pause-rest',
-    primaryLabel: 'Wait',
+    primaryLabel: t('workoutLogging.action.wait'),
   }
 }
 
@@ -127,8 +128,8 @@ export function buildTransitionItemViewModel(item: Extract<TimelineItem, { kind:
         : '100%',
     showPrimaryAction: isRunningTransition,
     transitionPrimaryAction: 'stay-here',
-    transitionPrimaryLabel: 'Wait',
-    nextExerciseName: nextExercise ? nextExercise.name : 'Workout complete',
+    transitionPrimaryLabel: t('workoutLogging.action.wait'),
+    nextExerciseName: nextExercise ? nextExercise.name : t('workoutLogging.complete.title'),
   }
 }
 
@@ -158,9 +159,9 @@ export function renderWorkoutLoggingMarkup(state: WorkoutLoggingViewState, style
       <div class="live-announcer" data-role="workout-announcement" aria-live="polite" aria-atomic="true">${state.liveAnnouncement}</div>
       <div class="stack is-dimmed">
         <section class="timeline-item timeline-item--start" data-state="${startState}">
-          <h2 class="name">Ready?</h2>
-          <div class="actions start-actions"${state.stage !== 'locked' ? ' hidden aria-hidden="true"' : ''}><rrr-button data-action="go" type="button" tone="accent" rounded>GO</rrr-button></div>
-          <div class="hint start-hint"${state.stage === 'locked' ? ' hidden aria-hidden="true"' : ''}>Workout flow is running. Active section is centered when possible.</div>
+          <h2 class="name">${t('workoutLogging.ready.title')}</h2>
+          <div class="actions start-actions"${state.stage !== 'locked' ? ' hidden aria-hidden="true"' : ''}><rrr-button data-action="go" type="button" tone="accent" rounded>${t('workoutLogging.action.go')}</rrr-button></div>
+          <div class="hint start-hint"${state.stage === 'locked' ? ' hidden aria-hidden="true"' : ''}>${t('workoutLogging.ready.runningHint')}</div>
         </section>
 
         ${timeline.map((item, index) => renderTimelineItem(item, index, state)).join('')}
@@ -168,12 +169,12 @@ export function renderWorkoutLoggingMarkup(state: WorkoutLoggingViewState, style
         ${state.stage === 'workout-complete'
           ? `
             <section class="timeline-item timeline-item--complete" data-state="active">
-              <h2 class="name">Workout complete</h2>
-              <div class="hint">Logged sets: ${state.completedSetCount}</div>
-              <div class="hint">Your logged values were saved during the flow.</div>
+              <h2 class="name">${t('workoutLogging.complete.title')}</h2>
+              <div class="hint">${t('workoutLogging.complete.loggedSets', { count: state.completedSetCount })}</div>
+              <div class="hint">${t('workoutLogging.complete.savedHint')}</div>
               <div class="actions">
-                <rrr-button type="button" tone="accent" data-action="finish-and-use">Finish + use</rrr-button>
-                <rrr-button type="button" variant="outline" data-action="finish-without-use">Finish don't use</rrr-button>
+                <rrr-button type="button" tone="accent" data-action="finish-and-use">${t('workoutLogging.action.finishAndUse')}</rrr-button>
+                <rrr-button type="button" variant="outline" data-action="finish-without-use">${t('workoutLogging.action.finishWithoutUse')}</rrr-button>
               </div>
             </section>
           `
@@ -195,12 +196,12 @@ function renderSetCard(viewModel: SetItemViewModel, detailMarkup: string): strin
   return `
     <section class="timeline-item timeline-item--set" data-state="${viewModel.timelineState}"${viewModel.stageDataAttribute}>
       <div class="set-header">
-        <h2 class="name"><span class="name-prefix">Doing&nbsp;</span><span class="name-text">${viewModel.exercise.name}</span></h2>
+        <h2 class="name"><span class="name-prefix">${t('workoutLogging.set.doingPrefix')}&nbsp;</span><span class="name-text">${viewModel.exercise.name}</span></h2>
         <span class="set-count">${viewModel.setNumber} / ${viewModel.exercise.totalSets}</span>
       </div>
       <div class="set-detail">
         <div class="set-detail__inner">
-          <div class="last-time">Previously: ${viewModel.exercise.previousPerformance}</div>
+          <div class="last-time">${t('workoutLogging.set.previous', { value: viewModel.exercise.previousPerformance })}</div>
           ${detailMarkup}
         </div>
       </div>
@@ -214,20 +215,20 @@ function renderTimedSetDetail(viewModel: SetItemViewModel): string {
       <div class="rep-row">
         <div class="rep-value timed-count-value">${viewModel.timedDisplay}</div>
       </div>
-      <div class="hint">Target: ${viewModel.timedTargetDisplay}</div>
+      <div class="hint">${t('workoutLogging.timed.target', { duration: viewModel.timedTargetDisplay })}</div>
       <div class="actions">
-        <rrr-button type="button" data-action="start-timed-set" class="timed-start-action" ${viewModel.isActiveTimedReady ? '' : 'disabled'}>Start</rrr-button>
-        <rrr-button type="button" variant="outline" data-action="stop-timed-set" class="timed-stop-action" ${viewModel.isActiveTimed ? '' : 'disabled'}>Stop</rrr-button>
+        <rrr-button type="button" data-action="start-timed-set" class="timed-start-action" ${viewModel.isActiveTimedReady ? '' : 'disabled'}>${t('workoutLogging.action.start')}</rrr-button>
+        <rrr-button type="button" variant="outline" data-action="stop-timed-set" class="timed-stop-action" ${viewModel.isActiveTimed ? '' : 'disabled'}>${t('workoutLogging.action.stop')}</rrr-button>
       </div>
     </div>
     <div class="timed-grace-group"${viewModel.isActiveGrace ? '' : ' hidden aria-hidden="true"'}>
       <div class="rep-row">
         <div class="rep-value grace-summary">${viewModel.graceSummary}</div>
       </div>
-      <div class="hint">Rest starts in <span class="grace-countdown-value">${viewModel.graceCountdownText}</span>...</div>
+      <div class="hint">${t('workoutLogging.rest.startsInPrefix')} <span class="grace-countdown-value">${viewModel.graceCountdownText}</span>${t('workoutLogging.countdownSuffix')}</div>
       <div class="actions">
-        <rrr-button type="button" variant="outline" data-action="edit-grace" class="timed-edit-grace-action" ${viewModel.isActiveGrace ? '' : 'disabled'}>Edit</rrr-button>
-        <rrr-button type="button" data-action="start-rest-now" class="timed-start-rest-now-action" ${viewModel.isActiveGrace ? '' : 'disabled'}>Start Rest Now</rrr-button>
+        <rrr-button type="button" variant="outline" data-action="edit-grace" class="timed-edit-grace-action" ${viewModel.isActiveGrace ? '' : 'disabled'}>${t('action.edit')}</rrr-button>
+        <rrr-button type="button" data-action="start-rest-now" class="timed-start-rest-now-action" ${viewModel.isActiveGrace ? '' : 'disabled'}>${t('workoutLogging.action.startRestNow')}</rrr-button>
       </div>
     </div>
   `
@@ -236,15 +237,15 @@ function renderTimedSetDetail(viewModel: SetItemViewModel): string {
 function renderRepSetDetail(viewModel: SetItemViewModel): string {
   return `
     <div class="rep-row">
-      <rrr-button type="button" variant="outline" rounded data-action="rep-minus" aria-label="Decrease reps" ${viewModel.isActiveSet ? '' : 'disabled'}><rrr-icon name="subtract"></rrr-icon></rrr-button>
+      <rrr-button type="button" variant="outline" rounded data-action="rep-minus" aria-label="${t('workoutLogging.action.decreaseReps')}" ${viewModel.isActiveSet ? '' : 'disabled'}><rrr-icon name="subtract"></rrr-icon></rrr-button>
       <div class="rep-value" aria-live="polite" aria-atomic="true" aria-label="${viewModel.repDisplay}">${viewModel.repDisplay}</div>
-      <rrr-button type="button" variant="outline" rounded data-action="rep-plus" aria-label="Increase reps" ${viewModel.isActiveSet ? '' : 'disabled'}><rrr-icon name="add"></rrr-icon></rrr-button>
+      <rrr-button type="button" variant="outline" rounded data-action="rep-plus" aria-label="${t('workoutLogging.action.increaseReps')}" ${viewModel.isActiveSet ? '' : 'disabled'}><rrr-icon name="add"></rrr-icon></rrr-button>
     </div>
-    <div class="hint rep-debounce-hint"${viewModel.isActiveDebounce ? '' : ' hidden aria-hidden="true"'}>Auto-confirm in <span class="debounce-countdown-value">${viewModel.debounceCountdownText}</span>...</div>
-    <div class="hint rep-grace-hint"${viewModel.isActiveGrace ? '' : ' hidden aria-hidden="true"'}>Rest starts in <span class="grace-countdown-value">${viewModel.graceCountdownText}</span>...</div>
+    <div class="hint rep-debounce-hint"${viewModel.isActiveDebounce ? '' : ' hidden aria-hidden="true"'}>${t('workoutLogging.reps.autoConfirmInPrefix')} <span class="debounce-countdown-value">${viewModel.debounceCountdownText}</span>${t('workoutLogging.countdownSuffix')}</div>
+    <div class="hint rep-grace-hint"${viewModel.isActiveGrace ? '' : ' hidden aria-hidden="true"'}>${t('workoutLogging.rest.startsInPrefix')} <span class="grace-countdown-value">${viewModel.graceCountdownText}</span>${t('workoutLogging.countdownSuffix')}</div>
     <div class="actions">
       <rrr-button type="button" data-action="done-set" rounded class="rep-confirm-action" aria-label="${viewModel.confirmLabel}" ${viewModel.isActiveSet ? '' : 'disabled'}>${viewModel.confirmLabel}</rrr-button>
-      <rrr-button type="button" data-action="start-rest-now" rounded class="rep-start-rest-now-action" ${viewModel.isActiveGrace ? '' : 'disabled'}${viewModel.isActiveGrace ? '' : ' hidden aria-hidden="true"'}>Start Rest Now</rrr-button>
+      <rrr-button type="button" data-action="start-rest-now" rounded class="rep-start-rest-now-action" ${viewModel.isActiveGrace ? '' : 'disabled'}${viewModel.isActiveGrace ? '' : ' hidden aria-hidden="true"'}>${t('workoutLogging.action.startRestNow')}</rrr-button>
     </div>
   `
 }
@@ -256,7 +257,7 @@ function renderRestTimelineItem(viewModel: RestItemViewModel): string {
         <div class="bar bar--vertical"><span style="height: ${viewModel.restRemainingPercent};"></span></div>
       </div>
       <div class="rest-header">
-        <div class="rest-title"><rrr-icon name="water-bottle"></rrr-icon>Rest</div>
+        <div class="rest-title"><rrr-icon name="water-bottle"></rrr-icon>${t('workoutLogging.rest.title')}</div>
         <span class="stage-count stage-count--rest${viewModel.showCountdown ? '' : ' is-countdown-hidden'}"${viewModel.showCountdown ? '' : ' aria-hidden="true"'}>${viewModel.restDisplayTime}</span>
       </div>
       <div class="rest-detail">
@@ -278,7 +279,7 @@ function renderTransitionTimelineItem(viewModel: TransitionItemViewModel): strin
         <div class="bar bar--vertical bar--vertical--transition"><span style="height: ${viewModel.transitionRemainingPercent};"></span></div>
       </div>
       <div class="rest-header">
-        <div class="rest-title">Time to switch to: ${viewModel.nextExerciseName}</div>
+        <div class="rest-title">${t('workoutLogging.transition.title', { exercise: viewModel.nextExerciseName })}</div>
         <span class="stage-count stage-count--transition${viewModel.showCountdown ? '' : ' is-countdown-hidden'}"${viewModel.showCountdown ? '' : ' aria-hidden="true"'}>${viewModel.transitionDisplayTime}</span>
       </div>
       <div class="transition-detail transition-detail--actions">
