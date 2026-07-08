@@ -14,7 +14,6 @@ import type {
   SwipeActionCommitDetail,
 } from '../../../design-system/components/rrr-swipe-action.ts'
 import { escapeHtml } from '../../render-helpers.ts'
-import { confirmSheet } from '../../../foundation/sheet-service.ts'
 import { RrrSheet } from '../../../design-system/components/rrr-sheet.ts'
 import { presentSheet } from '../../../foundation/sheet-service.ts'
 import {
@@ -358,32 +357,15 @@ export class RrrRoutineEditor extends HTMLElement {
     const exerciseName = this.resolveExerciseName(routineExercise.exerciseId)
     this.sheetSessionActive = true
     try {
-      const result = await promptRoutineExerciseSettings({
+      const settings = await promptRoutineExerciseSettings({
         exerciseName,
         setCount: routineExercise.setCount,
         restSeconds: routineExercise.restSeconds,
       })
-      if (!result) {
+      if (!settings) {
         return
       }
 
-      if (result.kind === 'delete') {
-        const confirmed = await confirmSheet({
-          title: t('routineExercise.dialog.delete.title', { exercise: exerciseName }),
-          message: t('routineExercise.dialog.delete.message'),
-          confirmLabel: t('action.delete'),
-          confirmTone: 'danger',
-        })
-        if (confirmed) {
-          this.exercises = this.exercises.filter(
-            (exercise) => exercise.id !== routineExerciseId,
-          )
-          this.render()
-        }
-        return
-      }
-
-      const { settings } = result
       if (
         settings.setCount === routineExercise.setCount
         && settings.restSeconds === routineExercise.restSeconds

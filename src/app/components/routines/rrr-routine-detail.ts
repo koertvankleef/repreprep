@@ -433,38 +433,15 @@ export class RrrRoutineDetail extends HTMLElement {
 
     this.sheetSessionActive = true
     try {
-      const result = await promptRoutineExerciseSettings({
+      const settings = await promptRoutineExerciseSettings({
         exerciseName,
         setCount: routineExercise.setCount,
         restSeconds: routineExercise.restSeconds,
       })
-      if (!result) {
+      if (!settings) {
         return
       }
 
-      if (result.kind === 'delete') {
-        const confirmed = await confirmSheet({
-          title: t('routineExercise.dialog.delete.title', { exercise: exerciseName }),
-          message: t('routineExercise.dialog.delete.message'),
-          confirmLabel: t('action.delete'),
-          confirmTone: 'danger',
-        })
-        if (!confirmed) {
-          return
-        }
-
-        const latest = this.getCurrentRoutineVersion()
-        if (latest) {
-          this.saveRoutineVersion(latest.routine, latest.version, {
-            exercises: latest.version.exercises.filter(
-              (exercise) => exercise.id !== routineExerciseId,
-            ),
-          })
-        }
-        return
-      }
-
-      const { settings } = result
       if (
         settings.setCount === routineExercise.setCount
         && settings.restSeconds === routineExercise.restSeconds
@@ -613,6 +590,19 @@ export class RrrRoutineDetail extends HTMLElement {
         ${summary.routine.description ? `<p>${escapeHtml(summary.routine.description)}</p>` : ''}
 
         <rrr-section>
+          <span slot="heading">${t('routineDetail.actions')}</span>
+          <div class="rrr-list-card">
+            <rrr-list-row
+              activation="button"
+              label="${t('routineDetail.action.start')}"
+              data-action="start-workout"
+            >
+              <rrr-icon slot="leading" name="play"></rrr-icon>
+            </rrr-list-row>
+          </div>
+        </rrr-section>
+
+        <rrr-section>
           <span slot="heading">${t('routineDetail.section.flow')}</span>
           ${exerciseCount > 0
             ? renderRoutineReorderControl({
@@ -655,27 +645,6 @@ export class RrrRoutineDetail extends HTMLElement {
         </rrr-section>
 
         <rrr-section>
-          <span slot="heading">${t('routineDetail.actions')}</span>
-          <div class="rrr-list-card">
-            <rrr-list-row
-              activation="button"
-              label="${t('routineDetail.action.start')}"
-              data-action="start-workout"
-            >
-              <rrr-icon slot="leading" name="play"></rrr-icon>
-            </rrr-list-row>
-            <rrr-list-row
-              activation="button"
-              label="${t('action.delete')}"
-              data-action="delete-routine"
-              tone="danger"
-            >
-              <rrr-icon slot="leading" name="delete"></rrr-icon>
-            </rrr-list-row>
-          </div>
-        </rrr-section>
-
-        <rrr-section>
           <span slot="heading">${t('routineDetail.section.overview')}</span>
           <dl class="rrr-property-list">
             ${renderPropertyRow({
@@ -687,6 +656,19 @@ export class RrrRoutineDetail extends HTMLElement {
               textValue: lastStarted,
             })}
           </dl>
+        </rrr-section>
+
+        <rrr-section>
+          <div class="rrr-list-card">
+            <rrr-list-row
+              activation="button"
+              label="${t('action.delete')}"
+              data-action="delete-routine"
+              tone="danger"
+            >
+              <rrr-icon slot="leading" name="delete"></rrr-icon>
+            </rrr-list-row>
+          </div>
         </rrr-section>
 
       </section>

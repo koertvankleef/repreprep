@@ -120,6 +120,9 @@ describe('value-first property lists', () => {
     const overviewSection = Array.from(sections).find(
       (section) => section.querySelector('[slot="heading"]')?.textContent === 'Overview',
     )
+    const deleteSection = Array.from(sections).find(
+      (section) => section.querySelector('rrr-list-row[data-action="delete-routine"]') !== null,
+    )
     const flowCard = flowSection?.querySelector<HTMLElement>(':scope > .rrr-card')
     const reorderCard = flowSection?.querySelector<HTMLElement>(
       ':scope > .routine-flow-reorder-control',
@@ -142,10 +145,14 @@ describe('value-first property lists', () => {
     expect(flowSection).not.toBeUndefined()
     expect(actionSection).not.toBeUndefined()
     expect(overviewSection).not.toBeUndefined()
-    expect(flowSection!.compareDocumentPosition(actionSection!)
+    expect(deleteSection).not.toBeUndefined()
+    expect(actionSection!.compareDocumentPosition(flowSection!)
       & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(actionSection!.compareDocumentPosition(overviewSection!)
+    expect(flowSection!.compareDocumentPosition(overviewSection!)
       & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(overviewSection!.compareDocumentPosition(deleteSection!)
+      & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(deleteSection?.querySelector('[slot="heading"]')).toBeNull()
     expect(firstExerciseRow?.getAttribute('activation')).toBe('button')
     expect(firstExerciseRow?.hasAttribute('href')).toBe(false)
     expect(firstExerciseRow?.hasAttribute('accessory')).toBe(false)
@@ -265,40 +272,6 @@ describe('value-first property lists', () => {
 
     expect(updatedRoutine.activeVersionId).not.toBe(previousVersionId)
     expect(updatedExercise).toMatchObject({ setCount: 4, restSeconds: 30 })
-  })
-
-  test('deletes a routine exercise from the edit sheet', async () => {
-    const data = storageService.getData()
-    const routine = data.routines[0]!
-    const previousVersionId = routine.activeVersionId
-    const version = data.routineVersions.find(({ id }) => id === previousVersionId)!
-    const routineExercise = version.exercises[0]!
-    const previousCount = version.exercises.length
-    const detail = new RrrRoutineDetail()
-    detail.routineId = routine.id
-    document.body.append(detail)
-    await Promise.resolve()
-
-    detail.querySelector<HTMLButtonElement>(
-      `rrr-list-row[data-routine-exercise-id="${routineExercise.id}"] > button`,
-    )?.click()
-
-    document.querySelector<HTMLElement>('rrr-sheet [data-sheet-result="delete"]')?.click()
-    await new Promise((resolve) => window.setTimeout(resolve, 240))
-
-    document.querySelector<HTMLElement>('rrr-sheet [data-sheet-result="confirm"]')?.click()
-    await new Promise((resolve) => window.setTimeout(resolve, 240))
-
-    const updatedRoutine = storageService.getData().routines.find(
-      ({ id }) => id === routine.id,
-    )!
-    const updatedVersion = storageService.getData().routineVersions.find(
-      ({ id }) => id === updatedRoutine.activeVersionId,
-    )!
-
-    expect(updatedRoutine.activeVersionId).not.toBe(previousVersionId)
-    expect(updatedVersion.exercises).toHaveLength(previousCount - 1)
-    expect(updatedVersion.exercises.some(({ id }) => id === routineExercise.id)).toBe(false)
   })
 
   test('deletes a routine exercise immediately when swipe commits', async () => {
