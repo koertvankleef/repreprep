@@ -238,6 +238,11 @@ export class RrrSequence extends HTMLElement {
       }
     }
 
+    if (!this.isPointerWithinBounds(event.clientX, event.clientY)) {
+      this.cancelSort()
+      return
+    }
+
     event.preventDefault()
     this.movePointerItem(event.clientY)
   }
@@ -277,6 +282,18 @@ export class RrrSequence extends HTMLElement {
       .find((node): node is HTMLElement =>
         node instanceof HTMLElement
         && node.matches(sortHandleSelector))
+  }
+
+  private isPointerWithinBounds(clientX: number, clientY: number): boolean {
+    const rect = this.getBoundingClientRect()
+    if (rect.width <= 0 || rect.height <= 0) {
+      return true
+    }
+
+    return clientX >= rect.left
+      && clientX <= rect.right
+      && clientY >= rect.top
+      && clientY <= rect.bottom
   }
 
   private getSortItems(): HTMLElement[] {

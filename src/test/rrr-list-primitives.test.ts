@@ -537,6 +537,112 @@ describe('list structure primitives', () => {
       })
   })
 
+  test('cancels pointer reordering when the drag leaves the sequence bounds', async () => {
+    document.body.innerHTML = `
+      <rrr-sequence sortable>
+        <div data-sequence-item data-sort-id="a" data-sort-label="Alpha">
+          <rrr-list-row label="Alpha"></rrr-list-row>
+          <button type="button" data-sort-handle>Move Alpha</button>
+        </div>
+        <rrr-sequence-gutter value="10" unit="s"></rrr-sequence-gutter>
+        <div data-sequence-item data-sort-id="b" data-sort-label="Bravo">
+          <rrr-list-row label="Bravo"></rrr-list-row>
+          <button type="button" data-sort-handle>Move Bravo</button>
+        </div>
+      </rrr-sequence>
+    `
+    await Promise.resolve()
+
+    const sequence = document.querySelector<HTMLElement>('rrr-sequence')!
+    sequence.getBoundingClientRect = () => ({
+      x: 0,
+      y: 0,
+      top: 0,
+      right: 300,
+      bottom: 180,
+      left: 0,
+      width: 300,
+      height: 180,
+      toJSON: () => ({}),
+    })
+
+    const items = Array.from(sequence.querySelectorAll<HTMLElement>('[data-sort-id]'))
+    for (const item of items) {
+      item.getBoundingClientRect = () => {
+        const index = Array.from(
+          sequence.querySelectorAll<HTMLElement>(':scope > [data-sort-id]'),
+        ).indexOf(item)
+        return {
+          x: 0,
+          y: index * 100,
+          top: index * 100,
+          right: 300,
+          bottom: index * 100 + 80,
+          left: 0,
+          width: 300,
+          height: 80,
+          toJSON: () => ({}),
+        }
+      }
+    }
+
+    const pointerEvent = (
+      type: string,
+      options: {
+        pointerId: number
+        clientX: number
+        clientY: number
+        button?: number
+      },
+    ): Event => {
+      const event = new Event(type, { bubbles: true, composed: true, cancelable: true })
+      Object.defineProperties(event, {
+        pointerId: { value: options.pointerId },
+        clientX: { value: options.clientX },
+        clientY: { value: options.clientY },
+        button: { value: options.button ?? 0 },
+        isPrimary: { value: true },
+      })
+      return event
+    }
+
+    const reorder = vi.fn()
+    const statuses: SequenceSortStatusDetail[] = []
+    sequence.addEventListener('rrr-sequence-reorder', reorder)
+    sequence.addEventListener('rrr-sequence-sort-status', (event) => {
+      statuses.push((event as CustomEvent<SequenceSortStatusDetail>).detail)
+    })
+
+    const alphaHandle = sequence.querySelector<HTMLElement>('[data-sort-id="a"] [data-sort-handle]')!
+    alphaHandle.dispatchEvent(pointerEvent('pointerdown', {
+      pointerId: 1,
+      clientX: 10,
+      clientY: 40,
+    }))
+    sequence.dispatchEvent(pointerEvent('pointermove', {
+      pointerId: 1,
+      clientX: 10,
+      clientY: 140,
+    }))
+    sequence.dispatchEvent(pointerEvent('pointermove', {
+      pointerId: 1,
+      clientX: 340,
+      clientY: 140,
+    }))
+    sequence.dispatchEvent(pointerEvent('pointerup', {
+      pointerId: 1,
+      clientX: 340,
+      clientY: 140,
+    }))
+
+    expect(Array.from(sequence.querySelectorAll<HTMLElement>(
+      ':scope > [data-sort-id]',
+    )).map((item) => item.dataset.sortId)).toEqual(['a', 'b'])
+    expect(reorder).not.toHaveBeenCalled()
+    expect(sequence.hasAttribute('data-sorting')).toBe(false)
+    expect(statuses.at(-1)?.status).toBe('cancelled')
+  })
+
   test('renders navigation and action rows as honest light-DOM interactive elements', async () => {
     document.body.innerHTML = `
       <div class="rrr-list-card">
