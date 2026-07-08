@@ -4,13 +4,10 @@ import {
   type RoutineSummary,
 } from '../../../domain/routine-summary-service.ts'
 import { t } from '../../../i18n/index.ts'
-import type { Muscle } from '../../../domain/types.ts'
-import { getMuscleLabel } from '../../exercise-labels.ts'
 import { escapeHtml, formatShortDate } from '../../render-helpers.ts'
 import styles from './rrr-routine-list.css?inline'
 
-const previewExerciseCount = 3
-const previewMuscleCount = 3
+const previewExerciseCount = 2
 
 export class RrrRoutineList extends HTMLElement {
   private readonly handleDataChanged = (): void => {
@@ -28,14 +25,11 @@ export class RrrRoutineList extends HTMLElement {
 
   private renderRoutineRow(summary: RoutineSummary): string {
     const exercisePreview = this.getExercisePreview(summary)
-    const musclePreview = t('routineList.muscles', {
-      muscles: this.getMusclePreview(summary.primaryMuscles),
-    })
     const lastStarted = summary.lastStartedAt
       ? t('routineList.lastStarted', {
           date: formatShortDate(new Date(summary.lastStartedAt)),
         })
-      : t('routineList.lastStartedNever')
+      : null
 
     return `
       <rrr-list-row
@@ -45,11 +39,15 @@ export class RrrRoutineList extends HTMLElement {
         description="${escapeHtml(exercisePreview)}"
         accessory="chevron"
       >
+        <rrr-icon slot="leading" name="clipboard-task-list-ltr"></rrr-icon>
         <span slot="label" class="rrr-domain-heading">${escapeHtml(summary.routine.name)}</span>
-        <span slot="body" class="routine-row-body">
-          <span>${escapeHtml(musclePreview)}</span>
-          <span>${escapeHtml(lastStarted)}</span>
-        </span>
+        ${lastStarted
+    ? `
+            <span slot="body" class="routine-row-body">
+              <span>${escapeHtml(lastStarted)}</span>
+            </span>
+          `
+    : ''}
       </rrr-list-row>
     `
   }
@@ -67,22 +65,6 @@ export class RrrRoutineList extends HTMLElement {
 
     return remaining > 0
       ? t('routineList.exercises.more', { names, count: remaining })
-      : names
-  }
-
-  private getMusclePreview(muscles: Muscle[]): string {
-    if (muscles.length === 0) {
-      return t('routineList.muscles.none')
-    }
-
-    const names = muscles
-      .slice(0, previewMuscleCount)
-      .map(getMuscleLabel)
-      .join(', ')
-    const remaining = muscles.length - previewMuscleCount
-
-    return remaining > 0
-      ? t('routineList.muscles.more', { names, count: remaining })
       : names
   }
 
