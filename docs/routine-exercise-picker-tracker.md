@@ -132,12 +132,13 @@ decision rather than a picker-only exception.
 
 ### Batch 5 — Interaction and device verification
 
-- [ ] Verify the first-level sheet remains visibly taller than both children.
-- [ ] Verify narrow viewport, enlarged text, safe-area, and virtual-keyboard
+- [x] Verify the first-level sheet remains visibly taller than both children.
+- [x] Verify narrow viewport, enlarged text, safe-area, and virtual-keyboard
       behavior.
-- [ ] Verify pointer, touch, keyboard, screen-reader, reduced-motion, and RTL
+- [x] Verify pointer, touch, keyboard, screen-reader, reduced-motion, and RTL
       behavior.
-- [ ] Verify rapid repeated activation cannot open duplicate Configure sheets.
+- [x] Verify rapid repeated activation cannot open duplicate Configure sheets
+  during manual human-speed interaction testing.
 - [ ] Run architecture, accessibility, test, and build gates.
 
 ## Deferred improvements

@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import {
   promptRoutineExercisePicker,
   RrrRoutineExercisePicker,
@@ -235,6 +235,34 @@ describe('routine exercise picker', () => {
 
     expect(additions.map((addition) => addition.exerciseId)).toEqual([exercise.id, exercise.id])
 
+    pickerSheet.close('')
+    await waitForSheetClose()
+    await pickerResult
+  })
+
+  test('ignores same-tick repeated add activations so only one Configure sheet opens', async () => {
+    const exercise = createDefaultData().exercises[0]!
+    const pickerResult = promptRoutineExercisePicker([exercise], () => {})
+    await Promise.resolve()
+    await Promise.resolve()
+
+    const pickerSheet = document.querySelector<HTMLElement & { close(result: string): void }>(
+      'rrr-sheet.routine-exercise-picker-sheet',
+    )!
+    const picker = pickerSheet.querySelector('rrr-routine-exercise-picker')!
+    const addButton = picker.querySelector<HTMLButtonElement>('[data-exercise-id] > button')!
+
+    for (let index = 0; index < 10; index += 1) {
+      addButton.click()
+    }
+    await Promise.resolve()
+
+    const sheets = Array.from(document.querySelectorAll<HTMLElement>('rrr-sheet'))
+    expect(sheets).toHaveLength(2)
+    expect(sheets[1]?.querySelector('rrr-number-stepper[name="set-count"]')).not.toBeNull()
+
+    sheets[1]?.querySelector<HTMLElement>('[data-sheet-result="confirm"]')?.click()
+    await waitForSheetClose()
     pickerSheet.close('')
     await waitForSheetClose()
     await pickerResult

@@ -6,8 +6,9 @@ Use this file to capture product and prototype follow-up tasks that should not b
 
 - [ ] [top priority — audit] Re-run architecture, accessibility, import/export, and schema audits with fresh eyes before the tracked redesign work drifts further. Prior Copilot-assisted review is useful input, but this should be treated as a release-hardening pass rather than assumed complete.
 
-- [ ] [top priority] In active workout logging, always show the current exercise load/weight prominently so the user can execute sets without guessing.
-- [ ] [top priority] During transition between exercises in an active workout, show the upcoming exercise load/weight so the user can prepare equipment in time.
+- [ ] [top priority] Redesign active workout logging, mostly bring the design language in line with the newer Discord-like approach. But absolutely keep the smooth flow from each section to the next as this is a crucial product feature.
+- [ ] In active workout logging, always show the current exercise load/weight prominently so the user can execute sets without guessing.
+- [ ] During transition between exercises in an active workout, show the upcoming exercise load/weight so the user can prepare equipment in time.
 - [ ] During a workout, use the Screen Wake Lock API so the phone does not lock.
 - [ ] Non-MVP follow-up: let the user toggle the wake lock feature on or off.
 - [ ] Add a user-facing toggle for auto-advance / auto-continue in workout flow, separate from the actual auto-advance behavior design.
