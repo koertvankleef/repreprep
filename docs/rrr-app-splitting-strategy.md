@@ -1,11 +1,13 @@
 # rrr-app splitting strategy
 
-`rrr-app.ts` currently acts as the app shell, route orchestrator, header renderer,
+`rrr-app.ts` originally acted as the app shell, route orchestrator, header renderer,
 preference coordinator, install prompt owner, exercise-filter controller, and
-data-reset bridge. Splitting it should be incremental: each step should extract
-one responsibility behind a narrow contract and keep the app shell as the place
-where route state is coordinated until enough surrounding pieces exist to move
-that state safely.
+data-reset bridge. The high-risk mixed responsibilities have now largely been
+extracted. Further splitting should remain incremental and conditional: each
+step should extract one responsibility behind a narrow contract only when that
+improves change safety or clarity. The app shell can reasonably remain the
+place where route state is coordinated unless that orchestration itself becomes
+too hard to reason about.
 
 ## Target boundaries
 
@@ -38,6 +40,10 @@ that state safely.
    longer need direct `rrr-app` state mutation.
 6. Revisit the reset event once the app shell has fewer unrelated side effects.
 
+The list above is now mostly historical guidance for work already completed.
+It should not be treated as an obligation to keep splitting past the point of
+clear maintainability gains.
+
 ## Guardrails
 
 - Keep each extraction behavior-preserving and verified with full test, build,
@@ -67,6 +73,6 @@ that state safely.
 - Done: install prompt event/prompt lifecycle lives in
   `src/app/app-install-prompt-controller.ts`.
 - Done: app reset coordination lives in `src/app/app-reset-controller.ts`.
-- Next: decide whether route-header mounting/transition mechanics should stay in
-  the app shell for the short term or move behind a dedicated shell/header
-  presenter once enough focused tests exist around that orchestration layer.
+- Next: treat route-header mounting/transition mechanics and route-view mounting
+  as acceptable shell responsibilities for now. Revisit only if that remaining
+  orchestration starts to accumulate unrelated state or becomes risky to change.

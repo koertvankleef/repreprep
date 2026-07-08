@@ -178,7 +178,7 @@ export function renderRoutineFlowControls(options: {
         accessory="value"
         data-action="${escapeHtml(options.transitionAction)}"
       >
-        <rrr-icon slot="leading" name="timer"></rrr-icon>
+        <rrr-icon slot="leading" name="water-bottle"></rrr-icon>
       </rrr-list-row>
       ${options.prefillSourceLabel === undefined
         ? ''
