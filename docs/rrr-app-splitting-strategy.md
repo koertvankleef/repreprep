@@ -54,13 +54,19 @@ that state safely.
 - Done: pure route equality and transition selection live in
   `src/app/app-route-transitions.ts`.
 - Done: route-to-element creation lives in `src/app/app-route-view-factory.ts`.
+- Done: persistent navigation and standard route-header rendering live in
+  `src/app/app-shell-navigation.ts`.
+- Done: app-shell click action dispatch lives in
+  `src/app/app-shell-action-dispatch.ts`.
 - Done: exercise catalogue header rendering and filter rail overflow helpers live
   in `src/app/exercise-catalogue-header.ts`.
+- Done: exercise catalogue search/filter state, debounce, and filter-rail
+  binding live in `src/app/exercise-catalogue-controller.ts`.
 - Done: display/language preference coordination lives in
   `src/app/app-preferences-controller.ts`.
 - Done: install prompt event/prompt lifecycle lives in
   `src/app/app-install-prompt-controller.ts`.
 - Done: app reset coordination lives in `src/app/app-reset-controller.ts`.
-- Next: decide whether the remaining exercise catalogue search/filter state and
-  event binding is still worth extracting before leaving route/header mounting
-  in the shell for the short term.
+- Next: decide whether route-header mounting/transition mechanics should stay in
+  the app shell for the short term or move behind a dedicated shell/header
+  presenter once enough focused tests exist around that orchestration layer.

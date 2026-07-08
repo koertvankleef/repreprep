@@ -139,7 +139,9 @@ decision rather than a picker-only exception.
       behavior.
 - [x] Verify rapid repeated activation cannot open duplicate Configure sheets
   during manual human-speed interaction testing.
-- [ ] Run architecture, accessibility, test, and build gates.
+- [x] Run architecture, accessibility, test, and build gates for current
+  completion scope. Deeper accessibility follow-up may still be revisited
+  separately later.
 
 ## Deferred improvements
 

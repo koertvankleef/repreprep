@@ -1,30 +1,30 @@
 import { storageService } from './storage-instance.ts'
 import { t } from '../i18n/index.ts'
-import type { Equipment, ExerciseCategory } from '../domain/types.ts'
-import type { ExerciseFilters } from '../domain/exercise-service.ts'
 import {
   appRoutes,
-  getAppRouteBackHref,
-  getAppRouteEndLink,
   getAppRouteMeta,
   toAppRoute,
-  type AppNavId,
   type AppRoute,
-  type AppHeaderLink,
 } from './app-routes.ts'
 import { computeRouteTransition, isSameAppRoute, type RouteTransition } from './app-route-transitions.ts'
 import { createHashRouter } from '../foundation/hash-router.ts'
 import { toastService } from '../foundation/toast.ts'
-import { escapeHtml } from './render-helpers.ts'
 import {
   createAppRouteViewElement,
   type RoutineEditorElement,
   type RouteViewFactoryContext,
 } from './app-route-view-factory.ts'
+import {
+  createStandardRouteHeader,
+  renderPrimaryNavigation,
+  syncPrimaryNavigationState,
+  type RouteHeader,
+} from './app-shell-navigation.ts'
+import { ExerciseCatalogueController } from './exercise-catalogue-controller.ts'
+import { dispatchAppShellAction, findActionTarget } from './app-shell-action-dispatch.ts'
 import type { RrrExerciseCatalogue } from './components/exercises/rrr-exercise-catalogue.ts'
 import {
   renderExerciseCatalogueHeader,
-  updateExerciseFilterRailOverflow,
 } from './exercise-catalogue-header.ts'
 import { AppPreferencesController } from './app-preferences-controller.ts'
 import { AppInstallPromptController } from './app-install-prompt-controller.ts'
@@ -47,26 +47,7 @@ type LanguagePreferenceChangeDetail = {
   language: string
 }
 
-type RouteHeader = {
-  className?: string
-  html: string
-  secondaryClassName?: string
-  secondaryHtml?: string
-  bind?: (primaryHeader: HTMLElement, secondaryHeader: HTMLElement) => void
-}
-
 const localHosts = new Set(['localhost', '127.0.0.1', '::1'])
-const primaryNavigationItems: ReadonlyArray<{
-  routeName: AppNavId
-  href: string
-  labelKey: string
-  iconName: string
-}> = [
-  { routeName: 'workouts', href: '#/workouts', labelKey: 'app.nav.today', iconName: 'calendar-date' },
-  { routeName: 'routines', href: '#/routines', labelKey: 'app.nav.routines', iconName: 'clipboard-task-list-ltr' },
-  { routeName: 'exercises', href: '#/exercises', labelKey: 'app.nav.exercises', iconName: 'library' },
-  { routeName: 'history', href: '#/history', labelKey: 'app.nav.history', iconName: 'data-trending' },
-]
 
 export class RrrApp extends HTMLElement {
   private route: AppRoute = { name: 'workouts' }
@@ -87,13 +68,10 @@ export class RrrApp extends HTMLElement {
   })
   private readonly styleguideEnabled = import.meta.env.DEV || localHosts.has(window.location.hostname)
   private shellRendered = false
-  private exerciseSearchQuery = ''
-  private exerciseFiltersOpen = false
-  private exerciseFilters: ExerciseFilters = { categories: [], equipment: [] }
-  private exerciseCatalogueFocusedId: string | null = null
-  private exerciseSearchDebounceId: number | null = null
-  private exerciseFilterRailController: AbortController | null = null
-  private exerciseFilterRailResizeObserver: ResizeObserver | null = null
+  private readonly exerciseCatalogueController = new ExerciseCatalogueController(
+    () => this.render(),
+    () => this.syncExerciseCatalogueState(),
+  )
   private currentRouteView: HTMLElement | null = null
   private finishHeaderTransition: (() => void) | null = null
   private readonly router = createHashRouter({
@@ -101,9 +79,7 @@ export class RrrApp extends HTMLElement {
     notFoundRouteId: 'workouts',
     onRouteChange: (match) => {
       const route = toAppRoute(match, this.styleguideEnabled)
-      if (route.name === 'exercise-detail') {
-        this.exerciseCatalogueFocusedId = route.exerciseId
-      }
+      this.exerciseCatalogueController.updateFocusedExercise(route)
       this.route = route
       this.render()
     },
@@ -162,81 +138,31 @@ export class RrrApp extends HTMLElement {
   }
 
   private readonly handleClick = (event: Event): void => {
-    const actionTarget = event
-      .composedPath()
-      .find((node): node is HTMLElement => node instanceof HTMLElement && node.dataset.action !== undefined)
-
+    const actionTarget = findActionTarget(event)
     if (!actionTarget) {
       return
     }
 
-    const action = actionTarget.dataset.action
-
-    if (action === 'navigate') {
-      const href = actionTarget.dataset.href
-      if (href) {
+    dispatchAppShellAction(actionTarget, {
+      navigate: (href) => {
         window.location.hash = href
-      }
-      return
-    }
-
-    if (action === 'install-app') {
-      void this.installPrompt.prompt()
-      return
-    }
-
-    if (action === 'rename-routine') {
-      void this.renameCurrentRoutine()
-      return
-    }
-
-    if (action === 'toggle-exercise-filters') {
-      this.exerciseFiltersOpen = !this.exerciseFiltersOpen
-      this.render()
-      return
-    }
-
-    if (action === 'toggle-exercise-filter') {
-      this.toggleExerciseFilter(actionTarget)
-      return
-    }
-
-    if (action === 'clear-exercise-filters') {
-      this.exerciseFilters = { categories: [], equipment: [] }
-      this.exerciseFiltersOpen = false
-      this.syncExerciseCatalogueState()
-      this.render()
-      return
-    }
-
-  }
-
-  private toggleExerciseFilter(target: HTMLElement): void {
-    const filterType = target.dataset.filterType
-    const value = target.dataset.filterValue
-
-    if (!value) {
-      return
-    }
-
-    if (filterType === 'category') {
-      this.exerciseFilters = {
-        ...this.exerciseFilters,
-        categories: toggleArrayValue(this.exerciseFilters.categories, value as ExerciseCategory),
-      }
-      this.syncExerciseCatalogueState()
-      this.render()
-      return
-    }
-
-    if (filterType === 'equipment') {
-      this.exerciseFilters = {
-        ...this.exerciseFilters,
-        equipment: toggleArrayValue(this.exerciseFilters.equipment, value as Equipment),
-      }
-      this.syncExerciseCatalogueState()
-      this.render()
-    }
+      },
+      installApp: () => {
+        void this.installPrompt.prompt()
+      },
+      renameRoutine: () => {
+        void this.renameCurrentRoutine()
+      },
+      toggleExerciseFilters: () => {
+        this.exerciseCatalogueController.toggleFilters()
+      },
+      toggleExerciseFilter: (target) => {
+        this.exerciseCatalogueController.toggleFilter(target)
+      },
+      clearExerciseFilters: () => {
+        this.exerciseCatalogueController.clearFilters()
+      },
+    })
   }
 
   private async renameCurrentRoutine(): Promise<void> {
@@ -272,11 +198,7 @@ export class RrrApp extends HTMLElement {
   }
 
   disconnectedCallback(): void {
-    if (this.exerciseSearchDebounceId !== null) {
-      window.clearTimeout(this.exerciseSearchDebounceId)
-      this.exerciseSearchDebounceId = null
-    }
-    this.clearExerciseFilterRailBinding()
+    this.exerciseCatalogueController.dispose()
     this.preferences.stop()
     window.removeEventListener('beforeinstallprompt', this.handleInstallPromptAvailable)
     window.removeEventListener('appinstalled', this.handleAppInstalled)
@@ -291,43 +213,14 @@ export class RrrApp extends HTMLElement {
     return this.installPrompt.shouldShowInstallButton
   }
 
-  private renderNavButton(routeName: AppNavId, href: string, label: string, iconName: string): string {
-    const isActive = getAppRouteMeta(this.route).nav === routeName
-    const activeClass = isActive ? 'nav-button active' : 'nav-button'
-    const ariaCurrent = isActive ? ' aria-current="page"' : ''
-
-    return `
-      <button
-        type="button"
-        class="${activeClass}"
-        data-action="navigate"
-        data-href="${href}"
-        data-route-name="${routeName}"
-        ${ariaCurrent}
-      >
-        <rrr-icon name="${iconName}"></rrr-icon>
-        <span>${label}</span>
-      </button>
-    `
-  }
-
   private renderPrimaryNav(): string {
-    return primaryNavigationItems
-      .map((item) => this.renderNavButton(item.routeName, item.href, t(item.labelKey), item.iconName))
-      .join('')
+    return renderPrimaryNavigation(this.route)
   }
 
   private restoreRouteScrollPosition(): void {
     requestAnimationFrame(() => {
       window.scrollTo(0, 0)
     })
-  }
-
-  private cloneExerciseFilters(): ExerciseFilters {
-    return {
-      categories: [...this.exerciseFilters.categories],
-      equipment: [...this.exerciseFilters.equipment],
-    }
   }
 
   private getExerciseCatalogueView(): RrrExerciseCatalogue | null {
@@ -351,14 +244,14 @@ export class RrrApp extends HTMLElement {
       return
     }
 
-    const filters = this.cloneExerciseFilters()
+    const filters = this.exerciseCatalogueController.filters
 
     if (catalogue.setSearchAndFilters) {
-      catalogue.setSearchAndFilters(this.exerciseSearchQuery, filters)
+      catalogue.setSearchAndFilters(this.exerciseCatalogueController.searchQuery, filters)
       return
     }
 
-    catalogue.searchQuery = this.exerciseSearchQuery
+    catalogue.searchQuery = this.exerciseCatalogueController.searchQuery
     catalogue.filters = filters
   }
 
@@ -383,33 +276,6 @@ export class RrrApp extends HTMLElement {
     })
   }
 
-  private queueExerciseCatalogueSync(): void {
-    if (this.exerciseSearchDebounceId !== null) {
-      window.clearTimeout(this.exerciseSearchDebounceId)
-    }
-
-    this.exerciseSearchDebounceId = window.setTimeout(() => {
-      this.exerciseSearchDebounceId = null
-      this.syncExerciseCatalogueState()
-    }, 150)
-  }
-
-  private flushExerciseCatalogueSync(): void {
-    if (this.exerciseSearchDebounceId !== null) {
-      window.clearTimeout(this.exerciseSearchDebounceId)
-      this.exerciseSearchDebounceId = null
-    }
-
-    this.syncExerciseCatalogueState()
-  }
-
-  private clearExerciseFilterRailBinding(): void {
-    this.exerciseFilterRailController?.abort()
-    this.exerciseFilterRailController = null
-    this.exerciseFilterRailResizeObserver?.disconnect()
-    this.exerciseFilterRailResizeObserver = null
-  }
-
   private createRouteViewElement(route: AppRoute): HTMLElement {
     return createAppRouteViewElement(route, this.getRouteViewFactoryContext())
   }
@@ -419,9 +285,9 @@ export class RrrApp extends HTMLElement {
       displayPreferences: this.preferences.displayPreferences,
       languagePreference: this.preferences.languagePreference,
       styleguideEnabled: this.styleguideEnabled,
-      exerciseSearchQuery: this.exerciseSearchQuery,
-      exerciseFilters: this.cloneExerciseFilters(),
-      exerciseCatalogueFocusedId: this.exerciseCatalogueFocusedId,
+      exerciseSearchQuery: this.exerciseCatalogueController.searchQuery,
+      exerciseFilters: this.exerciseCatalogueController.filters,
+      exerciseCatalogueFocusedId: this.exerciseCatalogueController.focusedId,
     }
   }
 
@@ -432,28 +298,9 @@ export class RrrApp extends HTMLElement {
       this.mountRouteHeader(appHeader, header, transition)
     }
 
-    const navButtons = this.shadowRoot?.querySelectorAll<HTMLButtonElement>(
-      '.primary-nav .nav-button[data-route-name]',
-    )
-    navButtons?.forEach((button) => {
-      const routeName = button.dataset.routeName as AppNavId | undefined
-      if (!routeName) {
-        return
-      }
-
-      const isActive = getAppRouteMeta(route).nav === routeName
-      button.classList.toggle('active', isActive)
-      const item = primaryNavigationItems.find((candidate) => candidate.routeName === routeName)
-      const label = button.querySelector<HTMLElement>('span')
-      if (item && label) {
-        label.textContent = t(item.labelKey)
-      }
-      if (isActive) {
-        button.setAttribute('aria-current', 'page')
-      } else {
-        button.removeAttribute('aria-current')
-      }
-    })
+    if (this.shadowRoot) {
+      syncPrimaryNavigationState(this.shadowRoot, route)
+    }
 
     const installButton = this.shadowRoot?.querySelector<HTMLElement>('[data-action="install-app"]')
     if (installButton) {
@@ -474,7 +321,7 @@ export class RrrApp extends HTMLElement {
     }
 
     this.finishHeaderTransition?.()
-    this.clearExerciseFilterRailBinding()
+    this.exerciseCatalogueController.clearFilterRailBinding()
     this.finishHeaderTransition?.()
     this.finishHeaderTransition = null
 
@@ -638,35 +485,6 @@ export class RrrApp extends HTMLElement {
     return t(getAppRouteMeta(route).titleKey)
   }
 
-  private renderHeaderButton(link: AppHeaderLink, className: string): string {
-    const label = escapeHtml(t(link.labelKey))
-
-    return `
-      <button
-        type="button"
-        class="header-icon-button ${className}"
-        data-action="navigate"
-        data-href="${escapeHtml(link.href)}"
-        aria-label="${label}"
-        title="${label}"
-      ><rrr-icon name="${escapeHtml(link.icon)}"></rrr-icon></button>
-    `
-  }
-
-  private renderRoutineRenameButton(): string {
-    const label = escapeHtml(t('routineEditor.action.rename'))
-
-    return `
-      <button
-        type="button"
-        class="header-icon-button header-action"
-        data-action="rename-routine"
-        aria-label="${label}"
-        title="${label}"
-      ><rrr-icon name="rename"></rrr-icon></button>
-    `
-  }
-
   private createRouteHeader(route: AppRoute): RouteHeader {
     if (getAppRouteMeta(route).header === 'exercise-catalogue') {
       return this.createExerciseCatalogueHeader()
@@ -676,41 +494,14 @@ export class RrrApp extends HTMLElement {
   }
 
   private createStandardHeader(route: AppRoute): RouteHeader {
-    const backHref = getAppRouteBackHref(route)
-    const endLink = getAppRouteEndLink(route)
-    const backContent = backHref
-      ? this.renderHeaderButton({
-          href: backHref,
-          icon: 'arrow-left',
-          labelKey: 'app.settings.back',
-        }, 'header-back')
-      : '<span class="app-header-spacer" aria-hidden="true"></span>'
-    const actionContent = (
-      route.name === 'routine-detail'
-      || route.name === 'routine-new'
-    )
-      ? this.renderRoutineRenameButton()
-      : endLink
-        ? this.renderHeaderButton(endLink, 'header-action')
-        : '<span class="app-header-spacer" aria-hidden="true"></span>'
-
-    return {
-      className: 'app-header-primary-standard',
-      html: `
-        <div class="standard-app-header">
-          ${backContent}
-          <h1 class="app-header-title">${escapeHtml(this.getHeaderTitle(route))}</h1>
-          ${actionContent}
-        </div>
-      `,
-    }
+    return createStandardRouteHeader(route, this.getHeaderTitle(route))
   }
 
   private createExerciseCatalogueHeader(): RouteHeader {
     const header = renderExerciseCatalogueHeader({
-      filtersOpen: this.exerciseFiltersOpen,
-      searchQuery: this.exerciseSearchQuery,
-      filters: this.exerciseFilters,
+      filtersOpen: this.exerciseCatalogueController.filtersOpen,
+      searchQuery: this.exerciseCatalogueController.searchQuery,
+      filters: this.exerciseCatalogueController.filters,
     })
 
     return {
@@ -720,51 +511,21 @@ export class RrrApp extends HTMLElement {
 
         if (searchInput) {
           const syncSearchInput = (): void => {
-            this.exerciseSearchQuery = searchInput.value
-            this.queueExerciseCatalogueSync()
+            this.exerciseCatalogueController.handleSearchInputChange(searchInput.value)
           }
 
           searchInput.addEventListener('input', syncSearchInput)
           searchInput.addEventListener('change', syncSearchInput)
           searchInput.addEventListener('keydown', (event) => {
             if (event instanceof KeyboardEvent && event.key === 'Enter') {
-              this.exerciseSearchQuery = searchInput.value
-              this.flushExerciseCatalogueSync()
+              this.exerciseCatalogueController.handleSearchInputConfirm(searchInput.value)
             }
           })
         }
 
-        this.bindExerciseFilterRail(secondaryHeader)
+        this.exerciseCatalogueController.bindFilterRail(secondaryHeader)
       },
     }
-  }
-
-  private bindExerciseFilterRail(header: HTMLElement): void {
-    this.clearExerciseFilterRailBinding()
-
-    const rails = [...header.querySelectorAll<HTMLElement>('[data-filter-rail]')]
-
-    if (rails.length === 0) {
-      return
-    }
-
-    const controller = new AbortController()
-    this.exerciseFilterRailController = controller
-    this.exerciseFilterRailResizeObserver = new ResizeObserver((entries) => {
-      entries.forEach((entry) => {
-        updateExerciseFilterRailOverflow(entry.target as HTMLElement)
-      })
-    })
-
-    rails.forEach((rail) => {
-      const updateOverflow = (): void => {
-        updateExerciseFilterRailOverflow(rail)
-      }
-
-      rail.addEventListener('scroll', updateOverflow, { passive: true, signal: controller.signal })
-      this.exerciseFilterRailResizeObserver?.observe(rail)
-      requestAnimationFrame(updateOverflow)
-    })
   }
 
   private render(): void {
@@ -824,12 +585,6 @@ export class RrrApp extends HTMLElement {
 
     this.previousRoute = route
   }
-}
-
-function toggleArrayValue<T>(values: readonly T[], value: T): T[] {
-  return values.includes(value)
-    ? values.filter((item) => item !== value)
-    : [...values, value]
 }
 
 customElements.define('rrr-app', RrrApp)
