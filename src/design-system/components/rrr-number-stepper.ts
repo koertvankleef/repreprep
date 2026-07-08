@@ -28,6 +28,8 @@ template.innerHTML = `
 `
 
 const defaultFieldSize = 3
+const holdRepeatDelayMs = 400
+const holdRepeatIntervalMs = 80
 
 export class RrrNumberStepper extends HTMLElement {
   static formAssociated = true
@@ -64,6 +66,10 @@ export class RrrNumberStepper extends HTMLElement {
   private defaultValue: string | null = null
   private formDisabled = false
   private reflectingValue = false
+  private holdRepeatTimeoutId: number | null = null
+  private holdRepeatIntervalId: number | null = null
+  private holdCleanupController: AbortController | null = null
+  private suppressNextClickButton: HTMLButtonElement | null = null
 
   constructor() {
     super()
@@ -82,8 +88,10 @@ export class RrrNumberStepper extends HTMLElement {
     this.decrementButton = shadowRoot.querySelector<HTMLButtonElement>('[data-step="-1"]')!
     this.incrementButton = shadowRoot.querySelector<HTMLButtonElement>('[data-step="1"]')!
 
-    this.decrementButton.addEventListener('click', () => this.stepBy(-1))
-    this.incrementButton.addEventListener('click', () => this.stepBy(1))
+    this.decrementButton.addEventListener('click', () => this.handleStepButtonClick(this.decrementButton, -1))
+    this.incrementButton.addEventListener('click', () => this.handleStepButtonClick(this.incrementButton, 1))
+    this.decrementButton.addEventListener('pointerdown', () => this.startHoldRepeat(this.decrementButton, -1))
+    this.incrementButton.addEventListener('pointerdown', () => this.startHoldRepeat(this.incrementButton, 1))
     this.input.addEventListener('keydown', (event) => this.handleInputKeydown(event))
     this.input.addEventListener('input', (event) => this.handleInput(event))
     this.input.addEventListener('change', (event) => this.handleChange(event))
@@ -101,6 +109,10 @@ export class RrrNumberStepper extends HTMLElement {
         }
       })
     }
+  }
+
+  disconnectedCallback(): void {
+    this.stopHoldRepeat()
   }
 
   attributeChangedCallback(name: string): void {
@@ -216,6 +228,15 @@ export class RrrNumberStepper extends HTMLElement {
     this.stepBy(event.key === 'ArrowUp' ? 1 : -1)
   }
 
+  private handleStepButtonClick(button: HTMLButtonElement, direction: -1 | 1): void {
+    if (this.suppressNextClickButton === button) {
+      this.suppressNextClickButton = null
+      return
+    }
+
+    this.stepBy(direction)
+  }
+
   private handleInput(event: Event): void {
     event.stopPropagation()
     const value = this.parseLocalizedNumber(this.input.value)
@@ -274,6 +295,44 @@ export class RrrNumberStepper extends HTMLElement {
     this.syncFormState()
     this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
     this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+  }
+
+  private startHoldRepeat(button: HTMLButtonElement, direction: -1 | 1): void {
+    if (this.isDisabled) {
+      return
+    }
+
+    this.stopHoldRepeat()
+    const controller = new AbortController()
+    this.holdCleanupController = controller
+    const stop = (): void => {
+      this.stopHoldRepeat()
+    }
+
+    window.addEventListener('pointerup', stop, { signal: controller.signal })
+    window.addEventListener('pointercancel', stop, { signal: controller.signal })
+    window.addEventListener('blur', stop, { signal: controller.signal })
+
+    this.holdRepeatTimeoutId = window.setTimeout(() => {
+      this.suppressNextClickButton = button
+      this.stepBy(direction)
+      this.holdRepeatIntervalId = window.setInterval(() => {
+        this.stepBy(direction)
+      }, holdRepeatIntervalMs)
+    }, holdRepeatDelayMs)
+  }
+
+  private stopHoldRepeat(): void {
+    if (this.holdRepeatTimeoutId !== null) {
+      window.clearTimeout(this.holdRepeatTimeoutId)
+      this.holdRepeatTimeoutId = null
+    }
+    if (this.holdRepeatIntervalId !== null) {
+      window.clearInterval(this.holdRepeatIntervalId)
+      this.holdRepeatIntervalId = null
+    }
+    this.holdCleanupController?.abort()
+    this.holdCleanupController = null
   }
 
   private syncButtonState(): void {

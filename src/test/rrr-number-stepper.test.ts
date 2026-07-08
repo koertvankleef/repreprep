@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest'
 import type { RrrNumberStepper } from '../design-system/components/rrr-number-stepper.ts'
 
 let NumberStepperConstructor: typeof RrrNumberStepper
@@ -36,6 +36,10 @@ describe('rrr-number-stepper', () => {
     document.documentElement.lang = 'en-US'
   })
 
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   test('declares native form association', () => {
     expect(NumberStepperConstructor.formAssociated).toBe(true)
   })
@@ -55,6 +59,20 @@ describe('rrr-number-stepper', () => {
     expect(getButton(stepper, 1).disabled).toBe(true)
     expect(inputSpy).toHaveBeenCalledOnce()
     expect(changeSpy).toHaveBeenCalledOnce()
+  })
+
+  test('repeats while a step button is held and does not double-step on release click', () => {
+    vi.useFakeTimers()
+    const stepper = createStepper({ value: '60', min: '0', step: '1' })
+    const decrementButton = getButton(stepper, -1)
+
+    decrementButton.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+    vi.advanceTimersByTime(400)
+    vi.advanceTimersByTime(160)
+    window.dispatchEvent(new Event('pointerup'))
+    decrementButton.click()
+
+    expect(stepper.value).toBe('57')
   })
 
   test('uses decimal-safe stepping', () => {

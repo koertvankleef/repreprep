@@ -230,9 +230,12 @@ describe('value-first property lists', () => {
     const restInput = document.querySelector<HTMLElement & { value: string }>(
       'rrr-sheet rrr-number-stepper[name="rest-seconds"]',
     )
+    const restTextInput = restInput?.shadowRoot?.querySelector<HTMLInputElement>('input')
     const confirmButton = document.querySelector<HTMLElement>(
       'rrr-sheet [data-sheet-result="confirm"]',
     )
+
+    expect(restTextInput?.readOnly).toBe(false)
 
     setCountInput!.value = ''
     restInput!.value = ''

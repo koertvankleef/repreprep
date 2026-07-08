@@ -179,8 +179,10 @@ describe('routine exercise picker', () => {
     let restSeconds = settingsSheet.querySelector<HTMLElement & { value: string }>(
       'rrr-number-stepper[name="rest-seconds"]',
     )!
+    const restTextInput = restSeconds.shadowRoot?.querySelector<HTMLInputElement>('input')
     expect(setCount.value).toBe('1')
     expect(restSeconds.value).toBe('60')
+    expect(restTextInput?.readOnly).toBe(false)
 
     setCount.value = '4'
     restSeconds.value = '90'

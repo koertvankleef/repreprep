@@ -15,6 +15,7 @@ function createNumberStepper(options: {
   min: number
   size: number
   autofocus?: boolean
+  buttonOnly?: boolean
 }): RrrNumberStepper {
   const stepper = document.createElement('rrr-number-stepper') as RrrNumberStepper
   stepper.slot = 'body'
@@ -24,7 +25,7 @@ function createNumberStepper(options: {
   stepper.setAttribute('step', '1')
   stepper.setAttribute('size', String(options.size))
   stepper.setAttribute('locale', getLocale())
-  stepper.setAttribute('button-only', '')
+  stepper.toggleAttribute('button-only', options.buttonOnly ?? true)
   stepper.setAttribute('decrement-label', t('numberStepper.decrement', { label: options.label }))
   stepper.setAttribute('increment-label', t('numberStepper.increment', { label: options.label }))
   stepper.toggleAttribute('autofocus', options.autofocus ?? false)
@@ -66,6 +67,7 @@ export async function promptRoutineExerciseSettings(options: {
     value: options.restSeconds,
     min: 0,
     size: 3,
+    buttonOnly: false,
   })
   const confirmButton = document.createElement('rrr-button')
   confirmButton.slot = 'actions'
@@ -126,6 +128,7 @@ export async function promptAddRoutineExerciseSettings(options: {
     value: options.restSeconds,
     min: 0,
     size: 3,
+    buttonOnly: false,
   })
   const confirmButton = document.createElement('rrr-button')
   confirmButton.slot = 'actions'
