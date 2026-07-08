@@ -1,11 +1,11 @@
-const CACHE_NAME = 'repreprep-runtime-v2'
+const CACHE_NAME = 'repreprep-runtime-v3'
 const APP_SHELL = [
   './',
   './index.html',
   './site.webmanifest',
   './apple-touch-icon.png',
-  './android-chrome-192x192.png',
-  './android-chrome-512x512.png',
+  './android-chrome-192x192-maskable.png',
+  './android-chrome-512x512-maskable.png',
   './fonts/7cHmv4okm5zmbtYlK-4E4Q.woff2',
   './fonts/7cHmv4okm5zmbtYmK-4E4Q.woff2',
   './fonts/7cHmv4okm5zmbtYnK-4E4Q.woff2',
