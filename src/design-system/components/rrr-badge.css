@@ -6,10 +6,10 @@ rrr-badge {
   box-sizing: border-box;
   min-block-size: var(--rrr-badge-min-block-size);
   padding: var(--rrr-badge-padding);
-  border: var(--rrr-badge-border-width) solid var(--_soft-border);
+  border: var(--rrr-badge-border-width) solid var(--_border);
   border-radius: var(--rrr-badge-radius);
-  background: var(--_soft-bg);
-  color: var(--_soft-fg);
+  background: var(--_bg);
+  color: var(--_fg);
   font: inherit;
   font-size: var(--rrr-badge-font-size);
   font-weight: var(--rrr-badge-font-weight);
@@ -23,42 +23,49 @@ rrr-badge {
   --rrr-badge-line-height: 1.2;
 
   --_tone: var(--rrr-color-primary);
-  --_soft-bg: color-mix(in oklab, var(--rrr-surface-raised) 67%, var(--_tone) 33%);
-  --_soft-border: color-mix(in oklab, var(--rrr-surface-raised) 62%, var(--_tone) 38%);
-  --_soft-fg: color-mix(in oklab, var(--_tone) 75%, var(--rrr-color-contrast-negative) 25%);
+  --_interactive-bg-mix: var(--rrr-color-primary-mix);
+  --_bg: color-mix(in oklab, var(--_interactive-bg-mix), var(--rrr-surface-raised) 85%);
+  --_border: color-mix(in oklab, var(--_tone) 25%, var(--rrr-surface-raised) 75%);
+  --_fg: color-mix(in oklab, var(--_tone) 75%, var(--rrr-color-contrast-negative) 25%);
   --_solid-bg: var(--_tone);
   --_solid-fg: var(--rrr-color-contrast);
 }
 
 rrr-badge[tone='neutral'] {
   --_tone: var(--rrr-color-text);
+  --_interactive-bg-mix: var(--rrr-color-neutral-mix);
   --_solid-fg: var(--rrr-surface-base);
 }
 
 rrr-badge[tone='accent'] {
   --_tone: var(--rrr-color-accent);
+  --_interactive-bg-mix: var(--rrr-color-accent-mix);
 }
 
 rrr-badge[tone='info'] {
   --_tone: var(--rrr-colors-context-info-60);
+  --_interactive-bg-mix: var(--rrr-colors-context-info-mix);
 }
 
 rrr-badge[tone='success'] {
   --_tone: var(--rrr-colors-context-success-60);
+  --_interactive-bg-mix: var(--rrr-colors-context-success-mix);
 }
 
 rrr-badge[tone='warning'] {
   --_tone: var(--rrr-colors-context-warning-60);
+  --_interactive-bg-mix: var(--rrr-colors-context-warning-mix);
 }
 
 rrr-badge[tone='danger'] {
   --_tone: var(--rrr-colors-context-danger-60);
+  --_interactive-bg-mix: var(--rrr-colors-context-danger-mix);
 }
 
 rrr-badge[variant='outline'] {
   background: transparent;
-  border-color: var(--_soft-fg);
-  color: var(--_soft-fg);
+  border-color: var(--_fg);
+  color: var(--_fg);
 }
 
 rrr-badge[variant='solid'] {
