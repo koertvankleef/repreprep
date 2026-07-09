@@ -44,6 +44,7 @@ import { promptRoutineExerciseSettings } from './routine-exercise-sheets.ts'
 import { promptRoutinePrefillSource } from './routine-prefill-sheets.ts'
 import { announceRoutineFlowSort } from './routine-flow-sorting.ts'
 import { promptRoutineExercisePicker } from './routine-exercise-picker.ts'
+import styles from './routine-card.css?inline'
 
 export class RrrRoutineDetail extends HTMLElement {
   private routineIdValue: string | null = null
@@ -187,17 +188,8 @@ export class RrrRoutineDetail extends HTMLElement {
       }
 
       this.name = routine.name
-      /* this.transitionSeconds = Math.max(0, version?.transitionSeconds ?? RrrRoutineEditor.defaultTransitionSeconds)
-      this.exercises = version
-        ? version.exercises.map((exercise) => ({
-            ...exercise,
-            restSeconds: Math.max(0, exercise.restSeconds ?? RrrRoutineEditor.defaultRestSeconds),
-          }))
-        : [] */
     } else {
       this.name = ''
-      // this.transitionSeconds = RrrRoutineEditor.defaultTransitionSeconds
-      // this.exercises = []
     }
 
     this.render()
@@ -585,6 +577,7 @@ export class RrrRoutineDetail extends HTMLElement {
       : t('routineDetail.prefill.noneValue')
 
     this.innerHTML = `
+      <style>${styles}</style>
       <section class="page">
         <p class="status-message">${t('routineEditor.status.default')}</p>
         ${summary.routine.description ? `<p>${escapeHtml(summary.routine.description)}</p>` : ''}
@@ -611,7 +604,7 @@ export class RrrRoutineDetail extends HTMLElement {
                 enabled: reorderEnabled,
               })
             : ''}
-          <div class="rrr-card">
+          <div class="rrr-card routine-card" part="routine-card">
             ${
               exerciseCount > 0
                 ? `

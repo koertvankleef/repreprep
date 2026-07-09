@@ -291,8 +291,6 @@ export const nlNlMessages = {
   'routineList.muscles': 'Primair: {muscles}',
   'routineList.muscles.none': 'Geen informatie over primaire spieren',
   'routineList.muscles.more': '{names} + nog {count}',
-  'routineList.lastStarted': 'Laatst gestart op {date}',
-  'routineList.lastStartedNever': 'Nog niet gestart',
   'message.routine.exerciseCount.one': '{count} oefening',
   'message.routine.exerciseCount.other': '{count} oefeningen',
 

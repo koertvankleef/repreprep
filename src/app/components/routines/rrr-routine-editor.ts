@@ -29,6 +29,7 @@ import {
 } from './routine-flow-markup.ts'
 import { announceRoutineFlowSort } from './routine-flow-sorting.ts'
 import { promptRoutineExercisePicker } from './routine-exercise-picker.ts'
+import styles from './routine-card.css?inline'
 
 export class RrrRoutineEditor extends HTMLElement {
   private static readonly defaultTransitionSeconds = 10
@@ -534,6 +535,7 @@ export class RrrRoutineEditor extends HTMLElement {
       : `data-gutter-motion="${gutterMotion}"`
 
     this.innerHTML = `
+      <style>${styles}</style>
       <section class="page">
         <p class="status-message">${t('routineEditor.status.default')}</p>
         <rrr-section>
@@ -545,7 +547,7 @@ export class RrrRoutineEditor extends HTMLElement {
                 enabled: reorderEnabled,
               })
             : ''}
-          <div class="rrr-card">
+          <div class="rrr-card routine-card" part="routine-card">
             ${
     this.exercises.length > 0
       ? `

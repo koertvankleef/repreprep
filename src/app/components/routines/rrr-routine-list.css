@@ -1,5 +1,5 @@
 rrr-routine-list {
-  --rrr-routine-list-body-gap: var(--rrr-spacing-xs) var(--rrr-spacing-m);
+  --rrr-routine-list-body-gap: var(--rrr-spacing-xs);
   --rrr-routine-list-body-color: var(--rrr-text-muted);
   --rrr-routine-list-body-size: var(--rrr-font-size-s);
 }
@@ -7,7 +7,6 @@ rrr-routine-list {
 .routine-row-body {
   display: flex;
   flex-wrap: wrap;
-  flex-direction: column;
   gap: var(--rrr-routine-list-body-gap);
   color: var(--rrr-routine-list-body-color);
   font-size: var(--rrr-routine-list-body-size);

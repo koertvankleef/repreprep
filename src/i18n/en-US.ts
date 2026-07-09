@@ -423,8 +423,6 @@ export const enUsMessages = {
   'routineList.muscles': 'Primary: {muscles}',
   'routineList.muscles.none': 'No primary muscle information',
   'routineList.muscles.more': '{names} +{count} more',
-  'routineList.lastStarted': 'Last started {date}',
-  'routineList.lastStartedNever': 'Not started yet',
   'message.routine.exerciseCount.one': '{count} exercise',
   'message.routine.exerciseCount.other': '{count} exercises',
 

@@ -26,9 +26,7 @@ export class RrrRoutineList extends HTMLElement {
   private renderRoutineRow(summary: RoutineSummary): string {
     const exercisePreview = this.getExercisePreview(summary)
     const lastStarted = summary.lastStartedAt
-      ? t('routineList.lastStarted', {
-          date: formatShortDate(new Date(summary.lastStartedAt)),
-        })
+      ? formatShortDate(new Date(summary.lastStartedAt))
       : null
 
     return `
@@ -44,6 +42,7 @@ export class RrrRoutineList extends HTMLElement {
         ${lastStarted
     ? `
             <span slot="body" class="routine-row-body">
+              <rrr-icon name="timer"></rrr-icon>
               <span>${escapeHtml(lastStarted)}</span>
             </span>
           `
