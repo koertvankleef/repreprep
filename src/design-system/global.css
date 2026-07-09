@@ -196,16 +196,16 @@ a:active {
   display: block;
   min-inline-size: 0;
   margin: 0;
-  background: var(--rrr-card-background, var(--rrr-surface-raised));
-  border: var(--rrr-border-width) solid var(--rrr-card-border-color, var(--rrr-border-subtle));
-  border-radius: var(--rrr-card-border-radius, var(--rrr-radius-l));
+  background: var(--rrr-surface-raised);
+  border: var(--rrr-border-width) solid var(--rrr-border-subtle);
+  border-radius: var(--rrr-radius-l);
   overflow: hidden;
 }
 
 .rrr-card {
   display: grid;
-  gap: var(--rrr-card-gap, var(--rrr-spacing-s));
-  padding: var(--rrr-card-padding, var(--rrr-spacing-m));
+  gap: var(--rrr-spacing-s);
+  padding: var(--rrr-spacing-m);
 }
 
 :where(.rrr-list-card, rrr-list-card, .rrr-property-list) {
@@ -214,7 +214,7 @@ a:active {
 }
 
 :where(.rrr-list-card, rrr-list-card) > :not(:last-child) {
-  border-block-end: var(--rrr-border-width) solid var(--rrr-card-divider-color, var(--rrr-border-subtle));
+  border-block-end: var(--rrr-border-width) solid var(--rrr-border-subtle);
 }
 
 .sr-only {

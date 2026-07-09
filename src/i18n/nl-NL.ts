@@ -312,7 +312,6 @@ export const nlNlMessages = {
   'routineDetail.prefill.sheet.description': 'Kies welke voltooide workout de startwaarden voor je volgende workout levert.',
   'routineDetail.prefill.sheet.groupAria': 'Workout gebruikt voor startwaarden',
   'routineDetail.prefill.sheet.completedAt': 'Voltooid om {time}',
-  'routineDetail.exercises.empty': 'Er zijn nog geen oefeningen aan deze routine toegevoegd.',
   'routineDetail.exercises.unknown': 'Onbekende oefening',
   'routineDetail.muscles.label': 'Primaire spieren',
   'routineDetail.muscles.none': 'Niet beschikbaar',
@@ -361,7 +360,7 @@ export const nlNlMessages = {
 
   'routineEditor.status.default': 'Definieer een routinestructuur en sla die op als herbruikbare template. Veeg naar links op een oefening om die te verwijderen.',
   'routineEditor.autoName.comboPattern': '{nato} {geographic}',
-  'routineEditor.exercises.empty': 'Nog geen oefeningen toegevoegd.',
+  'routineEditor.exercises.empty': 'Voeg oefeningen toe.',
   'routineEditor.exercises.unknown': 'Onbekende oefening',
   'routineEditor.action.rename': 'Routine hernoemen',
   'routineEditor.action.create': 'Routine aanmaken',

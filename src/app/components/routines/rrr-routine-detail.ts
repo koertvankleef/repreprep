@@ -604,30 +604,32 @@ export class RrrRoutineDetail extends HTMLElement {
                 enabled: reorderEnabled,
               })
             : ''}
-          <div class="rrr-card routine-card" part="routine-card">
             ${
-              exerciseCount > 0
-                ? `
-                  <rrr-sequence
-                    ${reorderEnabled ? 'sortable' : ''}
-                    ${gutterMotionAttribute}
-                    aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}"
-                  >
-                    ${summary.version
-    ? renderRoutineFlowSequence(summary.version, {
-      resolveExerciseName: (exerciseId) => this.resolveExerciseName(exerciseId),
-      showExerciseDescription: !reorderEnabled,
-      exerciseInteractive: !reorderEnabled,
-      transitionInteractive: !reorderEnabled,
-      sortable: reorderEnabled,
-      swipeable: !reorderEnabled,
-    })
-    : ''}
-                  </rrr-sequence>
-                `
-                : `<p>${t('routineDetail.exercises.empty')}</p>`
-            }
-          </div>
+            exerciseCount > 0
+            ? `
+          <div class="rrr-card routine-card">
+            <rrr-sequence
+              ${reorderEnabled ? 'sortable' : ''}
+              ${gutterMotionAttribute}
+              aria-label="${escapeHtml(t('routineDetail.exercises.sequenceAria'))}"
+            >
+              ${summary.version
+              ? renderRoutineFlowSequence(summary.version, {
+                resolveExerciseName: (exerciseId) => this.resolveExerciseName(exerciseId),
+                showExerciseDescription: !reorderEnabled,
+                exerciseInteractive: !reorderEnabled,
+                transitionInteractive: !reorderEnabled,
+                sortable: reorderEnabled,
+                swipeable: !reorderEnabled,
+              })
+              : ''}
+            </rrr-sequence>
+          </div>`
+            : `
+          <div class="rrr-card">
+            <p>${t('routineEditor.exercises.empty')}</p>
+          </div>`
+          }
           ${renderRoutineFlowControls({
     addAction: 'add-routine-exercise',
     addDisabled: reorderEnabled,

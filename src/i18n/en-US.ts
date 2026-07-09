@@ -444,7 +444,6 @@ export const enUsMessages = {
   'routineDetail.prefill.sheet.description': 'Choose which completed workout supplies the starting values for your next workout.',
   'routineDetail.prefill.sheet.groupAria': 'Workout used for starting values',
   'routineDetail.prefill.sheet.completedAt': 'Finished at {time}',
-  'routineDetail.exercises.empty': 'No exercises have been added to this routine.',
   'routineDetail.exercises.unknown': 'Unknown exercise',
   'routineDetail.muscles.label': 'Primary muscles',
   'routineDetail.muscles.none': 'Not available',
@@ -495,7 +494,7 @@ export const enUsMessages = {
 
   'routineEditor.status.default': 'Define a routine structure, then save it as a reusable template. Swipe left on an exercise to delete it.',
   'routineEditor.autoName.comboPattern': '{nato} {geographic}',
-  'routineEditor.exercises.empty': 'No exercises added yet.',
+  'routineEditor.exercises.empty': 'Add exercises.',
   'routineEditor.exercises.unknown': 'Unknown exercise',
   'routineEditor.action.rename': 'Rename routine',
   'routineEditor.action.create': 'Create routine',

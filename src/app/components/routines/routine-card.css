@@ -1,3 +1,4 @@
 .rrr-card.routine-card {
   background-color: var(--rrr-border-subtle);
+  padding: var(--rrr-spacing-xs)
 }
