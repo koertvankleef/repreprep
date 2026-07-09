@@ -23,6 +23,7 @@ rrr-button {
   --_bg-hover: var(--rrr-color-primary-deep);
   --_fg: var(--rrr-color-contrast);
   --_interactive-fg: var(--rrr-button-fg);
+  --_interactive-bg-mix: var(--rrr-color-primary-mix);
 }
 
 rrr-button[size='s'] {
@@ -40,6 +41,7 @@ rrr-button[tone='neutral'] {
   --_bg-hover: var(--rrr-button-neutral-bg-hover, color-mix(in oklab, var(--rrr-color-text), var(--rrr-surface-base) 16%));
   --_fg: var(--rrr-button-neutral-fg-solid, var(--rrr-surface-base));
   --_interactive-fg: var(--rrr-button-neutral-fg, var(--rrr-color-text));
+  --_interactive-bg-mix: var(--rrr-color-neutral-mix);
 }
 
 rrr-button[tone='accent'] {
@@ -47,6 +49,7 @@ rrr-button[tone='accent'] {
   --_bg-hover: var(--rrr-color-accent-deep);
   --_fg: var(--rrr-color-contrast);
   --_interactive-fg: var(--rrr-button-fg-accent);
+  --_interactive-bg-mix: var(--rrr-color-accent-mix);
 }
 
 rrr-button[tone='info'] {
@@ -54,6 +57,7 @@ rrr-button[tone='info'] {
   --_bg-hover: var(--rrr-colors-context-info-70);
   --_fg: var(--rrr-color-contrast);
   --_interactive-fg: var(--rrr-button-fg-info);
+  --_interactive-bg-mix: var(--rrr-colors-context-info-mix);
 }
 
 rrr-button[tone='success'] {
@@ -61,6 +65,7 @@ rrr-button[tone='success'] {
   --_bg-hover: var(--rrr-colors-context-success-70);
   --_fg: var(--rrr-color-contrast);
   --_interactive-fg: var(--rrr-button-fg-success);
+  --_interactive-bg-mix: var(--rrr-colors-context-success-mix);
 }
 
 rrr-button[tone='warning'] {
@@ -68,6 +73,7 @@ rrr-button[tone='warning'] {
   --_bg-hover: var(--rrr-colors-context-warning-70);
   --_fg: var(--rrr-color-contrast);
   --_interactive-fg: var(--rrr-button-fg-warning);
+  --_interactive-bg-mix: var(--rrr-colors-context-warning-mix);
 }
 
 rrr-button[tone='danger'] {
@@ -75,6 +81,7 @@ rrr-button[tone='danger'] {
   --_bg-hover: var(--rrr-colors-context-danger-70);
   --_fg: var(--rrr-color-contrast);
   --_interactive-fg: var(--rrr-button-fg-danger);
+  --_interactive-bg-mix: var(--rrr-colors-context-danger-mix);
 }
 
 rrr-button > button[data-rrr-button-inner] {
@@ -137,7 +144,7 @@ rrr-button[variant='outline'] > button[data-rrr-button-inner] {
 
 rrr-button[variant='outline'] > button[data-rrr-button-inner]:hover:enabled,
 rrr-button[variant='outline'] > button[data-rrr-button-inner]:active:enabled {
-  background: color-mix(in oklab, var(--rrr-color-primary-mix), var(--rrr-surface-raised) 85%);
+  background: color-mix(in oklab, var(--_interactive-bg-mix), var(--rrr-surface-raised) 85%);
   color: var(--_interactive-fg);
   border-color: var(--_interactive-fg);
 }
@@ -151,52 +158,10 @@ rrr-button[variant='ghost'] > button[data-rrr-button-inner] {
 
 rrr-button[variant='ghost'] > button[data-rrr-button-inner]:hover:enabled,
 rrr-button[variant='ghost'] > button[data-rrr-button-inner]:active:enabled {
-  background: color-mix(in oklab, var(--rrr-color-primary-mix), var(--rrr-surface-raised) 85%);
+  background: color-mix(in oklab, var(--_interactive-bg-mix), var(--rrr-surface-raised) 85%);
   color: var(--_interactive-fg);
   border-color: transparent;
   box-shadow: none;
-}
-
-rrr-button[variant='outline'][tone='accent'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='outline'][tone='accent'] > button[data-rrr-button-inner]:active:enabled,
-rrr-button[variant='ghost'][tone='accent'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='ghost'][tone='accent'] > button[data-rrr-button-inner]:active:enabled {
-  background: color-mix(in oklab, var(--rrr-color-accent-mix), var(--rrr-surface-raised) 85%);
-}
-
-rrr-button[variant='outline'][tone='neutral'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='outline'][tone='neutral'] > button[data-rrr-button-inner]:active:enabled,
-rrr-button[variant='ghost'][tone='neutral'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='ghost'][tone='neutral'] > button[data-rrr-button-inner]:active:enabled {
-  background: color-mix(in oklab, var(--rrr-color-neutral-mix), var(--rrr-surface-raised) 85%);
-}
-
-rrr-button[variant='outline'][tone='info'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='outline'][tone='info'] > button[data-rrr-button-inner]:active:enabled,
-rrr-button[variant='ghost'][tone='info'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='ghost'][tone='info'] > button[data-rrr-button-inner]:active:enabled {
-  background: color-mix(in oklab, var(--rrr-colors-context-info-mix), var(--rrr-surface-raised) 85%);
-}
-
-rrr-button[variant='outline'][tone='success'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='outline'][tone='success'] > button[data-rrr-button-inner]:active:enabled,
-rrr-button[variant='ghost'][tone='success'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='ghost'][tone='success'] > button[data-rrr-button-inner]:active:enabled {
-  background: color-mix(in oklab, var(--rrr-colors-context-success-mix), var(--rrr-surface-raised) 85%);
-}
-
-rrr-button[variant='outline'][tone='warning'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='outline'][tone='warning'] > button[data-rrr-button-inner]:active:enabled,
-rrr-button[variant='ghost'][tone='warning'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='ghost'][tone='warning'] > button[data-rrr-button-inner]:active:enabled {
-  background: color-mix(in oklab, var(--rrr-colors-context-warning-mix), var(--rrr-surface-raised) 85%);
-}
-
-rrr-button[variant='outline'][tone='danger'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='outline'][tone='danger'] > button[data-rrr-button-inner]:active:enabled,
-rrr-button[variant='ghost'][tone='danger'] > button[data-rrr-button-inner]:hover:enabled,
-rrr-button[variant='ghost'][tone='danger'] > button[data-rrr-button-inner]:active:enabled {
-  background: color-mix(in oklab, var(--rrr-colors-context-danger-mix), var(--rrr-surface-raised) 85%);
 }
 
 rrr-button > button[data-rrr-button-inner]:disabled {
