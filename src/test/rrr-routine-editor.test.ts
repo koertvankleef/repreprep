@@ -62,7 +62,7 @@ describe('rrr-routine-editor creation', () => {
     await Promise.resolve()
 
     const emptyMentions = Array.from(editor.querySelectorAll('p'))
-      .filter((node) => node.textContent?.includes('No exercises added yet.'))
+      .filter((node) => node.textContent?.includes('Add exercises.'))
 
     expect(emptyMentions).toHaveLength(1)
     expect(editor.querySelector('.status-message')?.textContent)
