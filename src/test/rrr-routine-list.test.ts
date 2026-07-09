@@ -61,6 +61,6 @@ describe('rrr-routine-list', () => {
       : names
 
     expect(row?.getAttribute('description')).toBe(expectedDescription)
-    expect(row?.querySelector('[slot="body"]')?.textContent).toContain('Last started')
+    expect(row?.querySelector('[slot="body"]')?.innerHTML).toContain('rrr-icon name="timer"')
   })
 })
